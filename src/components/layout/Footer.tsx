@@ -159,7 +159,7 @@ export default function Footer() {
 
         if (!hasChildren && !isProductsDropdown) {
           return (
-            <div key={item.id}>
+            <div key={item.id} className="text-center">
               <Link
                 href={buildHref(item.url)}
                 className="text-cream/70 hover:text-white text-sm font-medium transition-colors duration-200"
@@ -173,8 +173,8 @@ export default function Footer() {
         const showCategories = isProductsDropdown && categories.length > 0;
 
         return (
-          <div key={item.id} className="col-span-1">
-            <div className="flex items-center gap-1">
+          <div key={item.id} className="text-center">
+            <div className="inline-flex items-center gap-1 justify-center">
               <Link
                 href={buildHref(item.url)}
                 className="text-cream/70 hover:text-white text-sm font-medium transition-colors duration-200"
@@ -201,7 +201,7 @@ export default function Footer() {
                 isExpanded ? 'max-h-96 opacity-100 mt-1.5' : 'max-h-0 opacity-0'
               }`}
             >
-              <div className="border-l border-cream/15 pl-3 ml-1 space-y-1">
+              <div className="space-y-1">
                 {item.children.map((child) => (
                   <Link
                     key={child.id}
@@ -214,7 +214,7 @@ export default function Footer() {
                 {showCategories && (
                   <>
                     {hasChildren && (
-                      <div className="border-t border-cream/10 my-1.5" />
+                      <div className="border-t border-cream/10 my-1.5 w-12 mx-auto" />
                     )}
                     {categories.map((cat) => (
                       <Link
@@ -238,7 +238,7 @@ export default function Footer() {
     return fallbackNavItems.map((item) => {
       if (item.type === 'link') {
         return (
-          <div key={item.key}>
+          <div key={item.key} className="text-center">
             <Link
               href={buildHref(item.href)}
               className="text-cream/70 hover:text-white text-sm font-medium transition-colors duration-200"
@@ -255,8 +255,8 @@ export default function Footer() {
       const showCategories = isProductsDropdown && categories.length > 0;
 
       return (
-        <div key={item.key} className="col-span-1">
-          <div className="flex items-center gap-1">
+        <div key={item.key} className="text-center">
+          <div className="inline-flex items-center gap-1 justify-center">
             <Link
               href={buildHref(item.href)}
               className="text-cream/70 hover:text-white text-sm font-medium transition-colors duration-200"
@@ -281,7 +281,7 @@ export default function Footer() {
               isExpanded ? 'max-h-96 opacity-100 mt-1.5' : 'max-h-0 opacity-0'
             }`}
           >
-            <div className="border-l border-cream/15 pl-3 ml-1 space-y-1">
+            <div className="space-y-1">
               {item.children.map((child) => (
                 <Link
                   key={child.key}
@@ -293,7 +293,7 @@ export default function Footer() {
               ))}
               {showCategories && (
                 <>
-                  <div className="border-t border-cream/10 my-1.5" />
+                  <div className="border-t border-cream/10 my-1.5 w-12 mx-auto" />
                   {categories.map((cat) => (
                     <Link
                       key={cat.id}
@@ -314,137 +314,135 @@ export default function Footer() {
 
   return (
     <footer className="bg-navy text-cream/90">
-      <div className="max-w-7xl mx-auto px-6 py-14">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          {/* Left Column - Brand & Contact */}
-          <div className="lg:col-span-5">
-            {/* Brand */}
-            <div className="flex items-center gap-3 mb-4">
-              <Image
-                src="/images/logo.png"
-                alt="Mahkota Taiwan"
-                width={48}
-                height={48}
-                className="w-12 h-12 brightness-0 invert"
-              />
-              <h3 className="text-xl font-heading font-bold text-white">
-                Mahkota Taiwan
-              </h3>
-            </div>
-
-            {/* Description */}
-            <p className="text-cream/60 text-sm leading-relaxed max-w-sm mb-5">
-              {t('description')}
-            </p>
-
-            {/* Addresses */}
-            <div className="grid grid-cols-1 gap-3 mb-4">
-              {/* Office */}
-              <a
-                href="https://www.google.com/maps/search/No.+83,+Liyuan+2nd+Street,+Linkou+District,+New+Taipei+City"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-start gap-2.5 group"
-              >
-                <MapPin className="w-4 h-4 text-red mt-0.5 flex-shrink-0" />
-                <div>
-                  <span className="text-cream/80 text-xs font-semibold uppercase tracking-wider block mb-0.5">
-                    {t('office')}
-                  </span>
-                  <span className="text-cream/55 text-sm leading-snug group-hover:text-cream/80 transition-colors">
-                    {officeAddress}
-                  </span>
-                </div>
-              </a>
-
-              {/* Warehouse */}
-              <a
-                href="https://www.google.com/maps/search/No.+53,+Lane+216,+Nanshi+4th+Street,+Linkou+District,+New+Taipei+City"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-start gap-2.5 group"
-              >
-                <MapPin className="w-4 h-4 text-red mt-0.5 flex-shrink-0" />
-                <div>
-                  <span className="text-cream/80 text-xs font-semibold uppercase tracking-wider block mb-0.5">
-                    {t('warehouse')}
-                  </span>
-                  <span className="text-cream/55 text-sm leading-snug group-hover:text-cream/80 transition-colors">
-                    {warehouseAddress}
-                  </span>
-                </div>
-              </a>
-            </div>
-
-            {/* Phone + Email */}
-            <div className="flex gap-6 mb-5">
-              <a
-                href={`tel:${phone}`}
-                className="flex items-center gap-2 text-cream/60 hover:text-white text-sm transition-colors"
-              >
-                <Phone className="w-3.5 h-3.5" />
-                <span>{phone}</span>
-              </a>
-              <a
-                href={`mailto:${email}`}
-                className="flex items-center gap-2 text-cream/60 hover:text-white text-sm transition-colors"
-              >
-                <Mail className="w-3.5 h-3.5" />
-                <span>{email}</span>
-              </a>
-            </div>
-
-            {/* Social Icons */}
-            <div className="flex gap-2.5">
-              <a
-                href={facebookUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-cream/10 flex items-center justify-center text-cream/70 hover:bg-red hover:text-white transition-all duration-200"
-                aria-label="Facebook"
-              >
-                <Facebook className="w-4 h-4" />
-              </a>
-              <a
-                href={instagramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-cream/10 flex items-center justify-center text-cream/70 hover:bg-red hover:text-white transition-all duration-200"
-                aria-label="Instagram"
-              >
-                <Instagram className="w-4 h-4" />
-              </a>
-              <a
-                href={tiktokUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-cream/10 flex items-center justify-center text-cream/70 hover:bg-red hover:text-white transition-all duration-200"
-                aria-label="TikTok"
-              >
-                <Music2 className="w-4 h-4" />
-              </a>
-            </div>
+      <div className="max-w-5xl mx-auto px-6 py-14">
+        {/* Logo + Brand - Centered */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <Image
+              src="/images/logo.png"
+              alt="Mahkota Taiwan"
+              width={48}
+              height={48}
+              className="w-12 h-12 brightness-0 invert"
+            />
+            <h3 className="text-xl font-heading font-bold text-white">
+              Mahkota Taiwan
+            </h3>
           </div>
 
-          {/* Right Column - Quick Links */}
-          <div className="lg:col-span-7">
-            <h4 className="text-white font-heading font-semibold text-base mb-5 uppercase tracking-wider">
-              {t('quickLinks')}
-            </h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-1">
-              {renderNavItems()}
+          {/* Description - Centered */}
+          <p className="text-cream/60 text-sm leading-relaxed max-w-md text-center">
+            {t('description')}
+          </p>
+        </div>
+
+        {/* Nav links grid - Centered */}
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-x-6 gap-y-2 max-w-3xl mx-auto mb-8">
+          {renderNavItems()}
+        </div>
+
+        {/* Contact info - Centered compact row */}
+        <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 mb-8">
+          {/* Office */}
+          <a
+            href="https://www.google.com/maps/search/No.+83,+Liyuan+2nd+Street,+Linkou+District,+New+Taipei+City"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-start gap-2 group max-w-xs text-center md:text-left"
+          >
+            <MapPin className="w-3.5 h-3.5 text-red mt-0.5 flex-shrink-0" />
+            <div>
+              <span className="text-cream/80 text-[10px] font-semibold uppercase tracking-wider block mb-0.5">
+                {t('office')}
+              </span>
+              <span className="text-cream/55 text-xs leading-snug group-hover:text-cream/80 transition-colors">
+                {officeAddress}
+              </span>
             </div>
+          </a>
+
+          {/* Divider */}
+          <div className="hidden md:block w-px h-8 bg-cream/15" />
+
+          {/* Warehouse */}
+          <a
+            href="https://www.google.com/maps/search/No.+53,+Lane+216,+Nanshi+4th+Street,+Linkou+District,+New+Taipei+City"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-start gap-2 group max-w-xs text-center md:text-left"
+          >
+            <MapPin className="w-3.5 h-3.5 text-red mt-0.5 flex-shrink-0" />
+            <div>
+              <span className="text-cream/80 text-[10px] font-semibold uppercase tracking-wider block mb-0.5">
+                {t('warehouse')}
+              </span>
+              <span className="text-cream/55 text-xs leading-snug group-hover:text-cream/80 transition-colors">
+                {warehouseAddress}
+              </span>
+            </div>
+          </a>
+
+          {/* Divider */}
+          <div className="hidden md:block w-px h-8 bg-cream/15" />
+
+          {/* Phone + Email stacked */}
+          <div className="flex flex-col gap-1.5 items-center md:items-start">
+            <a
+              href={`tel:${phone}`}
+              className="flex items-center gap-1.5 text-cream/60 hover:text-white text-xs transition-colors"
+            >
+              <Phone className="w-3 h-3" />
+              <span>{phone}</span>
+            </a>
+            <a
+              href={`mailto:${email}`}
+              className="flex items-center gap-1.5 text-cream/60 hover:text-white text-xs transition-colors"
+            >
+              <Mail className="w-3 h-3" />
+              <span>{email}</span>
+            </a>
           </div>
+        </div>
+
+        {/* Social Icons - Centered */}
+        <div className="flex justify-center gap-3 mb-6">
+          <a
+            href={facebookUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-9 h-9 rounded-full bg-cream/10 flex items-center justify-center text-cream/70 hover:bg-red hover:text-white transition-all duration-200"
+            aria-label="Facebook"
+          >
+            <Facebook className="w-4 h-4" />
+          </a>
+          <a
+            href={instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-9 h-9 rounded-full bg-cream/10 flex items-center justify-center text-cream/70 hover:bg-red hover:text-white transition-all duration-200"
+            aria-label="Instagram"
+          >
+            <Instagram className="w-4 h-4" />
+          </a>
+          <a
+            href={tiktokUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-9 h-9 rounded-full bg-cream/10 flex items-center justify-center text-cream/70 hover:bg-red hover:text-white transition-all duration-200"
+            aria-label="TikTok"
+          >
+            <Music2 className="w-4 h-4" />
+          </a>
         </div>
       </div>
 
       {/* Bottom Bar */}
       <div className="border-t border-cream/10">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-cream/40 text-xs">
+        <div className="max-w-5xl mx-auto px-6 py-5 flex flex-col items-center gap-1.5">
+          <p className="text-cream/40 text-xs text-center">
             &copy; {new Date().getFullYear()} Mahkota Taiwan. {t('allRightsReserved')}
           </p>
-          <p className="text-cream/30 text-xs">
+          <p className="text-cream/30 text-xs text-center">
             {t('tagline')}
           </p>
         </div>
