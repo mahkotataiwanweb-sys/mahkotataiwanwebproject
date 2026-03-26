@@ -6,14 +6,29 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Facebook, Instagram, Music2, Phone, MapPin } from 'lucide-react';
 
-const quickLinks = [
-  { key: 'home', href: '' },
-  { key: 'about', href: '/about' },
-  { key: 'products', href: '/products' },
-  { key: 'recipes', href: '/recipes' },
-  { key: 'events', href: '/events' },
-  { key: 'lifestyle', href: '/lifestyle' },
-  { key: 'contact', href: '/contact' },
+const footerSections = [
+  {
+    titleKey: 'products',
+    links: [
+      { key: 'allProducts', href: '/products' },
+      { key: 'recipes', href: '/recipes' },
+    ],
+  },
+  {
+    titleKey: 'moments',
+    links: [
+      { key: 'events', href: '/events' },
+      { key: 'lifestyle', href: '/lifestyle' },
+    ],
+  },
+  {
+    titleKey: 'company',
+    links: [
+      { key: 'about', href: '/about' },
+      { key: 'contact', href: '/contact' },
+      { key: 'whereToBuy', href: '/where-to-buy' },
+    ],
+  },
 ];
 
 export default function Footer() {
@@ -24,9 +39,9 @@ export default function Footer() {
     <footer className="bg-navy text-cream/90">
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand Column */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-4">
               <Image src="/images/logo.png" alt="Mahkota Taiwan" width={40} height={40} className="brightness-0 invert" />
               <span className="font-heading text-xl font-bold text-white">Mahkota Taiwan</span>
@@ -50,52 +65,42 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="font-heading text-white font-semibold mb-4 text-lg">{t('quickLinks')}</h4>
-            <ul className="space-y-3">
-              {quickLinks.map((link) => (
-                <li key={link.key}>
-                  <Link
-                    href={`/${locale}${link.href}`}
-                    className="text-cream/60 hover:text-white text-sm transition-colors line-reveal inline-block"
-                  >
-                    {t(`links.${link.key}`)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Link Sections */}
+          {footerSections.map((section) => (
+            <div key={section.titleKey}>
+              <h4 className="font-heading text-white font-semibold mb-4 text-lg">
+                {t(`sections.${section.titleKey}`)}
+              </h4>
+              <ul className="space-y-3">
+                {section.links.map((link) => (
+                  <li key={link.key}>
+                    <Link
+                      href={`/${locale}${link.href}`}
+                      className="text-cream/60 hover:text-white text-sm transition-colors line-reveal inline-block"
+                    >
+                      {t(`links.${link.key}`)}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
 
-          {/* Contact */}
-          <div>
-            <h4 className="font-heading text-white font-semibold mb-4 text-lg">{t('contactUs')}</h4>
-            <ul className="space-y-3">
-              <li className="flex gap-3 text-sm text-cream/60">
-                <Phone className="w-4 h-4 mt-0.5 text-red shrink-0" />
-                <span>0226099118</span>
-              </li>
-              <li className="flex gap-3 text-sm text-cream/60">
-                <MapPin className="w-4 h-4 mt-0.5 text-red shrink-0" />
-                <span>No. 53, Lane 216, Nanshi 4th Street, Linkou District, New Taipei City</span>
-              </li>
-              <li className="flex gap-3 text-sm text-cream/60">
-                <MapPin className="w-4 h-4 mt-0.5 text-red shrink-0" />
-                <span>No. 83, Liyuan 2nd Street, Linkou District, New Taipei City</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Certifications */}
-          <div>
-            <h4 className="font-heading text-white font-semibold mb-4 text-lg">{t('certifications')}</h4>
-            <div className="flex gap-4">
-              {['HALAL', 'ISO', 'SGS'].map((cert) => (
-                <div key={cert}
-                  className="w-16 h-16 rounded-lg bg-cream/10 flex items-center justify-center text-xs font-bold text-cream/80 border border-cream/10">
-                  {cert}
-                </div>
-              ))}
+        {/* Contact Row */}
+        <div className="mt-12 pt-8 border-t border-cream/10">
+          <div className="flex flex-wrap gap-8 justify-center text-sm text-cream/60">
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-red shrink-0" />
+              <span>0226099118</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-red shrink-0" />
+              <span>No. 53, Lane 216, Nanshi 4th Street, Linkou District, New Taipei City</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-red shrink-0" />
+              <span>No. 83, Liyuan 2nd Street, Linkou District, New Taipei City</span>
             </div>
           </div>
         </div>

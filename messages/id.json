@@ -7,7 +7,9 @@
     "events": "Acara",
     "lifestyle": "Gaya Hidup",
     "contact": "Kontak",
-    "language": "Bahasa"
+    "language": "Bahasa",
+    "moments": "Momen",
+    "allProducts": "Semua Produk"
   },
   "hero": {
     "tagline": "Rasa Indonesia, Hadir di Taiwan",
@@ -94,13 +96,20 @@
       "home": "Beranda",
       "about": "Tentang Kami",
       "products": "Produk",
+      "allProducts": "Semua Produk",
       "recipes": "Resep",
       "events": "Acara",
       "lifestyle": "Gaya Hidup",
-      "contact": "Kontak"
+      "contact": "Kontak",
+      "whereToBuy": "Tempat Membeli"
     },
     "contactUs": "Hubungi Kami",
-    "certifications": "Sertifikasi"
+    "certifications": "Sertifikasi",
+    "sections": {
+      "products": "Produk",
+      "moments": "Momen",
+      "company": "Perusahaan"
+    }
   },
   "admin": {
     "dashboard": "Dasbor",
