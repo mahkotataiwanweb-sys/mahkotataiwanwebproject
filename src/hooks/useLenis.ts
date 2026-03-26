@@ -26,7 +26,7 @@ export function useLenis() {
 
     return () => {
       lenis.destroy();
-      gsap.ticker.remove(lenis.raf as any);
+      gsap.ticker.remove(lenis.raf);
     };
   }, []);
 }
