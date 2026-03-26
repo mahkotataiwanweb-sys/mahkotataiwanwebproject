@@ -44,19 +44,21 @@ export default function HomePage() {
   const locale = useLocale();
   const sectionRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       if (headerRef.current) {
         gsap.fromTo(
           headerRef.current.children,
-          { opacity: 0, y: 40 },
+          { opacity: 0, y: 50, filter: 'blur(4px)' },
           {
             opacity: 1,
             y: 0,
-            duration: 0.8,
-            stagger: 0.15,
-            ease: 'power3.out',
+            filter: 'blur(0px)',
+            duration: 1,
+            stagger: 0.12,
+            ease: 'power4.out',
             scrollTrigger: {
               trigger: headerRef.current,
               start: 'top 85%',
@@ -65,6 +67,27 @@ export default function HomePage() {
           }
         );
       }
+
+      // Card animations with scale-in
+      cardRefs.current.forEach((card, i) => {
+        if (!card) return;
+        gsap.fromTo(card,
+          { opacity: 0, y: 60, scale: 0.92 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.8,
+            delay: i * 0.12,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 70%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      });
     }, sectionRef);
     return () => ctx.revert();
   }, []);
@@ -100,15 +123,12 @@ export default function HomePage() {
             {discoverCards.map((card, index) => {
               const Icon = card.icon;
               return (
-                <motion.div
+                <div
                   key={card.key}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  ref={el => { cardRefs.current[index] = el; }}
                 >
                   <Link href={`/${locale}${card.href}`} className="group block h-full">
-                    <div className="bg-white rounded-2xl overflow-hidden hover-lift premium-shadow h-full flex flex-col">
+                    <div className="bg-white rounded-2xl overflow-hidden hover-lift premium-shadow h-full flex flex-col transition-shadow duration-500 hover:shadow-2xl">
                       {/* Icon Area */}
                       <div className={`bg-gradient-to-br ${card.gradient} p-8 flex items-center justify-center`}>
                         <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
@@ -130,7 +150,7 @@ export default function HomePage() {
                       </div>
                     </div>
                   </Link>
-                </motion.div>
+                </div>
               );
             })}
           </div>

@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
+import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Sparkles } from 'lucide-react';
@@ -19,6 +19,8 @@ export default function MomentsSection() {
   const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     async function fetchLifestyle() {
@@ -49,13 +51,14 @@ export default function MomentsSection() {
       if (headerRef.current) {
         gsap.fromTo(
           headerRef.current.children,
-          { opacity: 0, y: 40 },
+          { opacity: 0, y: 50, filter: 'blur(4px)' },
           {
             opacity: 1,
             y: 0,
-            duration: 0.8,
-            stagger: 0.15,
-            ease: 'power3.out',
+            filter: 'blur(0px)',
+            duration: 1,
+            stagger: 0.12,
+            ease: 'power4.out',
             scrollTrigger: {
               trigger: headerRef.current,
               start: 'top 85%',
@@ -67,6 +70,34 @@ export default function MomentsSection() {
     }, sectionRef);
     return () => ctx.revert();
   }, []);
+
+  // GSAP staggered card animations
+  useEffect(() => {
+    if (loading || articles.length === 0) return;
+
+    const ctx = gsap.context(() => {
+      cardRefs.current.forEach((card, i) => {
+        if (!card) return;
+        gsap.fromTo(card,
+          { opacity: 0, y: 60, scale: 0.95 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.8,
+            delay: i * 0.1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: gridRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      });
+    }, sectionRef);
+    return () => ctx.revert();
+  }, [loading, articles.length]);
 
   // Don't render section if no lifestyle articles
   if (!loading && articles.length === 0) {
@@ -115,58 +146,57 @@ export default function MomentsSection() {
 
         {/* Masonry-style Grid */}
         {!loading && articles.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          <div ref={gridRef} className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             {articles.map((article, index) => {
               // First item is large
               const isLarge = index === 0;
               return (
-                <motion.div
+                <div
                   key={article.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  ref={el => { cardRefs.current[index] = el; }}
                   className={`group cursor-pointer ${
                     isLarge ? 'col-span-2 row-span-2' : ''
                   }`}
                 >
-                  <div className="relative w-full h-full overflow-hidden rounded-2xl bg-gradient-to-br from-cream to-cream-dark">
-                    <div className={`relative ${isLarge ? 'aspect-square md:aspect-[4/3]' : 'aspect-square'}`}>
-                      {article.image_url ? (
-                        <Image
-                          src={article.image_url}
-                          alt={getLocalizedField(article, 'title', locale)}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-700"
-                          sizes={isLarge ? '(max-width: 768px) 100vw, 66vw' : '(max-width: 768px) 50vw, 33vw'}
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-navy/80 to-red/60">
-                          <Sparkles className="w-12 h-12 text-white/30" />
-                        </div>
-                      )}
-
-                      {/* Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
-
-                      {/* Text overlay */}
-                      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
-                        <h3
-                          className={`font-heading font-bold text-white drop-shadow-lg line-clamp-2 ${
-                            isLarge ? 'text-xl md:text-2xl' : 'text-sm md:text-base'
-                          }`}
-                        >
-                          {getLocalizedField(article, 'title', locale)}
-                        </h3>
-                        {isLarge && (
-                          <p className="text-white/70 text-sm mt-2 line-clamp-2 hidden md:block">
-                            {getLocalizedField(article, 'excerpt', locale)}
-                          </p>
+                  <Link href={`/${locale}/articles/${article.slug}`}>
+                    <div className="relative w-full h-full overflow-hidden rounded-2xl bg-gradient-to-br from-cream to-cream-dark transition-all duration-500 hover:shadow-2xl hover:shadow-navy/10">
+                      <div className={`relative ${isLarge ? 'aspect-square md:aspect-[4/3]' : 'aspect-square'}`}>
+                        {article.image_url ? (
+                          <Image
+                            src={article.image_url}
+                            alt={getLocalizedField(article, 'title', locale)}
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                            sizes={isLarge ? '(max-width: 768px) 100vw, 66vw' : '(max-width: 768px) 50vw, 33vw'}
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-navy/80 to-red/60">
+                            <Sparkles className="w-12 h-12 text-white/30" />
+                          </div>
                         )}
+
+                        {/* Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+
+                        {/* Text overlay */}
+                        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 transform group-hover:translate-y-0 transition-transform duration-500">
+                          <h3
+                            className={`font-heading font-bold text-white drop-shadow-lg line-clamp-2 ${
+                              isLarge ? 'text-xl md:text-2xl' : 'text-sm md:text-base'
+                            }`}
+                          >
+                            {getLocalizedField(article, 'title', locale)}
+                          </h3>
+                          {isLarge && (
+                            <p className="text-white/70 text-sm mt-2 line-clamp-2 hidden md:block">
+                              {getLocalizedField(article, 'excerpt', locale)}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
+                  </Link>
+                </div>
               );
             })}
           </div>

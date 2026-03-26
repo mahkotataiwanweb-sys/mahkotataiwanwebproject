@@ -37,6 +37,11 @@ export default function MarqueeSection() {
 
   return (
     <section className="py-6 bg-navy overflow-hidden relative">
+      {/* Gradient overlay at left edge */}
+      <div className="absolute top-0 left-0 w-24 h-full bg-gradient-to-r from-navy to-transparent z-10 pointer-events-none" />
+      {/* Gradient overlay at right edge */}
+      <div className="absolute top-0 right-0 w-24 h-full bg-gradient-to-l from-navy to-transparent z-10 pointer-events-none" />
+
       <div ref={marqueeRef} className="flex whitespace-nowrap">
         {[...marqueeItems, ...marqueeItems].map((item, i) => (
           <div key={i} className="flex items-center gap-6 mx-6">

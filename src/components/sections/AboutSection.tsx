@@ -20,29 +20,80 @@ export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
+  const decorRef = useRef<HTMLDivElement>(null);
   const counterRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      if (textRef.current) {
-        gsap.fromTo(textRef.current.children,
-          { opacity: 0, y: 40 },
+      // Parallax-like effect on decorative background
+      if (decorRef.current) {
+        gsap.fromTo(decorRef.current,
+          { xPercent: 10, skewX: -12 },
           {
-            opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: 'power3.out',
-            scrollTrigger: { trigger: textRef.current, start: 'top 80%', toggleActions: 'play none none reverse' }
+            xPercent: -5,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 1,
+            }
           }
         );
       }
 
+      // Smoother stagger on text elements
+      if (textRef.current) {
+        gsap.fromTo(textRef.current.children,
+          { opacity: 0, y: 50, filter: 'blur(4px)' },
+          {
+            opacity: 1, y: 0, filter: 'blur(0px)',
+            duration: 1,
+            stagger: 0.12,
+            ease: 'power4.out',
+            scrollTrigger: {
+              trigger: textRef.current,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            }
+          }
+        );
+      }
+
+      // Scale-in for stat cards
+      cardRefs.current.forEach((card, i) => {
+        if (!card) return;
+        gsap.fromTo(card,
+          { opacity: 0, scale: 0.8, y: 30 },
+          {
+            opacity: 1, scale: 1, y: 0,
+            duration: 0.7,
+            delay: i * 0.1,
+            ease: 'back.out(1.7)',
+            scrollTrigger: {
+              trigger: statsRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            }
+          }
+        );
+      });
+
+      // Counter animation with smooth ease
       counterRefs.current.forEach((el, i) => {
         if (!el) return;
         const target = stats[i].value;
         const obj = { val: 0 };
         gsap.to(obj, {
           val: target,
-          duration: 2,
-          ease: 'power2.out',
-          scrollTrigger: { trigger: statsRef.current, start: 'top 85%', toggleActions: 'play none none reverse' },
+          duration: 2.5,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: statsRef.current,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
           onUpdate: () => {
             if (el) el.textContent = Math.round(obj.val).toString();
           }
@@ -55,8 +106,8 @@ export default function AboutSection() {
 
   return (
     <section id="about" ref={sectionRef} className="py-20 sm:py-24 bg-cream relative overflow-hidden">
-      {/* Decorative */}
-      <div className="absolute top-0 right-0 w-1/3 h-full bg-navy/[0.02] -skew-x-12 translate-x-1/4" />
+      {/* Decorative with parallax */}
+      <div ref={decorRef} className="absolute top-0 right-0 w-1/3 h-full bg-navy/[0.02] -skew-x-12 translate-x-1/4" />
       
       <div className="max-w-4xl mx-auto px-6">
         {/* Text Content - Centered */}
@@ -86,8 +137,12 @@ export default function AboutSection() {
           {stats.map((stat, i) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.key} className="text-center group">
-                <div className="w-14 h-14 rounded-2xl bg-red/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-red/20 transition-colors duration-500">
+              <div
+                key={stat.key}
+                ref={el => { cardRefs.current[i] = el; }}
+                className="text-center group"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-red/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-red/20 group-hover:scale-110 transition-all duration-500">
                   <Icon className="w-6 h-6 text-red" />
                 </div>
                 <div className="text-3xl sm:text-4xl font-heading font-bold text-navy mb-1">

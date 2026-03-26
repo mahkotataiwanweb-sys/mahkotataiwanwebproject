@@ -67,7 +67,9 @@
       "phone": "Phone",
       "email": "Email",
       "hours": "Business Hours",
-      "hoursValue": "Mon - Sat: 9:00 AM - 6:00 PM"
+      "hoursValue": "Mon - Sat: 9:00 AM - 6:00 PM",
+      "emailValue": "mahkotataiwan@gmail.com",
+      "phoneValue": "+886-XXX-XXX-XXX"
     },
     "success": "Your message has been sent successfully!",
     "error": "Failed to send message. Please try again.",
@@ -147,5 +149,10 @@
     "close": "Close",
     "readMore": "Read More",
     "showLess": "Show Less"
+  },
+  "whereToBuy": {
+    "title": "Where to Buy",
+    "subtitle": "Find Mahkota Taiwan products at these trusted retail partners across Taiwan.",
+    "findUs": "Find Us"
   }
 }

@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChefHat, ArrowRight, Clock } from 'lucide-react';
+import { ChefHat, ArrowRight } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
@@ -20,6 +19,8 @@ export default function RecipesSection() {
   const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     async function fetchRecipes() {
@@ -50,13 +51,14 @@ export default function RecipesSection() {
       if (headerRef.current) {
         gsap.fromTo(
           headerRef.current.children,
-          { opacity: 0, y: 40 },
+          { opacity: 0, y: 50, filter: 'blur(4px)' },
           {
             opacity: 1,
             y: 0,
-            duration: 0.8,
-            stagger: 0.15,
-            ease: 'power3.out',
+            filter: 'blur(0px)',
+            duration: 1,
+            stagger: 0.12,
+            ease: 'power4.out',
             scrollTrigger: {
               trigger: headerRef.current,
               start: 'top 85%',
@@ -68,6 +70,34 @@ export default function RecipesSection() {
     }, sectionRef);
     return () => ctx.revert();
   }, []);
+
+  // GSAP scroll-triggered card animations
+  useEffect(() => {
+    if (loading || recipes.length === 0) return;
+
+    const ctx = gsap.context(() => {
+      cardRefs.current.forEach((card, i) => {
+        if (!card) return;
+        gsap.fromTo(card,
+          { opacity: 0, y: 60, scale: 0.95 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.8,
+            delay: i * 0.12,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: gridRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      });
+    }, sectionRef);
+    return () => ctx.revert();
+  }, [loading, recipes.length]);
 
   return (
     <section
@@ -123,52 +153,51 @@ export default function RecipesSection() {
             <p className="text-navy/30 text-sm mt-1">Check back later for delicious recipe ideas.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {recipes.map((recipe, index) => (
-              <motion.div
+              <div
                 key={recipe.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
+                ref={el => { cardRefs.current[index] = el; }}
                 className="group"
               >
-                <div className="bg-white rounded-2xl overflow-hidden hover-lift premium-shadow">
-                  {/* Image */}
-                  <div className="aspect-[4/3] relative overflow-hidden bg-gradient-to-br from-cream to-cream-dark">
-                    {recipe.image_url ? (
-                      <Image
-                        src={recipe.image_url}
-                        alt={getLocalizedField(recipe, 'title', locale)}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <ChefHat className="w-12 h-12 text-navy/15" />
-                      </div>
-                    )}
-                    {/* Overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-xs font-semibold text-red uppercase tracking-wider bg-red/10 px-3 py-1 rounded-full">
-                        Recipe
-                      </span>
+                <Link href={`/${locale}/articles/${recipe.slug}`}>
+                  <div className="bg-white rounded-2xl overflow-hidden hover-lift premium-shadow transition-shadow duration-500 hover:shadow-2xl">
+                    {/* Image */}
+                    <div className="aspect-[4/3] relative overflow-hidden bg-gradient-to-br from-cream to-cream-dark">
+                      {recipe.image_url ? (
+                        <Image
+                          src={recipe.image_url}
+                          alt={getLocalizedField(recipe, 'title', locale)}
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <ChefHat className="w-12 h-12 text-navy/15" />
+                        </div>
+                      )}
+                      {/* Overlay on hover */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     </div>
-                    <h3 className="font-heading text-xl font-bold text-navy mb-2 group-hover:text-red transition-colors duration-300 line-clamp-2">
-                      {getLocalizedField(recipe, 'title', locale)}
-                    </h3>
-                    <p className="text-navy/50 text-sm leading-relaxed line-clamp-2">
-                      {getLocalizedField(recipe, 'excerpt', locale)}
-                    </p>
+
+                    {/* Content */}
+                    <div className="p-6">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-xs font-semibold text-red uppercase tracking-wider bg-red/10 px-3 py-1 rounded-full">
+                          Recipe
+                        </span>
+                      </div>
+                      <h3 className="font-heading text-xl font-bold text-navy mb-2 group-hover:text-red transition-colors duration-300 line-clamp-2">
+                        {getLocalizedField(recipe, 'title', locale)}
+                      </h3>
+                      <p className="text-navy/50 text-sm leading-relaxed line-clamp-2">
+                        {getLocalizedField(recipe, 'excerpt', locale)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
+                </Link>
+              </div>
             ))}
           </div>
         )}

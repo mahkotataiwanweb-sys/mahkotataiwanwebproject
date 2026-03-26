@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -21,6 +20,7 @@ export default function EventsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     async function fetchEvents() {
@@ -45,19 +45,20 @@ export default function EventsSection() {
     fetchEvents();
   }, []);
 
-  // GSAP header animation
+  // GSAP header animation - premium
   useEffect(() => {
     const ctx = gsap.context(() => {
       if (headerRef.current) {
         gsap.fromTo(
           headerRef.current.children,
-          { opacity: 0, y: 40 },
+          { opacity: 0, y: 50, filter: 'blur(4px)' },
           {
             opacity: 1,
             y: 0,
-            duration: 0.8,
-            stagger: 0.15,
-            ease: 'power3.out',
+            filter: 'blur(0px)',
+            duration: 1,
+            stagger: 0.12,
+            ease: 'power4.out',
             scrollTrigger: {
               trigger: headerRef.current,
               start: 'top 85%',
@@ -69,6 +70,34 @@ export default function EventsSection() {
     }, sectionRef);
     return () => ctx.revert();
   }, []);
+
+  // GSAP card enter animations
+  useEffect(() => {
+    if (loading || events.length === 0) return;
+
+    const ctx = gsap.context(() => {
+      cardRefs.current.forEach((card, i) => {
+        if (!card) return;
+        gsap.fromTo(card,
+          { opacity: 0, x: 40, scale: 0.95 },
+          {
+            opacity: 1,
+            x: 0,
+            scale: 1,
+            duration: 0.7,
+            delay: i * 0.08,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: scrollContainerRef.current || sectionRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      });
+    }, sectionRef);
+    return () => ctx.revert();
+  }, [loading, events.length]);
 
   const scrollLeft = () => {
     scrollContainerRef.current?.scrollBy({ left: -360, behavior: 'smooth' });
@@ -171,50 +200,49 @@ export default function EventsSection() {
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {events.map((event, index) => (
-                <motion.div
+                <div
                   key={event.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  ref={el => { cardRefs.current[index] = el; }}
                   className="flex-shrink-0 w-80 group"
                 >
-                  <div className="rounded-2xl overflow-hidden bg-navy-light/50 border border-cream/10 hover:border-red/30 transition-all duration-500">
-                    {/* Image */}
-                    <div className="aspect-[16/10] relative overflow-hidden bg-gradient-to-br from-navy-light to-navy-dark">
-                      {event.image_url ? (
-                        <Image
-                          src={event.image_url}
-                          alt={getLocalizedField(event, 'title', locale)}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                          sizes="320px"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Calendar className="w-12 h-12 text-cream/15" />
+                  <Link href={`/${locale}/articles/${event.slug}`}>
+                    <div className="rounded-2xl overflow-hidden bg-navy-light/50 border border-cream/10 hover:border-red/30 transition-all duration-500 hover:shadow-lg hover:shadow-red/5">
+                      {/* Image */}
+                      <div className="aspect-[16/10] relative overflow-hidden bg-gradient-to-br from-navy-light to-navy-dark">
+                        {event.image_url ? (
+                          <Image
+                            src={event.image_url}
+                            alt={getLocalizedField(event, 'title', locale)}
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                            sizes="320px"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Calendar className="w-12 h-12 text-cream/15" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-transparent to-transparent" />
+                        {/* Date badge */}
+                        <div className="absolute bottom-4 left-4 bg-red px-3 py-1.5 rounded-lg">
+                          <span className="text-white text-xs font-semibold">
+                            {formatDate(event.published_at)}
+                          </span>
                         </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-transparent to-transparent" />
-                      {/* Date badge */}
-                      <div className="absolute bottom-4 left-4 bg-red px-3 py-1.5 rounded-lg">
-                        <span className="text-white text-xs font-semibold">
-                          {formatDate(event.published_at)}
-                        </span>
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-5">
+                        <h3 className="font-heading text-lg font-bold text-white mb-2 group-hover:text-red transition-colors duration-300 line-clamp-2">
+                          {getLocalizedField(event, 'title', locale)}
+                        </h3>
+                        <p className="text-cream/40 text-sm leading-relaxed line-clamp-2">
+                          {getLocalizedField(event, 'excerpt', locale)}
+                        </p>
                       </div>
                     </div>
-
-                    {/* Content */}
-                    <div className="p-5">
-                      <h3 className="font-heading text-lg font-bold text-white mb-2 group-hover:text-red transition-colors duration-300 line-clamp-2">
-                        {getLocalizedField(event, 'title', locale)}
-                      </h3>
-                      <p className="text-cream/40 text-sm leading-relaxed line-clamp-2">
-                        {getLocalizedField(event, 'excerpt', locale)}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
+                  </Link>
+                </div>
               ))}
             </div>
           </div>
