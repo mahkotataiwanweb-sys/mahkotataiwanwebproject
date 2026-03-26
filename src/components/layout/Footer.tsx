@@ -1,11 +1,24 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import Image from 'next/image';
-import { Facebook, Instagram, Music2, Phone, MapPin, Mail } from 'lucide-react';
+import Link from 'next/link';
+import { Facebook, Instagram, Music2, Phone, MapPin } from 'lucide-react';
+
+const quickLinks = [
+  { key: 'home', href: '' },
+  { key: 'about', href: '/about' },
+  { key: 'products', href: '/products' },
+  { key: 'recipes', href: '/recipes' },
+  { key: 'events', href: '/events' },
+  { key: 'lifestyle', href: '/lifestyle' },
+  { key: 'contact', href: '/contact' },
+];
 
 export default function Footer() {
   const t = useTranslations('footer');
+  const locale = useLocale();
 
   return (
     <footer className="bg-navy text-cream/90">
@@ -41,12 +54,14 @@ export default function Footer() {
           <div>
             <h4 className="font-heading text-white font-semibold mb-4 text-lg">{t('quickLinks')}</h4>
             <ul className="space-y-3">
-              {['home', 'about', 'products', 'contact'].map((link) => (
-                <li key={link}>
-                  <a href={`#${link === 'home' ? 'hero' : link}`}
-                    className="text-cream/60 hover:text-white text-sm transition-colors line-reveal inline-block">
-                    {t(`links.${link}`)}
-                  </a>
+              {quickLinks.map((link) => (
+                <li key={link.key}>
+                  <Link
+                    href={`/${locale}${link.href}`}
+                    className="text-cream/60 hover:text-white text-sm transition-colors line-reveal inline-block"
+                  >
+                    {t(`links.${link.key}`)}
+                  </Link>
                 </li>
               ))}
             </ul>

@@ -1,11 +1,12 @@
 {
   "nav": {
     "home": "首頁",
-    "about": "關於我們",
+    "about": "關於",
     "products": "產品",
     "recipes": "食譜",
     "events": "活動",
-    "contact": "聯絡我們",
+    "lifestyle": "生活風格",
+    "contact": "聯絡",
     "language": "語言"
   },
   "hero": {
@@ -93,6 +94,9 @@
       "home": "首頁",
       "about": "關於我們",
       "products": "產品",
+      "recipes": "食譜",
+      "events": "活動",
+      "lifestyle": "生活風格",
       "contact": "聯絡"
     },
     "contactUs": "聯絡我們",

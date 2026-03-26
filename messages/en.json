@@ -1,10 +1,11 @@
 {
   "nav": {
     "home": "Home",
-    "about": "About Us",
+    "about": "About",
     "products": "Products",
     "recipes": "Recipes",
     "events": "Events",
+    "lifestyle": "Lifestyle",
     "contact": "Contact",
     "language": "Language"
   },
@@ -93,6 +94,9 @@
       "home": "Home",
       "about": "About Us",
       "products": "Products",
+      "recipes": "Recipes",
+      "events": "Events",
+      "lifestyle": "Lifestyle",
       "contact": "Contact"
     },
     "contactUs": "Contact Us",
