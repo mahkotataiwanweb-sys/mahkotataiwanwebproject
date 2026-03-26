@@ -32,6 +32,24 @@ export interface Database {
         Update: CompanySettingsUpdate;
         Relationships: [];
       };
+      hero_slides: {
+        Row: HeroSlide;
+        Insert: HeroSlideInsert;
+        Update: HeroSlideUpdate;
+        Relationships: [];
+      };
+      articles: {
+        Row: Article;
+        Insert: ArticleInsert;
+        Update: ArticleUpdate;
+        Relationships: [];
+      };
+      store_partners: {
+        Row: StorePartner;
+        Insert: StorePartnerInsert;
+        Update: StorePartnerUpdate;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -231,6 +249,150 @@ export interface CompanySettingsUpdate {
   tiktok_url?: string | null;
   facebook_url?: string | null;
   instagram_url?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface HeroSlide {
+  id: string;
+  title_en: string;
+  title_id: string;
+  title_zh: string;
+  subtitle_en: string;
+  subtitle_id: string;
+  subtitle_zh: string;
+  image_url: string | null;
+  link_url: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HeroSlideInsert {
+  id?: string;
+  title_en: string;
+  title_id: string;
+  title_zh: string;
+  subtitle_en: string;
+  subtitle_id: string;
+  subtitle_zh: string;
+  image_url?: string | null;
+  link_url?: string | null;
+  sort_order?: number;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface HeroSlideUpdate {
+  id?: string;
+  title_en?: string;
+  title_id?: string;
+  title_zh?: string;
+  subtitle_en?: string;
+  subtitle_id?: string;
+  subtitle_zh?: string;
+  image_url?: string | null;
+  link_url?: string | null;
+  sort_order?: number;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Article {
+  id: string;
+  type: 'event' | 'news' | 'lifestyle' | 'recipe';
+  title_en: string;
+  title_id: string;
+  title_zh: string;
+  slug: string;
+  excerpt_en: string;
+  excerpt_id: string;
+  excerpt_zh: string;
+  content_en: string;
+  content_id: string;
+  content_zh: string;
+  image_url: string | null;
+  published_at: string;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ArticleInsert {
+  id?: string;
+  type: 'event' | 'news' | 'lifestyle' | 'recipe';
+  title_en: string;
+  title_id: string;
+  title_zh: string;
+  slug: string;
+  excerpt_en: string;
+  excerpt_id: string;
+  excerpt_zh: string;
+  content_en: string;
+  content_id: string;
+  content_zh: string;
+  image_url?: string | null;
+  published_at?: string;
+  is_active?: boolean;
+  sort_order?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ArticleUpdate {
+  id?: string;
+  type?: 'event' | 'news' | 'lifestyle' | 'recipe';
+  title_en?: string;
+  title_id?: string;
+  title_zh?: string;
+  slug?: string;
+  excerpt_en?: string;
+  excerpt_id?: string;
+  excerpt_zh?: string;
+  content_en?: string;
+  content_id?: string;
+  content_zh?: string;
+  image_url?: string | null;
+  published_at?: string;
+  is_active?: boolean;
+  sort_order?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface StorePartner {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  website_url: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StorePartnerInsert {
+  id?: string;
+  name: string;
+  logo_url?: string | null;
+  website_url?: string | null;
+  sort_order?: number;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface StorePartnerUpdate {
+  id?: string;
+  name?: string;
+  logo_url?: string | null;
+  website_url?: string | null;
+  sort_order?: number;
+  is_active?: boolean;
   created_at?: string;
   updated_at?: string;
 }

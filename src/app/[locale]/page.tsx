@@ -1,8 +1,12 @@
 import { setRequestLocale } from 'next-intl/server';
-import HeroSection from '@/components/sections/HeroSection';
-import AboutSection from '@/components/sections/AboutSection';
+import HeroSlider from '@/components/sections/HeroSlider';
 import MarqueeSection from '@/components/sections/MarqueeSection';
-import ProductsSection from '@/components/sections/ProductsSection';
+import ProductsShowcase from '@/components/sections/ProductsShowcase';
+import RecipesSection from '@/components/sections/RecipesSection';
+import MomentsSection from '@/components/sections/MomentsSection';
+import EventsSection from '@/components/sections/EventsSection';
+import WhereToBuySection from '@/components/sections/WhereToBuySection';
+import AboutSection from '@/components/sections/AboutSection';
 import ContactSection from '@/components/sections/ContactSection';
 
 type Props = {
@@ -15,10 +19,14 @@ export default async function HomePage({ params }: Props) {
 
   return (
     <>
-      <HeroSection />
+      <HeroSlider />
       <MarqueeSection />
+      <ProductsShowcase />
+      <RecipesSection />
+      <MomentsSection />
+      <EventsSection />
+      <WhereToBuySection />
       <AboutSection />
-      <ProductsSection />
       <ContactSection />
     </>
   );
