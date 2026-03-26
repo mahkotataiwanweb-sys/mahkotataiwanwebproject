@@ -61,7 +61,7 @@ const fallbackNavItems: FallbackNavItem[] = [
 ];
 
 // Pages that have dark navy hero headers
-const darkHeaderPages = ['/products', '/lifestyle', '/events', '/about', '/gallery'];
+const darkHeaderPages = ['/products', '/lifestyle', '/events', '/about', '/gallery', '/where-to-buy'];
 
 export default function Navbar() {
   const t = useTranslations('nav');
@@ -777,21 +777,57 @@ export default function Navbar() {
         animate={{ y: isHidden ? -100 : 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          {/* Logo */}
-          <motion.div whileHover={{ scale: 1.05 }} className="relative z-10">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between overflow-visible">
+          {/* Logo - Premium large with floating animation */}
+          <motion.div
+            whileHover={{ scale: 1.08 }}
+            className="relative z-10"
+          >
             <Link href={`/${locale}`} className="flex items-center gap-3">
-              <Image
-                src="/images/logo.png"
-                alt="Mahkota Taiwan"
-                width={56}
-                height={56}
-                priority
-                className={cn(
-                  'w-12 h-12 sm:w-14 sm:h-14 transition-all duration-300',
-                  useLightText && 'brightness-0 invert'
-                )}
-              />
+              <motion.div
+                animate={{
+                  y: [0, -3, 0],
+                  rotate: [0, 2, 0, -2, 0],
+                  scale: [1, 1.03, 1],
+                }}
+                transition={{
+                  y: { duration: 3, ease: 'easeInOut', repeat: Infinity },
+                  rotate: { duration: 5, ease: 'easeInOut', repeat: Infinity },
+                  scale: { duration: 4, ease: 'easeInOut', repeat: Infinity },
+                }}
+                className="relative"
+                style={{ marginTop: isScrolled ? '-8px' : '-16px' }}
+              >
+                {/* Breathing glow shadow */}
+                <motion.div
+                  className="absolute inset-0 rounded-full blur-xl"
+                  animate={{
+                    opacity: [0.15, 0.3, 0.15],
+                    scale: [1, 1.2, 1],
+                  }}
+                  transition={{
+                    duration: 3,
+                    ease: 'easeInOut',
+                    repeat: Infinity,
+                  }}
+                  style={{
+                    background: useLightText
+                      ? 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)'
+                      : 'radial-gradient(circle, rgba(26,82,118,0.25) 0%, transparent 70%)',
+                  }}
+                />
+                <Image
+                  src="/images/logo.png"
+                  alt="Mahkota Taiwan"
+                  width={80}
+                  height={80}
+                  priority
+                  className={cn(
+                    'relative w-16 h-16 sm:w-20 sm:h-20 transition-all duration-300 drop-shadow-lg',
+                    useLightText && 'brightness-0 invert'
+                  )}
+                />
+              </motion.div>
             </Link>
           </motion.div>
 

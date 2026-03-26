@@ -1,6 +1,5 @@
 'use client';
-
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import gsap from 'gsap';
@@ -8,126 +7,103 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ------------------------------------------------------------------ */
-/*  Detailed Taiwan SVG paths (viewBox 0 0 300 450)                   */
-/* ------------------------------------------------------------------ */
-
-// Main island — realistic "sweet potato" coastline
-const MAIN_ISLAND =
-  'M168,28 C172,26 178,27 184,30 C192,34 198,36 206,42 ' +
-  'C214,48 222,54 228,62 C234,70 238,80 240,90 ' +
-  'C242,100 244,112 245,124 C246,136 246,150 245,164 ' +
-  'C244,178 242,192 240,206 C238,218 236,230 233,242 ' +
-  'C230,254 226,266 222,278 C218,290 214,300 210,310 ' +
-  'C206,320 200,330 194,340 C188,350 182,358 176,366 ' +
-  'C170,374 164,380 158,388 C152,396 148,402 144,408 ' +
-  'C140,412 136,414 132,412 C128,410 124,406 120,400 ' +
-  'C116,394 112,386 108,376 C104,366 102,356 100,344 ' +
-  'C98,332 96,320 94,306 C92,292 90,278 88,264 ' +
-  'C86,250 84,236 82,222 C80,208 78,194 78,180 ' +
-  'C78,166 80,152 82,140 C84,128 86,118 90,108 ' +
-  'C94,98 98,90 104,82 C110,74 116,68 122,62 ' +
-  'C128,56 134,50 140,44 C146,38 152,34 158,30 ' +
-  'C162,28 165,27 168,28 Z';
-
-// Internal county / region boundaries
-const BOUNDARIES = [
-  // Northern region (Taipei basin) — horizontal split
-  'M108,82 C118,78 130,80 142,84 C154,88 166,86 178,82 C190,78 200,80 210,86',
-  // Northwest / Taoyuan-Hsinchu divide
-  'M90,108 C100,118 112,122 124,120 C136,118 148,114 156,108',
-  // Central horizontal — Taichung / Nantou divide
-  'M82,180 C96,176 112,178 128,182 C144,186 160,184 176,180 C192,176 210,180 230,186',
-  // Central-south divide (Chiayi / Yunlin)
-  'M86,250 C100,244 116,246 132,250 C148,254 164,252 180,248 C196,244 212,248 224,256',
-  // Southern divide — Tainan / Kaohsiung / Pingtung
-  'M94,306 C108,300 124,302 140,308 C156,312 170,310 184,306 C198,302 210,306 218,314',
-  // East–west spine (Central Mountain Range)
-  'M158,84 C162,110 164,140 166,170 C168,200 168,230 166,260 C164,290 160,320 154,350 C150,370 146,390 142,408',
-  // Yilan / northeast pocket
-  'M178,82 C186,90 196,100 206,108 C214,114 220,120 224,130',
-  // Hualien / Taitung east coast divide
-  'M232,186 C236,210 238,240 236,270 C234,300 228,320 220,340',
-];
+const MAIN_ISLAND = `M 185.1,48.2 L 170.7,38.5 L 160.8,38.9 L 154.9,38.5 L 148.8,36.1 L 143.2,31.6 L 140.5,28.0 L 139.6,27.2 L 139.2,26.9 L 138.1,26.3 L 136.4,25.6 L 134.5,25.0 L 133.8,25.1 L 129.5,26.0 L 128.9,26.2 L 125.8,27.9 L 125.4,28.3 L 122.5,31.9 L 121.8,32.8 L 118.9,38.8 L 118.6,39.3 L 118.8,40.0 L 119.1,40.5 L 124.8,44.4 L 124.6,45.0 L 121.8,43.2 L 120.8,42.7 L 119.4,42.4 L 118.8,42.6 L 118.2,42.9 L 117.3,43.6 L 117.0,44.1 L 116.2,44.9 L 113.9,46.6 L 111.1,47.8 L 107.6,49.3 L 102.2,50.6 L 99.4,51.8 L 86.9,61.1 L 86.4,61.5 L 82.1,66.8 L 81.4,67.8 L 78.3,76.4 L 77.7,77.6 L 75.4,83.7 L 74.4,88.5 L 73.0,100.2 L 72.3,100.3 L 71.9,100.7 L 62.2,112.9 L 57.5,119.3 L 57.3,119.8 L 55.5,127.6 L 54.9,130.3 L 54.6,132.4 L 54.2,134.2 L 52.9,136.3 L 50.0,141.0 L 48.7,143.3 L 48.1,144.4 L 47.2,146.6 L 46.1,149.4 L 43.8,158.1 L 43.6,158.8 L 41.8,168.1 L 41.7,170.2 L 37.8,175.9 L 37.3,177.0 L 33.0,188.7 L 29.5,200.5 L 27.5,207.3 L 27.1,208.5 L 24.1,215.9 L 22.3,217.4 L 20.3,221.8 L 20.1,222.4 L 14.7,240.9 L 14.4,242.2 L 14.5,242.9 L 15.8,248.1 L 17.8,254.2 L 18.0,254.8 L 18.6,256.5 L 19.8,259.5 L 22.5,267.1 L 22.6,267.8 L 23.8,275.2 L 23.6,275.7 L 23.2,276.1 L 22.1,276.7 L 20.5,280.5 L 19.8,283.0 L 18.8,287.7 L 17.3,296.1 L 17.3,296.7 L 17.4,297.4 L 17.8,297.9 L 18.3,298.2 L 18.8,298.4 L 20.4,298.4 L 21.0,298.6 L 21.6,298.9 L 21.8,299.4 L 23.1,302.8 L 23.1,303.5 L 22.7,303.9 L 22.0,304.7 L 19.9,305.0 L 18.8,305.6 L 18.5,306.1 L 18.3,307.4 L 18.7,308.6 L 19.0,309.2 L 19.3,309.6 L 20.4,310.1 L 25.4,311.8 L 28.2,310.3 L 32.5,317.8 L 33.8,322.9 L 34.8,325.8 L 39.5,336.2 L 40.4,337.6 L 43.5,341.4 L 46.8,346.3 L 47.0,347.0 L 47.0,347.8 L 46.0,349.9 L 46.4,351.2 L 47.1,352.2 L 48.2,353.4 L 49.4,354.6 L 49.9,354.8 L 50.4,355.1 L 53.3,356.1 L 55.6,358.7 L 56.9,360.6 L 58.1,362.6 L 58.6,363.7 L 58.5,364.2 L 57.7,363.8 L 55.5,362.0 L 55.2,361.4 L 54.6,360.6 L 54.9,361.4 L 55.6,362.5 L 58.3,364.5 L 60.0,365.6 L 60.5,366.0 L 64.2,367.7 L 64.8,368.0 L 65.2,368.1 L 66.0,368.0 L 68.5,367.1 L 69.3,367.9 L 70.1,368.7 L 72.0,370.0 L 75.7,371.8 L 76.4,372.0 L 77.2,371.9 L 79.1,372.4 L 85.0,376.1 L 87.5,377.6 L 87.9,378.0 L 92.5,383.1 L 93.9,384.8 L 95.2,386.7 L 102.0,396.8 L 102.4,397.9 L 105.0,404.1 L 105.3,405.3 L 105.6,411.2 L 109.0,423.3 L 109.2,423.9 L 110.1,424.6 L 110.7,424.8 L 111.3,425.0 L 112.0,424.9 L 123.0,423.0 L 126.9,409.9 L 127.0,409.3 L 126.1,402.6 L 123.0,387.3 L 121.4,382.6 L 121.0,380.7 L 120.5,377.8 L 120.5,377.0 L 120.7,374.9 L 125.2,351.3 L 126.1,347.3 L 129.6,338.9 L 130.8,336.1 L 135.0,329.2 L 137.8,327.2 L 139.0,326.7 L 139.9,326.1 L 140.7,325.2 L 143.4,321.5 L 150.4,304.1 L 156.9,280.9 L 162.4,251.6 L 163.1,242.8 L 163.1,241.2 L 163.0,240.3 L 163.9,232.7 L 163.8,207.2 L 165.9,183.3 L 165.8,173.5 L 165.3,167.6 L 164.4,166.8 L 163.5,165.3 L 163.3,164.8 L 163.1,162.5 L 163.3,161.8 L 166.8,149.5 L 168.1,146.9 L 173.7,136.2 L 174.4,135.4 L 176.2,133.9 L 174.5,131.6 L 174.2,131.1 L 174.1,130.3 L 174.3,121.0 L 174.5,119.5 L 175.7,116.7 L 176.3,115.7 L 177.5,114.6 L 178.9,113.4 L 179.7,112.6 L 179.9,105.9 L 179.3,102.4 L 178.3,99.2 L 177.3,97.7 L 175.6,97.0 L 174.8,96.2 L 174.4,95.7 L 173.9,94.6 L 170.0,82.5 L 169.6,81.2 L 169.6,77.2 L 169.5,71.9 L 169.6,70.5 L 169.7,69.8 L 170.4,68.0 L 174.3,59.9 L 174.6,59.4 L 177.3,55.7 L 180.4,53.2 L 182.6,51.8 L 183.5,51.4 L 184.8,50.3 L 185.3,49.9 L 185.6,49.4 L 185.5,48.6 L 185.1,48.2 z`;
 
 // Penghu islands (west side)
-const PENGHU_ISLANDS = [
-  'M52,248 C56,244 62,244 66,248 C70,252 70,258 66,262 C62,266 56,266 52,262 C48,258 48,252 52,248 Z',
-  'M60,232 C63,229 68,229 71,232 C74,235 74,240 71,243 C68,246 63,246 60,243 C57,240 57,235 60,232 Z',
-  'M44,258 C46,256 50,256 52,258 C54,260 54,264 52,266 C50,268 46,268 44,266 C42,264 42,260 44,258 Z',
+const PENGHU_MAIN = 'M 10,245 Q 8,240 12,237 Q 16,234 20,237 Q 24,240 22,245 Q 20,250 16,252 Q 12,250 10,245 Z';
+const PENGHU_SMALL_1 = 'M 6,252 Q 5,249 8,248 Q 11,249 12,252 Q 11,255 8,255 Q 6,254 6,252 Z';
+const PENGHU_SMALL_2 = 'M 16,256 Q 15,254 17,253 Q 19,254 20,256 Q 19,258 17,258 Q 15,257 16,256 Z';
+const PENGHU_SMALL_3 = 'M 22,242 Q 21,240 23,239 Q 25,240 26,242 Q 25,244 23,244 Q 21,243 22,242 Z';
+
+// Northern islets (Keelung area)
+const NORTH_ISLET_1 = 'M 158,13 Q 156,11 158,10 Q 160,9 162,11 Q 163,13 161,14 Q 159,15 158,13 Z';
+const NORTH_ISLET_2 = 'M 168,16 Q 167,14 169,13 Q 171,14 172,16 Q 171,18 169,18 Q 167,17 168,16 Z';
+
+// Internal county boundaries (approximate)
+const BOUNDARIES = [
+  // Northern boundary (Taipei/Yilan)
+  'M 75,85 Q 100,80 130,78 Q 150,80 165,85',
+  // Central boundary (Taichung/Nantou)
+  'M 42,190 Q 70,182 100,185 Q 130,188 164,195',
+  // South-central (Chiayi/Tainan)
+  'M 22,270 Q 50,262 80,265 Q 110,268 155,278',
+  // Southern boundary (Kaohsiung/Pingtung)
+  'M 30,330 Q 55,322 80,325 Q 105,330 140,325',
+  // Central mountain range
+  'M 130,78 Q 135,100 132,130 Q 128,160 125,190 Q 120,230 115,270 Q 110,310 108,350 Q 106,380 110,410',
 ];
 
-// Small northern islands (e.g. approximate Keelung Islet / Pengjia)
-const NORTH_ISLANDS = [
-  'M196,18 C199,16 203,16 206,18 C209,20 209,24 206,26 C203,28 199,28 196,26 C193,24 193,20 196,18 Z',
-  'M214,12 C216,10 219,10 221,12 C223,14 223,17 221,19 C219,21 216,21 214,19 C212,17 212,14 214,12 Z',
-];
-
-/* ------------------------------------------------------------------ */
-/*  Pin locations (percentages of the SVG viewBox)                     */
-/* ------------------------------------------------------------------ */
-
+// Pin locations (accurate positions inside the island)
 const PIN_LOCATIONS = [
-  { id: 'taipei',    label: 'Taipei',    cx: '62%', cy: '15%' },
-  { id: 'taichung',  label: 'Taichung',  cx: '42%', cy: '40%' },
-  { id: 'tainan',    label: 'Tainan',    cx: '38%', cy: '62%' },
-  { id: 'kaohsiung', label: 'Kaohsiung', cx: '42%', cy: '72%' },
+  { x: 148, y: 65, label: 'Taipei' },
+  { x: 85, y: 195, label: 'Taichung' },
+  { x: 72, y: 290, label: 'Tainan' },
+  { x: 80, y: 330, label: 'Kaohsiung' },
 ];
-
-/* ================================================================== */
 
 export default function WhereToBuySection() {
-  const locale = useLocale();
-  const sectionRef = useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<SVGSVGElement>(null);
-  const pinRefs = useRef<(SVGGElement | null)[]>([]);
+  const pinsRef = useRef<(SVGGElement | null)[]>([]);
+  const [isHovered, setIsHovered] = useState(false);
+  const locale = useLocale();
 
   useEffect(() => {
+    if (!sectionRef.current || !mapRef.current) return;
+
     const ctx = gsap.context(() => {
-      /* --- map fade-in on scroll --- */
-      gsap.from(mapRef.current, {
-        opacity: 0,
-        y: 60,
-        duration: 1,
-        ease: 'power3.out',
+      // Entrance animation for the whole section
+      gsap.from(sectionRef.current, {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: 'top 80%',
           toggleActions: 'play none none none',
         },
+        opacity: 0,
+        y: 60,
+        duration: 1,
+        ease: 'power3.out',
       });
 
-      /* --- pins pop-up sequentially --- */
-      pinRefs.current.forEach((pin, i) => {
-        if (!pin) return;
-        gsap.fromTo(
-          pin,
-          { scale: 0, opacity: 0, transformOrigin: '50% 100%' },
-          {
-            scale: 1,
-            opacity: 1,
-            duration: 0.6,
-            ease: 'back.out(2)',
-            delay: 0.8 + i * 0.35,
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top 80%',
-              toggleActions: 'play none none none',
-            },
-          },
-        );
+      // Map entrance
+      gsap.from('.taiwan-map-group', {
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 75%',
+          toggleActions: 'play none none none',
+        },
+        opacity: 0,
+        scale: 0.85,
+        duration: 1.2,
+        ease: 'power3.out',
       });
 
-      /* --- continuous floating animation --- */
-      pinRefs.current.forEach((pin, i) => {
+      // Staggered pin pop-up
+      pinsRef.current.forEach((pin, i) => {
         if (!pin) return;
+
+        gsap.set(pin, { scale: 0, transformOrigin: '50% 100%' });
+
         gsap.to(pin, {
-          y: -4,
-          duration: 1.4 + i * 0.15,
-          ease: 'sine.inOut',
-          yoyo: true,
-          repeat: -1,
-          delay: 1.8 + i * 0.35,
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 65%',
+            toggleActions: 'play none none none',
+          },
+          scale: 1,
+          duration: 0.7,
+          delay: 0.6 + i * 0.25,
+          ease: 'back.out(2.5)',
+          onComplete: () => {
+            // Floating animation after pin appears
+            gsap.to(pin, {
+              y: -3,
+              duration: 1.5 + i * 0.2,
+              ease: 'sine.inOut',
+              yoyo: true,
+              repeat: -1,
+            });
+          },
         });
       });
     }, sectionRef);
@@ -136,177 +112,163 @@ export default function WhereToBuySection() {
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      className="bg-cream py-24 sm:py-32 overflow-hidden"
-    >
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        {/* ---------- header ---------- */}
-        <div className="text-center mb-16">
-          <span className="text-sm font-semibold tracking-widest uppercase text-navy/60">
+    <section ref={sectionRef} className="bg-cream py-20 md:py-28 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <span className="inline-block text-red/80 text-sm font-semibold tracking-widest uppercase mb-3">
             Find Us
           </span>
-          <Link
-            href={`/${locale}/where-to-buy`}
-            className="block mt-2 group"
-          >
-            <h2 className="text-4xl sm:text-5xl font-bold text-navy group-hover:text-red-700 transition-colors duration-300">
-              Where to Buy
-            </h2>
-          </Link>
-          <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-red-700" />
+          <h2 className="text-4xl md:text-5xl font-heading font-bold text-navy">
+            Where to Buy
+          </h2>
+          <div className="w-16 h-1 bg-red mx-auto mt-4 rounded-full" />
         </div>
 
-        {/* ---------- map ---------- */}
-        <Link
-          href={`/${locale}/where-to-buy`}
-          className="group relative block mx-auto max-w-md"
-        >
-          {/* hover overlay */}
-          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-navy/0 group-hover:bg-navy/30 transition-all duration-500 pointer-events-none">
-            <span className="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500 text-white text-lg font-semibold tracking-wide drop-shadow-lg">
-              View All Locations →
-            </span>
-          </div>
-
-          <svg
-            ref={mapRef}
-            viewBox="0 0 300 450"
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-full h-auto drop-shadow-xl transition-transform duration-500 group-hover:scale-[1.02]"
-            role="img"
-            aria-label="Map of Taiwan showing store locations"
+        {/* Map Container */}
+        <div className="flex justify-center">
+          <Link
+            href={`/${locale}/where-to-buy`}
+            className="relative group block"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
           >
-            <defs>
-              <linearGradient
-                id="taiwanGradHome"
-                x1="0%"
-                y1="0%"
-                x2="100%"
-                y2="100%"
-              >
-                <stop offset="0%" stopColor="#1a5276" />
-                <stop offset="100%" stopColor="#2980b9" />
-              </linearGradient>
-              <filter id="mapShadowHome" x="-10%" y="-10%" width="120%" height="120%">
-                <feDropShadow dx="0" dy="4" stdDeviation="8" floodColor="#1a5276" floodOpacity="0.25" />
-              </filter>
-            </defs>
+            <svg
+              ref={mapRef}
+              viewBox="0 0 200 450"
+              className="w-64 md:w-80 h-auto transition-transform duration-500 group-hover:scale-[1.02]"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient id="taiwanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#1a5276" />
+                  <stop offset="100%" stopColor="#2980b9" />
+                </linearGradient>
+                <filter id="mapShadow" x="-10%" y="-5%" width="120%" height="110%">
+                  <feDropShadow dx="2" dy="4" stdDeviation="6" floodColor="#1a5276" floodOpacity="0.25" />
+                </filter>
+                <filter id="pinGlow">
+                  <feGaussianBlur stdDeviation="2" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
 
-            {/* Main island */}
-            <path
-              d={MAIN_ISLAND}
-              fill="url(#taiwanGradHome)"
-              stroke="#fff"
-              strokeWidth="1"
-              strokeOpacity="0.3"
-              filter="url(#mapShadowHome)"
-            />
+              <g className="taiwan-map-group" filter="url(#mapShadow)">
+                {/* Main island */}
+                <path d={MAIN_ISLAND} fill="url(#taiwanGradient)" stroke="#154360" strokeWidth="0.5" />
 
-            {/* Penghu islands */}
-            {PENGHU_ISLANDS.map((d, i) => (
-              <path
-                key={`penghu-${i}`}
-                d={d}
-                fill="url(#taiwanGradHome)"
-                stroke="#fff"
-                strokeWidth="0.6"
-                strokeOpacity="0.3"
-              />
-            ))}
+                {/* Penghu islands */}
+                <path d={PENGHU_MAIN} fill="url(#taiwanGradient)" stroke="#154360" strokeWidth="0.3" />
+                <path d={PENGHU_SMALL_1} fill="url(#taiwanGradient)" stroke="#154360" strokeWidth="0.3" />
+                <path d={PENGHU_SMALL_2} fill="url(#taiwanGradient)" stroke="#154360" strokeWidth="0.3" />
+                <path d={PENGHU_SMALL_3} fill="url(#taiwanGradient)" stroke="#154360" strokeWidth="0.3" />
 
-            {/* Northern islets */}
-            {NORTH_ISLANDS.map((d, i) => (
-              <path
-                key={`north-${i}`}
-                d={d}
-                fill="url(#taiwanGradHome)"
-                stroke="#fff"
-                strokeWidth="0.5"
-                strokeOpacity="0.3"
-              />
-            ))}
+                {/* Northern islets */}
+                <path d={NORTH_ISLET_1} fill="url(#taiwanGradient)" stroke="#154360" strokeWidth="0.3" />
+                <path d={NORTH_ISLET_2} fill="url(#taiwanGradient)" stroke="#154360" strokeWidth="0.3" />
 
-            {/* County boundaries */}
-            {BOUNDARIES.map((d, i) => (
-              <path
-                key={`bnd-${i}`}
-                d={d}
-                fill="none"
-                stroke="#fff"
-                strokeWidth="0.8"
-                strokeOpacity="0.3"
-                strokeLinecap="round"
-              />
-            ))}
-
-            {/* ---- Location pins ---- */}
-            {PIN_LOCATIONS.map((pin, i) => (
-              <g
-                key={pin.id}
-                ref={(el) => { pinRefs.current[i] = el; }}
-                style={{ opacity: 0 }}
-              >
-                {/* pulsing ring */}
-                <circle
-                  cx={pin.cx}
-                  cy={pin.cy}
-                  r="12"
-                  fill="none"
-                  stroke="#C12126"
-                  strokeWidth="2"
-                  opacity="0.4"
-                >
-                  <animate
-                    attributeName="r"
-                    values="10;18;10"
-                    dur="2.5s"
-                    repeatCount="indefinite"
-                  />
-                  <animate
-                    attributeName="opacity"
-                    values="0.5;0;0.5"
-                    dur="2.5s"
-                    repeatCount="indefinite"
-                  />
-                </circle>
-
-                {/* pin body (marker shape) */}
-                <g transform={`translate(${pin.cx === '62%' ? 186 : pin.cx === '42%' ? 126 : 114}, ${
-                  pin.cy === '15%' ? 67.5 : pin.cy === '40%' ? 180 : pin.cy === '62%' ? 279 : 324
-                })`}>
+                {/* County boundaries */}
+                {BOUNDARIES.map((d, i) => (
                   <path
-                    d="M0,-14 C-4,-14 -8,-12 -10,-8 C-12,-4 -12,0 -10,4 C-8,8 -4,14 0,20 C4,14 8,8 10,4 C12,0 12,-4 10,-8 C8,-12 4,-14 0,-14 Z"
-                    fill="#C12126"
-                    stroke="#fff"
-                    strokeWidth="1.2"
+                    key={`boundary-${i}`}
+                    d={d}
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="0.5"
+                    strokeOpacity="0.2"
+                    strokeDasharray="none"
                   />
-                  <circle cx="0" cy="-4" r="4.5" fill="#fff" />
-                </g>
-
-                {/* label */}
-                <text
-                  x={pin.cx === '62%' ? 186 : pin.cx === '42%' ? 126 : 114}
-                  y={
-                    pin.cy === '15%'
-                      ? 67.5 + 30
-                      : pin.cy === '40%'
-                        ? 180 + 30
-                        : pin.cy === '62%'
-                          ? 279 + 30
-                          : 324 + 30
-                  }
-                  textAnchor="middle"
-                  className="text-[9px] font-semibold"
-                  fill="#1a5276"
-                  fontFamily="sans-serif"
-                >
-                  {pin.label}
-                </text>
+                ))}
               </g>
-            ))}
-          </svg>
-        </Link>
+
+              {/* Pin markers */}
+              {PIN_LOCATIONS.map((pin, i) => (
+                <g
+                  key={pin.label}
+                  ref={(el) => { pinsRef.current[i] = el; }}
+                  className="pin-marker"
+                >
+                  {/* Pulsing ring */}
+                  <circle cx={pin.x} cy={pin.y} r="8" fill="none" stroke="#C12126" strokeWidth="1" opacity="0.4">
+                    <animate
+                      attributeName="r"
+                      values="6;14;6"
+                      dur={`${2 + i * 0.3}s`}
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0.5;0;0.5"
+                      dur={`${2 + i * 0.3}s`}
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+
+                  {/* Second pulsing ring (offset) */}
+                  <circle cx={pin.x} cy={pin.y} r="4" fill="none" stroke="#C12126" strokeWidth="0.8" opacity="0.3">
+                    <animate
+                      attributeName="r"
+                      values="4;10;4"
+                      dur={`${2.5 + i * 0.2}s`}
+                      begin={`${0.5}s`}
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0.4;0;0.4"
+                      dur={`${2.5 + i * 0.2}s`}
+                      begin={`${0.5}s`}
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+
+                  {/* Teardrop pin shape */}
+                  <path
+                    d={`M ${pin.x},${pin.y - 18} 
+                        C ${pin.x - 7},${pin.y - 18} ${pin.x - 10},${pin.y - 12} ${pin.x - 10},${pin.y - 8}
+                        C ${pin.x - 10},${pin.y - 3} ${pin.x},${pin.y} ${pin.x},${pin.y}
+                        C ${pin.x},${pin.y} ${pin.x + 10},${pin.y - 3} ${pin.x + 10},${pin.y - 8}
+                        C ${pin.x + 10},${pin.y - 12} ${pin.x + 7},${pin.y - 18} ${pin.x},${pin.y - 18} Z`}
+                    fill="#C12126"
+                    stroke="#8B0000"
+                    strokeWidth="0.5"
+                    filter="url(#pinGlow)"
+                  />
+
+                  {/* White inner circle */}
+                  <circle cx={pin.x} cy={pin.y - 10} r="3.5" fill="white" />
+
+                  {/* City label */}
+                  <text
+                    x={pin.x}
+                    y={pin.y + 12}
+                    textAnchor="middle"
+                    fill="#1a5276"
+                    fontSize="7"
+                    fontWeight="600"
+                    fontFamily="sans-serif"
+                  >
+                    {pin.label}
+                  </text>
+                </g>
+              ))}
+            </svg>
+
+            {/* Hover overlay */}
+            <div
+              className={`absolute inset-0 flex items-center justify-center bg-navy/40 rounded-2xl transition-all duration-300 ${
+                isHovered ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              <span className="text-white text-lg font-semibold tracking-wide bg-red/90 px-6 py-3 rounded-full shadow-lg transform transition-transform duration-300 group-hover:scale-105">
+                View All Locations →
+              </span>
+            </div>
+          </Link>
+        </div>
       </div>
     </section>
   );
