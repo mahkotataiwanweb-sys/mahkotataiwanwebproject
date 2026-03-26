@@ -16,6 +16,10 @@ const socials = [
   { icon: Instagram, href: 'https://www.instagram.com/mahkotatw', label: 'Instagram' },
 ];
 
+// Google Maps links
+const OFFICE_MAPS_URL = 'https://www.google.com/maps/search/No.+83,+Liyuan+2nd+Street,+Linkou+District,+New+Taipei+City';
+const WAREHOUSE_MAPS_URL = 'https://www.google.com/maps/search/No.+53,+Lane+216,+Nanshi+4th+Street,+Linkou+District,+New+Taipei+City';
+
 export default function ContactPage() {
   const t = useTranslations('contact');
   const locale = useLocale();
@@ -128,25 +132,37 @@ export default function ContactPage() {
 
       {/* Content */}
       <div className="max-w-5xl mx-auto px-6 py-16">
-        {/* Info Cards - 4 cards grid */}
+        {/* Info Cards - 4 cards grid: Office first, then Warehouse */}
         <div ref={infoCardsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {/* Warehouse Address */}
-          <div className="bg-white rounded-2xl p-6 text-center premium-shadow hover:shadow-xl transition-shadow duration-300">
-            <div className="w-12 h-12 rounded-xl bg-red/10 flex items-center justify-center mx-auto mb-3">
-              <MapPin className="w-5 h-5 text-red" />
-            </div>
-            <h4 className="font-semibold text-navy text-sm mb-1">{t('warehouse')}</h4>
-            <p className="text-navy/60 text-sm">No. 53, Lane 216, Nanshi 4th Street, Linkou District, New Taipei City</p>
-          </div>
-
-          {/* Office Address */}
-          <div className="bg-white rounded-2xl p-6 text-center premium-shadow hover:shadow-xl transition-shadow duration-300">
-            <div className="w-12 h-12 rounded-xl bg-red/10 flex items-center justify-center mx-auto mb-3">
-              <MapPin className="w-5 h-5 text-red" />
+          {/* Office Address (first) */}
+          <a
+            href={OFFICE_MAPS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-white rounded-2xl p-6 text-center premium-shadow hover:shadow-xl transition-all duration-300 group cursor-pointer"
+          >
+            <div className="w-12 h-12 rounded-xl bg-red/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-red/20 transition-colors duration-300">
+              <MapPin className="w-5 h-5 text-red group-hover:scale-110 transition-transform duration-300" />
             </div>
             <h4 className="font-semibold text-navy text-sm mb-1">{t('office')}</h4>
-            <p className="text-navy/60 text-sm">No. 83, Liyuan 2nd Street, Linkou District, New Taipei City</p>
-          </div>
+            <p className="text-navy/60 text-sm group-hover:text-navy transition-colors duration-300">No. 83, Liyuan 2nd Street, Linkou District, New Taipei City</p>
+            <p className="text-red/60 text-xs mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Open in Maps ↗</p>
+          </a>
+
+          {/* Warehouse Address (second) */}
+          <a
+            href={WAREHOUSE_MAPS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-white rounded-2xl p-6 text-center premium-shadow hover:shadow-xl transition-all duration-300 group cursor-pointer"
+          >
+            <div className="w-12 h-12 rounded-xl bg-red/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-red/20 transition-colors duration-300">
+              <MapPin className="w-5 h-5 text-red group-hover:scale-110 transition-transform duration-300" />
+            </div>
+            <h4 className="font-semibold text-navy text-sm mb-1">{t('warehouse')}</h4>
+            <p className="text-navy/60 text-sm group-hover:text-navy transition-colors duration-300">No. 53, Lane 216, Nanshi 4th Street, Linkou District, New Taipei City</p>
+            <p className="text-red/60 text-xs mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Open in Maps ↗</p>
+          </a>
 
           {/* Phone */}
           <div className="bg-white rounded-2xl p-6 text-center premium-shadow hover:shadow-xl transition-shadow duration-300">

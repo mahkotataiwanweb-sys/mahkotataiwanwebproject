@@ -1,46 +1,27 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ShoppingBag, ExternalLink } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import type { StorePartner } from '@/types/database';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Pin locations on the Taiwan map (percentage-based positions)
+const pinLocations = [
+  { id: 1, x: 52, y: 18, label: 'Taipei' },
+  { id: 2, x: 42, y: 38, label: 'Taichung' },
+  { id: 3, x: 48, y: 58, label: 'Tainan' },
+  { id: 4, x: 55, y: 72, label: 'Kaohsiung' },
+];
+
 export default function WhereToBuySection() {
   const locale = useLocale();
-  const [partners, setPartners] = useState<StorePartner[]>([]);
-  const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const marqueeRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    async function fetchPartners() {
-      try {
-        const { data, error } = await supabase
-          .from('store_partners')
-          .select('*')
-          .eq('is_active', true)
-          .order('sort_order', { ascending: true });
-
-        if (!error && data) {
-          setPartners(data as StorePartner[]);
-        }
-      } catch {
-        // Silent fail
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchPartners();
-  }, []);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const pinRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // GSAP header animation
   useEffect(() => {
@@ -67,68 +48,62 @@ export default function WhereToBuySection() {
     return () => ctx.revert();
   }, []);
 
-  // GSAP marquee animation for logos
+  // GSAP map + pin animations
   useEffect(() => {
-    if (!marqueeRef.current || partners.length === 0) return;
-    const el = marqueeRef.current;
-
     const ctx = gsap.context(() => {
-      gsap.to(el, {
-        xPercent: -50,
-        ease: 'none',
-        duration: 20,
-        repeat: -1,
+      // Map fade in
+      if (mapContainerRef.current) {
+        gsap.fromTo(
+          mapContainerRef.current,
+          { opacity: 0, scale: 0.9 },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: mapContainerRef.current,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
+
+      // Pins pop up one by one with stagger
+      pinRefs.current.forEach((pin, i) => {
+        if (!pin) return;
+        gsap.fromTo(
+          pin,
+          { opacity: 0, scale: 0, y: 20 },
+          {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.6,
+            delay: 0.4 + i * 0.35,
+            ease: 'back.out(2)',
+            scrollTrigger: {
+              trigger: mapContainerRef.current,
+              start: 'top 75%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+
+        // Continuous gentle floating animation after pin appears
+        gsap.to(pin, {
+          y: -4,
+          duration: 1.2 + i * 0.2,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+          delay: 0.4 + i * 0.35 + 0.6,
+        });
       });
-    });
-
+    }, sectionRef);
     return () => ctx.revert();
-  }, [partners]);
-
-  // Don't render if no partners
-  if (!loading && partners.length === 0) {
-    return null;
-  }
-
-  const PartnerLogo = ({ partner }: { partner: StorePartner }) => {
-    const content = (
-      <div className="flex-shrink-0 mx-6 sm:mx-10 group">
-        <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl bg-white flex items-center justify-center p-4 premium-shadow hover-lift border border-navy/5">
-          {partner.logo_url ? (
-            <Image
-              src={partner.logo_url}
-              alt={partner.name}
-              width={120}
-              height={120}
-              className="object-contain max-h-20 w-auto opacity-60 group-hover:opacity-100 transition-opacity duration-300"
-            />
-          ) : (
-            <div className="text-center">
-              <ShoppingBag className="w-8 h-8 text-navy/20 mx-auto mb-1" />
-              <p className="text-navy/40 text-xs font-medium">{partner.name}</p>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-
-    if (partner.website_url) {
-      return (
-        <a
-          href={partner.website_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block"
-        >
-          {content}
-        </a>
-      );
-    }
-
-    return content;
-  };
-
-  // Double the partners for seamless looping
-  const displayPartners = [...partners, ...partners];
+  }, []);
 
   return (
     <section
@@ -157,31 +132,142 @@ export default function WhereToBuySection() {
             Find Mahkota Taiwan products at these trusted retail partners across Taiwan.
           </p>
         </div>
-      </div>
 
-      {/* Scrolling Logo Carousel (full-width) */}
-      {loading ? (
-        <div className="flex items-center justify-center gap-8 px-6">
-          {Array.from({ length: 5 }).map((_, i) => (
+        {/* Taiwan Map */}
+        <div className="flex justify-center">
+          <Link
+            href={`/${locale}/where-to-buy`}
+            className="group relative inline-block cursor-pointer"
+          >
             <div
-              key={`skeleton-${i}`}
-              className="flex-shrink-0 w-36 h-36 rounded-2xl bg-cream-dark animate-pulse"
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="overflow-hidden relative">
-          {/* Fade edges */}
-          <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-cream to-transparent z-10" />
-          <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-cream to-transparent z-10" />
+              ref={mapContainerRef}
+              className="relative w-[280px] h-[400px] sm:w-[320px] sm:h-[460px] lg:w-[380px] lg:h-[540px] transition-transform duration-500 group-hover:scale-[1.03]"
+            >
+              {/* Taiwan SVG Map */}
+              <svg
+                viewBox="0 0 200 340"
+                className="w-full h-full drop-shadow-lg"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Glow filter */}
+                <defs>
+                  <filter id="mapGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                  <linearGradient id="mapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#004A6E" />
+                    <stop offset="50%" stopColor="#003048" />
+                    <stop offset="100%" stopColor="#001E2E" />
+                  </linearGradient>
+                  <linearGradient id="mapStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#5BA4C9" stopOpacity="0.6" />
+                    <stop offset="100%" stopColor="#003048" stopOpacity="0.3" />
+                  </linearGradient>
+                </defs>
 
-          <div ref={marqueeRef} className="flex whitespace-nowrap py-4">
-            {displayPartners.map((partner, index) => (
-              <PartnerLogo key={`${partner.id}-${index}`} partner={partner} />
-            ))}
-          </div>
+                {/* Taiwan main island shape */}
+                <path
+                  d="M 105 12 
+                     C 112 10, 120 14, 125 20
+                     C 132 28, 138 38, 140 48
+                     C 143 55, 144 62, 145 70
+                     C 147 82, 148 95, 146 108
+                     C 145 118, 142 128, 139 138
+                     C 136 148, 132 158, 128 168
+                     C 124 178, 120 188, 116 198
+                     C 112 208, 108 218, 104 228
+                     C 100 238, 96 248, 93 258
+                     C 90 268, 88 275, 85 282
+                     C 82 290, 78 298, 73 305
+                     C 68 312, 62 318, 56 322
+                     C 50 326, 44 328, 40 326
+                     C 36 324, 35 318, 36 312
+                     C 38 305, 42 298, 44 290
+                     C 46 282, 48 274, 50 266
+                     C 52 256, 53 246, 54 236
+                     C 55 226, 55 216, 54 206
+                     C 53 196, 51 186, 50 176
+                     C 49 166, 48 156, 48 146
+                     C 48 136, 49 126, 52 116
+                     C 54 108, 58 100, 62 92
+                     C 66 84, 70 76, 75 68
+                     C 80 60, 85 52, 90 44
+                     C 94 36, 98 28, 100 20
+                     C 102 16, 103 13, 105 12 Z"
+                  fill="url(#mapGradient)"
+                  stroke="url(#mapStroke)"
+                  strokeWidth="1.5"
+                  filter="url(#mapGlow)"
+                  className="transition-all duration-500 group-hover:brightness-110"
+                />
+
+                {/* Inner detail lines for depth effect */}
+                <path
+                  d="M 108 30 C 120 40, 135 65, 142 90 C 146 108, 145 130, 138 155"
+                  fill="none"
+                  stroke="#5BA4C9"
+                  strokeWidth="0.5"
+                  strokeOpacity="0.2"
+                />
+                <path
+                  d="M 52 140 C 52 170, 54 210, 60 250 C 65 270, 70 295, 55 318"
+                  fill="none"
+                  stroke="#5BA4C9"
+                  strokeWidth="0.5"
+                  strokeOpacity="0.15"
+                />
+              </svg>
+
+              {/* Animated Pin Markers */}
+              {pinLocations.map((pin, index) => (
+                <div
+                  key={pin.id}
+                  ref={(el) => { pinRefs.current[index] = el; }}
+                  className="absolute"
+                  style={{
+                    left: `${pin.x}%`,
+                    top: `${pin.y}%`,
+                    transform: 'translate(-50%, -100%)',
+                  }}
+                >
+                  {/* Pin */}
+                  <div className="relative flex flex-col items-center">
+                    {/* Pulse ring */}
+                    <div className="absolute top-[18px] sm:top-[22px] left-1/2 -translate-x-1/2 w-3 h-3 sm:w-4 sm:h-4">
+                      <span className="absolute inset-0 rounded-full bg-red/30 animate-ping" />
+                      <span className="absolute inset-0 rounded-full bg-red/20" />
+                    </div>
+                    {/* Pin icon */}
+                    <svg
+                      width="24"
+                      height="32"
+                      viewBox="0 0 24 32"
+                      className="w-5 h-7 sm:w-6 sm:h-8 drop-shadow-md"
+                    >
+                      <path
+                        d="M12 0C5.373 0 0 5.373 0 12c0 9 12 20 12 20s12-11 12-20c0-6.627-5.373-12-12-12z"
+                        fill="#C12126"
+                      />
+                      <circle cx="12" cy="12" r="5" fill="white" fillOpacity="0.9" />
+                    </svg>
+                  </div>
+                </div>
+              ))}
+
+              {/* Hover overlay text */}
+              <div className="absolute inset-0 flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <span className="bg-navy/80 backdrop-blur-sm text-white text-sm font-semibold px-5 py-2 rounded-full shadow-lg">
+                  View All Locations →
+                </span>
+              </div>
+            </div>
+          </Link>
         </div>
-      )}
+      </div>
     </section>
   );
 }
