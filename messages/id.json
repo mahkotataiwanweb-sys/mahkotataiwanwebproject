@@ -15,10 +15,10 @@
   },
   "about": {
     "title": "Tentang Mahkota Taiwan",
-    "description": "Mahkota Taiwan adalah distributor makanan Indonesia terkemuka yang berbasis di Taiwan, berdedikasi untuk menghadirkan cita rasa Indonesia yang autentik ke pasar Taiwan. Kami menyediakan berbagai produk makanan Indonesia yang digemari — dari mie instan dan camilan hingga bumbu masak dan minuman — memastikan bahwa komunitas Indonesia di Taiwan dan pecinta kuliner lokal dapat menikmati cita rasa Indonesia yang sesungguhnya.",
+    "description": "Mahkota Taiwan adalah distributor makanan Indonesia terkemuka di Taiwan, yang berdedikasi untuk menghadirkan cita rasa Indonesia otentik ke pasar Taiwan. Kami menyediakan berbagai macam produk makanan Indonesia — dari mie instan dan snack hingga bumbu masak dan minuman.",
     "mission": "Misi kami adalah menjembatani budaya melalui makanan, menyediakan produk Indonesia berkualitas tinggi dengan distribusi yang andal di seluruh Taiwan.",
     "stats": {
-      "since": "Berdiri Sejak",
+      "since": "Didirikan",
       "sinceValue": "2019",
       "stores": "Toko Mitra",
       "storesValue": "500+",
@@ -26,7 +26,11 @@
       "productsValue": "1000+",
       "customers": "Pelanggan Puas",
       "customersValue": "50.000+"
-    }
+    },
+    "label": "Siapa Kami",
+    "highlight1": "Produk bersertifikat Halal menjamin kualitas dan kepercayaan",
+    "highlight2": "Jaringan distribusi langsung di seluruh Taiwan",
+    "highlight3": "Cita rasa Indonesia otentik, dipilih dengan cermat"
   },
   "products": {
     "title": "Produk Kami",
@@ -40,7 +44,7 @@
   },
   "contact": {
     "title": "Hubungi Kami",
-    "subtitle": "Punya pertanyaan atau ingin memesan? Hubungi kami!",
+    "subtitle": "Ada pertanyaan atau ingin memesan? Hubungi kami!",
     "form": {
       "name": "Nama Lengkap",
       "email": "Alamat Email",
@@ -48,22 +52,35 @@
       "subject": "Subjek",
       "message": "Pesan",
       "submit": "Kirim Pesan",
-      "namePlaceholder": "Masukkan nama lengkap Anda",
-      "emailPlaceholder": "Masukkan alamat email Anda",
-      "phonePlaceholder": "Masukkan nomor telepon Anda",
-      "subjectPlaceholder": "Tentang apa ini?",
-      "messagePlaceholder": "Tulis pesan Anda di sini..."
+      "namePlaceholder": "Masukkan nama lengkap",
+      "emailPlaceholder": "Masukkan email",
+      "phonePlaceholder": "Masukkan nomor telepon",
+      "subjectPlaceholder": "Tentang apa?",
+      "messagePlaceholder": "Tulis pesan Anda..."
     },
     "info": {
       "address": "Alamat",
       "addressValue": "Taiwan",
       "phone": "Telepon",
       "email": "Email",
-      "hours": "Jam Operasional",
-      "hoursValue": "Sen - Sab: 09.00 - 18.00"
+      "hours": "Jam Kerja",
+      "hoursValue": "Senin - Sabtu: 09:00 - 18:00"
     },
-    "success": "Pesan Anda telah berhasil terkirim! Kami akan segera menghubungi Anda.",
-    "error": "Gagal mengirim pesan. Silakan coba lagi."
+    "success": "Pesan berhasil dikirim!",
+    "error": "Gagal mengirim pesan.",
+    "label": "Hubungi Kami",
+    "warehouse": "Alamat Gudang",
+    "office": "Alamat Kantor",
+    "phone": "Telepon",
+    "followUs": "Ikuti Kami di Media Sosial",
+    "formTitle": "Kirim Pesan",
+    "name": "Nama Lengkap",
+    "email": "Alamat Email",
+    "message": "Pesan",
+    "send": "Kirim Pesan",
+    "namePlaceholder": "Masukkan nama lengkap",
+    "emailPlaceholder": "Masukkan email",
+    "messagePlaceholder": "Tulis pesan Anda..."
   },
   "footer": {
     "description": "Sumber terpercaya untuk produk makanan Indonesia asli di Taiwan. Menjembatani budaya melalui cita rasa Indonesia.",
