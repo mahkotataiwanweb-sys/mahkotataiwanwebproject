@@ -13,8 +13,9 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-export function getLocalizedField<T extends Record<string, unknown>>(
-  item: T,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getLocalizedField(
+  item: any,
   field: string,
   locale: string
 ): string {

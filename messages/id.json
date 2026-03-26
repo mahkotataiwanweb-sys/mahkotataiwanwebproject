@@ -3,6 +3,8 @@
     "home": "Beranda",
     "about": "Tentang Kami",
     "products": "Produk",
+    "recipes": "Resep",
+    "events": "Acara",
     "contact": "Kontak",
     "language": "Bahasa"
   },
@@ -69,7 +71,15 @@
     "followUs": "Ikuti Kami",
     "copyright": "© {year} Mahkota Taiwan. Hak cipta dilindungi.",
     "privacy": "Kebijakan Privasi",
-    "terms": "Syarat dan Ketentuan"
+    "terms": "Syarat dan Ketentuan",
+    "links": {
+      "home": "Beranda",
+      "about": "Tentang Kami",
+      "products": "Produk",
+      "contact": "Kontak"
+    },
+    "contactUs": "Hubungi Kami",
+    "certifications": "Sertifikasi"
   },
   "admin": {
     "dashboard": "Dasbor",

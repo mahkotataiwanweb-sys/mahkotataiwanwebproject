@@ -3,24 +3,38 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import LanguageSwitcher from './LanguageSwitcher';
 import { cn } from '@/lib/utils';
 
-const navLinks = [
-  { href: '#hero', key: 'home' },
-  { href: '#about', key: 'about' },
-  { href: '#products', key: 'products' },
-  { href: '#contact', key: 'contact' },
+interface NavItem {
+  key: string;
+  type: 'page' | 'anchor';
+  href: string;
+}
+
+const navItems: NavItem[] = [
+  { key: 'home', type: 'page', href: '/' },
+  { key: 'products', type: 'page', href: '/products' },
+  { key: 'recipes', type: 'page', href: '/recipes' },
+  { key: 'events', type: 'page', href: '/events' },
+  { key: 'contact', type: 'anchor', href: '#contact' },
 ];
 
 export default function Navbar() {
   const t = useTranslations('nav');
+  const locale = useLocale();
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  const isHomePage = pathname === `/${locale}` || pathname === `/${locale}/`;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,10 +47,52 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  const scrollToSection = (href: string) => {
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileOpen]);
+
+  const handleNavClick = (item: NavItem) => {
     setIsMobileOpen(false);
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
+
+    if (item.type === 'anchor') {
+      if (isHomePage) {
+        // Same page: scroll to section
+        const el = document.querySelector(item.href);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        // Navigate to home then scroll
+        window.location.href = `/${locale}/${item.href}`;
+      }
+      return;
+    }
+
+    if (item.key === 'home') {
+      if (isHomePage) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      // else Link handles navigation
+    }
+  };
+
+  const getHref = (item: NavItem) => {
+    if (item.type === 'anchor') {
+      return isHomePage ? item.href : `/${locale}/${item.href}`;
+    }
+    if (item.key === 'home') return `/${locale}`;
+    return `/${locale}${item.href}`;
+  };
+
+  const isActive = (item: NavItem) => {
+    if (item.key === 'home') return isHomePage;
+    return pathname.includes(item.href);
   };
 
   return (
@@ -52,25 +108,60 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
           <motion.div whileHover={{ scale: 1.05 }} className="relative z-10">
-            <button onClick={() => scrollToSection('#hero')} className="flex items-center gap-3">
+            <Link href={`/${locale}`} className="flex items-center gap-3">
               <Image src="/images/logo.png" alt="Mahkota Taiwan" width={44} height={44} priority />
               <span className="font-heading text-lg font-bold text-navy hidden sm:block">
                 Mahkota Taiwan
               </span>
-            </button>
+            </Link>
           </motion.div>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map(({ href, key }) => (
-              <button
-                key={key}
-                onClick={() => scrollToSection(href)}
-                className="text-sm font-medium text-navy/80 hover:text-navy line-reveal tracking-wide uppercase"
-              >
-                {t(key)}
-              </button>
-            ))}
+            {navItems.map((item) => {
+              if (item.type === 'anchor') {
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => handleNavClick(item)}
+                    className={cn(
+                      'text-sm font-medium tracking-wide uppercase line-reveal transition-colors',
+                      isActive(item) ? 'text-red' : 'text-navy/80 hover:text-navy'
+                    )}
+                  >
+                    {t(item.key)}
+                  </button>
+                );
+              }
+
+              if (item.key === 'home' && isHomePage) {
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => handleNavClick(item)}
+                    className={cn(
+                      'text-sm font-medium tracking-wide uppercase line-reveal transition-colors',
+                      'text-red'
+                    )}
+                  >
+                    {t(item.key)}
+                  </button>
+                );
+              }
+
+              return (
+                <Link
+                  key={item.key}
+                  href={getHref(item)}
+                  className={cn(
+                    'text-sm font-medium tracking-wide uppercase line-reveal transition-colors',
+                    isActive(item) ? 'text-red' : 'text-navy/80 hover:text-navy'
+                  )}
+                >
+                  {t(item.key)}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Right side */}
@@ -79,6 +170,7 @@ export default function Navbar() {
             <button
               className="md:hidden relative z-10 p-2"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
+              aria-label="Toggle menu"
             >
               {isMobileOpen ? <X className="w-6 h-6 text-navy" /> : <Menu className="w-6 h-6 text-navy" />}
             </button>
@@ -97,18 +189,50 @@ export default function Navbar() {
             transition={{ duration: 0.3 }}
           >
             <nav className="flex flex-col items-center gap-8">
-              {navLinks.map(({ href, key }, i) => (
-                <motion.button
-                  key={key}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
-                  onClick={() => scrollToSection(href)}
-                  className="text-3xl font-heading font-bold text-navy hover:text-red transition-colors"
-                >
-                  {t(key)}
-                </motion.button>
-              ))}
+              {navItems.map((item, i) => {
+                if (item.type === 'anchor') {
+                  return (
+                    <motion.button
+                      key={item.key}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.1, duration: 0.5 }}
+                      onClick={() => handleNavClick(item)}
+                      className={cn(
+                        'text-3xl font-heading font-bold transition-colors',
+                        isActive(item) ? 'text-red' : 'text-navy hover:text-red'
+                      )}
+                    >
+                      {t(item.key)}
+                    </motion.button>
+                  );
+                }
+
+                return (
+                  <motion.div
+                    key={item.key}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1, duration: 0.5 }}
+                  >
+                    <Link
+                      href={getHref(item)}
+                      onClick={() => {
+                        setIsMobileOpen(false);
+                        if (item.key === 'home' && isHomePage) {
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                      }}
+                      className={cn(
+                        'text-3xl font-heading font-bold transition-colors',
+                        isActive(item) ? 'text-red' : 'text-navy hover:text-red'
+                      )}
+                    >
+                      {t(item.key)}
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </nav>
           </motion.div>
         )}

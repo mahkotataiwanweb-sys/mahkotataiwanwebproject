@@ -3,6 +3,8 @@
     "home": "Home",
     "about": "About Us",
     "products": "Products",
+    "recipes": "Recipes",
+    "events": "Events",
     "contact": "Contact",
     "language": "Language"
   },
@@ -69,7 +71,15 @@
     "followUs": "Follow Us",
     "copyright": "© {year} Mahkota Taiwan. All rights reserved.",
     "privacy": "Privacy Policy",
-    "terms": "Terms of Service"
+    "terms": "Terms of Service",
+    "links": {
+      "home": "Home",
+      "about": "About Us",
+      "products": "Products",
+      "contact": "Contact"
+    },
+    "contactUs": "Contact Us",
+    "certifications": "Certifications"
   },
   "admin": {
     "dashboard": "Dashboard",
