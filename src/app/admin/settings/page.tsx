@@ -26,7 +26,7 @@ export default function SettingsPage() {
     setSaving(true);
     const { id, created_at, updated_at, ...updateData } = settings;
     void id; void created_at; void updated_at;
-    const { error } = await supabase.from('company_settings').update(updateData as any).eq('id', settings.id);
+    const { error } = await supabase.from('company_settings').update(updateData).eq('id', settings.id);
     if (error) toast.error('Failed to save');
     else toast.success('Settings saved!');
     setSaving(false);

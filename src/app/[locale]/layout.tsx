@@ -18,7 +18,7 @@ export function generateStaticParams() {
 
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
-  if (!routing.locales.includes(locale as any)) notFound();
+  if (!routing.locales.includes(locale)) notFound();
   setRequestLocale(locale);
 
   const messages = await getMessages();

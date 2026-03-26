@@ -68,11 +68,11 @@ export default function ProductsPage() {
   const handleSave = async () => {
     try {
       if (editingProduct) {
-        const { error } = await supabase.from('products').update(form as any).eq('id', editingProduct.id);
+        const { error } = await supabase.from('products').update(form).eq('id', editingProduct.id);
         if (error) throw error;
         toast.success('Product updated!');
       } else {
-        const { error } = await supabase.from('products').insert(form as any);
+        const { error } = await supabase.from('products').insert(form);
         if (error) throw error;
         toast.success('Product created!');
       }
