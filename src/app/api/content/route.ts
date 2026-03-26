@@ -23,14 +23,14 @@ export async function PUT(request: NextRequest) {
     const results = [];
     for (const item of body) {
       const { id, ...updateData } = item;
-      const { data, error } = await admin.from('site_content').update(updateData).eq('id', id).select().single();
+      const { data, error } = await admin.from('site_content').update(updateData as any).eq('id', id).select().single();
       results.push(error ? { id, error: error.message } : data);
     }
     return NextResponse.json(results);
   }
 
   const { id, ...updateData } = body;
-  const { data, error } = await admin.from('site_content').update(updateData).eq('id', id).select().single();
+  const { data, error } = await admin.from('site_content').update(updateData as any).eq('id', id).select().single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json(data);

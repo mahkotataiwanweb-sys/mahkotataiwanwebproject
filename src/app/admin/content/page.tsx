@@ -35,7 +35,7 @@ export default function ContentPage() {
           value_en: item.value_en,
           value_id: item.value_id,
           value_zh: item.value_zh,
-        }).eq('id', item.id);
+        } as any).eq('id', item.id);
       }
       toast.success('All content saved!');
     } catch {
