@@ -7,7 +7,9 @@
     "events": "Events",
     "lifestyle": "Lifestyle",
     "contact": "Contact",
-    "language": "Language"
+    "language": "Language",
+    "moments": "Moments",
+    "allProducts": "All Products"
   },
   "hero": {
     "tagline": "Indonesian Flavors, Now in Taiwan",
@@ -94,13 +96,20 @@
       "home": "Home",
       "about": "About Us",
       "products": "Products",
+      "allProducts": "All Products",
       "recipes": "Recipes",
       "events": "Events",
       "lifestyle": "Lifestyle",
-      "contact": "Contact"
+      "contact": "Contact",
+      "whereToBuy": "Where to Buy"
     },
     "contactUs": "Contact Us",
-    "certifications": "Certifications"
+    "certifications": "Certifications",
+    "sections": {
+      "products": "Products",
+      "moments": "Moments",
+      "company": "Company"
+    }
   },
   "admin": {
     "dashboard": "Dashboard",

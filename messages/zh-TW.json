@@ -7,7 +7,9 @@
     "events": "活動",
     "lifestyle": "生活風格",
     "contact": "聯絡",
-    "language": "語言"
+    "language": "語言",
+    "moments": "精彩時刻",
+    "allProducts": "所有產品"
   },
   "hero": {
     "tagline": "印尼風味，在台灣呈現",
@@ -94,13 +96,20 @@
       "home": "首頁",
       "about": "關於我們",
       "products": "產品",
+      "allProducts": "所有產品",
       "recipes": "食譜",
       "events": "活動",
       "lifestyle": "生活風格",
-      "contact": "聯絡"
+      "contact": "聯絡我們",
+      "whereToBuy": "哪裡買"
     },
     "contactUs": "聯絡我們",
-    "certifications": "認證"
+    "certifications": "認證",
+    "sections": {
+      "products": "產品",
+      "moments": "精彩時刻",
+      "company": "公司"
+    }
   },
   "admin": {
     "dashboard": "儀表板",
