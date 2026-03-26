@@ -52,6 +52,9 @@ const navItems: NavItem[] = [
   { type: 'link', key: 'contact', href: '/contact' },
 ];
 
+// Pages that have dark navy hero headers
+const darkHeaderPages = ['/products', '/lifestyle', '/events', '/about'];
+
 export default function Navbar() {
   const t = useTranslations('nav');
   const locale = useLocale();
@@ -65,6 +68,14 @@ export default function Navbar() {
   const dropdownTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const isHomePage = pathname === `/${locale}` || pathname === `/${locale}/`;
+
+  // Check if current page has a dark header background
+  const isDarkHeaderPage = darkHeaderPages.some(
+    (p) => pathname === `/${locale}${p}` || pathname.startsWith(`/${locale}${p}/`)
+  );
+
+  // Use light (white) text when on dark header pages and NOT scrolled yet
+  const useLightText = isDarkHeaderPage && !isScrolled;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -108,6 +119,16 @@ export default function Navbar() {
     dropdownTimeout.current = setTimeout(() => setOpenDropdown(null), 150);
   };
 
+  // Dynamic color classes based on page and scroll state
+  const linkColor = (active: boolean) => {
+    if (active) return 'text-red';
+    if (useLightText) return 'text-white/90 hover:text-white';
+    return 'text-navy/80 hover:text-navy';
+  };
+
+  const logoTextColor = useLightText ? 'text-white' : 'text-navy';
+  const hamburgerColor = useLightText ? 'text-white' : 'text-navy';
+
   return (
     <>
       <motion.header
@@ -122,8 +143,21 @@ export default function Navbar() {
           {/* Logo */}
           <motion.div whileHover={{ scale: 1.05 }} className="relative z-10">
             <Link href={`/${locale}`} className="flex items-center gap-3">
-              <Image src="/images/logo.png" alt="Mahkota Taiwan" width={44} height={44} priority />
-              <span className="font-heading text-lg font-bold text-navy hidden sm:block">
+              <Image
+                src="/images/logo.png"
+                alt="Mahkota Taiwan"
+                width={44}
+                height={44}
+                priority
+                className={cn(
+                  'transition-all duration-300',
+                  useLightText && 'brightness-0 invert'
+                )}
+              />
+              <span className={cn(
+                'font-heading text-lg font-bold hidden sm:block transition-colors duration-300',
+                logoTextColor
+              )}>
                 Mahkota Taiwan
               </span>
             </Link>
@@ -151,8 +185,8 @@ export default function Navbar() {
                     key={item.key}
                     href={buildHref(item.href)}
                     className={cn(
-                      'text-sm font-medium tracking-wide uppercase line-reveal transition-colors',
-                      isLinkActive(item.href) ? 'text-red' : 'text-navy/80 hover:text-navy'
+                      'text-sm font-medium tracking-wide uppercase line-reveal transition-colors duration-300',
+                      linkColor(isLinkActive(item.href))
                     )}
                   >
                     {t(item.key)}
@@ -170,8 +204,8 @@ export default function Navbar() {
                 >
                   <button
                     className={cn(
-                      'flex items-center gap-1 text-sm font-medium tracking-wide uppercase transition-colors',
-                      isDropdownActive(item) ? 'text-red' : 'text-navy/80 hover:text-navy'
+                      'flex items-center gap-1 text-sm font-medium tracking-wide uppercase transition-colors duration-300',
+                      linkColor(isDropdownActive(item))
                     )}
                   >
                     {t(item.key)}
@@ -224,7 +258,10 @@ export default function Navbar() {
               onClick={() => setIsMobileOpen(!isMobileOpen)}
               aria-label="Toggle menu"
             >
-              {isMobileOpen ? <X className="w-6 h-6 text-navy" /> : <Menu className="w-6 h-6 text-navy" />}
+              {isMobileOpen
+                ? <X className="w-6 h-6 text-navy" />
+                : <Menu className={cn('w-6 h-6 transition-colors duration-300', hamburgerColor)} />
+              }
             </button>
           </div>
         </div>
