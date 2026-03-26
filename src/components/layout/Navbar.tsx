@@ -11,7 +11,7 @@ import { Menu, X, ChevronDown } from 'lucide-react';
 import LanguageSwitcher from './LanguageSwitcher';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
-import type { NavMenuItem } from '@/types/database';
+import type { NavMenuItem, Category } from '@/types/database';
 
 // Fallback hardcoded nav items (displayed while DB loads or on error)
 interface FallbackNavLink {
@@ -28,6 +28,7 @@ interface FallbackNavItemSimple {
 interface FallbackNavItemDropdown {
   type: 'dropdown';
   key: string;
+  href: string;
   children: FallbackNavLink[];
 }
 
@@ -38,25 +39,29 @@ const fallbackNavItems: FallbackNavItem[] = [
   {
     type: 'dropdown',
     key: 'products',
+    href: '/products',
     children: [
       { key: 'allProducts', href: '/products' },
-      { key: 'recipes', href: '/recipes' },
     ],
   },
+  { type: 'link', key: 'recipes', href: '/recipes' },
   {
     type: 'dropdown',
     key: 'moments',
+    href: '/moments',
     children: [
       { key: 'events', href: '/events' },
       { key: 'lifestyle', href: '/lifestyle' },
+      { key: 'gallery', href: '/gallery' },
     ],
   },
   { type: 'link', key: 'about', href: '/about' },
   { type: 'link', key: 'contact', href: '/contact' },
+  { type: 'link', key: 'whereToBuy', href: '/where-to-buy' },
 ];
 
 // Pages that have dark navy hero headers
-const darkHeaderPages = ['/products', '/lifestyle', '/events', '/about'];
+const darkHeaderPages = ['/products', '/lifestyle', '/events', '/about', '/gallery'];
 
 export default function Navbar() {
   const t = useTranslations('nav');
@@ -72,6 +77,7 @@ export default function Navbar() {
 
   // Dynamic menu items from database
   const [dbMenuItems, setDbMenuItems] = useState<NavMenuItem[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [menuLoaded, setMenuLoaded] = useState(false);
 
   const isHomePage = pathname === `/${locale}` || pathname === `/${locale}/`;
@@ -84,17 +90,19 @@ export default function Navbar() {
   // Use light (white) text when on dark header pages and NOT scrolled yet
   const useLightText = isDarkHeaderPage && !isScrolled;
 
-  // Fetch navbar_menus from Supabase
+  // Fetch navbar_menus and categories from Supabase
   useEffect(() => {
-    async function fetchMenus() {
+    async function fetchData() {
       try {
-        const { data, error } = await supabase
-          .from('navbar_menus')
-          .select('*')
-          .eq('is_active', true)
-          .order('sort_order');
-        if (!error && data && data.length > 0) {
-          setDbMenuItems(data as NavMenuItem[]);
+        const [menusRes, catsRes] = await Promise.all([
+          supabase.from('navbar_menus').select('*').eq('is_active', true).order('sort_order'),
+          supabase.from('categories').select('*').eq('is_active', true).order('sort_order'),
+        ]);
+        if (menusRes.data && menusRes.data.length > 0) {
+          setDbMenuItems(menusRes.data as NavMenuItem[]);
+        }
+        if (catsRes.data) {
+          setCategories(catsRes.data as Category[]);
         }
       } catch {
         // Keep fallback
@@ -102,7 +110,7 @@ export default function Navbar() {
         setMenuLoaded(true);
       }
     }
-    fetchMenus();
+    fetchData();
   }, []);
 
   // Build tree structure from flat DB items
@@ -131,6 +139,13 @@ export default function Navbar() {
     if (locale === 'zh-TW') return item.label_zh || item.label_en;
     if (locale === 'id') return item.label_id || item.label_en;
     return item.label_en;
+  };
+
+  // Category label helper
+  const getCategoryLabel = (cat: Category) => {
+    if (locale === 'zh-TW') return cat.name_zh || cat.name_en;
+    if (locale === 'id') return cat.name_id || cat.name_en;
+    return cat.name_en;
   };
 
   useEffect(() => {
@@ -164,7 +179,9 @@ export default function Navbar() {
 
   const isLinkActive = (href: string) => {
     if (href === '/') return isHomePage;
-    const fullPath = href.startsWith('/') ? `/${locale}${href}` : `/${locale}/${href}`;
+    // Strip query parameters for matching
+    const hrefPath = href.split('?')[0];
+    const fullPath = hrefPath.startsWith('/') ? `/${locale}${hrefPath}` : `/${locale}/${hrefPath}`;
     return pathname.startsWith(fullPath);
   };
 
@@ -187,7 +204,6 @@ export default function Navbar() {
     return 'text-navy/80 hover:text-navy';
   };
 
-  const logoTextColor = useLightText ? 'text-white' : 'text-navy';
   const hamburgerColor = useLightText ? 'text-white' : 'text-navy';
 
   // Decide whether to use DB menus or fallback
@@ -201,6 +217,10 @@ export default function Navbar() {
       const isHome = item.url === '/';
       const isActive = isLinkActive(item.url);
       const isChildActive = hasChildren && item.children.some((c) => isLinkActive(c.url));
+      const isProductsDropdown = item.url === '/products';
+      const isCategoryActive = isProductsDropdown && categories.some((cat) =>
+        pathname === `/${locale}/products` && typeof window !== 'undefined' && window.location.search.includes(`category=${cat.slug}`)
+      );
 
       if (!hasChildren) {
         // Home special behavior on homepage
@@ -209,7 +229,12 @@ export default function Navbar() {
             <button
               key={item.id}
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="text-sm font-medium tracking-wide uppercase line-reveal transition-colors text-navy font-bold border-b-2 border-red pb-0.5"
+              className={cn(
+                'text-sm font-medium tracking-wide uppercase line-reveal transition-colors',
+                useLightText
+                  ? 'text-white font-bold border-b-2 border-white pb-0.5'
+                  : 'text-navy font-bold border-b-2 border-red pb-0.5'
+              )}
             >
               {getLabel(item)}
             </button>
@@ -241,7 +266,7 @@ export default function Navbar() {
           <button
             className={cn(
               'flex items-center gap-1 text-sm font-medium tracking-wide uppercase transition-colors duration-300',
-              linkColor(isChildActive || isActive)
+              linkColor(isChildActive || isActive || isCategoryActive)
             )}
           >
             {getLabel(item)}
@@ -260,7 +285,7 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.2 }}
-                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 min-w-[180px] bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden"
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 min-w-[220px] bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden"
               >
                 <div className="py-2">
                   {item.children.map((child) => (
@@ -277,6 +302,21 @@ export default function Navbar() {
                       {getLabel(child)}
                     </Link>
                   ))}
+                  {/* Category items for Products dropdown */}
+                  {isProductsDropdown && categories.length > 0 && (
+                    <>
+                      <div className="mx-4 my-1.5 border-t border-navy/10" />
+                      {categories.map((cat) => (
+                        <Link
+                          key={cat.id}
+                          href={buildHref(`/products?category=${cat.slug}`)}
+                          className="block px-5 py-2 text-sm text-navy/60 hover:text-navy hover:bg-cream/50 transition-colors"
+                        >
+                          {getCategoryLabel(cat)}
+                        </Link>
+                      ))}
+                    </>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -292,6 +332,7 @@ export default function Navbar() {
       const hasChildren = item.children.length > 0;
       const isActive = isLinkActive(item.url);
       const isChildActive = hasChildren && item.children.some((c) => isLinkActive(c.url));
+      const isProductsDropdown = item.url === '/products';
 
       if (!hasChildren) {
         return (
@@ -369,6 +410,22 @@ export default function Navbar() {
                     {getLabel(child)}
                   </Link>
                 ))}
+                {/* Category items for Products dropdown */}
+                {isProductsDropdown && categories.length > 0 && (
+                  <>
+                    <div className="w-16 border-t border-navy/10 my-1" />
+                    {categories.map((cat) => (
+                      <Link
+                        key={cat.id}
+                        href={buildHref(`/products?category=${cat.slug}`)}
+                        onClick={() => setIsMobileOpen(false)}
+                        className="text-lg font-medium text-navy/50 hover:text-red transition-colors"
+                      >
+                        {getCategoryLabel(cat)}
+                      </Link>
+                    ))}
+                  </>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -390,7 +447,12 @@ export default function Navbar() {
             <button
               key={item.key}
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="text-sm font-medium tracking-wide uppercase line-reveal transition-colors text-navy font-bold border-b-2 border-red pb-0.5"
+              className={cn(
+                'text-sm font-medium tracking-wide uppercase line-reveal transition-colors',
+                useLightText
+                  ? 'text-white font-bold border-b-2 border-white pb-0.5'
+                  : 'text-navy font-bold border-b-2 border-red pb-0.5'
+              )}
             >
               {t(item.key)}
             </button>
@@ -412,6 +474,7 @@ export default function Navbar() {
       }
 
       // Dropdown
+      const isProductsDropdown = item.key === 'products';
       return (
         <div
           key={item.key}
@@ -441,7 +504,7 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.2 }}
-                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 min-w-[180px] bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden"
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 min-w-[220px] bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden"
               >
                 <div className="py-2">
                   {item.children.map((child) => (
@@ -458,6 +521,21 @@ export default function Navbar() {
                       {t(child.key)}
                     </Link>
                   ))}
+                  {/* Category items for Products dropdown */}
+                  {isProductsDropdown && categories.length > 0 && (
+                    <>
+                      <div className="mx-4 my-1.5 border-t border-navy/10" />
+                      {categories.map((cat) => (
+                        <Link
+                          key={cat.id}
+                          href={buildHref(`/products?category=${cat.slug}`)}
+                          className="block px-5 py-2 text-sm text-navy/60 hover:text-navy hover:bg-cream/50 transition-colors"
+                        >
+                          {getCategoryLabel(cat)}
+                        </Link>
+                      ))}
+                    </>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -497,6 +575,7 @@ export default function Navbar() {
       }
 
       // Mobile dropdown
+      const isProductsDropdown = item.key === 'products';
       return (
         <motion.div
           key={item.key}
@@ -545,6 +624,22 @@ export default function Navbar() {
                     {t(child.key)}
                   </Link>
                 ))}
+                {/* Category items for Products dropdown */}
+                {isProductsDropdown && categories.length > 0 && (
+                  <>
+                    <div className="w-16 border-t border-navy/10 my-1" />
+                    {categories.map((cat) => (
+                      <Link
+                        key={cat.id}
+                        href={buildHref(`/products?category=${cat.slug}`)}
+                        onClick={() => setIsMobileOpen(false)}
+                        className="text-lg font-medium text-navy/50 hover:text-red transition-colors"
+                      >
+                        {getCategoryLabel(cat)}
+                      </Link>
+                    ))}
+                  </>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -570,20 +665,14 @@ export default function Navbar() {
               <Image
                 src="/images/logo.png"
                 alt="Mahkota Taiwan"
-                width={48}
-                height={48}
+                width={56}
+                height={56}
                 priority
                 className={cn(
-                  'w-10 h-10 sm:w-12 sm:h-12 transition-all duration-300',
+                  'w-12 h-12 sm:w-14 sm:h-14 transition-all duration-300',
                   useLightText && 'brightness-0 invert'
                 )}
               />
-              <span className={cn(
-                'font-heading text-lg font-bold hidden sm:block transition-colors duration-300',
-                logoTextColor
-              )}>
-                Mahkota Taiwan
-              </span>
             </Link>
           </motion.div>
 
