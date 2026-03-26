@@ -21,10 +21,17 @@ export default function LoadingScreen() {
           transition={{ duration: 0.8, ease: [0.65, 0, 0.35, 1] }}
         >
           <motion.div
+            className="w-32 h-32 sm:w-40 sm:h-40 relative"
             animate={{ scale: [1, 1.1, 1], opacity: [1, 0.7, 1] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
-            <Image src="/images/logo.png" alt="Mahkota Taiwan" width={80} height={80} priority />
+            {/* Pulsing glow effect */}
+            <motion.div
+              className="absolute inset-0 rounded-full bg-red/20 blur-2xl"
+              animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <Image src="/images/logo.png" alt="Mahkota Taiwan" width={160} height={160} priority className="relative z-10" />
           </motion.div>
           <motion.div
             className="mt-6 h-[2px] bg-red rounded-full"

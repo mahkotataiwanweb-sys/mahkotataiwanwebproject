@@ -314,7 +314,12 @@ export interface Article {
   content_en: string;
   content_id: string;
   content_zh: string;
+  description_en: string | null;
+  description_id: string | null;
+  description_zh: string | null;
   image_url: string | null;
+  slider_section: string | null;
+  gallery_images: string[] | null;
   published_at: string;
   is_active: boolean;
   sort_order: number;
@@ -335,7 +340,12 @@ export interface ArticleInsert {
   content_en: string;
   content_id: string;
   content_zh: string;
+  description_en?: string | null;
+  description_id?: string | null;
+  description_zh?: string | null;
   image_url?: string | null;
+  slider_section?: string | null;
+  gallery_images?: string[] | null;
   published_at?: string;
   is_active?: boolean;
   sort_order?: number;
@@ -356,7 +366,12 @@ export interface ArticleUpdate {
   content_en?: string;
   content_id?: string;
   content_zh?: string;
+  description_en?: string | null;
+  description_id?: string | null;
+  description_zh?: string | null;
   image_url?: string | null;
+  slider_section?: string | null;
+  gallery_images?: string[] | null;
   published_at?: string;
   is_active?: boolean;
   sort_order?: number;
@@ -395,4 +410,26 @@ export interface StorePartnerUpdate {
   is_active?: boolean;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface NavMenuItem {
+  id: string;
+  parent_id: string | null;
+  label_en: string;
+  label_id: string;
+  label_zh: string;
+  url: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export interface FooterLink {
+  id: string;
+  section: string;
+  label_en: string;
+  label_id: string;
+  label_zh: string;
+  url: string;
+  sort_order: number;
+  is_active: boolean;
 }

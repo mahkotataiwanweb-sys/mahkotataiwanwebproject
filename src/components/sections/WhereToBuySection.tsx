@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useLocale } from 'next-intl';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ShoppingBag, ExternalLink } from 'lucide-react';
@@ -12,6 +14,7 @@ import type { StorePartner } from '@/types/database';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function WhereToBuySection() {
+  const locale = useLocale();
   const [partners, setPartners] = useState<StorePartner[]>([]);
   const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
@@ -142,7 +145,12 @@ export default function WhereToBuySection() {
             Find Us
           </p>
           <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-3">
-            Where to Buy
+            <Link
+              href={`/${locale}/where-to-buy`}
+              className="hover:text-red transition-colors duration-300 hover:underline underline-offset-4 decoration-red/50"
+            >
+              Where to Buy
+            </Link>
           </h2>
           <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
           <p className="text-navy/60 max-w-lg mx-auto">

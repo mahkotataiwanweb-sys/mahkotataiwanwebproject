@@ -67,7 +67,9 @@
       "phone": "Telepon",
       "email": "Email",
       "hours": "Jam Kerja",
-      "hoursValue": "Senin - Sabtu: 09:00 - 18:00"
+      "hoursValue": "Senin - Sabtu: 09:00 - 18:00",
+      "emailValue": "mahkotataiwan@gmail.com",
+      "phoneValue": "+886-XXX-XXX-XXX"
     },
     "success": "Pesan berhasil dikirim!",
     "error": "Gagal mengirim pesan.",
@@ -147,5 +149,10 @@
     "close": "Tutup",
     "readMore": "Baca Selengkapnya",
     "showLess": "Tampilkan Lebih Sedikit"
+  },
+  "whereToBuy": {
+    "title": "Tempat Membeli",
+    "subtitle": "Temukan produk Mahkota Taiwan di mitra ritel terpercaya di seluruh Taiwan.",
+    "findUs": "Temukan Kami"
   }
 }

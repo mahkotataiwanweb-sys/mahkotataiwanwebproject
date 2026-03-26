@@ -6,7 +6,7 @@ import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowLeft, MapPin, Phone, Facebook, Instagram, Music2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Phone, Mail, Facebook, Instagram, Music2 } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,7 +20,8 @@ export default function ContactPage() {
   const t = useTranslations('contact');
   const locale = useLocale();
   const headerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const infoCardsRef = useRef<HTMLDivElement>(null);
+  const socialRef = useRef<HTMLDivElement>(null);
 
   // GSAP header animation
   useEffect(() => {
@@ -41,27 +42,52 @@ export default function ContactPage() {
     return () => ctx.revert();
   }, []);
 
-  // GSAP content animation
+  // GSAP staggered info cards animation
   useEffect(() => {
+    if (!infoCardsRef.current) return;
+    const cards = infoCardsRef.current.children;
     const ctx = gsap.context(() => {
-      if (contentRef.current) {
-        gsap.fromTo(
-          contentRef.current.children,
-          { opacity: 0, y: 40 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            stagger: 0.12,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: contentRef.current,
-              start: 'top 80%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
-      }
+      gsap.fromTo(
+        cards,
+        { opacity: 0, y: 60, scale: 0.9 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.7,
+          stagger: 0.15,
+          ease: 'back.out(1.4)',
+          scrollTrigger: {
+            trigger: infoCardsRef.current,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
+    });
+    return () => ctx.revert();
+  }, []);
+
+  // GSAP social section animation
+  useEffect(() => {
+    if (!socialRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        socialRef.current!.children,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: socialRef.current,
+            start: 'top 90%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
     });
     return () => ctx.revert();
   }, []);
@@ -101,34 +127,58 @@ export default function ContactPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-16" ref={contentRef}>
-        {/* Info Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
-          <div className="bg-white rounded-2xl p-6 text-center premium-shadow">
+      <div className="max-w-5xl mx-auto px-6 py-16">
+        {/* Info Cards - 4 cards grid */}
+        <div ref={infoCardsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {/* Warehouse Address */}
+          <div className="bg-white rounded-2xl p-6 text-center premium-shadow hover:shadow-xl transition-shadow duration-300">
             <div className="w-12 h-12 rounded-xl bg-red/10 flex items-center justify-center mx-auto mb-3">
               <MapPin className="w-5 h-5 text-red" />
             </div>
             <h4 className="font-semibold text-navy text-sm mb-1">{t('warehouse')}</h4>
             <p className="text-navy/60 text-sm">No. 53, Lane 216, Nanshi 4th Street, Linkou District, New Taipei City</p>
           </div>
-          <div className="bg-white rounded-2xl p-6 text-center premium-shadow">
+
+          {/* Office Address */}
+          <div className="bg-white rounded-2xl p-6 text-center premium-shadow hover:shadow-xl transition-shadow duration-300">
             <div className="w-12 h-12 rounded-xl bg-red/10 flex items-center justify-center mx-auto mb-3">
               <MapPin className="w-5 h-5 text-red" />
             </div>
             <h4 className="font-semibold text-navy text-sm mb-1">{t('office')}</h4>
             <p className="text-navy/60 text-sm">No. 83, Liyuan 2nd Street, Linkou District, New Taipei City</p>
           </div>
-          <div className="bg-white rounded-2xl p-6 text-center premium-shadow">
+
+          {/* Phone */}
+          <div className="bg-white rounded-2xl p-6 text-center premium-shadow hover:shadow-xl transition-shadow duration-300">
             <div className="w-12 h-12 rounded-xl bg-red/10 flex items-center justify-center mx-auto mb-3">
               <Phone className="w-5 h-5 text-red" />
             </div>
             <h4 className="font-semibold text-navy text-sm mb-1">{t('phone')}</h4>
-            <p className="text-navy/60 text-sm">0226099118</p>
+            <a
+              href="tel:+886226099118"
+              className="text-navy/60 text-sm hover:text-red transition-colors duration-300"
+            >
+              +886-2-26099118
+            </a>
+          </div>
+
+          {/* Email */}
+          <div className="bg-white rounded-2xl p-6 text-center premium-shadow hover:shadow-xl transition-shadow duration-300">
+            <div className="w-12 h-12 rounded-xl bg-red/10 flex items-center justify-center mx-auto mb-3">
+              <Mail className="w-5 h-5 text-red" />
+            </div>
+            <h4 className="font-semibold text-navy text-sm mb-1">{t('info.email')}</h4>
+            <a
+              href="mailto:mahkotataiwan@gmail.com"
+              className="text-navy/60 text-sm hover:text-red transition-colors duration-300 break-all"
+            >
+              mahkotataiwan@gmail.com
+            </a>
           </div>
         </div>
 
         {/* Social Links */}
-        <div className="text-center">
+        <div ref={socialRef} className="text-center">
           <p className="text-navy font-semibold text-sm mb-4">{t('followUs')}</p>
           <div className="flex justify-center gap-4">
             {socials.map((s) => {

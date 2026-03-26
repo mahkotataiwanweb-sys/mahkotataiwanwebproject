@@ -74,6 +74,7 @@ export default function HeroSlider() {
   const [direction, setDirection] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
 
   // Fetch slides from Supabase
   useEffect(() => {
@@ -123,25 +124,56 @@ export default function HeroSlider() {
   const title = getLocalizedField(currentSlide, 'title', locale);
   const subtitle = getLocalizedField(currentSlide, 'subtitle', locale);
 
+  // Smoother slide variants with scale for parallax feel
   const slideVariants = {
     enter: (dir: number) => ({
-      x: dir > 0 ? '100%' : '-100%',
+      x: dir > 0 ? '60%' : '-60%',
       opacity: 0,
+      scale: 1.1,
     }),
     center: {
       x: 0,
       opacity: 1,
+      scale: 1,
     },
     exit: (dir: number) => ({
-      x: dir > 0 ? '-100%' : '100%',
+      x: dir > 0 ? '-40%' : '40%',
       opacity: 0,
+      scale: 1.05,
     }),
+  };
+
+  // Text entrance variants - staggered and premium
+  const textContainerVariants = {
+    hidden: {},
+    visible: {
+      transition: { staggerChildren: 0.15, delayChildren: 0.3 },
+    },
+  };
+
+  const textItemVariants = {
+    hidden: { opacity: 0, y: 40, filter: 'blur(8px)' },
+    visible: {
+      opacity: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
+    },
+  };
+
+  const lineVariants = {
+    hidden: { scaleX: 0, opacity: 0 },
+    visible: {
+      scaleX: 1,
+      opacity: 1,
+      transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
+    },
   };
 
   return (
     <section
       id="hero"
-      className="relative w-full h-screen min-h-[600px] max-h-[900px] overflow-hidden"
+      className="relative w-full h-[55vh] md:h-[75vh] min-h-[400px] max-h-[900px] overflow-hidden"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -154,18 +186,26 @@ export default function HeroSlider() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: 0.7, ease: [0.65, 0, 0.35, 1] }}
+          transition={{ duration: 0.9, ease: [0.43, 0.13, 0.23, 0.96] }}
           className="absolute inset-0"
         >
           {currentSlide.image_url ? (
-            <Image
-              src={currentSlide.image_url}
-              alt={title}
-              fill
-              className="object-cover"
-              priority={currentIndex === 0}
-              sizes="100vw"
-            />
+            <motion.div
+              ref={imageRef}
+              className="absolute inset-0"
+              initial={{ scale: 1.15 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 6, ease: 'linear' }}
+            >
+              <Image
+                src={currentSlide.image_url}
+                alt={title}
+                fill
+                className="object-cover"
+                priority={currentIndex === 0}
+                sizes="100vw"
+              />
+            </motion.div>
           ) : (
             <div
               className={`absolute inset-0 bg-gradient-to-br ${slideBgColors[currentIndex % slideBgColors.length]}`}
@@ -191,12 +231,13 @@ export default function HeroSlider() {
 
           {/* Slide content */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="max-w-4xl mx-auto px-6 text-center">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-              >
+            <motion.div
+              className="max-w-4xl mx-auto px-6 text-center"
+              variants={textContainerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <motion.div variants={textItemVariants}>
                 <Image
                   src="/images/logo.png"
                   alt="Mahkota Taiwan"
@@ -208,25 +249,19 @@ export default function HeroSlider() {
               </motion.div>
 
               <motion.h1
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.7 }}
+                variants={textItemVariants}
                 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg"
               >
                 {title}
               </motion.h1>
 
               <motion.div
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.6, duration: 0.6 }}
-                className="w-20 h-[3px] bg-red mx-auto mb-6"
+                variants={lineVariants}
+                className="w-20 h-[3px] bg-red mx-auto mb-6 origin-center"
               />
 
               <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7, duration: 0.6 }}
+                variants={textItemVariants}
                 className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow"
               >
                 {subtitle}
@@ -235,15 +270,13 @@ export default function HeroSlider() {
               {currentSlide.link_url && (
                 <motion.a
                   href={currentSlide.link_url}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.9, duration: 0.6 }}
+                  variants={textItemVariants}
                   className="inline-block mt-8 px-8 py-4 bg-red text-white rounded-full text-sm font-semibold tracking-wide uppercase hover:bg-red-dark transition-colors duration-300 premium-shadow"
                 >
                   <span>Learn More</span>
                 </motion.a>
               )}
-            </div>
+            </motion.div>
           </div>
         </motion.div>
       </AnimatePresence>

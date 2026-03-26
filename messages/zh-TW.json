@@ -67,7 +67,9 @@
       "phone": "電話",
       "email": "電子郵件",
       "hours": "營業時間",
-      "hoursValue": "週一至週六：09:00 - 18:00"
+      "hoursValue": "週一至週六：09:00 - 18:00",
+      "emailValue": "mahkotataiwan@gmail.com",
+      "phoneValue": "+886-XXX-XXX-XXX"
     },
     "success": "訊息已成功發送！",
     "error": "發送失敗，請重試。",
@@ -147,5 +149,10 @@
     "close": "關閉",
     "readMore": "閱讀更多",
     "showLess": "收起"
+  },
+  "whereToBuy": {
+    "title": "哪裡買",
+    "subtitle": "在台灣各地值得信賴的零售合作夥伴找到皇冠台灣產品。",
+    "findUs": "找到我們"
   }
 }
