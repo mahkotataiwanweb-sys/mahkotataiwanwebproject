@@ -23,6 +23,7 @@ const fallbackFooterSections = [
     links: [
       { key: 'events', href: '/events' },
       { key: 'lifestyle', href: '/lifestyle' },
+      { key: 'gallery', href: '/gallery' },
     ],
   },
   {
