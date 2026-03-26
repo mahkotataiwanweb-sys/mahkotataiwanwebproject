@@ -26,7 +26,11 @@
       "productsValue": "1000+",
       "customers": "Happy Customers",
       "customersValue": "50,000+"
-    }
+    },
+    "label": "Who We Are",
+    "highlight1": "Halal certified products ensuring quality and trust",
+    "highlight2": "Direct distribution network across Taiwan",
+    "highlight3": "Authentic Indonesian flavors, carefully sourced"
   },
   "products": {
     "title": "Our Products",
@@ -62,8 +66,21 @@
       "hours": "Business Hours",
       "hoursValue": "Mon - Sat: 9:00 AM - 6:00 PM"
     },
-    "success": "Your message has been sent successfully! We will get back to you soon.",
-    "error": "Failed to send message. Please try again."
+    "success": "Your message has been sent successfully!",
+    "error": "Failed to send message. Please try again.",
+    "label": "Get In Touch",
+    "warehouse": "Warehouse Address",
+    "office": "Office Address",
+    "phone": "Phone",
+    "followUs": "Follow Us on Social Media",
+    "formTitle": "Send Us a Message",
+    "name": "Full Name",
+    "email": "Email Address",
+    "message": "Message",
+    "send": "Send Message",
+    "namePlaceholder": "Enter your full name",
+    "emailPlaceholder": "Enter your email address",
+    "messagePlaceholder": "Write your message here..."
   },
   "footer": {
     "description": "Your trusted source for authentic Indonesian food products in Taiwan. Bridging cultures through the flavors of Indonesia.",

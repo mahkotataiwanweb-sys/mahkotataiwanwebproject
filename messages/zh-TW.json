@@ -15,7 +15,7 @@
   },
   "about": {
     "title": "關於 Mahkota Taiwan",
-    "description": "Mahkota Taiwan 是一家位於台灣的領先印尼食品經銷商，致力於將正宗的印尼風味帶入台灣市場。我們供應各種深受喜愛的印尼食品 — 從泡麵和零食到烹飪香料和飲料 — 確保在台灣的印尼社區和當地美食愛好者都能享受到正宗的印尼風味。",
+    "description": "Mahkota Taiwan 是一家位於台灣的領先印尼食品經銷商，致力於將正宗的印尼風味帶入台灣市場。我們供應各種深受喜愛的印尼食品 — 從泡麵和零食到烹飪香料和飲料。",
     "mission": "我們的使命是透過食物連結文化，以可靠的配送網絡在全台灣提供高品質的印尼產品。",
     "stats": {
       "since": "成立於",
@@ -26,7 +26,11 @@
       "productsValue": "1000+",
       "customers": "滿意客戶",
       "customersValue": "50,000+"
-    }
+    },
+    "label": "關於我們",
+    "highlight1": "清真認證產品，保證品質與信任",
+    "highlight2": "覆蓋全台灣的直接配送網絡",
+    "highlight3": "正宗印尼風味，精心選材"
   },
   "products": {
     "title": "我們的產品",
@@ -48,11 +52,11 @@
       "subject": "主旨",
       "message": "訊息",
       "submit": "發送訊息",
-      "namePlaceholder": "請輸入您的姓名",
-      "emailPlaceholder": "請輸入您的電子郵件",
-      "phonePlaceholder": "請輸入您的電話號碼",
+      "namePlaceholder": "請輸入姓名",
+      "emailPlaceholder": "請輸入電子郵件",
+      "phonePlaceholder": "請輸入電話號碼",
       "subjectPlaceholder": "這是關於什麼的？",
-      "messagePlaceholder": "在此撰寫您的訊息..."
+      "messagePlaceholder": "在此撰寫訊息..."
     },
     "info": {
       "address": "地址",
@@ -60,10 +64,23 @@
       "phone": "電話",
       "email": "電子郵件",
       "hours": "營業時間",
-      "hoursValue": "週一至週六：上午 9:00 - 下午 6:00"
+      "hoursValue": "週一至週六：09:00 - 18:00"
     },
-    "success": "您的訊息已成功發送！我們會盡快回覆您。",
-    "error": "發送訊息失敗，請重試。"
+    "success": "訊息已成功發送！",
+    "error": "發送失敗，請重試。",
+    "label": "聯繫方式",
+    "warehouse": "倉庫地址",
+    "office": "辦公室地址",
+    "phone": "電話",
+    "followUs": "在社交媒體上關注我們",
+    "formTitle": "發送訊息",
+    "name": "姓名",
+    "email": "電子郵件",
+    "message": "訊息",
+    "send": "發送訊息",
+    "namePlaceholder": "請輸入姓名",
+    "emailPlaceholder": "請輸入電子郵件",
+    "messagePlaceholder": "在此撰寫訊息..."
   },
   "footer": {
     "description": "您在台灣值得信賴的正宗印尼食品來源。透過印尼風味連結文化。",
