@@ -19,26 +19,11 @@ export default function AboutSection() {
   const t = useTranslations('about');
   const sectionRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
   const counterRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Image reveal
-      if (imageRef.current) {
-        gsap.fromTo(imageRef.current, 
-          { clipPath: 'inset(0 100% 0 0)' },
-          {
-            clipPath: 'inset(0 0% 0 0)',
-            duration: 1.2,
-            ease: 'power3.inOut',
-            scrollTrigger: { trigger: imageRef.current, start: 'top 80%', toggleActions: 'play none none reverse' }
-          }
-        );
-      }
-
-      // Text stagger
       if (textRef.current) {
         gsap.fromTo(textRef.current.children,
           { opacity: 0, y: 40 },
@@ -49,7 +34,6 @@ export default function AboutSection() {
         );
       }
 
-      // Counter animation
       counterRefs.current.forEach((el, i) => {
         if (!el) return;
         const target = stats[i].value;
@@ -70,51 +54,35 @@ export default function AboutSection() {
   }, []);
 
   return (
-    <section id="about" ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+    <section id="about" ref={sectionRef} className="py-20 sm:py-24 bg-cream relative overflow-hidden">
       {/* Decorative */}
       <div className="absolute top-0 right-0 w-1/3 h-full bg-navy/[0.02] -skew-x-12 translate-x-1/4" />
       
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Image Side */}
-          <div ref={imageRef} className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-navy/10">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-20 h-20 rounded-full bg-red/10 flex items-center justify-center mx-auto mb-4">
-                  <Award className="w-10 h-10 text-red" />
-                </div>
-                <p className="text-navy/40 text-sm font-medium">Company Image</p>
+      <div className="max-w-4xl mx-auto px-6">
+        {/* Text Content - Centered */}
+        <div ref={textRef} className="text-center">
+          <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
+            {t('label')}
+          </p>
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-6 leading-tight">
+            {t('title')}
+          </h2>
+          <div className="w-16 h-[2px] bg-red mx-auto mb-6" />
+          <p className="text-navy/70 leading-relaxed mb-4 text-base sm:text-lg max-w-2xl mx-auto">
+            {t('description')}
+          </p>
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 mb-0">
+            {['highlight1', 'highlight2', 'highlight3'].map((key) => (
+              <div key={key} className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-red shrink-0" />
+                <p className="text-navy/60 text-sm">{t(key)}</p>
               </div>
-            </div>
-            {/* Decorative frame */}
-            <div className="absolute -bottom-4 -right-4 w-full h-full border-2 border-red/20 rounded-2xl -z-10" />
-          </div>
-
-          {/* Text Side */}
-          <div ref={textRef}>
-            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
-              {t('label')}
-            </p>
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-6 leading-tight">
-              {t('title')}
-            </h2>
-            <div className="w-16 h-[2px] bg-red mb-6" />
-            <p className="text-navy/70 leading-relaxed mb-6 text-base sm:text-lg">
-              {t('description')}
-            </p>
-            <div className="space-y-3 mb-8">
-              {['highlight1', 'highlight2', 'highlight3'].map((key) => (
-                <div key={key} className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-red shrink-0" />
-                  <p className="text-navy/60 text-sm">{t(key)}</p>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
 
         {/* Stats Row */}
-        <div ref={statsRef} className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div ref={statsRef} className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, i) => {
             const Icon = stat.icon;
             return (
