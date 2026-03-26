@@ -9,7 +9,9 @@
     "contact": "聯絡",
     "language": "語言",
     "moments": "精彩時刻",
-    "allProducts": "所有產品"
+    "allProducts": "所有產品",
+    "gallery": "相簿",
+    "whereToBuy": "哪裡購買"
   },
   "hero": {
     "tagline": "印尼風味，在台灣呈現",
@@ -103,7 +105,8 @@
       "events": "活動",
       "lifestyle": "生活風格",
       "contact": "聯絡我們",
-      "whereToBuy": "哪裡買"
+      "whereToBuy": "哪裡買",
+      "gallery": "相簿"
     },
     "contactUs": "聯絡我們",
     "certifications": "認證",

@@ -9,7 +9,9 @@
     "contact": "Kontak",
     "language": "Bahasa",
     "moments": "Momen",
-    "allProducts": "Semua Produk"
+    "allProducts": "Semua Produk",
+    "gallery": "Galeri",
+    "whereToBuy": "Tempat Membeli"
   },
   "hero": {
     "tagline": "Rasa Indonesia, Hadir di Taiwan",
@@ -103,7 +105,8 @@
       "events": "Acara",
       "lifestyle": "Gaya Hidup",
       "contact": "Kontak",
-      "whereToBuy": "Tempat Membeli"
+      "whereToBuy": "Tempat Membeli",
+      "gallery": "Galeri"
     },
     "contactUs": "Hubungi Kami",
     "certifications": "Sertifikasi",
