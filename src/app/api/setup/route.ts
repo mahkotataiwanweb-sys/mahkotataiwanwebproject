@@ -219,7 +219,7 @@ export async function GET() {
   // Step 2: Seed categories
   const { data: existingCats } = await supabase.from('categories').select('id').limit(1);
   if (!existingCats || existingCats.length === 0) {
-    const { error } = await supabase.from('categories').insert(categoriesSeed);
+    const { error } = await supabase.from('categories').insert(categoriesSeed as any);
     results.categories = error ? `Error: ${error.message}` : `Seeded ${categoriesSeed.length} categories`;
   } else {
     results.categories = 'Already has data, skipped';
@@ -238,7 +238,7 @@ export async function GET() {
         description_id: `${p.name_id} yang lezat`,
         description_zh: `美味的${p.name_zh}`,
       }));
-      const { error } = await supabase.from('products').insert(productsData);
+      const { error } = await supabase.from('products').insert(productsData as any);
       results.products = error ? `Error: ${error.message}` : `Seeded ${productsData.length} products`;
     }
   } else {
@@ -248,7 +248,7 @@ export async function GET() {
   // Step 4: Seed site content
   const { data: existingContent } = await supabase.from('site_content').select('id').limit(1);
   if (!existingContent || existingContent.length === 0) {
-    const { error } = await supabase.from('site_content').insert(siteContentSeed);
+    const { error } = await supabase.from('site_content').insert(siteContentSeed as any);
     results.site_content = error ? `Error: ${error.message}` : `Seeded ${siteContentSeed.length} content blocks`;
   } else {
     results.site_content = 'Already has data, skipped';
@@ -257,7 +257,7 @@ export async function GET() {
   // Step 5: Seed company settings
   const { data: existingSettings } = await supabase.from('company_settings').select('id').limit(1);
   if (!existingSettings || existingSettings.length === 0) {
-    const { error } = await supabase.from('company_settings').insert(companySettingsSeed);
+    const { error } = await supabase.from('company_settings').insert(companySettingsSeed as any);
     results.company_settings = error ? `Error: ${error.message}` : 'Seeded company settings';
   } else {
     results.company_settings = 'Already has data, skipped';

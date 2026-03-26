@@ -47,11 +47,11 @@ export default function CategoriesPage() {
   const handleSave = async () => {
     try {
       if (editing) {
-        const { error } = await supabase.from('categories').update(form).eq('id', editing.id);
+        const { error } = await supabase.from('categories').update(form as any).eq('id', editing.id);
         if (error) throw error;
         toast.success('Category updated!');
       } else {
-        const { error } = await supabase.from('categories').insert(form);
+        const { error } = await supabase.from('categories').insert(form as any);
         if (error) throw error;
         toast.success('Category created!');
       }

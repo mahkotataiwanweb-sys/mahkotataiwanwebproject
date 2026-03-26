@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
   const admin = createAdminClient();
   const body = await request.json();
 
-  const { data, error } = await admin.from('products').insert(body).select().single();
+  const { data, error } = await admin.from('products').insert(body as any).select().single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json(data, { status: 201 });
