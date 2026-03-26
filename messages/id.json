@@ -1,10 +1,11 @@
 {
   "nav": {
     "home": "Beranda",
-    "about": "Tentang Kami",
+    "about": "Tentang",
     "products": "Produk",
     "recipes": "Resep",
     "events": "Acara",
+    "lifestyle": "Gaya Hidup",
     "contact": "Kontak",
     "language": "Bahasa"
   },
@@ -93,6 +94,9 @@
       "home": "Beranda",
       "about": "Tentang Kami",
       "products": "Produk",
+      "recipes": "Resep",
+      "events": "Acara",
+      "lifestyle": "Gaya Hidup",
       "contact": "Kontak"
     },
     "contactUs": "Hubungi Kami",

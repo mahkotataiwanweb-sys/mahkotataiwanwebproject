@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 
 interface NavItem {
   key: string;
-  type: 'page' | 'anchor';
+  type: 'page';
   href: string;
 }
 
@@ -22,7 +22,9 @@ const navItems: NavItem[] = [
   { key: 'products', type: 'page', href: '/products' },
   { key: 'recipes', type: 'page', href: '/recipes' },
   { key: 'events', type: 'page', href: '/events' },
-  { key: 'contact', type: 'anchor', href: '#contact' },
+  { key: 'lifestyle', type: 'page', href: '/lifestyle' },
+  { key: 'about', type: 'page', href: '/about' },
+  { key: 'contact', type: 'page', href: '/contact' },
 ];
 
 export default function Navbar() {
@@ -59,33 +61,7 @@ export default function Navbar() {
     };
   }, [isMobileOpen]);
 
-  const handleNavClick = (item: NavItem) => {
-    setIsMobileOpen(false);
-
-    if (item.type === 'anchor') {
-      if (isHomePage) {
-        // Same page: scroll to section
-        const el = document.querySelector(item.href);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        // Navigate to home then scroll
-        window.location.href = `/${locale}/${item.href}`;
-      }
-      return;
-    }
-
-    if (item.key === 'home') {
-      if (isHomePage) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-      // else Link handles navigation
-    }
-  };
-
   const getHref = (item: NavItem) => {
-    if (item.type === 'anchor') {
-      return isHomePage ? item.href : `/${locale}/${item.href}`;
-    }
     if (item.key === 'home') return `/${locale}`;
     return `/${locale}${item.href}`;
   };
@@ -119,26 +95,11 @@ export default function Navbar() {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
             {navItems.map((item) => {
-              if (item.type === 'anchor') {
-                return (
-                  <button
-                    key={item.key}
-                    onClick={() => handleNavClick(item)}
-                    className={cn(
-                      'text-sm font-medium tracking-wide uppercase line-reveal transition-colors',
-                      isActive(item) ? 'text-red' : 'text-navy/80 hover:text-navy'
-                    )}
-                  >
-                    {t(item.key)}
-                  </button>
-                );
-              }
-
               if (item.key === 'home' && isHomePage) {
                 return (
                   <button
                     key={item.key}
-                    onClick={() => handleNavClick(item)}
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                     className={cn(
                       'text-sm font-medium tracking-wide uppercase line-reveal transition-colors',
                       'text-red'
@@ -189,50 +150,30 @@ export default function Navbar() {
             transition={{ duration: 0.3 }}
           >
             <nav className="flex flex-col items-center gap-8">
-              {navItems.map((item, i) => {
-                if (item.type === 'anchor') {
-                  return (
-                    <motion.button
-                      key={item.key}
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.1, duration: 0.5 }}
-                      onClick={() => handleNavClick(item)}
-                      className={cn(
-                        'text-3xl font-heading font-bold transition-colors',
-                        isActive(item) ? 'text-red' : 'text-navy hover:text-red'
-                      )}
-                    >
-                      {t(item.key)}
-                    </motion.button>
-                  );
-                }
-
-                return (
-                  <motion.div
-                    key={item.key}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1, duration: 0.5 }}
+              {navItems.map((item, i) => (
+                <motion.div
+                  key={item.key}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1, duration: 0.5 }}
+                >
+                  <Link
+                    href={getHref(item)}
+                    onClick={() => {
+                      setIsMobileOpen(false);
+                      if (item.key === 'home' && isHomePage) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }
+                    }}
+                    className={cn(
+                      'text-3xl font-heading font-bold transition-colors',
+                      isActive(item) ? 'text-red' : 'text-navy hover:text-red'
+                    )}
                   >
-                    <Link
-                      href={getHref(item)}
-                      onClick={() => {
-                        setIsMobileOpen(false);
-                        if (item.key === 'home' && isHomePage) {
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }
-                      }}
-                      className={cn(
-                        'text-3xl font-heading font-bold transition-colors',
-                        isActive(item) ? 'text-red' : 'text-navy hover:text-red'
-                      )}
-                    >
-                      {t(item.key)}
-                    </Link>
-                  </motion.div>
-                );
-              })}
+                    {t(item.key)}
+                  </Link>
+                </motion.div>
+              ))}
             </nav>
           </motion.div>
         )}
