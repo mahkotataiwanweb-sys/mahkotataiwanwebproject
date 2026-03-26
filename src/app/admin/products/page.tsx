@@ -167,7 +167,7 @@ export default function ProductsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <span className="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-600">
-                      {(product.category as Category | undefined)?.name_en || '—'}
+                      {((product as unknown as Record<string, unknown>).category as Category | undefined)?.name_en || '—'}
                     </span>
                   </td>
                   <td className="px-4 py-3">
