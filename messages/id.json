@@ -5,10 +5,10 @@
     "products": "Produk",
     "recipes": "Resep",
     "events": "Acara",
-    "lifestyle": "Gaya Hidup",
+    "lifestyle": "Aktivitas",
     "contact": "Kontak",
     "language": "Bahasa",
-    "moments": "Momen",
+    "moments": "Etalase",
     "allProducts": "Semua Produk",
     "gallery": "Galeri",
     "whereToBuy": "Tempat Membeli"
@@ -103,7 +103,7 @@
       "allProducts": "Semua Produk",
       "recipes": "Resep",
       "events": "Acara",
-      "lifestyle": "Gaya Hidup",
+      "lifestyle": "Aktivitas",
       "contact": "Kontak",
       "whereToBuy": "Tempat Membeli",
       "gallery": "Galeri"
@@ -112,9 +112,13 @@
     "certifications": "Sertifikasi",
     "sections": {
       "products": "Produk",
-      "moments": "Momen",
+      "moments": "Etalase",
       "company": "Perusahaan"
-    }
+    },
+    "office": "Kantor",
+    "warehouse": "Gudang",
+    "tagline": "Dibuat dengan ❤️ untuk komunitas Indonesia di Taiwan",
+    "allRightsReserved": "Hak cipta dilindungi."
   },
   "admin": {
     "dashboard": "Dasbor",
@@ -157,5 +161,14 @@
     "title": "Tempat Membeli",
     "subtitle": "Temukan produk Mahkota Taiwan di mitra ritel terpercaya di seluruh Taiwan.",
     "findUs": "Temukan Kami"
+  },
+  "gallery": {
+    "title": "Galeri",
+    "subtitle": "Jelajahi koleksi momen dan acara kami",
+    "noImages": "Belum ada gambar galeri.",
+    "allEvents": "Semua Acara",
+    "filterByDate": "Filter berdasarkan Tanggal",
+    "clearFilter": "Hapus Filter",
+    "photos": "foto"
   }
 }

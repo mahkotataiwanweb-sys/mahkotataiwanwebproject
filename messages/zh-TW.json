@@ -5,10 +5,10 @@
     "products": "產品",
     "recipes": "食譜",
     "events": "活動",
-    "lifestyle": "生活風格",
+    "lifestyle": "活動花絮",
     "contact": "聯絡",
     "language": "語言",
-    "moments": "精彩時刻",
+    "moments": "展示",
     "allProducts": "所有產品",
     "gallery": "相簿",
     "whereToBuy": "哪裡購買"
@@ -103,7 +103,7 @@
       "allProducts": "所有產品",
       "recipes": "食譜",
       "events": "活動",
-      "lifestyle": "生活風格",
+      "lifestyle": "活動花絮",
       "contact": "聯絡我們",
       "whereToBuy": "哪裡買",
       "gallery": "相簿"
@@ -112,9 +112,13 @@
     "certifications": "認證",
     "sections": {
       "products": "產品",
-      "moments": "精彩時刻",
+      "moments": "展示",
       "company": "公司"
-    }
+    },
+    "office": "辦公室",
+    "warehouse": "倉庫",
+    "tagline": "用 ❤️ 為台灣的印尼社區打造",
+    "allRightsReserved": "版權所有。"
   },
   "admin": {
     "dashboard": "儀表板",
@@ -157,5 +161,14 @@
     "title": "哪裡買",
     "subtitle": "在台灣各地值得信賴的零售合作夥伴找到皇冠台灣產品。",
     "findUs": "找到我們"
+  },
+  "gallery": {
+    "title": "相簿",
+    "subtitle": "瀏覽我們的精彩時刻和活動照片",
+    "noImages": "目前還沒有相簿照片。",
+    "allEvents": "所有活動",
+    "filterByDate": "按日期篩選",
+    "clearFilter": "清除篩選",
+    "photos": "張照片"
   }
 }

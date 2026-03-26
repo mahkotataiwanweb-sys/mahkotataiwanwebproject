@@ -107,7 +107,7 @@ export default function EventsPage() {
               What&apos;s Happening
             </p>
             <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
-              Events
+              Event
             </h1>
             <div className="w-20 h-[3px] bg-red mb-6" />
             <p className="text-cream/60 max-w-lg text-lg">

@@ -80,10 +80,10 @@ export default function LifestylePage() {
 
           <div ref={headerRef}>
             <p className="text-red/80 text-sm tracking-[0.3em] uppercase font-semibold mb-3">
-              Community
+              Showcase
             </p>
             <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
-              Mahkota Moments
+              Activity
             </h1>
             <div className="w-20 h-[3px] bg-white/50 mb-6" />
             <p className="text-cream/60 max-w-lg text-lg">

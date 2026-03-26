@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
@@ -14,8 +15,18 @@ import type { Product, Category } from '@/types/database';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-cream" />}>
+      <ProductsContent />
+    </Suspense>
+  );
+}
+
+function ProductsContent() {
   const locale = useLocale();
   const t = useTranslations('products');
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get('category');
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -41,7 +52,14 @@ export default function ProductsPage() {
             .order('sort_order', { ascending: true }),
         ]);
 
-        if (catRes.data) setCategories(catRes.data as Category[]);
+        if (catRes.data) {
+          setCategories(catRes.data as Category[]);
+          // Set active category from URL param
+          if (categoryParam) {
+            const matchedCat = (catRes.data as Category[]).find(c => c.slug === categoryParam);
+            if (matchedCat) setActiveCategory(matchedCat.id);
+          }
+        }
         if (prodRes.data) setProducts(prodRes.data as Product[]);
       } catch {
         // Silent fail

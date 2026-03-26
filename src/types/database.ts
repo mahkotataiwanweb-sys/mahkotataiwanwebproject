@@ -433,3 +433,41 @@ export interface FooterLink {
   sort_order: number;
   is_active: boolean;
 }
+
+export interface GalleryImage {
+  id: string;
+  image_url: string;
+  description_en: string | null;
+  description_id: string | null;
+  description_zh: string | null;
+  event_name: string;
+  event_date: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GalleryImageInsert {
+  id?: string;
+  image_url: string;
+  description_en?: string | null;
+  description_id?: string | null;
+  description_zh?: string | null;
+  event_name: string;
+  event_date: string;
+  sort_order?: number;
+  is_active?: boolean;
+}
+
+export interface GalleryImageUpdate {
+  id?: string;
+  image_url?: string;
+  description_en?: string | null;
+  description_id?: string | null;
+  description_zh?: string | null;
+  event_name?: string;
+  event_date?: string;
+  sort_order?: number;
+  is_active?: boolean;
+}

@@ -4,11 +4,11 @@
     "about": "About",
     "products": "Products",
     "recipes": "Recipes",
-    "events": "Events",
-    "lifestyle": "Lifestyle",
+    "events": "Event",
+    "lifestyle": "Activity",
     "contact": "Contact",
     "language": "Language",
-    "moments": "Moments",
+    "moments": "Showcase",
     "allProducts": "All Products",
     "gallery": "Gallery",
     "whereToBuy": "Where to Buy"
@@ -102,8 +102,8 @@
       "products": "Products",
       "allProducts": "All Products",
       "recipes": "Recipes",
-      "events": "Events",
-      "lifestyle": "Lifestyle",
+      "events": "Event",
+      "lifestyle": "Activity",
       "contact": "Contact",
       "whereToBuy": "Where to Buy",
       "gallery": "Gallery"
@@ -112,9 +112,13 @@
     "certifications": "Certifications",
     "sections": {
       "products": "Products",
-      "moments": "Moments",
+      "moments": "Showcase",
       "company": "Company"
-    }
+    },
+    "office": "Office",
+    "warehouse": "Warehouse",
+    "tagline": "Crafted with ❤️ for Indonesian community in Taiwan",
+    "allRightsReserved": "All rights reserved."
   },
   "admin": {
     "dashboard": "Dashboard",
@@ -157,5 +161,14 @@
     "title": "Where to Buy",
     "subtitle": "Find Mahkota Taiwan products at these trusted retail partners across Taiwan.",
     "findUs": "Find Us"
+  },
+  "gallery": {
+    "title": "Gallery",
+    "subtitle": "Browse our collection of moments and events",
+    "noImages": "No gallery images available yet.",
+    "allEvents": "All Events",
+    "filterByDate": "Filter by Date",
+    "clearFilter": "Clear Filter",
+    "photos": "photos"
   }
 }

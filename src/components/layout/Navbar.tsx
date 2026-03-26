@@ -42,9 +42,9 @@ const fallbackNavItems: FallbackNavItem[] = [
     href: '/products',
     children: [
       { key: 'allProducts', href: '/products' },
+      { key: 'recipes', href: '/recipes' },
     ],
   },
-  { type: 'link', key: 'recipes', href: '/recipes' },
   {
     type: 'dropdown',
     key: 'moments',
@@ -256,6 +256,15 @@ export default function Navbar() {
       }
 
       // Dropdown
+      // For Products dropdown, detect recipe children (url === '/recipes')
+      const recipeChildren = isProductsDropdown
+        ? item.children.filter((c) => c.url === '/recipes')
+        : [];
+      const nonRecipeChildren = isProductsDropdown
+        ? item.children.filter((c) => c.url !== '/recipes')
+        : item.children;
+      const hasRecipe = recipeChildren.length > 0;
+
       return (
         <div
           key={item.id}
@@ -285,39 +294,97 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.2 }}
-                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 min-w-[220px] bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden"
+                className={cn(
+                  'absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden',
+                  isProductsDropdown && hasRecipe ? 'min-w-[380px]' : 'min-w-[220px]'
+                )}
               >
-                <div className="py-2">
-                  {item.children.map((child) => (
-                    <Link
-                      key={child.id}
-                      href={buildHref(child.url)}
-                      className={cn(
-                        'block px-5 py-2.5 text-sm font-medium transition-colors',
-                        isLinkActive(child.url)
-                          ? 'text-red bg-red/5'
-                          : 'text-navy/70 hover:text-navy hover:bg-cream/50'
-                      )}
-                    >
-                      {getLabel(child)}
-                    </Link>
-                  ))}
-                  {/* Category items for Products dropdown */}
-                  {isProductsDropdown && categories.length > 0 && (
-                    <>
-                      <div className="mx-4 my-1.5 border-t border-navy/10" />
-                      {categories.map((cat) => (
+                {isProductsDropdown && hasRecipe ? (
+                  <div className="flex">
+                    {/* Left side: All Products + Categories */}
+                    <div className="flex-1 py-2">
+                      {nonRecipeChildren.map((child) => (
                         <Link
-                          key={cat.id}
-                          href={buildHref(`/products?category=${cat.slug}`)}
-                          className="block px-5 py-2 text-sm text-navy/60 hover:text-navy hover:bg-cream/50 transition-colors"
+                          key={child.id}
+                          href={buildHref(child.url)}
+                          className={cn(
+                            'block px-5 py-2.5 text-sm font-medium transition-colors',
+                            isLinkActive(child.url)
+                              ? 'text-red bg-red/5'
+                              : 'text-navy/70 hover:text-navy hover:bg-cream/50'
+                          )}
                         >
-                          {getCategoryLabel(cat)}
+                          {getLabel(child)}
                         </Link>
                       ))}
-                    </>
-                  )}
-                </div>
+                      {categories.length > 0 && (
+                        <>
+                          <div className="mx-4 my-1.5 border-t border-navy/10" />
+                          {categories.map((cat) => (
+                            <Link
+                              key={cat.id}
+                              href={buildHref(`/products?category=${cat.slug}`)}
+                              className="block px-5 py-2 text-sm text-navy/60 hover:text-navy hover:bg-cream/50 transition-colors"
+                            >
+                              {getCategoryLabel(cat)}
+                            </Link>
+                          ))}
+                        </>
+                      )}
+                    </div>
+                    {/* Vertical divider */}
+                    <div className="w-px bg-navy/10 my-2" />
+                    {/* Right side: Recipes */}
+                    <div className="py-2 min-w-[130px]">
+                      {recipeChildren.map((child) => (
+                        <Link
+                          key={child.id}
+                          href={buildHref(child.url)}
+                          className={cn(
+                            'block px-5 py-2.5 text-sm font-medium transition-colors',
+                            isLinkActive(child.url)
+                              ? 'text-red bg-red/5'
+                              : 'text-navy/70 hover:text-navy hover:bg-cream/50'
+                          )}
+                        >
+                          {getLabel(child)}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="py-2">
+                    {item.children.map((child) => (
+                      <Link
+                        key={child.id}
+                        href={buildHref(child.url)}
+                        className={cn(
+                          'block px-5 py-2.5 text-sm font-medium transition-colors',
+                          isLinkActive(child.url)
+                            ? 'text-red bg-red/5'
+                            : 'text-navy/70 hover:text-navy hover:bg-cream/50'
+                        )}
+                      >
+                        {getLabel(child)}
+                      </Link>
+                    ))}
+                    {/* Category items for non-recipe Products dropdown */}
+                    {isProductsDropdown && categories.length > 0 && (
+                      <>
+                        <div className="mx-4 my-1.5 border-t border-navy/10" />
+                        {categories.map((cat) => (
+                          <Link
+                            key={cat.id}
+                            href={buildHref(`/products?category=${cat.slug}`)}
+                            className="block px-5 py-2 text-sm text-navy/60 hover:text-navy hover:bg-cream/50 transition-colors"
+                          >
+                            {getCategoryLabel(cat)}
+                          </Link>
+                        ))}
+                      </>
+                    )}
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -475,6 +542,15 @@ export default function Navbar() {
 
       // Dropdown
       const isProductsDropdown = item.key === 'products';
+      // For Products fallback, separate recipe children from non-recipe
+      const recipeChildren = isProductsDropdown
+        ? item.children.filter((c) => c.href === '/recipes')
+        : [];
+      const nonRecipeChildren = isProductsDropdown
+        ? item.children.filter((c) => c.href !== '/recipes')
+        : item.children;
+      const hasRecipe = recipeChildren.length > 0;
+
       return (
         <div
           key={item.key}
@@ -504,39 +580,82 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.2 }}
-                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 min-w-[220px] bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden"
+                className={cn(
+                  'absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden',
+                  isProductsDropdown && hasRecipe ? 'min-w-[380px]' : 'min-w-[220px]'
+                )}
               >
-                <div className="py-2">
-                  {item.children.map((child) => (
-                    <Link
-                      key={child.key}
-                      href={buildHref(child.href)}
-                      className={cn(
-                        'block px-5 py-2.5 text-sm font-medium transition-colors',
-                        isLinkActive(child.href)
-                          ? 'text-red bg-red/5'
-                          : 'text-navy/70 hover:text-navy hover:bg-cream/50'
-                      )}
-                    >
-                      {t(child.key)}
-                    </Link>
-                  ))}
-                  {/* Category items for Products dropdown */}
-                  {isProductsDropdown && categories.length > 0 && (
-                    <>
-                      <div className="mx-4 my-1.5 border-t border-navy/10" />
-                      {categories.map((cat) => (
+                {isProductsDropdown && hasRecipe ? (
+                  <div className="flex">
+                    {/* Left side: All Products + Categories */}
+                    <div className="flex-1 py-2">
+                      {nonRecipeChildren.map((child) => (
                         <Link
-                          key={cat.id}
-                          href={buildHref(`/products?category=${cat.slug}`)}
-                          className="block px-5 py-2 text-sm text-navy/60 hover:text-navy hover:bg-cream/50 transition-colors"
+                          key={child.key}
+                          href={buildHref(child.href)}
+                          className={cn(
+                            'block px-5 py-2.5 text-sm font-medium transition-colors',
+                            isLinkActive(child.href)
+                              ? 'text-red bg-red/5'
+                              : 'text-navy/70 hover:text-navy hover:bg-cream/50'
+                          )}
                         >
-                          {getCategoryLabel(cat)}
+                          {t(child.key)}
                         </Link>
                       ))}
-                    </>
-                  )}
-                </div>
+                      {categories.length > 0 && (
+                        <>
+                          <div className="mx-4 my-1.5 border-t border-navy/10" />
+                          {categories.map((cat) => (
+                            <Link
+                              key={cat.id}
+                              href={buildHref(`/products?category=${cat.slug}`)}
+                              className="block px-5 py-2 text-sm text-navy/60 hover:text-navy hover:bg-cream/50 transition-colors"
+                            >
+                              {getCategoryLabel(cat)}
+                            </Link>
+                          ))}
+                        </>
+                      )}
+                    </div>
+                    {/* Vertical divider */}
+                    <div className="w-px bg-navy/10 my-2" />
+                    {/* Right side: Recipes */}
+                    <div className="py-2 min-w-[130px]">
+                      {recipeChildren.map((child) => (
+                        <Link
+                          key={child.key}
+                          href={buildHref(child.href)}
+                          className={cn(
+                            'block px-5 py-2.5 text-sm font-medium transition-colors',
+                            isLinkActive(child.href)
+                              ? 'text-red bg-red/5'
+                              : 'text-navy/70 hover:text-navy hover:bg-cream/50'
+                          )}
+                        >
+                          {t(child.key)}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="py-2">
+                    {item.children.map((child) => (
+                      <Link
+                        key={child.key}
+                        href={buildHref(child.href)}
+                        className={cn(
+                          'block px-5 py-2.5 text-sm font-medium transition-colors',
+                          isLinkActive(child.href)
+                            ? 'text-red bg-red/5'
+                            : 'text-navy/70 hover:text-navy hover:bg-cream/50'
+                        )}
+                      >
+                        {t(child.key)}
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
