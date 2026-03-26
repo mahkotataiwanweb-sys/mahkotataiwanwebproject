@@ -1,0 +1,111 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "products": "Products",
+    "contact": "Contact",
+    "language": "Language"
+  },
+  "hero": {
+    "tagline": "Indonesian Flavors, Now in Taiwan",
+    "subtitle": "Your trusted source for authentic Indonesian food products in Taiwan. From beloved snacks to essential cooking ingredients, we bring the taste of home to you.",
+    "cta": "Explore Products"
+  },
+  "about": {
+    "title": "About Mahkota Taiwan",
+    "description": "Mahkota Taiwan is a leading Indonesian food distributor based in Taiwan, dedicated to bringing authentic Indonesian flavors to the Taiwanese market. We supply a wide range of beloved Indonesian food products — from instant noodles and snacks to cooking spices and beverages — ensuring that Indonesian communities in Taiwan and local food enthusiasts can enjoy the genuine taste of Indonesia.",
+    "mission": "Our mission is to bridge cultures through food, providing high-quality Indonesian products with reliable distribution across Taiwan.",
+    "stats": {
+      "since": "Established",
+      "sinceValue": "2019",
+      "stores": "Partner Stores",
+      "storesValue": "500+",
+      "products": "Products",
+      "productsValue": "1000+",
+      "customers": "Happy Customers",
+      "customersValue": "50,000+"
+    }
+  },
+  "products": {
+    "title": "Our Products",
+    "subtitle": "Discover our wide selection of authentic Indonesian food products",
+    "viewAll": "View All Products",
+    "categories": "Categories",
+    "searchPlaceholder": "Search products...",
+    "noProducts": "No products found",
+    "addToInquiry": "Add to Inquiry",
+    "details": "View Details"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Have questions or want to place an order? Get in touch with us!",
+    "form": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "subject": "Subject",
+      "message": "Message",
+      "submit": "Send Message",
+      "namePlaceholder": "Enter your full name",
+      "emailPlaceholder": "Enter your email address",
+      "phonePlaceholder": "Enter your phone number",
+      "subjectPlaceholder": "What is this about?",
+      "messagePlaceholder": "Write your message here..."
+    },
+    "info": {
+      "address": "Address",
+      "addressValue": "Taiwan",
+      "phone": "Phone",
+      "email": "Email",
+      "hours": "Business Hours",
+      "hoursValue": "Mon - Sat: 9:00 AM - 6:00 PM"
+    },
+    "success": "Your message has been sent successfully! We will get back to you soon.",
+    "error": "Failed to send message. Please try again."
+  },
+  "footer": {
+    "description": "Your trusted source for authentic Indonesian food products in Taiwan. Bridging cultures through the flavors of Indonesia.",
+    "quickLinks": "Quick Links",
+    "followUs": "Follow Us",
+    "copyright": "© {year} Mahkota Taiwan. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "categories": "Categories",
+    "content": "Content",
+    "settings": "Settings",
+    "orders": "Orders",
+    "messages": "Messages",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add New",
+    "upload": "Upload",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "search": "Search...",
+    "actions": "Actions",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "totalProducts": "Total Products",
+    "totalCategories": "Total Categories",
+    "totalMessages": "Total Messages",
+    "recentOrders": "Recent Orders"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "success": "Success!",
+    "noData": "No data available",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "readMore": "Read More",
+    "showLess": "Show Less"
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "nav": {
+    "home": "首頁",
+    "about": "關於我們",
+    "products": "產品",
+    "contact": "聯絡我們",
+    "language": "語言"
+  },
+  "hero": {
+    "tagline": "印尼風味，在台灣呈現",
+    "subtitle": "您在台灣值得信賴的正宗印尼食品來源。從受歡迎的零食到必備的烹飪食材，我們為您帶來家鄉的味道。",
+    "cta": "瀏覽產品"
+  },
+  "about": {
+    "title": "關於 Mahkota Taiwan",
+    "description": "Mahkota Taiwan 是一家位於台灣的領先印尼食品經銷商，致力於將正宗的印尼風味帶入台灣市場。我們供應各種深受喜愛的印尼食品 — 從泡麵和零食到烹飪香料和飲料 — 確保在台灣的印尼社區和當地美食愛好者都能享受到正宗的印尼風味。",
+    "mission": "我們的使命是透過食物連結文化，以可靠的配送網絡在全台灣提供高品質的印尼產品。",
+    "stats": {
+      "since": "成立於",
+      "sinceValue": "2019",
+      "stores": "合作店家",
+      "storesValue": "500+",
+      "products": "產品種類",
+      "productsValue": "1000+",
+      "customers": "滿意客戶",
+      "customersValue": "50,000+"
+    }
+  },
+  "products": {
+    "title": "我們的產品",
+    "subtitle": "探索我們豐富的正宗印尼食品選擇",
+    "viewAll": "查看全部產品",
+    "categories": "分類",
+    "searchPlaceholder": "搜尋產品...",
+    "noProducts": "找不到產品",
+    "addToInquiry": "加入詢價",
+    "details": "查看詳情"
+  },
+  "contact": {
+    "title": "聯絡我們",
+    "subtitle": "有問題或想要訂購？請與我們聯繫！",
+    "form": {
+      "name": "姓名",
+      "email": "電子郵件",
+      "phone": "電話號碼",
+      "subject": "主旨",
+      "message": "訊息",
+      "submit": "發送訊息",
+      "namePlaceholder": "請輸入您的姓名",
+      "emailPlaceholder": "請輸入您的電子郵件",
+      "phonePlaceholder": "請輸入您的電話號碼",
+      "subjectPlaceholder": "這是關於什麼的？",
+      "messagePlaceholder": "在此撰寫您的訊息..."
+    },
+    "info": {
+      "address": "地址",
+      "addressValue": "台灣",
+      "phone": "電話",
+      "email": "電子郵件",
+      "hours": "營業時間",
+      "hoursValue": "週一至週六：上午 9:00 - 下午 6:00"
+    },
+    "success": "您的訊息已成功發送！我們會盡快回覆您。",
+    "error": "發送訊息失敗，請重試。"
+  },
+  "footer": {
+    "description": "您在台灣值得信賴的正宗印尼食品來源。透過印尼風味連結文化。",
+    "quickLinks": "快速連結",
+    "followUs": "追蹤我們",
+    "copyright": "© {year} Mahkota Taiwan. 版權所有。",
+    "privacy": "隱私權政策",
+    "terms": "服務條款"
+  },
+  "admin": {
+    "dashboard": "儀表板",
+    "products": "產品",
+    "categories": "分類",
+    "content": "內容",
+    "settings": "設定",
+    "orders": "訂單",
+    "messages": "訊息",
+    "save": "儲存",
+    "delete": "刪除",
+    "edit": "編輯",
+    "add": "新增",
+    "upload": "上傳",
+    "cancel": "取消",
+    "confirm": "確認",
+    "search": "搜尋...",
+    "actions": "操作",
+    "status": "狀態",
+    "active": "啟用",
+    "inactive": "停用",
+    "totalProducts": "產品總數",
+    "totalCategories": "分類總數",
+    "totalMessages": "訊息總數",
+    "recentOrders": "最近訂單"
+  },
+  "common": {
+    "loading": "載入中...",
+    "error": "發生錯誤",
+    "success": "成功！",
+    "noData": "沒有資料",
+    "back": "返回",
+    "next": "下一頁",
+    "previous": "上一頁",
+    "close": "關閉",
+    "readMore": "閱讀更多",
+    "showLess": "收起"
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "nav": {
+    "home": "Beranda",
+    "about": "Tentang Kami",
+    "products": "Produk",
+    "contact": "Kontak",
+    "language": "Bahasa"
+  },
+  "hero": {
+    "tagline": "Rasa Indonesia, Hadir di Taiwan",
+    "subtitle": "Sumber terpercaya untuk produk makanan Indonesia asli di Taiwan. Dari camilan favorit hingga bumbu masak esensial, kami membawa cita rasa rumah untuk Anda.",
+    "cta": "Jelajahi Produk"
+  },
+  "about": {
+    "title": "Tentang Mahkota Taiwan",
+    "description": "Mahkota Taiwan adalah distributor makanan Indonesia terkemuka yang berbasis di Taiwan, berdedikasi untuk menghadirkan cita rasa Indonesia yang autentik ke pasar Taiwan. Kami menyediakan berbagai produk makanan Indonesia yang digemari — dari mie instan dan camilan hingga bumbu masak dan minuman — memastikan bahwa komunitas Indonesia di Taiwan dan pecinta kuliner lokal dapat menikmati cita rasa Indonesia yang sesungguhnya.",
+    "mission": "Misi kami adalah menjembatani budaya melalui makanan, menyediakan produk Indonesia berkualitas tinggi dengan distribusi yang andal di seluruh Taiwan.",
+    "stats": {
+      "since": "Berdiri Sejak",
+      "sinceValue": "2019",
+      "stores": "Toko Mitra",
+      "storesValue": "500+",
+      "products": "Produk",
+      "productsValue": "1000+",
+      "customers": "Pelanggan Puas",
+      "customersValue": "50.000+"
+    }
+  },
+  "products": {
+    "title": "Produk Kami",
+    "subtitle": "Temukan beragam pilihan produk makanan Indonesia asli kami",
+    "viewAll": "Lihat Semua Produk",
+    "categories": "Kategori",
+    "searchPlaceholder": "Cari produk...",
+    "noProducts": "Produk tidak ditemukan",
+    "addToInquiry": "Tambah ke Pertanyaan",
+    "details": "Lihat Detail"
+  },
+  "contact": {
+    "title": "Hubungi Kami",
+    "subtitle": "Punya pertanyaan atau ingin memesan? Hubungi kami!",
+    "form": {
+      "name": "Nama Lengkap",
+      "email": "Alamat Email",
+      "phone": "Nomor Telepon",
+      "subject": "Subjek",
+      "message": "Pesan",
+      "submit": "Kirim Pesan",
+      "namePlaceholder": "Masukkan nama lengkap Anda",
+      "emailPlaceholder": "Masukkan alamat email Anda",
+      "phonePlaceholder": "Masukkan nomor telepon Anda",
+      "subjectPlaceholder": "Tentang apa ini?",
+      "messagePlaceholder": "Tulis pesan Anda di sini..."
+    },
+    "info": {
+      "address": "Alamat",
+      "addressValue": "Taiwan",
+      "phone": "Telepon",
+      "email": "Email",
+      "hours": "Jam Operasional",
+      "hoursValue": "Sen - Sab: 09.00 - 18.00"
+    },
+    "success": "Pesan Anda telah berhasil terkirim! Kami akan segera menghubungi Anda.",
+    "error": "Gagal mengirim pesan. Silakan coba lagi."
+  },
+  "footer": {
+    "description": "Sumber terpercaya untuk produk makanan Indonesia asli di Taiwan. Menjembatani budaya melalui cita rasa Indonesia.",
+    "quickLinks": "Tautan Cepat",
+    "followUs": "Ikuti Kami",
+    "copyright": "© {year} Mahkota Taiwan. Hak cipta dilindungi.",
+    "privacy": "Kebijakan Privasi",
+    "terms": "Syarat dan Ketentuan"
+  },
+  "admin": {
+    "dashboard": "Dasbor",
+    "products": "Produk",
+    "categories": "Kategori",
+    "content": "Konten",
+    "settings": "Pengaturan",
+    "orders": "Pesanan",
+    "messages": "Pesan",
+    "save": "Simpan",
+    "delete": "Hapus",
+    "edit": "Edit",
+    "add": "Tambah Baru",
+    "upload": "Unggah",
+    "cancel": "Batal",
+    "confirm": "Konfirmasi",
+    "search": "Cari...",
+    "actions": "Aksi",
+    "status": "Status",
+    "active": "Aktif",
+    "inactive": "Nonaktif",
+    "totalProducts": "Total Produk",
+    "totalCategories": "Total Kategori",
+    "totalMessages": "Total Pesan",
+    "recentOrders": "Pesanan Terbaru"
+  },
+  "common": {
+    "loading": "Memuat...",
+    "error": "Terjadi kesalahan",
+    "success": "Berhasil!",
+    "noData": "Tidak ada data",
+    "back": "Kembali",
+    "next": "Selanjutnya",
+    "previous": "Sebelumnya",
+    "close": "Tutup",
+    "readMore": "Baca Selengkapnya",
+    "showLess": "Tampilkan Lebih Sedikit"
+  }
+}
