@@ -1,7 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import HeroSlider from '@/components/sections/HeroSlider';
 import MarqueeSection from '@/components/sections/MarqueeSection';
-import ProductsShowcase from '@/components/sections/ProductsShowcase';
+
 import RecipesSection from '@/components/sections/RecipesSection';
 import MomentsSection from '@/components/sections/MomentsSection';
 import EventsSection from '@/components/sections/EventsSection';
@@ -21,7 +21,7 @@ export default async function HomePage({ params }: Props) {
     <>
       <HeroSlider />
       <MarqueeSection />
-      <ProductsShowcase />
+
       <RecipesSection />
       <MomentsSection />
       <EventsSection />
