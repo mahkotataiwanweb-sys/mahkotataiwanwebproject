@@ -1,30 +1,39 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronDown, Facebook, Instagram, Music2, Phone, Mail, MapPin } from 'lucide-react';
+import {
+  ChevronDown,
+  Facebook,
+  Instagram,
+  Music2,
+  Phone,
+  Mail,
+  MapPin,
+} from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import type { NavMenuItem, FooterLink, CompanySettings, Category } from '@/types/database';
+import type { NavMenuItem, CompanySettings, Category } from '@/types/database';
 
-// Fallback nav items matching navbar structure
 interface FallbackNavLink {
   key: string;
   href: string;
 }
+
 interface FallbackNavItemSimple {
   type: 'link';
   key: string;
   href: string;
 }
+
 interface FallbackNavItemDropdown {
   type: 'dropdown';
   key: string;
   href: string;
   children: FallbackNavLink[];
 }
+
 type FallbackNavItem = FallbackNavItemSimple | FallbackNavItemDropdown;
 
 const fallbackNavItems: FallbackNavItem[] = [
@@ -35,9 +44,9 @@ const fallbackNavItems: FallbackNavItem[] = [
     href: '/products',
     children: [
       { key: 'allProducts', href: '/products' },
+      { key: 'recipes', href: '/recipes' },
     ],
   },
-  { type: 'link', key: 'recipes', href: '/recipes' },
   {
     type: 'dropdown',
     key: 'moments',
@@ -53,33 +62,16 @@ const fallbackNavItems: FallbackNavItem[] = [
   { type: 'link', key: 'whereToBuy', href: '/where-to-buy' },
 ];
 
-// Fallback contact info
-const fallbackSettings = {
-  phone: '+886-2-26099118',
-  email: 'mahkotataiwan@gmail.com',
-  warehouse_address: 'No. 53, Lane 216, Nanshi 4th Street, Linkou District, New Taipei City',
-  office_address: 'No. 83, Liyuan 2nd Street, Linkou District, New Taipei City',
-  tiktok_url: 'https://www.tiktok.com/@mahkotataiwan',
-  facebook_url: 'https://www.facebook.com/share/1DhYShuL19/?mibextid=wwXIfr',
-  instagram_url: 'https://www.instagram.com/mahkotatw',
-};
-
-// Google Maps links
-const OFFICE_MAPS_URL = 'https://www.google.com/maps/search/No.+83,+Liyuan+2nd+Street,+Linkou+District,+New+Taipei+City';
-const WAREHOUSE_MAPS_URL = 'https://www.google.com/maps/search/No.+53,+Lane+216,+Nanshi+4th+Street,+Linkou+District,+New+Taipei+City';
-
 export default function Footer() {
   const t = useTranslations('footer');
   const navT = useTranslations('nav');
   const locale = useLocale();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+
   const [settings, setSettings] = useState<CompanySettings | null>(null);
   const [dbMenuItems, setDbMenuItems] = useState<NavMenuItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [dataLoaded, setDataLoaded] = useState(false);
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
 
-  // Fetch company_settings, navbar_menus, and categories from Supabase
   useEffect(() => {
     async function fetchData() {
       try {
@@ -98,19 +90,18 @@ export default function Footer() {
           setCategories(catsRes.data as Category[]);
         }
       } catch {
-        // Keep fallbacks
-      } finally {
-        setDataLoaded(true);
+        // Keep fallback
       }
     }
     fetchData();
   }, []);
 
-  // Build tree structure from flat DB items (same as navbar)
   const menuTree = useMemo(() => {
     if (dbMenuItems.length === 0) return null;
+
     const topLevel = dbMenuItems.filter((item) => item.parent_id === null);
     const childrenMap = new Map<string, NavMenuItem[]>();
+
     dbMenuItems.forEach((item) => {
       if (item.parent_id) {
         const existing = childrenMap.get(item.parent_id) || [];
@@ -118,20 +109,19 @@ export default function Footer() {
         childrenMap.set(item.parent_id, existing);
       }
     });
+
     return topLevel.map((parent) => ({
       ...parent,
       children: childrenMap.get(parent.id) || [],
     }));
   }, [dbMenuItems]);
 
-  // Locale-aware label helper for nav items
-  const getNavLabel = (item: NavMenuItem) => {
+  const getLabel = (item: NavMenuItem) => {
     if (locale === 'zh-TW') return item.label_zh || item.label_en;
     if (locale === 'id') return item.label_id || item.label_en;
     return item.label_en;
   };
 
-  // Category label helper
   const getCategoryLabel = (cat: Category) => {
     if (locale === 'zh-TW') return cat.name_zh || cat.name_en;
     if (locale === 'id') return cat.name_id || cat.name_en;
@@ -145,310 +135,304 @@ export default function Footer() {
     return `/${locale}/${href}`;
   };
 
-  // Get contact values from settings or fallback
-  const phone = settings?.phone || fallbackSettings.phone;
-  const email = settings?.email || fallbackSettings.email;
-  const warehouseAddress = settings?.warehouse_address || fallbackSettings.warehouse_address;
-  const officeAddress = settings?.office_address || fallbackSettings.office_address;
-  const tiktokUrl = settings?.tiktok_url || fallbackSettings.tiktok_url;
-  const facebookUrl = settings?.facebook_url || fallbackSettings.facebook_url;
-  const instagramUrl = settings?.instagram_url || fallbackSettings.instagram_url;
-
   const useDbMenus = menuTree && menuTree.length > 0;
 
-  // Render DB-based menu for footer (matching navbar structure)
-  const renderDbFooterMenu = () => {
-    if (!menuTree) return null;
-    return (
-      <ul className="space-y-2">
-        {menuTree.map((item) => {
-          const hasChildren = item.children.length > 0;
-          const isProductsDropdown = item.url === '/products';
+  const officeAddress = settings?.office_address || 'No. 83, Liyuan 2nd Street, Linkou District, New Taipei City';
+  const warehouseAddress = settings?.warehouse_address || 'No. 53, Lane 216, Nanshi 4th Street, Linkou District, New Taipei City';
+  const phone = settings?.phone || '+886-2-26099118';
+  const email = settings?.email || 'mahkotataiwan@gmail.com';
+  const facebookUrl = settings?.facebook_url || 'https://www.facebook.com/share/1DhYShuL19/?mibextid=wwXIfr';
+  const instagramUrl = settings?.instagram_url || 'https://www.instagram.com/mahkotatw';
+  const tiktokUrl = settings?.tiktok_url || 'https://www.tiktok.com/@mahkotataiwan';
+
+  const toggleMenu = (key: string) => {
+    setExpandedMenu(expandedMenu === key ? null : key);
+  };
+
+  const renderNavItems = () => {
+    if (useDbMenus && menuTree) {
+      return menuTree.map((item) => {
+        const hasChildren = item.children.length > 0;
+        const isProductsDropdown = item.url === '/products';
+        const menuKey = item.id;
+        const isExpanded = expandedMenu === menuKey;
+
+        if (!hasChildren && !isProductsDropdown) {
           return (
-            <li key={item.id}>
+            <div key={item.id}>
               <Link
                 href={buildHref(item.url)}
-                className="text-cream/60 hover:text-white text-sm transition-colors duration-300 line-reveal inline-block"
+                className="text-cream/70 hover:text-white text-sm font-medium transition-colors duration-200"
               >
-                {getNavLabel(item)}
+                {getLabel(item)}
               </Link>
-              {hasChildren && (
-                <ul className="ml-4 mt-1.5 space-y-1.5 border-l border-cream/10 pl-3">
-                  {item.children.map((child) => (
-                    <li key={child.id}>
+            </div>
+          );
+        }
+
+        const showCategories = isProductsDropdown && categories.length > 0;
+
+        return (
+          <div key={item.id} className="col-span-1">
+            <div className="flex items-center gap-1">
+              <Link
+                href={buildHref(item.url)}
+                className="text-cream/70 hover:text-white text-sm font-medium transition-colors duration-200"
+              >
+                {getLabel(item)}
+              </Link>
+              {(hasChildren || showCategories) && (
+                <button
+                  onClick={() => toggleMenu(menuKey)}
+                  className="p-0.5 text-cream/40 hover:text-cream/70 transition-colors"
+                  aria-label="Toggle submenu"
+                >
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                      isExpanded ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+              )}
+            </div>
+
+            <div
+              className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                isExpanded ? 'max-h-96 opacity-100 mt-1.5' : 'max-h-0 opacity-0'
+              }`}
+            >
+              <div className="border-l border-cream/15 pl-3 ml-1 space-y-1">
+                {item.children.map((child) => (
+                  <Link
+                    key={child.id}
+                    href={buildHref(child.url)}
+                    className="block text-cream/50 hover:text-white text-xs transition-colors duration-200"
+                  >
+                    {getLabel(child)}
+                  </Link>
+                ))}
+                {showCategories && (
+                  <>
+                    {hasChildren && (
+                      <div className="border-t border-cream/10 my-1.5" />
+                    )}
+                    {categories.map((cat) => (
                       <Link
-                        href={buildHref(child.url)}
-                        className="text-cream/40 hover:text-white text-xs transition-colors duration-300 inline-block"
-                      >
-                        {getNavLabel(child)}
-                      </Link>
-                    </li>
-                  ))}
-                  {/* Category items for Products dropdown */}
-                  {isProductsDropdown && categories.length > 0 && categories.map((cat) => (
-                    <li key={cat.id}>
-                      <Link
+                        key={cat.id}
                         href={buildHref(`/products?category=${cat.slug}`)}
-                        className="text-cream/40 hover:text-white text-xs transition-colors duration-300 inline-block"
+                        className="block text-cream/50 hover:text-white text-xs transition-colors duration-200"
                       >
                         {getCategoryLabel(cat)}
                       </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    );
-  };
-
-  // Render fallback menu for footer (matching navbar structure)
-  const renderFallbackFooterMenu = () => {
-    return (
-      <ul className="space-y-2">
-        {fallbackNavItems.map((item) => {
-          const hasChildren = item.type === 'dropdown';
-          return (
-            <li key={item.key}>
-              <Link
-                href={buildHref(item.href)}
-                className="text-cream/60 hover:text-white text-sm transition-colors duration-300 line-reveal inline-block"
-              >
-                {navT(item.key)}
-              </Link>
-              {hasChildren && (
-                <ul className="ml-4 mt-1.5 space-y-1.5 border-l border-cream/10 pl-3">
-                  {(item as FallbackNavItemDropdown).children.map((child) => (
-                    <li key={child.key}>
-                      <Link
-                        href={buildHref(child.href)}
-                        className="text-cream/40 hover:text-white text-xs transition-colors duration-300 inline-block"
-                      >
-                        {navT(child.key)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    );
-  };
-
-  // Mobile menu for footer with expand/collapse
-  const renderMobileMenu = () => {
-    const items = useDbMenus ? menuTree! : null;
-    
-    if (items) {
-      return (
-        <ul className="space-y-2">
-          {items.map((item) => {
-            const hasChildren = item.children.length > 0;
-            const isExpanded = mobileExpanded === item.id;
-            const isProductsDropdown = item.url === '/products';
-            return (
-              <li key={item.id}>
-                <div className="flex items-center gap-1">
-                  <Link
-                    href={buildHref(item.url)}
-                    className="text-cream/60 hover:text-white text-sm transition-colors duration-300"
-                  >
-                    {getNavLabel(item)}
-                  </Link>
-                  {hasChildren && (
-                    <button
-                      onClick={() => setMobileExpanded(isExpanded ? null : item.id)}
-                      className="p-1"
-                    >
-                      <ChevronDown className={`w-3 h-3 text-cream/40 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
-                    </button>
-                  )}
-                </div>
-                {hasChildren && (
-                  <div className={`overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-                    <ul className="ml-4 mt-1.5 space-y-1.5 border-l border-cream/10 pl-3">
-                      {item.children.map((child) => (
-                        <li key={child.id}>
-                          <Link
-                            href={buildHref(child.url)}
-                            className="text-cream/40 hover:text-white text-xs transition-colors duration-300"
-                          >
-                            {getNavLabel(child)}
-                          </Link>
-                        </li>
-                      ))}
-                      {isProductsDropdown && categories.length > 0 && categories.map((cat) => (
-                        <li key={cat.id}>
-                          <Link
-                            href={buildHref(`/products?category=${cat.slug}`)}
-                            className="text-cream/40 hover:text-white text-xs transition-colors duration-300"
-                          >
-                            {getCategoryLabel(cat)}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      );
-    }
-
-    // Fallback mobile
-    return (
-      <ul className="space-y-2">
-        {fallbackNavItems.map((item) => {
-          const hasChildren = item.type === 'dropdown';
-          const isExpanded = mobileExpanded === item.key;
-          return (
-            <li key={item.key}>
-              <div className="flex items-center gap-1">
-                <Link
-                  href={buildHref(item.href)}
-                  className="text-cream/60 hover:text-white text-sm transition-colors duration-300"
-                >
-                  {navT(item.key)}
-                </Link>
-                {hasChildren && (
-                  <button
-                    onClick={() => setMobileExpanded(isExpanded ? null : item.key)}
-                    className="p-1"
-                  >
-                    <ChevronDown className={`w-3 h-3 text-cream/40 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
-                  </button>
+                    ))}
+                  </>
                 )}
               </div>
-              {hasChildren && (
-                <div className={`overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-                  <ul className="ml-4 mt-1.5 space-y-1.5 border-l border-cream/10 pl-3">
-                    {(item as FallbackNavItemDropdown).children.map((child) => (
-                      <li key={child.key}>
-                        <Link
-                          href={buildHref(child.href)}
-                          className="text-cream/40 hover:text-white text-xs transition-colors duration-300"
-                        >
-                          {navT(child.key)}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+            </div>
+          </div>
+        );
+      });
+    }
+
+    // Fallback nav items
+    return fallbackNavItems.map((item) => {
+      if (item.type === 'link') {
+        return (
+          <div key={item.key}>
+            <Link
+              href={buildHref(item.href)}
+              className="text-cream/70 hover:text-white text-sm font-medium transition-colors duration-200"
+            >
+              {navT(item.key)}
+            </Link>
+          </div>
+        );
+      }
+
+      const menuKey = item.key;
+      const isExpanded = expandedMenu === menuKey;
+      const isProductsDropdown = item.key === 'products';
+      const showCategories = isProductsDropdown && categories.length > 0;
+
+      return (
+        <div key={item.key} className="col-span-1">
+          <div className="flex items-center gap-1">
+            <Link
+              href={buildHref(item.href)}
+              className="text-cream/70 hover:text-white text-sm font-medium transition-colors duration-200"
+            >
+              {navT(item.key)}
+            </Link>
+            <button
+              onClick={() => toggleMenu(menuKey)}
+              className="p-0.5 text-cream/40 hover:text-cream/70 transition-colors"
+              aria-label="Toggle submenu"
+            >
+              <ChevronDown
+                className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                  isExpanded ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+          </div>
+
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              isExpanded ? 'max-h-96 opacity-100 mt-1.5' : 'max-h-0 opacity-0'
+            }`}
+          >
+            <div className="border-l border-cream/15 pl-3 ml-1 space-y-1">
+              {item.children.map((child) => (
+                <Link
+                  key={child.key}
+                  href={buildHref(child.href)}
+                  className="block text-cream/50 hover:text-white text-xs transition-colors duration-200"
+                >
+                  {navT(child.key)}
+                </Link>
+              ))}
+              {showCategories && (
+                <>
+                  <div className="border-t border-cream/10 my-1.5" />
+                  {categories.map((cat) => (
+                    <Link
+                      key={cat.id}
+                      href={buildHref(`/products?category=${cat.slug}`)}
+                      className="block text-cream/50 hover:text-white text-xs transition-colors duration-200"
+                    >
+                      {getCategoryLabel(cat)}
+                    </Link>
+                  ))}
+                </>
               )}
-            </li>
-          );
-        })}
-      </ul>
-    );
+            </div>
+          </div>
+        </div>
+      );
+    });
   };
 
   return (
     <footer className="bg-navy text-cream/90">
-      {/* Main Footer */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-
-          {/* Left Side - Brand, Address & Contact */}
-          <div className="lg:col-span-7">
+      <div className="max-w-7xl mx-auto px-6 py-14">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          {/* Left Column - Brand & Contact */}
+          <div className="lg:col-span-5">
             {/* Brand */}
             <div className="flex items-center gap-3 mb-4">
-              <Image src="/images/logo.png" alt="Mahkota Taiwan" width={40} height={40} className="brightness-0 invert" />
-              <span className="font-heading text-xl font-bold text-white">Mahkota Taiwan</span>
+              <Image
+                src="/images/logo.png"
+                alt="Mahkota Taiwan"
+                width={48}
+                height={48}
+                className="w-12 h-12 brightness-0 invert"
+              />
+              <h3 className="text-xl font-heading font-bold text-white">
+                Mahkota Taiwan
+              </h3>
             </div>
-            <p className="text-cream/60 text-sm leading-relaxed mb-6 max-w-md">
+
+            {/* Description */}
+            <p className="text-cream/60 text-sm leading-relaxed max-w-sm mb-5">
               {t('description')}
             </p>
 
-            {/* Address & Contact Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-              {/* Office Address (first) */}
+            {/* Addresses */}
+            <div className="grid grid-cols-1 gap-3 mb-4">
+              {/* Office */}
               <a
-                href={OFFICE_MAPS_URL}
+                href="https://www.google.com/maps/search/No.+83,+Liyuan+2nd+Street,+Linkou+District,+New+Taipei+City"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-3 text-cream/60 hover:text-white transition-colors duration-300 group"
+                className="flex items-start gap-2.5 group"
               >
-                <MapPin className="w-4 h-4 text-red shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                <MapPin className="w-4 h-4 text-red mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-xs text-cream/40 font-semibold uppercase tracking-wider mb-0.5">Office</p>
-                  <p className="text-sm leading-snug">{officeAddress}</p>
+                  <span className="text-cream/80 text-xs font-semibold uppercase tracking-wider block mb-0.5">
+                    {t('office')}
+                  </span>
+                  <span className="text-cream/55 text-sm leading-snug group-hover:text-cream/80 transition-colors">
+                    {officeAddress}
+                  </span>
                 </div>
               </a>
 
-              {/* Warehouse Address (second) */}
+              {/* Warehouse */}
               <a
-                href={WAREHOUSE_MAPS_URL}
+                href="https://www.google.com/maps/search/No.+53,+Lane+216,+Nanshi+4th+Street,+Linkou+District,+New+Taipei+City"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-3 text-cream/60 hover:text-white transition-colors duration-300 group"
+                className="flex items-start gap-2.5 group"
               >
-                <MapPin className="w-4 h-4 text-red shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                <MapPin className="w-4 h-4 text-red mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-xs text-cream/40 font-semibold uppercase tracking-wider mb-0.5">Warehouse</p>
-                  <p className="text-sm leading-snug">{warehouseAddress}</p>
+                  <span className="text-cream/80 text-xs font-semibold uppercase tracking-wider block mb-0.5">
+                    {t('warehouse')}
+                  </span>
+                  <span className="text-cream/55 text-sm leading-snug group-hover:text-cream/80 transition-colors">
+                    {warehouseAddress}
+                  </span>
                 </div>
               </a>
+            </div>
 
-              {/* Phone */}
+            {/* Phone + Email */}
+            <div className="flex gap-6 mb-5">
               <a
-                href={`tel:${phone.replace(/[^+\d]/g, '')}`}
-                className="flex items-center gap-3 text-cream/60 hover:text-white transition-colors duration-300"
+                href={`tel:${phone}`}
+                className="flex items-center gap-2 text-cream/60 hover:text-white text-sm transition-colors"
               >
-                <Phone className="w-4 h-4 text-red shrink-0" />
-                <span className="text-sm">{phone}</span>
+                <Phone className="w-3.5 h-3.5" />
+                <span>{phone}</span>
               </a>
-
-              {/* Email */}
               <a
                 href={`mailto:${email}`}
-                className="flex items-center gap-3 text-cream/60 hover:text-white transition-colors duration-300"
+                className="flex items-center gap-2 text-cream/60 hover:text-white text-sm transition-colors"
               >
-                <Mail className="w-4 h-4 text-red shrink-0" />
-                <span className="text-sm">{email}</span>
+                <Mail className="w-3.5 h-3.5" />
+                <span>{email}</span>
               </a>
             </div>
 
             {/* Social Icons */}
-            <div className="flex gap-3">
-              {tiktokUrl && (
-                <a href={tiktokUrl} target="_blank" rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full border border-cream/20 flex items-center justify-center hover:bg-red hover:border-red transition-all duration-300">
-                  <Music2 className="w-4 h-4" />
-                </a>
-              )}
-              {facebookUrl && (
-                <a href={facebookUrl} target="_blank" rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full border border-cream/20 flex items-center justify-center hover:bg-red hover:border-red transition-all duration-300">
-                  <Facebook className="w-4 h-4" />
-                </a>
-              )}
-              {instagramUrl && (
-                <a href={instagramUrl} target="_blank" rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full border border-cream/20 flex items-center justify-center hover:bg-red hover:border-red transition-all duration-300">
-                  <Instagram className="w-4 h-4" />
-                </a>
-              )}
+            <div className="flex gap-2.5">
+              <a
+                href={facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-full bg-cream/10 flex items-center justify-center text-cream/70 hover:bg-red hover:text-white transition-all duration-200"
+                aria-label="Facebook"
+              >
+                <Facebook className="w-4 h-4" />
+              </a>
+              <a
+                href={instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-full bg-cream/10 flex items-center justify-center text-cream/70 hover:bg-red hover:text-white transition-all duration-200"
+                aria-label="Instagram"
+              >
+                <Instagram className="w-4 h-4" />
+              </a>
+              <a
+                href={tiktokUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-full bg-cream/10 flex items-center justify-center text-cream/70 hover:bg-red hover:text-white transition-all duration-200"
+                aria-label="TikTok"
+              >
+                <Music2 className="w-4 h-4" />
+              </a>
             </div>
           </div>
 
-          {/* Right Side - Navigation Menu (navbar style) */}
-          <div className="lg:col-span-5">
-            <h4 className="font-heading text-white font-semibold text-lg mb-4">
+          {/* Right Column - Quick Links */}
+          <div className="lg:col-span-7">
+            <h4 className="text-white font-heading font-semibold text-base mb-5 uppercase tracking-wider">
               {t('quickLinks')}
             </h4>
-            {/* Desktop: show full menu, always expanded */}
-            <div className="hidden md:block">
-              {useDbMenus ? renderDbFooterMenu() : renderFallbackFooterMenu()}
-            </div>
-            {/* Mobile: collapsible children */}
-            <div className="md:hidden">
-              {renderMobileMenu()}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-1">
+              {renderNavItems()}
             </div>
           </div>
         </div>
@@ -456,12 +440,12 @@ export default function Footer() {
 
       {/* Bottom Bar */}
       <div className="border-t border-cream/10">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-cream/40 text-xs">
-            © {new Date().getFullYear()} Mahkota Taiwan. {t('copyright')}
+            &copy; {new Date().getFullYear()} Mahkota Taiwan. {t('allRightsReserved')}
           </p>
           <p className="text-cream/30 text-xs">
-            Crafted with ❤️ for Indonesian community in Taiwan
+            {t('tagline')}
           </p>
         </div>
       </div>
