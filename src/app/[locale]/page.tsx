@@ -13,7 +13,7 @@ import MarqueeSection from '@/components/sections/MarqueeSection';
 import ProductCatalogSection from '@/components/sections/ProductCatalogSection';
 import VideoShowcaseSection from '@/components/sections/VideoShowcaseSection';
 import WhereToBuySection from '@/components/sections/WhereToBuySection';
-import WaveDivider from '@/components/ui/WaveDivider';
+// WaveDivider removed
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
@@ -347,16 +347,10 @@ export default function HomePage() {
 
       <MarqueeSection />
 
-      {/* ═══ Cream → Red: Arc transition into product catalog ═══ */}
-      <WaveDivider variant="arc" fillColor="var(--color-cream)" bgColor="var(--color-red)" height={70} />
-
       {/* Product Catalog Showcase */}
       <div ref={catalogSectionRef} className="section-card-reveal">
         <ProductCatalogSection />
       </div>
-
-      {/* ═══ Red → Cream: Wave transition out of product catalog ═══ */}
-      <WaveDivider variant="wave" fillColor="var(--color-cream)" bgColor="var(--color-red)" height={70} />
 
       {/* Discover Section */}
       <section ref={(el: HTMLElement | null) => { (sectionRef as React.MutableRefObject<HTMLElement | null>).current = el; discoverSectionRef.current = el; }} className="py-24 sm:py-32 bg-cream relative overflow-hidden section-card-reveal">
@@ -401,22 +395,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ Cream → Dark: Concave into video section ═══ */}
-      <WaveDivider variant="concave" fillColor="var(--color-cream)" bgColor="#111" flip height={60} />
-
       <div ref={videoSectionRef} className="section-card-reveal">
         <VideoShowcaseSection />
       </div>
-
-      {/* ═══ Dark → Cream: Blob transition into map ═══ */}
-      <WaveDivider variant="blob" fillColor="var(--color-cream)" bgColor="#111" height={65} />
 
       <div ref={mapSectionRef} className="section-card-reveal">
         <WhereToBuySection />
       </div>
 
-      {/* ═══ Bottom: Cream → footer ═══ */}
-      <WaveDivider variant="ribbon" fillColor="var(--color-navy)" height={90} />
     </>
   );
 }
