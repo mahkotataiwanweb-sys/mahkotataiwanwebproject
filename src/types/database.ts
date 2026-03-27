@@ -50,6 +50,12 @@ export interface Database {
         Update: StorePartnerUpdate;
         Relationships: [];
       };
+      video_showcases: {
+        Row: VideoShowcase;
+        Insert: VideoShowcaseInsert;
+        Update: VideoShowcaseUpdate;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -471,6 +477,53 @@ export interface GalleryImageUpdate {
   description_zh?: string | null;
   event_name?: string;
   event_date?: string;
+  sort_order?: number;
+  is_active?: boolean;
+}
+
+export interface VideoShowcase {
+  id: string;
+  title_en: string;
+  title_id: string;
+  title_zh: string;
+  description_en: string | null;
+  description_id: string | null;
+  description_zh: string | null;
+  video_type: 'youtube' | 'upload';
+  video_url: string;
+  thumbnail_url: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VideoShowcaseInsert {
+  id?: string;
+  title_en: string;
+  title_id: string;
+  title_zh: string;
+  description_en?: string | null;
+  description_id?: string | null;
+  description_zh?: string | null;
+  video_type: 'youtube' | 'upload';
+  video_url: string;
+  thumbnail_url?: string | null;
+  sort_order?: number;
+  is_active?: boolean;
+}
+
+export interface VideoShowcaseUpdate {
+  id?: string;
+  title_en?: string;
+  title_id?: string;
+  title_zh?: string;
+  description_en?: string | null;
+  description_id?: string | null;
+  description_zh?: string | null;
+  video_type?: 'youtube' | 'upload';
+  video_url?: string;
+  thumbnail_url?: string | null;
   sort_order?: number;
   is_active?: boolean;
 }

@@ -104,7 +104,7 @@ export default function WhereToBuyPage() {
 
       {/* Map Section */}
       <section className="py-16 md:py-24">
-        <div className="max-w-4xl mx-auto px-6 flex flex-col items-center">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col items-center">
           <div className="relative">
             {/* Background glow */}
             <div className="map-glow absolute inset-0 bg-gradient-to-b from-blue-200/30 to-transparent rounded-full blur-3xl scale-110 opacity-40" />
@@ -112,7 +112,7 @@ export default function WhereToBuyPage() {
             <svg
               ref={mapRef}
               viewBox="0 0 200 450"
-              className="relative w-80 md:w-[28rem] lg:w-[32rem] h-auto"
+              className="relative w-full max-w-3xl h-auto"
               xmlns="http://www.w3.org/2000/svg"
             >
               <defs>

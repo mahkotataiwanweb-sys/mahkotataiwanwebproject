@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Package, FolderOpen, FileText, Newspaper, ImageIcon, Store } from 'lucide-react';
+import { Package, FolderOpen, FileText, Newspaper, ImageIcon, Store, Play } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 
@@ -12,22 +12,24 @@ interface DashboardStats {
   heroSlides: number;
   storePartners: number;
   content: number;
+  videoShowcases: number;
 }
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<DashboardStats>({ products: 0, categories: 0, articles: 0, heroSlides: 0, storePartners: 0, content: 0 });
+  const [stats, setStats] = useState<DashboardStats>({ products: 0, categories: 0, articles: 0, heroSlides: 0, storePartners: 0, content: 0, videoShowcases: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const [productsRes, categoriesRes, articlesRes, heroSlidesRes, storePartnersRes, contentRes] = await Promise.all([
+        const [productsRes, categoriesRes, articlesRes, heroSlidesRes, storePartnersRes, contentRes, videoShowcasesRes] = await Promise.all([
           supabase.from('products').select('id', { count: 'exact', head: true }),
           supabase.from('categories').select('id', { count: 'exact', head: true }),
           supabase.from('articles').select('id', { count: 'exact', head: true }),
           supabase.from('hero_slides').select('id', { count: 'exact', head: true }),
           supabase.from('store_partners').select('id', { count: 'exact', head: true }),
           supabase.from('site_content').select('id', { count: 'exact', head: true }),
+          supabase.from('video_showcases').select('id', { count: 'exact', head: true }),
         ]);
         setStats({
           products: productsRes.count || 0,
@@ -36,6 +38,7 @@ export default function AdminDashboard() {
           heroSlides: heroSlidesRes.count || 0,
           storePartners: storePartnersRes.count || 0,
           content: contentRes.count || 0,
+          videoShowcases: videoShowcasesRes.count || 0,
         });
       } catch (err) {
         console.error('Failed to fetch stats:', err);
@@ -53,6 +56,7 @@ export default function AdminDashboard() {
     { label: 'Hero Slides', value: stats.heroSlides, icon: ImageIcon, color: 'bg-amber-500' },
     { label: 'Store Partners', value: stats.storePartners, icon: Store, color: 'bg-teal-500' },
     { label: 'Content Blocks', value: stats.content, icon: FileText, color: 'bg-purple-500' },
+    { label: 'Video Showcases', value: stats.videoShowcases, icon: Play, color: 'bg-rose-500' },
   ];
 
   return (
@@ -105,6 +109,10 @@ export default function AdminDashboard() {
           <Link href="/admin/content" className="p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors text-center">
             <FileText className="w-6 h-6 text-purple-500 mx-auto mb-2" />
             <p className="text-sm font-medium text-gray-700">Content</p>
+          </Link>
+          <Link href="/admin/video-showcase" className="p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors text-center">
+            <Play className="w-6 h-6 text-rose-500 mx-auto mb-2" />
+            <p className="text-sm font-medium text-gray-700">Video Showcase</p>
           </Link>
         </div>
       </div>
