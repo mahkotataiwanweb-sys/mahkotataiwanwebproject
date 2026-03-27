@@ -347,8 +347,8 @@ export default function HomePage() {
 
       <MarqueeSection />
 
-      {/* ═══ Cream → Red: Bulge transition into product catalog ═══ */}
-      <WaveDivider variant="arc" fillColor="var(--color-red)" height={70} />
+      {/* ═══ Cream → Red: Arc transition into product catalog ═══ */}
+      <WaveDivider variant="arc" fillColor="var(--color-cream)" bgColor="var(--color-red)" height={70} />
 
       {/* Product Catalog Showcase */}
       <div ref={catalogSectionRef} className="section-card-reveal">
@@ -356,7 +356,7 @@ export default function HomePage() {
       </div>
 
       {/* ═══ Red → Cream: Wave transition out of product catalog ═══ */}
-      <WaveDivider variant="wave" fillColor="var(--color-cream)" flip height={70} />
+      <WaveDivider variant="wave" fillColor="var(--color-cream)" bgColor="var(--color-red)" height={70} />
 
       {/* Discover Section */}
       <section ref={(el: HTMLElement | null) => { (sectionRef as React.MutableRefObject<HTMLElement | null>).current = el; discoverSectionRef.current = el; }} className="py-24 sm:py-32 bg-cream relative overflow-hidden section-card-reveal">
@@ -401,15 +401,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ Cream → Navy: Concave into video section ═══ */}
-      <WaveDivider variant="concave" fillColor="var(--color-cream)" flip height={60} />
+      {/* ═══ Cream → Dark: Concave into video section ═══ */}
+      <WaveDivider variant="concave" fillColor="var(--color-cream)" bgColor="#111" flip height={60} />
 
       <div ref={videoSectionRef} className="section-card-reveal">
         <VideoShowcaseSection />
       </div>
 
       {/* ═══ Dark → Cream: Blob transition into map ═══ */}
-      <WaveDivider variant="blob" fillColor="var(--color-cream)" height={65} />
+      <WaveDivider variant="blob" fillColor="var(--color-cream)" bgColor="#111" height={65} />
 
       <div ref={mapSectionRef} className="section-card-reveal">
         <WhereToBuySection />
