@@ -11,7 +11,7 @@ import { Menu, X, ChevronDown } from 'lucide-react';
 import LanguageSwitcher from './LanguageSwitcher';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
-import type { NavMenuItem, Category } from '@/types/database';
+import type { NavMenuItem } from '@/types/database';
 
 // Fallback hardcoded nav items (displayed while DB loads or on error)
 interface FallbackNavLink {
@@ -47,7 +47,7 @@ const fallbackNavItems: FallbackNavItem[] = [
   },
   {
     type: 'dropdown',
-    key: 'moments',
+    key: 'journal',
     href: '/moments',
     children: [
       { key: 'events', href: '/events' },
@@ -60,7 +60,7 @@ const fallbackNavItems: FallbackNavItem[] = [
   { type: 'link', key: 'whereToBuy', href: '/where-to-buy' },
 ];
 
-// Pages that have dark navy hero headers
+// Pages that have dark navy hero headers (non-homepage pages)
 const darkHeaderPages = ['/products', '/lifestyle', '/events', '/about', '/gallery', '/where-to-buy'];
 
 export default function Navbar() {
@@ -77,32 +77,70 @@ export default function Navbar() {
 
   // Dynamic menu items from database
   const [dbMenuItems, setDbMenuItems] = useState<NavMenuItem[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [menuLoaded, setMenuLoaded] = useState(false);
+
+  // Smart hero brightness detection for homepage
+  const [heroBrightness, setHeroBrightness] = useState<string>('dark');
 
   const isHomePage = pathname === `/${locale}` || pathname === `/${locale}/`;
 
-  // Check if current page has a dark header background
+  // Check if current page has a dark header background (for non-homepage pages)
   const isDarkHeaderPage = darkHeaderPages.some(
     (p) => pathname === `/${locale}${p}` || pathname.startsWith(`/${locale}${p}/`)
   );
 
-  // Use light (white) text when on dark header pages and NOT scrolled yet
-  const useLightText = isDarkHeaderPage && !isScrolled;
+  // Smart adaptive text color:
+  // - Homepage (not scrolled): determined by --hero-brightness CSS variable on documentElement
+  // - Dark header pages (not scrolled): always light (white) text
+  // - Scrolled on any page: always dark text
+  const useLightText = !isScrolled && (isHomePage ? heroBrightness === 'dark' : isDarkHeaderPage);
 
-  // Fetch navbar_menus and categories from Supabase
+  // Observe --hero-brightness CSS variable on document.documentElement for homepage
+  useEffect(() => {
+    if (!isHomePage) return;
+
+    const readBrightness = () => {
+      const value = getComputedStyle(document.documentElement)
+        .getPropertyValue('--hero-brightness')
+        .trim();
+      if (value === 'light' || value === 'dark') {
+        setHeroBrightness(value);
+      }
+    };
+
+    // Initial read
+    readBrightness();
+
+    // Observe style/class attribute changes on documentElement
+    const observer = new MutationObserver(() => {
+      readBrightness();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['style', 'class'],
+    });
+
+    // Also poll as a fallback in case the variable is set indirectly
+    const interval = setInterval(readBrightness, 500);
+
+    return () => {
+      observer.disconnect();
+      clearInterval(interval);
+    };
+  }, [isHomePage]);
+
+  // Fetch navbar_menus from Supabase
   useEffect(() => {
     async function fetchData() {
       try {
-        const [menusRes, catsRes] = await Promise.all([
-          supabase.from('navbar_menus').select('*').eq('is_active', true).order('sort_order'),
-          supabase.from('categories').select('*').eq('is_active', true).order('sort_order'),
-        ]);
+        const menusRes = await supabase
+          .from('navbar_menus')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order');
         if (menusRes.data && menusRes.data.length > 0) {
           setDbMenuItems(menusRes.data as NavMenuItem[]);
-        }
-        if (catsRes.data) {
-          setCategories(catsRes.data as Category[]);
         }
       } catch {
         // Keep fallback
@@ -139,13 +177,6 @@ export default function Navbar() {
     if (locale === 'zh-TW') return item.label_zh || item.label_en;
     if (locale === 'id') return item.label_id || item.label_en;
     return item.label_en;
-  };
-
-  // Category label helper
-  const getCategoryLabel = (cat: Category) => {
-    if (locale === 'zh-TW') return cat.name_zh || cat.name_en;
-    if (locale === 'id') return cat.name_id || cat.name_en;
-    return cat.name_en;
   };
 
   useEffect(() => {
@@ -217,10 +248,6 @@ export default function Navbar() {
       const isHome = item.url === '/';
       const isActive = isLinkActive(item.url);
       const isChildActive = hasChildren && item.children.some((c) => isLinkActive(c.url));
-      const isProductsDropdown = item.url === '/products';
-      const isCategoryActive = isProductsDropdown && categories.some((cat) =>
-        pathname === `/${locale}/products` && typeof window !== 'undefined' && window.location.search.includes(`category=${cat.slug}`)
-      );
 
       if (!hasChildren) {
         // Home special behavior on homepage
@@ -255,16 +282,7 @@ export default function Navbar() {
         );
       }
 
-      // Dropdown
-      // For Products dropdown, detect recipe children (url === '/recipes')
-      const recipeChildren = isProductsDropdown
-        ? item.children.filter((c) => c.url === '/recipes')
-        : [];
-      const nonRecipeChildren = isProductsDropdown
-        ? item.children.filter((c) => c.url !== '/recipes')
-        : item.children;
-      const hasRecipe = recipeChildren.length > 0;
-
+      // Dropdown — single column with children only (no categories)
       return (
         <div
           key={item.id}
@@ -275,7 +293,7 @@ export default function Navbar() {
           <button
             className={cn(
               'flex items-center gap-1 text-sm font-medium tracking-wide uppercase transition-colors duration-300',
-              linkColor(isChildActive || isActive || isCategoryActive)
+              linkColor(isChildActive || isActive)
             )}
           >
             {getLabel(item)}
@@ -294,97 +312,24 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.2 }}
-                className={cn(
-                  'absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden',
-                  isProductsDropdown && hasRecipe ? 'min-w-[380px]' : 'min-w-[220px]'
-                )}
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden min-w-[220px]"
               >
-                {isProductsDropdown && hasRecipe ? (
-                  <div className="flex">
-                    {/* Left side: All Products + Categories */}
-                    <div className="flex-1 py-2">
-                      {nonRecipeChildren.map((child) => (
-                        <Link
-                          key={child.id}
-                          href={buildHref(child.url)}
-                          className={cn(
-                            'block px-5 py-2.5 text-sm font-medium transition-colors',
-                            isLinkActive(child.url)
-                              ? 'text-red bg-red/5'
-                              : 'text-navy/70 hover:text-navy hover:bg-cream/50'
-                          )}
-                        >
-                          {getLabel(child)}
-                        </Link>
-                      ))}
-                      {categories.length > 0 && (
-                        <>
-                          <div className="mx-4 my-1.5 border-t border-navy/10" />
-                          {categories.map((cat) => (
-                            <Link
-                              key={cat.id}
-                              href={buildHref(`/products?category=${cat.slug}`)}
-                              className="block px-5 py-2 text-sm text-navy/60 hover:text-navy hover:bg-cream/50 transition-colors"
-                            >
-                              {getCategoryLabel(cat)}
-                            </Link>
-                          ))}
-                        </>
+                <div className="py-2">
+                  {item.children.map((child) => (
+                    <Link
+                      key={child.id}
+                      href={buildHref(child.url)}
+                      className={cn(
+                        'block px-5 py-2.5 text-sm font-medium transition-colors',
+                        isLinkActive(child.url)
+                          ? 'text-red bg-red/5'
+                          : 'text-navy/70 hover:text-navy hover:bg-cream/50'
                       )}
-                    </div>
-                    {/* Vertical divider */}
-                    <div className="w-px bg-navy/10 my-2" />
-                    {/* Right side: Recipes */}
-                    <div className="py-2 min-w-[130px]">
-                      {recipeChildren.map((child) => (
-                        <Link
-                          key={child.id}
-                          href={buildHref(child.url)}
-                          className={cn(
-                            'block px-5 py-2.5 text-sm font-medium transition-colors',
-                            isLinkActive(child.url)
-                              ? 'text-red bg-red/5'
-                              : 'text-navy/70 hover:text-navy hover:bg-cream/50'
-                          )}
-                        >
-                          {getLabel(child)}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="py-2">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.id}
-                        href={buildHref(child.url)}
-                        className={cn(
-                          'block px-5 py-2.5 text-sm font-medium transition-colors',
-                          isLinkActive(child.url)
-                            ? 'text-red bg-red/5'
-                            : 'text-navy/70 hover:text-navy hover:bg-cream/50'
-                        )}
-                      >
-                        {getLabel(child)}
-                      </Link>
-                    ))}
-                    {/* Category items for non-recipe Products dropdown */}
-                    {isProductsDropdown && categories.length > 0 && (
-                      <>
-                        <div className="mx-4 my-1.5 border-t border-navy/10" />
-                        {categories.map((cat) => (
-                          <Link
-                            key={cat.id}
-                            href={buildHref(`/products?category=${cat.slug}`)}
-                            className="block px-5 py-2 text-sm text-navy/60 hover:text-navy hover:bg-cream/50 transition-colors"
-                          >
-                            {getCategoryLabel(cat)}
-                          </Link>
-                        ))}
-                      </>
-                    )}
-                  </div>
-                )}
+                    >
+                      {getLabel(child)}
+                    </Link>
+                  ))}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -399,7 +344,6 @@ export default function Navbar() {
       const hasChildren = item.children.length > 0;
       const isActive = isLinkActive(item.url);
       const isChildActive = hasChildren && item.children.some((c) => isLinkActive(c.url));
-      const isProductsDropdown = item.url === '/products';
 
       if (!hasChildren) {
         return (
@@ -428,7 +372,7 @@ export default function Navbar() {
         );
       }
 
-      // Mobile dropdown
+      // Mobile dropdown — children only, no categories
       return (
         <motion.div
           key={item.id}
@@ -477,22 +421,6 @@ export default function Navbar() {
                     {getLabel(child)}
                   </Link>
                 ))}
-                {/* Category items for Products dropdown */}
-                {isProductsDropdown && categories.length > 0 && (
-                  <>
-                    <div className="w-16 border-t border-navy/10 my-1" />
-                    {categories.map((cat) => (
-                      <Link
-                        key={cat.id}
-                        href={buildHref(`/products?category=${cat.slug}`)}
-                        onClick={() => setIsMobileOpen(false)}
-                        className="text-lg font-medium text-navy/50 hover:text-red transition-colors"
-                      >
-                        {getCategoryLabel(cat)}
-                      </Link>
-                    ))}
-                  </>
-                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -540,17 +468,7 @@ export default function Navbar() {
         );
       }
 
-      // Dropdown
-      const isProductsDropdown = item.key === 'products';
-      // For Products fallback, separate recipe children from non-recipe
-      const recipeChildren = isProductsDropdown
-        ? item.children.filter((c) => c.href === '/recipes')
-        : [];
-      const nonRecipeChildren = isProductsDropdown
-        ? item.children.filter((c) => c.href !== '/recipes')
-        : item.children;
-      const hasRecipe = recipeChildren.length > 0;
-
+      // Dropdown — single column with children only
       return (
         <div
           key={item.key}
@@ -580,82 +498,24 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.2 }}
-                className={cn(
-                  'absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden',
-                  isProductsDropdown && hasRecipe ? 'min-w-[380px]' : 'min-w-[220px]'
-                )}
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden min-w-[220px]"
               >
-                {isProductsDropdown && hasRecipe ? (
-                  <div className="flex">
-                    {/* Left side: All Products + Categories */}
-                    <div className="flex-1 py-2">
-                      {nonRecipeChildren.map((child) => (
-                        <Link
-                          key={child.key}
-                          href={buildHref(child.href)}
-                          className={cn(
-                            'block px-5 py-2.5 text-sm font-medium transition-colors',
-                            isLinkActive(child.href)
-                              ? 'text-red bg-red/5'
-                              : 'text-navy/70 hover:text-navy hover:bg-cream/50'
-                          )}
-                        >
-                          {t(child.key)}
-                        </Link>
-                      ))}
-                      {categories.length > 0 && (
-                        <>
-                          <div className="mx-4 my-1.5 border-t border-navy/10" />
-                          {categories.map((cat) => (
-                            <Link
-                              key={cat.id}
-                              href={buildHref(`/products?category=${cat.slug}`)}
-                              className="block px-5 py-2 text-sm text-navy/60 hover:text-navy hover:bg-cream/50 transition-colors"
-                            >
-                              {getCategoryLabel(cat)}
-                            </Link>
-                          ))}
-                        </>
+                <div className="py-2">
+                  {item.children.map((child) => (
+                    <Link
+                      key={child.key}
+                      href={buildHref(child.href)}
+                      className={cn(
+                        'block px-5 py-2.5 text-sm font-medium transition-colors',
+                        isLinkActive(child.href)
+                          ? 'text-red bg-red/5'
+                          : 'text-navy/70 hover:text-navy hover:bg-cream/50'
                       )}
-                    </div>
-                    {/* Vertical divider */}
-                    <div className="w-px bg-navy/10 my-2" />
-                    {/* Right side: Recipes */}
-                    <div className="py-2 min-w-[130px]">
-                      {recipeChildren.map((child) => (
-                        <Link
-                          key={child.key}
-                          href={buildHref(child.href)}
-                          className={cn(
-                            'block px-5 py-2.5 text-sm font-medium transition-colors',
-                            isLinkActive(child.href)
-                              ? 'text-red bg-red/5'
-                              : 'text-navy/70 hover:text-navy hover:bg-cream/50'
-                          )}
-                        >
-                          {t(child.key)}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="py-2">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.key}
-                        href={buildHref(child.href)}
-                        className={cn(
-                          'block px-5 py-2.5 text-sm font-medium transition-colors',
-                          isLinkActive(child.href)
-                            ? 'text-red bg-red/5'
-                            : 'text-navy/70 hover:text-navy hover:bg-cream/50'
-                        )}
-                      >
-                        {t(child.key)}
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                    >
+                      {t(child.key)}
+                    </Link>
+                  ))}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -693,8 +553,7 @@ export default function Navbar() {
         );
       }
 
-      // Mobile dropdown
-      const isProductsDropdown = item.key === 'products';
+      // Mobile dropdown — children only
       return (
         <motion.div
           key={item.key}
@@ -743,22 +602,6 @@ export default function Navbar() {
                     {t(child.key)}
                   </Link>
                 ))}
-                {/* Category items for Products dropdown */}
-                {isProductsDropdown && categories.length > 0 && (
-                  <>
-                    <div className="w-16 border-t border-navy/10 my-1" />
-                    {categories.map((cat) => (
-                      <Link
-                        key={cat.id}
-                        href={buildHref(`/products?category=${cat.slug}`)}
-                        onClick={() => setIsMobileOpen(false)}
-                        className="text-lg font-medium text-navy/50 hover:text-red transition-colors"
-                      >
-                        {getCategoryLabel(cat)}
-                      </Link>
-                    ))}
-                  </>
-                )}
               </motion.div>
             )}
           </AnimatePresence>

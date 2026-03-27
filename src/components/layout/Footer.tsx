@@ -14,7 +14,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import type { NavMenuItem, CompanySettings, Category } from '@/types/database';
+import type { NavMenuItem, CompanySettings } from '@/types/database';
 
 interface FallbackNavLink {
   key: string;
@@ -49,7 +49,7 @@ const fallbackNavItems: FallbackNavItem[] = [
   },
   {
     type: 'dropdown',
-    key: 'moments',
+    key: 'journal',
     href: '/moments',
     children: [
       { key: 'events', href: '/events' },
@@ -69,25 +69,20 @@ export default function Footer() {
 
   const [settings, setSettings] = useState<CompanySettings | null>(null);
   const [dbMenuItems, setDbMenuItems] = useState<NavMenuItem[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [settingsRes, menusRes, catsRes] = await Promise.all([
+        const [settingsRes, menusRes] = await Promise.all([
           supabase.from('company_settings').select('*').single(),
           supabase.from('navbar_menus').select('*').eq('is_active', true).order('sort_order'),
-          supabase.from('categories').select('*').eq('is_active', true).order('sort_order'),
         ]);
         if (settingsRes.data) {
           setSettings(settingsRes.data as CompanySettings);
         }
         if (menusRes.data && menusRes.data.length > 0) {
           setDbMenuItems(menusRes.data as NavMenuItem[]);
-        }
-        if (catsRes.data) {
-          setCategories(catsRes.data as Category[]);
         }
       } catch {
         // Keep fallback
@@ -122,12 +117,6 @@ export default function Footer() {
     return item.label_en;
   };
 
-  const getCategoryLabel = (cat: Category) => {
-    if (locale === 'zh-TW') return cat.name_zh || cat.name_en;
-    if (locale === 'id') return cat.name_id || cat.name_en;
-    return cat.name_en;
-  };
-
   const buildHref = (href: string) => {
     if (href === '/') return `/${locale}`;
     if (href.startsWith('/')) return `/${locale}${href}`;
@@ -153,11 +142,10 @@ export default function Footer() {
     if (useDbMenus && menuTree) {
       return menuTree.map((item) => {
         const hasChildren = item.children.length > 0;
-        const isProductsDropdown = item.url === '/products';
         const menuKey = item.id;
         const isExpanded = expandedMenu === menuKey;
 
-        if (!hasChildren && !isProductsDropdown) {
+        if (!hasChildren) {
           return (
             <div key={item.id} className="text-center">
               <Link
@@ -170,8 +158,6 @@ export default function Footer() {
           );
         }
 
-        const showCategories = isProductsDropdown && categories.length > 0;
-
         return (
           <div key={item.id} className="text-center">
             <div className="inline-flex items-center gap-1 justify-center">
@@ -181,19 +167,17 @@ export default function Footer() {
               >
                 {getLabel(item)}
               </button>
-              {(hasChildren || showCategories) && (
-                <button
-                  onClick={() => toggleMenu(menuKey)}
-                  className="p-0.5 text-cream/40 hover:text-cream/70 transition-colors"
-                  aria-label="Toggle submenu"
-                >
-                  <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform duration-300 ${
-                      isExpanded ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-              )}
+              <button
+                onClick={() => toggleMenu(menuKey)}
+                className="p-0.5 text-cream/40 hover:text-cream/70 transition-colors"
+                aria-label="Toggle submenu"
+              >
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                    isExpanded ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
             </div>
 
             <div
@@ -211,22 +195,6 @@ export default function Footer() {
                     {getLabel(child)}
                   </Link>
                 ))}
-                {showCategories && (
-                  <>
-                    {hasChildren && (
-                      <div className="border-t border-cream/10 my-1.5 w-12 mx-auto" />
-                    )}
-                    {categories.map((cat) => (
-                      <Link
-                        key={cat.id}
-                        href={buildHref(`/products?category=${cat.slug}`)}
-                        className="block text-cream/50 hover:text-white text-xs transition-colors duration-200"
-                      >
-                        {getCategoryLabel(cat)}
-                      </Link>
-                    ))}
-                  </>
-                )}
               </div>
             </div>
           </div>
@@ -251,8 +219,6 @@ export default function Footer() {
 
       const menuKey = item.key;
       const isExpanded = expandedMenu === menuKey;
-      const isProductsDropdown = item.key === 'products';
-      const showCategories = isProductsDropdown && categories.length > 0;
 
       return (
         <div key={item.key} className="text-center">
@@ -291,20 +257,6 @@ export default function Footer() {
                   {navT(child.key)}
                 </Link>
               ))}
-              {showCategories && (
-                <>
-                  <div className="border-t border-cream/10 my-1.5 w-12 mx-auto" />
-                  {categories.map((cat) => (
-                    <Link
-                      key={cat.id}
-                      href={buildHref(`/products?category=${cat.slug}`)}
-                      className="block text-cream/50 hover:text-white text-xs transition-colors duration-200"
-                    >
-                      {getCategoryLabel(cat)}
-                    </Link>
-                  ))}
-                </>
-              )}
             </div>
           </div>
         </div>

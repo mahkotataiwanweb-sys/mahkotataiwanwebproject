@@ -1,20 +1,56 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowLeft, Award, Store, Package, Users } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Award, Store, Package, Users, Shield, Heart, Sparkles, ChevronRight } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 gsap.registerPlugin(ScrollTrigger);
 
+interface StorePartner {
+  id: number;
+  name: string;
+  logo_url: string;
+  is_active: boolean;
+  sort_order: number;
+}
+
 const stats = [
-  { icon: Award, key: 'since', value: 2021, prefix: '', suffix: '' },
-  { icon: Store, key: 'stores', value: 300, prefix: '', suffix: '+' },
-  { icon: Package, key: 'products', value: 26, prefix: '', suffix: '' },
-  { icon: Users, key: 'customers', value: 1000, prefix: '', suffix: '+' },
+  { icon: Award, key: 'since', value: 2021, prefix: '', suffix: '', displayType: 'number' as const },
+  { icon: Store, key: 'stores', value: 300, prefix: '', suffix: '+', displayType: 'number' as const },
+  { icon: Package, key: 'products', value: 26, prefix: '', suffix: '', displayType: 'number' as const },
+  { icon: Users, key: 'customers', value: 1, prefix: '', suffix: 'M+', displayType: 'million' as const },
+];
+
+const values = [
+  {
+    icon: Shield,
+    title: 'Quality First',
+    description: 'Every product is carefully selected and tested to meet the highest standards of quality before reaching our shelves.',
+  },
+  {
+    icon: Heart,
+    title: 'Cultural Bridge',
+    description: 'We bridge the gap between Indonesian heritage and Taiwanese daily life, bringing authentic flavors to every home.',
+  },
+  {
+    icon: Users,
+    title: 'Community',
+    description: 'Building a strong community of over 1 million customers who trust us to deliver the tastes of home.',
+  },
+];
+
+const milestones = [
+  { year: '2021', title: 'Founded', description: 'Mahkota Taiwan was established with a vision to bring authentic Indonesian products to Taiwan.' },
+  { year: '2022', title: '100+ Stores', description: 'Expanded our network to over 100 retail partner stores across northern Taiwan.' },
+  { year: '2023', title: '300+ Stores', description: 'Reached 300+ partner stores island-wide, becoming the leading Indonesian product distributor.' },
+  { year: '2024', title: 'Expanded Product Lines', description: 'Introduced new product categories including beverages, snacks, and household essentials.' },
+  { year: '2025', title: '1 Million+ Customers', description: 'Proudly serving over 1 million customers, a testament to our quality and community trust.' },
 ];
 
 export default function AboutPage() {
@@ -23,7 +59,31 @@ export default function AboutPage() {
   const headerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
+  const valuesRef = useRef<HTMLDivElement>(null);
+  const partnersRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
   const counterRefs = useRef<(HTMLSpanElement | null)[]>([]);
+
+  const [partners, setPartners] = useState<StorePartner[]>([]);
+
+  // Fetch partner logos from Supabase
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('store_partners')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order');
+        if (!error && data) {
+          setPartners(data);
+        }
+      } catch (e) {
+        // silently fail — placeholder will show
+      }
+    };
+    fetchPartners();
+  }, []);
 
   // GSAP header animation
   useEffect(() => {
@@ -31,10 +91,11 @@ export default function AboutPage() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         headerRef.current!.children,
-        { opacity: 0, y: 40 },
+        { opacity: 0, y: 40, filter: 'blur(10px)' },
         {
           opacity: 1,
           y: 0,
+          filter: 'blur(0px)',
           duration: 0.8,
           stagger: 0.12,
           ease: 'power3.out',
@@ -50,10 +111,11 @@ export default function AboutPage() {
       if (textRef.current) {
         gsap.fromTo(
           textRef.current.children,
-          { opacity: 0, y: 40 },
+          { opacity: 0, y: 40, filter: 'blur(8px)' },
           {
             opacity: 1,
             y: 0,
+            filter: 'blur(0px)',
             duration: 0.8,
             stagger: 0.15,
             ease: 'power3.out',
@@ -66,13 +128,35 @@ export default function AboutPage() {
         );
       }
 
+      // Stats scale-in
+      if (statsRef.current) {
+        gsap.fromTo(
+          statsRef.current.children,
+          { opacity: 0, scale: 0.8, y: 30 },
+          {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.12,
+            ease: 'back.out(1.4)',
+            scrollTrigger: {
+              trigger: statsRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
+
       counterRefs.current.forEach((el, i) => {
         if (!el) return;
-        const target = stats[i].value;
+        const stat = stats[i];
+        const target = stat.value;
         const obj = { val: 0 };
         gsap.to(obj, {
           val: target,
-          duration: 2,
+          duration: stat.displayType === 'million' ? 1.5 : 2,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: statsRef.current,
@@ -84,6 +168,67 @@ export default function AboutPage() {
           },
         });
       });
+
+      // Values section
+      if (valuesRef.current) {
+        gsap.fromTo(
+          valuesRef.current.querySelectorAll('.value-card'),
+          { opacity: 0, y: 60, scale: 0.9 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.7,
+            stagger: 0.15,
+            ease: 'back.out(1.4)',
+            scrollTrigger: {
+              trigger: valuesRef.current,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
+
+      // Partners section
+      if (partnersRef.current) {
+        gsap.fromTo(
+          partnersRef.current,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: partnersRef.current,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
+
+      // Timeline section
+      if (timelineRef.current) {
+        gsap.fromTo(
+          timelineRef.current.querySelectorAll('.timeline-item'),
+          { opacity: 0, x: (i: number) => (i % 2 === 0 ? -60 : 60), y: 20 },
+          {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            duration: 0.7,
+            stagger: 0.2,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: timelineRef.current,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
     });
     return () => ctx.revert();
   }, []);
@@ -96,6 +241,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-20 right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl" />
           <div className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-red/10 blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-red/5 blur-3xl" />
         </div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -123,7 +269,7 @@ export default function AboutPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-16">
+      <div className="max-w-5xl mx-auto px-6 py-16">
         {/* Description */}
         <div ref={textRef} className="text-center">
           <p className="text-navy/70 leading-relaxed text-base sm:text-lg max-w-2xl mx-auto mb-8">
@@ -144,7 +290,11 @@ export default function AboutPage() {
           {stats.map((stat, i) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.key} className="text-center group">
+              <motion.div
+                key={stat.key}
+                className="text-center group"
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              >
                 <div className="w-14 h-14 rounded-2xl bg-red/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-red/20 transition-colors duration-500">
                   <Icon className="w-6 h-6 text-red" />
                 </div>
@@ -154,11 +304,217 @@ export default function AboutPage() {
                   {stat.suffix}
                 </div>
                 <p className="text-navy/50 text-sm font-medium">{t(`stats.${stat.key}`)}</p>
-              </div>
+              </motion.div>
             );
           })}
         </div>
       </div>
+
+      {/* Our Values Section */}
+      <div ref={valuesRef} className="max-w-6xl mx-auto px-6 pb-20">
+        <div className="text-center mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">What We Stand For</p>
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-navy mb-4">Our Values</h2>
+            <div className="w-16 h-[3px] bg-red/40 mx-auto" />
+          </motion.div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {values.map((val, i) => {
+            const Icon = val.icon;
+            return (
+              <motion.div
+                key={val.title}
+                className="value-card relative bg-navy rounded-3xl p-8 text-center group cursor-default overflow-hidden"
+                whileHover={{ y: -6, transition: { duration: 0.3 } }}
+              >
+                {/* Decorative glow */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-red/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full blur-2xl" />
+
+                <div className="relative z-10">
+                  <div className="w-16 h-16 rounded-2xl bg-red/20 flex items-center justify-center mx-auto mb-5 group-hover:bg-red/30 transition-colors duration-500">
+                    <Icon className="w-7 h-7 text-red" />
+                  </div>
+                  <h3 className="font-heading text-xl font-bold text-white mb-3">{val.title}</h3>
+                  <div className="w-8 h-[2px] bg-red/50 mx-auto mb-4" />
+                  <p className="text-cream/60 text-sm leading-relaxed">{val.description}</p>
+                </div>
+
+                {/* Bottom accent line */}
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-red/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Our Partners Section */}
+      <div className="bg-white/50 py-20">
+        <div ref={partnersRef} className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Collaboration</p>
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-navy mb-4">Trusted Partners</h2>
+            <div className="w-16 h-[3px] bg-red/40 mx-auto mb-4" />
+            <p className="text-navy/60 text-base max-w-lg mx-auto">Working with Taiwan&apos;s leading retailers to bring you the best Indonesian products</p>
+          </div>
+
+          {partners.length > 0 ? (
+            <div className="relative overflow-hidden">
+              {/* Marquee container */}
+              <div className="flex gap-8 animate-marquee">
+                {[...partners, ...partners].map((partner, i) => (
+                  <motion.div
+                    key={`${partner.id}-${i}`}
+                    className="flex-shrink-0 bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 flex items-center justify-center min-w-[160px] h-24"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    {partner.logo_url ? (
+                      <img
+                        src={partner.logo_url}
+                        alt={partner.name}
+                        className="max-h-12 max-w-[120px] object-contain"
+                      />
+                    ) : (
+                      <span className="text-navy/60 font-semibold text-sm">{partner.name}</span>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl p-8 shadow-sm flex items-center justify-center h-24"
+                >
+                  <div className="flex items-center gap-2 text-navy/30">
+                    <Store className="w-5 h-5" />
+                    <span className="text-sm font-medium">Partner Store</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Our Journey Timeline Section */}
+      <div className="py-20 max-w-5xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Our Story</p>
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-navy mb-4">Our Journey</h2>
+            <div className="w-16 h-[3px] bg-red/40 mx-auto" />
+          </motion.div>
+        </div>
+
+        <div ref={timelineRef} className="relative">
+          {/* Vertical line */}
+          <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-navy/10 -translate-x-1/2 hidden md:block" />
+          <div className="absolute left-6 top-0 bottom-0 w-[2px] bg-navy/10 md:hidden" />
+
+          <div className="space-y-12 md:space-y-16">
+            {milestones.map((milestone, i) => (
+              <div
+                key={milestone.year}
+                className={`timeline-item relative flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-0 ${
+                  i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
+                }`}
+              >
+                {/* Content Card */}
+                <div className={`md:w-[calc(50%-32px)] pl-14 md:pl-0 ${i % 2 === 0 ? 'md:pr-8 md:text-right' : 'md:pl-8 md:text-left'}`}>
+                  <motion.div
+                    className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-navy/5"
+                    whileHover={{ y: -4 }}
+                  >
+                    <span className="inline-block text-red font-heading font-bold text-2xl mb-2">{milestone.year}</span>
+                    <h3 className="font-heading text-lg font-bold text-navy mb-2">{milestone.title}</h3>
+                    <p className="text-navy/60 text-sm leading-relaxed">{milestone.description}</p>
+                  </motion.div>
+                </div>
+
+                {/* Center dot */}
+                <div className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-6 md:top-1/2 md:-translate-y-1/2 z-10">
+                  <div className="w-4 h-4 rounded-full bg-red border-4 border-cream shadow-md" />
+                </div>
+
+                {/* Spacer for other side */}
+                <div className="hidden md:block md:w-[calc(50%-32px)]" />
+              </div>
+            ))}
+          </div>
+
+          {/* End dot */}
+          <div className="absolute left-6 md:left-1/2 md:-translate-x-1/2 -bottom-4">
+            <div className="w-3 h-3 rounded-full bg-navy/20" />
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom CTA */}
+      <div className="bg-gradient-to-r from-navy via-navy/95 to-red-dark py-16 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-1/4 w-64 h-64 rounded-full bg-red/10 blur-3xl" />
+          <div className="absolute bottom-0 left-1/4 w-48 h-48 rounded-full bg-white/5 blur-3xl" />
+        </div>
+        <motion.div
+          className="max-w-3xl mx-auto px-6 text-center relative z-10"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+        >
+          <Sparkles className="w-8 h-8 text-red/60 mx-auto mb-4" />
+          <h2 className="font-heading text-2xl sm:text-3xl font-bold text-white mb-4">
+            Want to Learn More?
+          </h2>
+          <p className="text-cream/60 mb-8 max-w-md mx-auto">
+            Discover our products or get in touch with our team today.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href={`/${locale}/products`}
+              className="inline-flex items-center justify-center gap-2 bg-red hover:bg-red/90 text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              Browse Products
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href={`/${locale}/contact`}
+              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 border border-white/20"
+            >
+              Contact Us
+            </Link>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Marquee animation styles */}
+      <style jsx>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          animation: marquee 30s linear infinite;
+        }
+        .animate-marquee:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
     </div>
   );
 }
