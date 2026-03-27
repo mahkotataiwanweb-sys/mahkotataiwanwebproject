@@ -406,8 +406,8 @@ export default function ContactPage() {
       </div>
 
       {/* Business Hours Section */}
-      <div className="bg-white/50 py-20">
-        <div className="max-w-3xl mx-auto px-6">
+      <div className="bg-white/50 py-14">
+        <div className="max-w-xl mx-auto px-6">
           <div className="text-center mb-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -416,14 +416,14 @@ export default function ContactPage() {
               transition={{ duration: 0.6 }}
             >
               <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Availability</p>
-              <h2 className="font-heading text-3xl sm:text-4xl font-bold text-navy mb-4">Business Hours</h2>
+              <h2 className="font-heading text-2xl sm:text-3xl font-bold text-navy mb-4">Business Hours</h2>
               <div className="w-16 h-[3px] bg-red/40 mx-auto" />
             </motion.div>
           </div>
 
           <div ref={hoursRef}>
             <motion.div
-              className="bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-navy/5 relative overflow-hidden"
+              className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-navy/5 relative overflow-hidden"
               whileHover={{ y: -2, transition: { duration: 0.2 } }}
             >
               {/* Decorative */}
@@ -431,15 +431,15 @@ export default function ContactPage() {
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-navy/5 rounded-full blur-2xl" />
 
               <div className="relative z-10">
-                <div className="w-16 h-16 rounded-2xl bg-red/10 flex items-center justify-center mx-auto mb-6">
-                  <Clock className="w-7 h-7 text-red" />
+                <div className="w-12 h-12 rounded-2xl bg-red/10 flex items-center justify-center mx-auto mb-4">
+                  <Clock className="w-5 h-5 text-red" />
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {businessHours.map((item) => (
                     <div
                       key={item.day}
-                      className="flex items-center justify-between py-3 border-b border-navy/5 last:border-0"
+                      className="flex items-center justify-between py-2 border-b border-navy/5 last:border-0"
                     >
                       <span className="font-semibold text-navy text-sm sm:text-base">{item.day}</span>
                       <span className={`text-sm sm:text-base font-medium ${item.open ? 'text-navy/70' : 'text-red/70'}`}>

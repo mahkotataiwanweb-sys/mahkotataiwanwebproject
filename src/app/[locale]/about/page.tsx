@@ -21,6 +21,7 @@ interface StorePartner {
   id: number;
   name: string;
   logo_url: string;
+  website_url: string | null;
   is_active: boolean;
   sort_order: number;
 }
@@ -501,21 +502,43 @@ export default function AboutPage() {
                 style={{ willChange: 'transform' }}
               >
                 {tripledPartners.map((partner, i) => (
-                  <div
-                    key={`${partner.id}-${i}`}
-                    className="flex-shrink-0 bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 flex items-center justify-center min-w-[180px] h-24"
-                  >
-                    {partner.logo_url ? (
-                      <img
-                        src={partner.logo_url}
-                        alt={partner.name}
-                        className="max-h-12 max-w-[120px] object-contain pointer-events-none"
-                        draggable={false}
-                      />
-                    ) : (
-                      <span className="text-navy/60 font-semibold text-sm pointer-events-none">{partner.name}</span>
-                    )}
-                  </div>
+                  partner.website_url && partner.website_url !== '#' ? (
+                    <a
+                      key={`${partner.id}-${i}`}
+                      href={partner.website_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-shrink-0 bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center min-w-[180px] h-24 cursor-pointer group"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {partner.logo_url ? (
+                        <img
+                          src={partner.logo_url}
+                          alt={partner.name}
+                          className="max-h-12 max-w-[120px] object-contain pointer-events-none group-hover:scale-110 transition-transform duration-300"
+                          draggable={false}
+                        />
+                      ) : (
+                        <span className="text-navy/60 font-semibold text-sm pointer-events-none">{partner.name}</span>
+                      )}
+                    </a>
+                  ) : (
+                    <div
+                      key={`${partner.id}-${i}`}
+                      className="flex-shrink-0 bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 flex items-center justify-center min-w-[180px] h-24"
+                    >
+                      {partner.logo_url ? (
+                        <img
+                          src={partner.logo_url}
+                          alt={partner.name}
+                          className="max-h-12 max-w-[120px] object-contain pointer-events-none"
+                          draggable={false}
+                        />
+                      ) : (
+                        <span className="text-navy/60 font-semibold text-sm pointer-events-none">{partner.name}</span>
+                      )}
+                    </div>
+                  )
                 ))}
               </div>
             </div>
