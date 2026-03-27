@@ -262,6 +262,7 @@ export interface HeroSlide {
   subtitle_id: string;
   subtitle_zh: string;
   image_url: string | null;
+  media_type: 'image' | 'video' | 'gif';
   link_url: string | null;
   sort_order: number;
   is_active: boolean;
@@ -278,6 +279,7 @@ export interface HeroSlideInsert {
   subtitle_id: string;
   subtitle_zh: string;
   image_url?: string | null;
+  media_type?: 'image' | 'video' | 'gif';
   link_url?: string | null;
   sort_order?: number;
   is_active?: boolean;
@@ -294,6 +296,7 @@ export interface HeroSlideUpdate {
   subtitle_id?: string;
   subtitle_zh?: string;
   image_url?: string | null;
+  media_type?: 'image' | 'video' | 'gif';
   link_url?: string | null;
   sort_order?: number;
   is_active?: boolean;

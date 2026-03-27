@@ -8,10 +8,10 @@
     "lifestyle": "Aktivitas",
     "contact": "Kontak",
     "language": "Bahasa",
-    "moments": "Etalase",
     "allProducts": "Semua Produk",
     "gallery": "Galeri",
-    "whereToBuy": "Tempat Membeli"
+    "whereToBuy": "Tempat Membeli",
+    "journal": "Jurnal"
   },
   "hero": {
     "tagline": "Rasa Indonesia, Hadir di Taiwan",
@@ -112,8 +112,8 @@
     "certifications": "Sertifikasi",
     "sections": {
       "products": "Produk",
-      "moments": "Etalase",
-      "company": "Perusahaan"
+      "company": "Perusahaan",
+      "journal": "Jurnal"
     },
     "office": "Kantor",
     "warehouse": "Gudang",

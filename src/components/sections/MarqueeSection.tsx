@@ -1,11 +1,7 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useRef, useEffect, useCallback } from 'react';
 import { Crown } from 'lucide-react';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const marqueeItems = [
   'Mahkota Taiwan',
@@ -16,23 +12,125 @@ const marqueeItems = [
   '300+ Stores',
 ];
 
+const DEFAULT_SPEED = 1.5; // px per frame (leftward)
+const FRICTION = 0.95; // momentum decay per frame
+const RETURN_RATE = 0.05; // how fast velocity returns to default after release
+
 export default function MarqueeSection() {
-  const marqueeRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const offsetRef = useRef(0);
+  const velocityRef = useRef(-DEFAULT_SPEED);
+  const isDraggingRef = useRef(false);
+  const lastPointerXRef = useRef(0);
+  const lastMoveTimeRef = useRef(0);
+  const dragVelocityRef = useRef(0);
+  const rafRef = useRef<number>(0);
+  const singleSetWidthRef = useRef(0);
+
+  // Tripled items for seamless infinite loop
+  const items = [...marqueeItems, ...marqueeItems, ...marqueeItems];
+
+  const measureSetWidth = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    // Total width is 3 sets; one set = total / 3
+    singleSetWidthRef.current = track.scrollWidth / 3;
+  }, []);
+
+  const animate = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const setWidth = singleSetWidthRef.current;
+
+    if (!isDraggingRef.current) {
+      // Blend velocity back toward default speed
+      velocityRef.current += (-DEFAULT_SPEED - velocityRef.current) * RETURN_RATE;
+
+      // Apply friction to any momentum beyond default
+      const excess = velocityRef.current - (-DEFAULT_SPEED);
+      if (Math.abs(excess) > 0.01) {
+        velocityRef.current = -DEFAULT_SPEED + excess * FRICTION;
+      }
+    }
+
+    if (!isDraggingRef.current) {
+      offsetRef.current += velocityRef.current;
+    }
+
+    // Seamless loop: wrap offset within one set width
+    if (setWidth > 0) {
+      // Keep offset in range (-setWidth, 0]
+      while (offsetRef.current < -setWidth) {
+        offsetRef.current += setWidth;
+      }
+      while (offsetRef.current > 0) {
+        offsetRef.current -= setWidth;
+      }
+    }
+
+    track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
+
+    rafRef.current = requestAnimationFrame(animate);
+  }, []);
 
   useEffect(() => {
-    const el = marqueeRef.current;
-    if (!el) return;
+    measureSetWidth();
+    rafRef.current = requestAnimationFrame(animate);
 
-    const ctx = gsap.context(() => {
-      gsap.to(el, {
-        xPercent: -50,
-        ease: 'none',
-        duration: 25,
-        repeat: -1,
-      });
-    });
+    const handleResize = () => measureSetWidth();
+    window.addEventListener('resize', handleResize);
 
-    return () => ctx.revert();
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [animate, measureSetWidth]);
+
+  const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    isDraggingRef.current = true;
+    lastPointerXRef.current = e.clientX;
+    lastMoveTimeRef.current = performance.now();
+    dragVelocityRef.current = 0;
+    (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+  }, []);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current) return;
+
+    const now = performance.now();
+    const dx = e.clientX - lastPointerXRef.current;
+    const dt = now - lastMoveTimeRef.current;
+
+    if (dt > 0) {
+      // Convert to per-frame velocity (assuming ~16ms frames)
+      dragVelocityRef.current = (dx / dt) * 16;
+    }
+
+    offsetRef.current += dx;
+    lastPointerXRef.current = e.clientX;
+    lastMoveTimeRef.current = now;
+
+    // Apply transform immediately for responsive feel
+    const track = trackRef.current;
+    const setWidth = singleSetWidthRef.current;
+    if (track && setWidth > 0) {
+      while (offsetRef.current < -setWidth) {
+        offsetRef.current += setWidth;
+      }
+      while (offsetRef.current > 0) {
+        offsetRef.current -= setWidth;
+      }
+      track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
+    }
+  }, []);
+
+  const handlePointerUp = useCallback(() => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+
+    // Transfer drag velocity as momentum
+    velocityRef.current = dragVelocityRef.current || -DEFAULT_SPEED;
   }, []);
 
   return (
@@ -42,8 +140,15 @@ export default function MarqueeSection() {
       {/* Gradient overlay at right edge */}
       <div className="absolute top-0 right-0 w-24 h-full bg-gradient-to-l from-navy to-transparent z-10 pointer-events-none" />
 
-      <div ref={marqueeRef} className="flex whitespace-nowrap">
-        {[...marqueeItems, ...marqueeItems].map((item, i) => (
+      <div
+        className="flex whitespace-nowrap select-none touch-none cursor-grab active:cursor-grabbing"
+        ref={trackRef}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+      >
+        {items.map((item, i) => (
           <div key={i} className="flex items-center gap-6 mx-6">
             <Crown className="w-4 h-4 text-red shrink-0" />
             <span className="text-cream/80 text-lg sm:text-xl font-heading font-semibold tracking-wide">

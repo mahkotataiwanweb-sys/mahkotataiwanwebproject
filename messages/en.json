@@ -8,10 +8,10 @@
     "lifestyle": "Activity",
     "contact": "Contact",
     "language": "Language",
-    "moments": "Showcase",
     "allProducts": "All Products",
     "gallery": "Gallery",
-    "whereToBuy": "Where to Buy"
+    "whereToBuy": "Where to Buy",
+    "journal": "Journal"
   },
   "hero": {
     "tagline": "Indonesian Flavors, Now in Taiwan",
@@ -112,8 +112,8 @@
     "certifications": "Certifications",
     "sections": {
       "products": "Products",
-      "moments": "Showcase",
-      "company": "Company"
+      "company": "Company",
+      "journal": "Journal"
     },
     "office": "Office",
     "warehouse": "Warehouse",

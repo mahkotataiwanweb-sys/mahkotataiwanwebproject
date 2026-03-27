@@ -22,6 +22,7 @@ const fallbackSlides: HeroSlide[] = [
     subtitle_id: 'Menghadirkan rasa kampung halaman di Taiwan',
     subtitle_zh: '將家鄉的味道帶到台灣',
     image_url: null,
+    media_type: 'image',
     link_url: null,
     sort_order: 0,
     is_active: true,
@@ -37,6 +38,7 @@ const fallbackSlides: HeroSlide[] = [
     subtitle_id: 'Bersertifikat Halal, dibuat dengan bahan terbaik',
     subtitle_zh: '清真認證，採用最優質的食材',
     image_url: null,
+    media_type: 'image',
     link_url: null,
     sort_order: 1,
     is_active: true,
@@ -52,6 +54,7 @@ const fallbackSlides: HeroSlide[] = [
     subtitle_id: 'Temukan produk Mahkota Taiwan di dekat Anda',
     subtitle_zh: '在您附近找到皇冠台灣產品',
     image_url: null,
+    media_type: 'image',
     link_url: null,
     sort_order: 2,
     is_active: true,
@@ -66,6 +69,65 @@ const slideBgColors = [
   'from-red via-red-dark to-navy',
   'from-navy-dark via-navy to-red-dark',
 ];
+
+/**
+ * Analyze image brightness by sampling the top 40% of the image.
+ * Returns 'dark' or 'light'.
+ */
+function analyzeImageBrightness(src: string): Promise<'dark' | 'light'> {
+  return new Promise((resolve) => {
+    try {
+      const img = new window.Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          const sampleWidth = Math.min(img.naturalWidth, 200);
+          const scale = sampleWidth / img.naturalWidth;
+          const sampleHeight = Math.round(img.naturalHeight * scale * 0.4); // top 40%
+          canvas.width = sampleWidth;
+          canvas.height = sampleHeight;
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve('dark');
+            return;
+          }
+
+          ctx.drawImage(
+            img,
+            0,
+            0,
+            img.naturalWidth,
+            Math.round(img.naturalHeight * 0.4),
+            0,
+            0,
+            sampleWidth,
+            sampleHeight
+          );
+
+          const imageData = ctx.getImageData(0, 0, sampleWidth, sampleHeight);
+          const data = imageData.data;
+          let totalBrightness = 0;
+          const pixelCount = data.length / 4;
+
+          for (let i = 0; i < data.length; i += 4) {
+            totalBrightness += 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+          }
+
+          const avgBrightness = totalBrightness / pixelCount;
+          resolve(avgBrightness < 128 ? 'dark' : 'light');
+        } catch {
+          resolve('dark');
+        }
+      };
+      img.onerror = () => resolve('dark');
+      img.src = src;
+    } catch {
+      resolve('dark');
+    }
+  });
+}
 
 export default function HeroSlider() {
   const locale = useLocale();
@@ -96,6 +158,37 @@ export default function HeroSlider() {
     fetchSlides();
   }, []);
 
+  // Brightness detection - runs whenever currentIndex changes
+  useEffect(() => {
+    const slide = slides[currentIndex];
+    if (!slide) return;
+
+    const mediaType = slide.media_type;
+
+    // Video slides: always dark (dark overlay)
+    if (mediaType === 'video') {
+      document.documentElement.style.setProperty('--hero-brightness', 'dark');
+      return;
+    }
+
+    // No media URL (gradient backgrounds): always dark
+    if (!slide.image_url) {
+      document.documentElement.style.setProperty('--hero-brightness', 'dark');
+      return;
+    }
+
+    // Image or GIF: analyze brightness
+    if (mediaType === 'image' || mediaType === 'gif' || !mediaType) {
+      analyzeImageBrightness(slide.image_url).then((brightness) => {
+        document.documentElement.style.setProperty('--hero-brightness', brightness);
+      });
+      return;
+    }
+
+    // Fallback for any other type
+    document.documentElement.style.setProperty('--hero-brightness', 'dark');
+  }, [currentIndex, slides]);
+
   // Autoplay
   const nextSlide = useCallback(() => {
     setDirection(1);
@@ -123,6 +216,7 @@ export default function HeroSlider() {
   const currentSlide = slides[currentIndex];
   const title = getLocalizedField(currentSlide, 'title', locale);
   const subtitle = getLocalizedField(currentSlide, 'subtitle', locale);
+  const mediaType = currentSlide.media_type;
 
   // Smoother slide variants with scale for parallax feel
   const slideVariants = {
@@ -170,6 +264,92 @@ export default function HeroSlider() {
     },
   };
 
+  /** Renders the appropriate media element based on media_type */
+  const renderSlideMedia = () => {
+    if (!currentSlide.image_url) {
+      // No media - gradient background
+      return (
+        <div
+          className={`absolute inset-0 bg-gradient-to-br ${slideBgColors[currentIndex % slideBgColors.length]}`}
+        >
+          {/* Decorative elements for non-image slides */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-20 left-10 w-72 h-72 rounded-full bg-white/5 blur-3xl" />
+            <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-red/10 blur-3xl" />
+            <div
+              className="absolute inset-0 opacity-[0.03]"
+              style={{
+                backgroundImage:
+                  'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+                backgroundSize: '60px 60px',
+              }}
+            />
+          </div>
+        </div>
+      );
+    }
+
+    if (mediaType === 'video') {
+      return (
+        <motion.div
+          ref={imageRef}
+          className="absolute inset-0"
+          initial={{ scale: 1.15 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 6, ease: 'linear' }}
+        >
+          <video
+            src={currentSlide.image_url}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="object-cover w-full h-full absolute inset-0"
+          />
+        </motion.div>
+      );
+    }
+
+    if (mediaType === 'gif') {
+      return (
+        <motion.div
+          ref={imageRef}
+          className="absolute inset-0"
+          initial={{ scale: 1.15 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 6, ease: 'linear' }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={currentSlide.image_url}
+            alt={title}
+            className="object-cover w-full h-full absolute inset-0"
+          />
+        </motion.div>
+      );
+    }
+
+    // Default: image (media_type === 'image' or undefined)
+    return (
+      <motion.div
+        ref={imageRef}
+        className="absolute inset-0"
+        initial={{ scale: 1.15 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 6, ease: 'linear' }}
+      >
+        <Image
+          src={currentSlide.image_url}
+          alt={title}
+          fill
+          className="object-cover"
+          priority={currentIndex === 0}
+          sizes="100vw"
+        />
+      </motion.div>
+    );
+  };
+
   return (
     <section
       id="hero"
@@ -189,42 +369,7 @@ export default function HeroSlider() {
           transition={{ duration: 0.9, ease: [0.43, 0.13, 0.23, 0.96] }}
           className="absolute inset-0"
         >
-          {currentSlide.image_url ? (
-            <motion.div
-              ref={imageRef}
-              className="absolute inset-0"
-              initial={{ scale: 1.15 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 6, ease: 'linear' }}
-            >
-              <Image
-                src={currentSlide.image_url}
-                alt={title}
-                fill
-                className="object-cover"
-                priority={currentIndex === 0}
-                sizes="100vw"
-              />
-            </motion.div>
-          ) : (
-            <div
-              className={`absolute inset-0 bg-gradient-to-br ${slideBgColors[currentIndex % slideBgColors.length]}`}
-            >
-              {/* Decorative elements for non-image slides */}
-              <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-20 left-10 w-72 h-72 rounded-full bg-white/5 blur-3xl" />
-                <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-red/10 blur-3xl" />
-                <div
-                  className="absolute inset-0 opacity-[0.03]"
-                  style={{
-                    backgroundImage:
-                      'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-                    backgroundSize: '60px 60px',
-                  }}
-                />
-              </div>
-            </div>
-          )}
+          {renderSlideMedia()}
 
           {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-black/40" />
