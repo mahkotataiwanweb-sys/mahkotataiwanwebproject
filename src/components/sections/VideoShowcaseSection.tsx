@@ -34,9 +34,10 @@ function extractYouTubeId(url: string): string | null {
 export default function VideoShowcaseSection() {
   const locale = useLocale();
   const sectionRef = useRef<HTMLDivElement>(null);
+  const videoElRef = useRef<HTMLVideoElement>(null);
   const [videos, setVideos] = useState<VideoShowcase[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [showControls, setShowControls] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   /* ---------- Fetch videos ---------- */
@@ -60,7 +61,7 @@ export default function VideoShowcaseSection() {
     if (videos.length <= 1) return;
     timerRef.current = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % videos.length);
-      setShowControls(false);
+      setIsMuted(true);
     }, 15000);
   }, [videos.length]);
 
@@ -70,6 +71,13 @@ export default function VideoShowcaseSection() {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [startAutoRotate]);
+
+  /* ---------- Handle mute toggle for uploaded videos ---------- */
+  useEffect(() => {
+    if (videoElRef.current) {
+      videoElRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
 
   /* ---------- GSAP entrance ---------- */
   useEffect(() => {
@@ -101,15 +109,14 @@ export default function VideoShowcaseSection() {
   const title = getLocalizedField(current, 'title', locale);
   const description = getLocalizedField(current, 'description', locale);
 
-  const handleVideoClick = () => {
-    setShowControls((prev) => !prev);
-    // Reset auto-rotate on interaction
+  const handleMuteToggle = () => {
+    setIsMuted((prev) => !prev);
     startAutoRotate();
   };
 
   const goToVideo = (index: number) => {
     setActiveIndex(index);
-    setShowControls(false);
+    setIsMuted(true);
     startAutoRotate();
   };
 
@@ -129,16 +136,15 @@ export default function VideoShowcaseSection() {
 
         {/* Large Video Player Container */}
         <div
-          className="relative w-full rounded-2xl overflow-hidden shadow-2xl cursor-pointer"
+          className="relative w-full rounded-2xl overflow-hidden shadow-2xl"
           style={{ aspectRatio: '16/9' }}
-          onClick={handleVideoClick}
         >
           {/* Subtle gradient overlay on top/bottom for cinematic feel */}
           <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-navy/30 via-transparent to-navy/20" />
 
           <AnimatePresence mode="wait">
             <motion.div
-              key={`video-${activeIndex}`}
+              key={`video-${activeIndex}-${isMuted ? 'muted' : 'unmuted'}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -149,10 +155,9 @@ export default function VideoShowcaseSection() {
                 (() => {
                   const videoId = extractYouTubeId(current.video_url);
                   if (!videoId) return null;
-                  const controlsParam = showControls ? 1 : 0;
                   return (
                     <iframe
-                      src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=${showControls ? 0 : 1}&loop=1&controls=${controlsParam}&showinfo=0&rel=0&modestbranding=1&playlist=${videoId}`}
+                      src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&controls=1&showinfo=0&rel=0&modestbranding=1&playlist=${videoId}`}
                       className="absolute inset-0 w-full h-full"
                       allow="autoplay; encrypted-media"
                       allowFullScreen
@@ -162,28 +167,43 @@ export default function VideoShowcaseSection() {
                 })()
               ) : (
                 <video
+                  ref={videoElRef}
                   src={current.video_url}
                   className="absolute inset-0 w-full h-full object-cover"
                   autoPlay
-                  muted={!showControls}
+                  muted={isMuted}
                   loop
                   playsInline
-                  controls={showControls}
+                  controls
                 />
               )}
             </motion.div>
           </AnimatePresence>
 
-          {/* Play button overlay when controls are hidden */}
-          {!showControls && (
-            <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-transform duration-300 hover:scale-110">
-                <svg className="w-8 h-8 md:w-10 md:h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
+          {/* Mute/Unmute floating button — always visible, above the iframe */}
+          <button
+            onClick={handleMuteToggle}
+            className="absolute bottom-4 right-4 z-30 flex items-center gap-2 bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white px-4 py-2 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl text-sm font-medium"
+            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+          >
+            {isMuted ? (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707A1 1 0 0112 5v14a1 1 0 01-1.707.707L5.586 15z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
                 </svg>
-              </div>
-            </div>
-          )}
+                <span>Click to unmute</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707A1 1 0 0112 5v14a1 1 0 01-1.707.707L5.586 15z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728" />
+                </svg>
+                <span>Sound on</span>
+              </>
+            )}
+          </button>
         </div>
 
         {/* Title + Description below video */}
