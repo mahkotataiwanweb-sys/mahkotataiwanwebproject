@@ -13,6 +13,7 @@ import MarqueeSection from '@/components/sections/MarqueeSection';
 import ProductCatalogSection from '@/components/sections/ProductCatalogSection';
 import VideoShowcaseSection from '@/components/sections/VideoShowcaseSection';
 import WhereToBuySection from '@/components/sections/WhereToBuySection';
+import WaveDivider from '@/components/ui/WaveDivider';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
@@ -346,17 +347,22 @@ export default function HomePage() {
 
       <MarqueeSection />
 
+      {/* ═══ Cream → Red: Bulge transition into product catalog ═══ */}
+      <WaveDivider variant="arc" fillColor="var(--color-red)" height={70} />
+
       {/* Product Catalog Showcase */}
       <div ref={catalogSectionRef} className="section-card-reveal">
         <ProductCatalogSection />
       </div>
+
+      {/* ═══ Red → Cream: Wave transition out of product catalog ═══ */}
+      <WaveDivider variant="wave" fillColor="var(--color-cream)" flip height={70} />
 
       {/* Discover Section */}
       <section ref={(el: HTMLElement | null) => { (sectionRef as React.MutableRefObject<HTMLElement | null>).current = el; discoverSectionRef.current = el; }} className="py-24 sm:py-32 bg-cream relative overflow-hidden section-card-reveal">
         {/* Subtle background texture */}
         <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)', backgroundSize: '32px 32px' }} />
         {/* Decorative */}
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-navy/10 to-transparent" />
         <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
 
         <div className="max-w-7xl mx-auto px-6">
@@ -395,19 +401,22 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Divider between Discover and Video */}
-      <div className="w-full h-px bg-gradient-to-r from-transparent via-navy/10 to-transparent" />
+      {/* ═══ Cream → Navy: Concave into video section ═══ */}
+      <WaveDivider variant="concave" fillColor="var(--color-cream)" flip height={60} />
 
       <div ref={videoSectionRef} className="section-card-reveal">
         <VideoShowcaseSection />
       </div>
 
-      {/* Divider between Video and WhereToBuy */}
-      <div className="w-full h-px bg-gradient-to-r from-transparent via-navy/10 to-transparent" />
+      {/* ═══ Dark → Cream: Blob transition into map ═══ */}
+      <WaveDivider variant="blob" fillColor="var(--color-cream)" height={65} />
 
       <div ref={mapSectionRef} className="section-card-reveal">
         <WhereToBuySection />
       </div>
+
+      {/* ═══ Bottom: Cream → footer ═══ */}
+      <WaveDivider variant="bulge" fillColor="var(--color-navy)" height={50} />
     </>
   );
 }
