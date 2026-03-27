@@ -235,7 +235,7 @@ export default function HomePage() {
 
   /* ---------- Refs for card-open section transitions ---------- */
   const catalogSectionRef = useRef<HTMLDivElement>(null);
-  const discoverSectionRef = useRef<HTMLDivElement>(null);
+  const discoverSectionRef = useRef<HTMLElement>(null);
   const videoSectionRef = useRef<HTMLDivElement>(null);
   const mapSectionRef = useRef<HTMLDivElement>(null);
 
@@ -352,7 +352,7 @@ export default function HomePage() {
       </div>
 
       {/* Discover Section */}
-      <section ref={(el) => { sectionRef.current = el; discoverSectionRef.current = el; }} className="py-24 sm:py-32 bg-cream relative overflow-hidden section-card-reveal">
+      <section ref={(el: HTMLElement | null) => { (sectionRef as React.MutableRefObject<HTMLElement | null>).current = el; discoverSectionRef.current = el; }} className="py-24 sm:py-32 bg-cream relative overflow-hidden section-card-reveal">
         {/* Subtle background texture */}
         <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)', backgroundSize: '32px 32px' }} />
         {/* Decorative */}
