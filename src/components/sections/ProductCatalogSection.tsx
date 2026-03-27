@@ -463,8 +463,8 @@ function InfiniteSlider({
             <div
               className="product-img-wrap relative cursor-pointer"
               style={{
-                width: itemWidth < 200 ? '120px' : '200px',
-                height: itemWidth < 200 ? '120px' : '200px',
+                width: itemWidth < 200 ? '132px' : '220px',
+                height: itemWidth < 200 ? '132px' : '220px',
                 transformOrigin: 'center bottom',
               }}
             >
