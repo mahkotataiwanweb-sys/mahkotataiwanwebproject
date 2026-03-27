@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
@@ -13,7 +13,6 @@ import MarqueeSection from '@/components/sections/MarqueeSection';
 import ProductCatalogSection from '@/components/sections/ProductCatalogSection';
 import VideoShowcaseSection from '@/components/sections/VideoShowcaseSection';
 import WhereToBuySection from '@/components/sections/WhereToBuySection';
-// WaveDivider removed
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
@@ -22,144 +21,166 @@ import type { GalleryImage } from '@/types/database';
 gsap.registerPlugin(ScrollTrigger);
 
 /* ------------------------------------------------------------------ */
-/*  Category config                                                    */
+/*  Types & config                                                     */
 /* ------------------------------------------------------------------ */
-interface SlideItem {
+interface UnifiedSlide {
   title: string;
   description: string;
   imageUrl: string | null;
+  categoryLabel: string;
+  categoryHref: string;
+  categoryIcon: typeof ChefHat;
 }
 
-interface CategoryConfig {
-  key: string;
-  label: string;
-  href: string;
-  icon: typeof ChefHat;
-  interval: number;
+const CATEGORY_META: Record<string, { label: string; href: string; icon: typeof ChefHat }> = {
+  recipes: { label: 'Recipes', href: '/recipes', icon: ChefHat },
+  event: { label: 'Event', href: '/events', icon: Calendar },
+  activity: { label: 'Activity', href: '/lifestyle', icon: Sparkles },
+  gallery: { label: 'Gallery', href: '/gallery', icon: ImageIcon },
+};
+
+/* Fisher-Yates shuffle */
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
-const CATEGORIES: CategoryConfig[] = [
-  { key: 'recipes', label: 'Recipes', href: '/recipes', icon: ChefHat, interval: 4000 },
-  { key: 'event', label: 'Event', href: '/events', icon: Calendar, interval: 4500 },
-  { key: 'activity', label: 'Activity', href: '/lifestyle', icon: Sparkles, interval: 5000 },
-  { key: 'gallery', label: 'Gallery', href: '/gallery', icon: ImageIcon, interval: 5500 },
-];
-
 /* ------------------------------------------------------------------ */
-/*  ContentSliderCard                                                  */
+/*  UnifiedDiscoverSlider                                              */
 /* ------------------------------------------------------------------ */
-function ContentSliderCard({
-  category,
-  items,
-  locale,
-}: {
-  category: CategoryConfig;
-  items: SlideItem[];
-  locale: string;
-}) {
+function UnifiedDiscoverSlider({ slides, locale }: { slides: UnifiedSlide[]; locale: string }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const Icon = category.icon;
+  const [direction, setDirection] = useState(1); // 1 = forward, -1 = back
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setDirection(1);
+      setActiveIndex((prev) => (prev + 1) % slides.length);
+    }, 5000);
+  }, [slides.length]);
 
   useEffect(() => {
-    if (items.length <= 1) return;
-    const id = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % items.length);
-    }, category.interval);
-    return () => clearInterval(id);
-  }, [items.length, category.interval]);
+    if (slides.length <= 1) return;
+    startTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [slides.length, startTimer]);
 
-  /* Empty state */
-  if (items.length === 0) {
+  const goTo = (i: number) => {
+    setDirection(i > activeIndex ? 1 : -1);
+    setActiveIndex(i);
+    startTimer();
+  };
+
+  if (slides.length === 0) {
     return (
-      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-navy to-navy/80 shadow-lg ring-1 ring-white/10">
+      <div className="relative w-full aspect-[16/7] sm:aspect-[16/6] rounded-2xl overflow-hidden bg-gradient-to-br from-navy to-navy/80 shadow-lg ring-1 ring-white/10">
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <Icon className="w-12 h-12 text-white/30 mb-3" />
+          <Sparkles className="w-12 h-12 text-white/30 mb-3" />
           <span className="text-white/50 text-sm font-medium">Coming Soon</span>
-        </div>
-        {/* Category badge */}
-        <div className="absolute top-4 left-4 flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
-          <Icon className="w-4 h-4 text-white" />
-          <span className="text-white text-xs font-semibold uppercase tracking-wider">{category.label}</span>
         </div>
       </div>
     );
   }
 
-  const current = items[activeIndex];
+  const current = slides[activeIndex];
+  const Icon = current.categoryIcon;
+
+  const variants = {
+    enter: (d: number) => ({ opacity: 0, x: d > 0 ? 80 : -80, scale: 0.97 }),
+    center: { opacity: 1, x: 0, scale: 1 },
+    exit: (d: number) => ({ opacity: 0, x: d > 0 ? -80 : 80, scale: 0.97 }),
+  };
 
   return (
-    <Link
-      href={`/${locale}${category.href}`}
-      className="group block relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 ring-1 ring-black/5 hover:ring-red/20"
-    >
-      {/* Background image with AnimatePresence crossfade */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeIndex}
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: 'easeInOut' }}
-          className="absolute inset-0 will-change-transform"
-        >
-          {current.imageUrl ? (
-            <Image
-              src={current.imageUrl}
-              alt={current.title || category.label}
-              fill
-              className="object-cover transition-transform duration-[8s] ease-linear group-hover:scale-105"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-navy to-navy/80" />
-          )}
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-all duration-500" />
-
-      {/* Category badge top-left */}
-      <div className="absolute top-4 left-4 flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
-        <Icon className="w-4 h-4 text-white" />
-        <span className="text-white text-xs font-semibold uppercase tracking-wider">{category.label}</span>
-      </div>
-
-      {/* Content overlay bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-5">
-        <AnimatePresence mode="wait">
+    <div className="relative w-full">
+      <Link
+        href={`/${locale}${current.categoryHref}`}
+        className="group block relative w-full aspect-[16/7] sm:aspect-[16/6] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 ring-1 ring-black/5 hover:ring-red/20"
+      >
+        {/* Background image crossfade */}
+        <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={activeIndex}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.5 }}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+            className="absolute inset-0 will-change-transform"
           >
-            <h3 className="text-white font-bold text-lg mb-1 line-clamp-1">{current.title}</h3>
-            <p className="text-white/70 text-sm line-clamp-2">{current.description}</p>
+            {current.imageUrl ? (
+              <Image
+                src={current.imageUrl}
+                alt={current.title || current.categoryLabel}
+                fill
+                className="object-cover transition-transform duration-[8s] ease-linear group-hover:scale-105"
+                sizes="(max-width: 640px) 100vw, 90vw"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-navy to-navy/80" />
+            )}
           </motion.div>
         </AnimatePresence>
 
-        {/* Dot indicators */}
-        {items.length > 1 && (
-          <div className="flex gap-1.5 mt-3">
-            {items.map((_, i) => (
-              <div
-                key={i}
-                className={`h-1 rounded-full transition-all duration-500 ${
-                  i === activeIndex ? 'w-6 bg-red' : 'w-1.5 bg-white/40'
-                }`}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-all duration-500" />
 
-      {/* Hover arrow */}
-      <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <ArrowRight className="w-4 h-4 text-white" />
+        {/* Category badge top-left */}
+        <div className="absolute top-4 sm:top-6 left-4 sm:left-6 flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+          <Icon className="w-4 h-4 text-white" />
+          <span className="text-white text-xs font-semibold uppercase tracking-wider">{current.categoryLabel}</span>
+        </div>
+
+        {/* Content overlay bottom */}
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={activeIndex}
+              custom={direction}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <h3 className="text-white font-bold text-xl sm:text-2xl lg:text-3xl mb-2 line-clamp-1">{current.title}</h3>
+              <p className="text-white/70 text-sm sm:text-base line-clamp-2 max-w-2xl">{current.description}</p>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Progress dots */}
+          {slides.length > 1 && (
+            <div className="flex gap-2 mt-4">
+              {slides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo(i); }}
+                  className={`h-1.5 rounded-full transition-all duration-500 ${
+                    i === activeIndex ? 'w-8 bg-red' : 'w-2 bg-white/40 hover:bg-white/60'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Hover arrow */}
+        <div className="absolute top-4 sm:top-6 right-4 sm:right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <ArrowRight className="w-5 h-5 text-white" />
+        </div>
+      </Link>
+
+      {/* Slide counter */}
+      <div className="absolute bottom-4 sm:bottom-8 right-5 sm:right-8 text-white/40 text-xs font-mono pointer-events-none">
+        {String(activeIndex + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
       </div>
-    </Link>
+    </div>
   );
 }
 
@@ -170,15 +191,10 @@ export default function HomePage() {
   const locale = useLocale();
   const sectionRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const sliderWrapRef = useRef<HTMLDivElement>(null);
 
   /* ---------- Dynamic content state ---------- */
-  const [contentMap, setContentMap] = useState<Record<string, SlideItem[]>>({
-    recipes: [],
-    event: [],
-    activity: [],
-    gallery: [],
-  });
+  const [allSlides, setAllSlides] = useState<UnifiedSlide[]>([]);
 
   /* ---------- Fetch all content in parallel ---------- */
   useEffect(() => {
@@ -189,46 +205,56 @@ export default function HomePage() {
           .select('*')
           .eq('type', 'recipe')
           .order('published_at', { ascending: false })
-          .limit(3),
+          .limit(5),
         supabase
           .from('articles')
           .select('*')
           .eq('type', 'event')
           .order('published_at', { ascending: false })
-          .limit(3),
+          .limit(5),
         supabase
           .from('articles')
           .select('*')
           .eq('type', 'lifestyle')
           .order('published_at', { ascending: false })
-          .limit(3),
+          .limit(5),
         supabase
           .from('gallery_images')
           .select('*')
           .eq('is_active', true)
           .order('event_date', { ascending: false })
-          .limit(3),
+          .limit(5),
       ]);
 
-      const toSlides = (articles: Article[] | null): SlideItem[] =>
-        (articles || []).map((item) => ({
+      const toUnified = (articles: Article[] | null, catKey: string): UnifiedSlide[] => {
+        const meta = CATEGORY_META[catKey];
+        return (articles || []).map((item) => ({
           title: getLocalizedField(item, 'title', locale) || '',
           description: getLocalizedField(item, 'excerpt', locale) || '',
           imageUrl: item.image_url || null,
+          categoryLabel: meta.label,
+          categoryHref: meta.href,
+          categoryIcon: meta.icon,
         }));
+      };
 
-      const gallerySlides: SlideItem[] = ((galleryRes.data as GalleryImage[] | null) || []).map((item) => ({
+      const gallerySlides: UnifiedSlide[] = ((galleryRes.data as GalleryImage[] | null) || []).map((item) => ({
         title: item.event_name || '',
         description: getLocalizedField(item, 'description', locale) || '',
         imageUrl: item.image_url || null,
+        categoryLabel: CATEGORY_META.gallery.label,
+        categoryHref: CATEGORY_META.gallery.href,
+        categoryIcon: CATEGORY_META.gallery.icon,
       }));
 
-      setContentMap({
-        recipes: toSlides(recipesRes.data as Article[] | null),
-        event: toSlides(eventsRes.data as Article[] | null),
-        activity: toSlides(lifestyleRes.data as Article[] | null),
-        gallery: gallerySlides,
-      });
+      const combined = [
+        ...toUnified(recipesRes.data as Article[] | null, 'recipes'),
+        ...toUnified(eventsRes.data as Article[] | null, 'event'),
+        ...toUnified(lifestyleRes.data as Article[] | null, 'activity'),
+        ...gallerySlides,
+      ].filter((s) => s.title); // Only items with titles
+
+      setAllSlides(shuffle(combined));
     }
 
     fetchAll();
@@ -263,17 +289,15 @@ export default function HomePage() {
         );
       }
 
-      // Card animations with scale-in
-      cardRefs.current.forEach((card, i) => {
-        if (!card) return;
-        gsap.fromTo(card,
-          { opacity: 0, y: 60, scale: 0.92 },
+      // Slider card animation
+      if (sliderWrapRef.current) {
+        gsap.fromTo(sliderWrapRef.current,
+          { opacity: 0, y: 60, scale: 0.94 },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 0.8,
-            delay: i * 0.12,
+            duration: 0.9,
             ease: 'power3.out',
             scrollTrigger: {
               trigger: sectionRef.current,
@@ -282,7 +306,7 @@ export default function HomePage() {
             },
           }
         );
-      });
+      }
 
       /* ---- Card-open reveal transitions for each section ---- */
       const sectionEls = [
@@ -352,7 +376,7 @@ export default function HomePage() {
         <ProductCatalogSection />
       </div>
 
-      {/* Discover Section */}
+      {/* Discover Section — Single Unified Slider */}
       <section ref={(el: HTMLElement | null) => { (sectionRef as React.MutableRefObject<HTMLElement | null>).current = el; discoverSectionRef.current = el; }} className="py-24 sm:py-32 bg-cream relative overflow-hidden section-card-reveal">
         {/* Subtle background texture */}
         <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)', backgroundSize: '32px 32px' }} />
@@ -377,20 +401,9 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Dynamic Content Slider Cards — 2×2 Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
-            {CATEGORIES.map((category, index) => (
-              <div
-                key={category.key}
-                ref={(el) => { cardRefs.current[index] = el; }}
-              >
-                <ContentSliderCard
-                  category={category}
-                  items={contentMap[category.key] || []}
-                  locale={locale}
-                />
-              </div>
-            ))}
+          {/* Single Unified Slider */}
+          <div ref={sliderWrapRef}>
+            <UnifiedDiscoverSlider slides={allSlides} locale={locale} />
           </div>
         </div>
       </section>
