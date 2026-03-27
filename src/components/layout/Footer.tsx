@@ -175,12 +175,12 @@ export default function Footer() {
         return (
           <div key={item.id} className="text-center">
             <div className="inline-flex items-center gap-1 justify-center">
-              <Link
-                href={buildHref(item.url)}
+              <button
+                onClick={() => toggleMenu(menuKey)}
                 className="text-cream/70 hover:text-white text-sm font-medium transition-colors duration-200"
               >
                 {getLabel(item)}
-              </Link>
+              </button>
               {(hasChildren || showCategories) && (
                 <button
                   onClick={() => toggleMenu(menuKey)}
@@ -257,12 +257,12 @@ export default function Footer() {
       return (
         <div key={item.key} className="text-center">
           <div className="inline-flex items-center gap-1 justify-center">
-            <Link
-              href={buildHref(item.href)}
+            <button
+              onClick={() => toggleMenu(menuKey)}
               className="text-cream/70 hover:text-white text-sm font-medium transition-colors duration-200"
             >
               {navT(item.key)}
-            </Link>
+            </button>
             <button
               onClick={() => toggleMenu(menuKey)}
               className="p-0.5 text-cream/40 hover:text-cream/70 transition-colors"
