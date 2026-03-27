@@ -91,6 +91,9 @@ export default function GalleryPage() {
   // Event filter
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 
+  // Calendar transition direction
+  const [calDirection, setCalDirection] = useState(0); // -1 = prev, 1 = next
+
   // Refs
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -148,6 +151,7 @@ export default function GalleryPage() {
 
   /* ---------- calendar navigation ---------- */
   function prevMonth() {
+    setCalDirection(-1);
     if (calMonth === 0) {
       setCalMonth(11);
       setCalYear((y) => y - 1);
@@ -156,6 +160,7 @@ export default function GalleryPage() {
     }
   }
   function nextMonth() {
+    setCalDirection(1);
     if (calMonth === 11) {
       setCalMonth(0);
       setCalYear((y) => y + 1);
@@ -201,6 +206,13 @@ export default function GalleryPage() {
     const mm = String(calMonth + 1).padStart(2, '0');
     const dd = String(day).padStart(2, '0');
     return selectedDate === `${calYear}-${mm}-${dd}`;
+  };
+
+  /* Calendar month slide variants */
+  const calSlideVariants = {
+    enter: (dir: number) => ({ x: dir > 0 ? 80 : -80, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir: number) => ({ x: dir > 0 ? -80 : 80, opacity: 0 }),
   };
 
   /* ================================================================ */
@@ -264,7 +276,7 @@ export default function GalleryPage() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* ---------- CALENDAR SIDEBAR ---------- */}
+          {/* ---------- PREMIUM CALENDAR SIDEBAR ---------- */}
           <AnimatePresence>
             {(calOpen || typeof window !== 'undefined') && (
               <motion.div
@@ -274,75 +286,114 @@ export default function GalleryPage() {
                 transition={{ duration: 0.3 }}
                 className={`${calOpen ? 'block' : 'hidden'} lg:block lg:w-80 flex-shrink-0`}
               >
-                <div className="bg-white rounded-2xl shadow-lg p-5 sticky top-24">
+                <div className="sticky top-24 bg-gradient-to-br from-[#003048] to-[#00425e] rounded-2xl shadow-2xl ring-1 ring-white/10 p-6 relative overflow-hidden">
+                  {/* Decorative glassmorphism reflections */}
+                  <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-white/5 blur-2xl pointer-events-none" />
+                  <div className="absolute -bottom-16 -left-16 w-36 h-36 rounded-full bg-[#C12126]/10 blur-2xl pointer-events-none" />
+                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
                   {/* Month header */}
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="relative flex items-center justify-between mb-5">
                     <button
                       onClick={prevMonth}
-                      className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="p-2 rounded-xl hover:bg-white/10 transition-all duration-200 active:scale-95"
                       aria-label="Previous month"
                     >
-                      <ChevronLeft className="w-5 h-5 text-[#003048]" />
+                      <ChevronLeft className="w-5 h-5 text-white/80" />
                     </button>
-                    <h3 className="font-bold text-[#003048] text-lg">
+                    <h3 className="font-bold text-white text-lg tracking-wide">
                       {MONTH_NAMES[calMonth]} {calYear}
                     </h3>
                     <button
                       onClick={nextMonth}
-                      className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="p-2 rounded-xl hover:bg-white/10 transition-all duration-200 active:scale-95"
                       aria-label="Next month"
                     >
-                      <ChevronRight className="w-5 h-5 text-[#003048]" />
+                      <ChevronRight className="w-5 h-5 text-white/80" />
                     </button>
                   </div>
 
                   {/* Day labels */}
-                  <div className="grid grid-cols-7 mb-2">
+                  <div className="relative grid grid-cols-7 mb-2 pb-2 border-b border-white/10">
                     {DAY_LABELS.map((d) => (
                       <div
                         key={d}
-                        className="text-center text-xs font-semibold text-gray-400 py-1"
+                        className="text-center text-[10px] font-semibold text-white/40 uppercase tracking-wider py-1"
                       >
                         {d}
                       </div>
                     ))}
                   </div>
 
-                  {/* Day cells */}
-                  <div className="grid grid-cols-7 gap-y-1">
-                    {calendarCells.map((day, i) => {
-                      if (day === null) {
-                        return <div key={`empty-${i}`} />;
-                      }
-                      const hasImages = dayHasImages(day);
-                      const isSel = dayIsSelected(day);
-                      const isTdy = isToday(day);
-                      return (
-                        <button
-                          key={day}
-                          onClick={() => handleDayClick(day)}
-                          disabled={!hasImages}
-                          className={`
-                            relative flex flex-col items-center justify-center h-10 rounded-lg text-sm transition-all
-                            ${hasImages ? 'cursor-pointer hover:bg-[#003048]/10 font-medium text-[#003048]' : 'text-gray-300 cursor-default'}
-                            ${isSel ? 'bg-[#003048] !text-white hover:bg-[#003048]/90' : ''}
-                            ${isTdy && !isSel ? 'bg-[#FFF8F0] ring-1 ring-[#003048]/30' : ''}
-                          `}
-                        >
-                          {day}
-                          {hasImages && !isSel && (
-                            <span className="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-[#C12126]" />
-                          )}
-                        </button>
-                      );
-                    })}
+                  {/* Day cells with month transition */}
+                  <div className="relative overflow-hidden min-h-[240px]">
+                    <AnimatePresence mode="wait" custom={calDirection}>
+                      <motion.div
+                        key={`${calYear}-${calMonth}`}
+                        custom={calDirection}
+                        variants={calSlideVariants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={{ duration: 0.25, ease: 'easeInOut' }}
+                        className="grid grid-cols-7 gap-y-1 will-change-transform"
+                      >
+                        {calendarCells.map((day, i) => {
+                          if (day === null) {
+                            return <div key={`empty-${i}`} className="h-10" />;
+                          }
+                          const hasImages = dayHasImages(day);
+                          const isSel = dayIsSelected(day);
+                          const isTdy = isToday(day);
+                          return (
+                            <button
+                              key={day}
+                              onClick={() => handleDayClick(day)}
+                              disabled={!hasImages}
+                              className={`
+                                relative flex flex-col items-center justify-center h-10 rounded-xl text-sm transition-all duration-200
+                                ${hasImages
+                                  ? 'cursor-pointer hover:bg-white/10 font-medium text-white'
+                                  : 'text-white/20 cursor-default'
+                                }
+                                ${isSel
+                                  ? 'bg-[#C12126] !text-white shadow-lg shadow-[#C12126]/30 scale-110 hover:bg-[#C12126]/90 font-bold'
+                                  : ''
+                                }
+                                ${isTdy && !isSel
+                                  ? 'ring-2 ring-white/30 rounded-xl'
+                                  : ''
+                                }
+                              `}
+                            >
+                              {day}
+                              {/* Glowing red indicator for days with images */}
+                              {hasImages && !isSel && (
+                                <span className="absolute bottom-0.5 flex items-center justify-center">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-[#C12126] shadow-[0_0_6px_rgba(193,33,38,0.8)]" />
+                                  <span className="absolute w-1.5 h-1.5 rounded-full bg-[#C12126] animate-ping opacity-40" />
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </motion.div>
+                    </AnimatePresence>
                   </div>
 
-                  {/* Clear filter */}
+                  {/* Legend */}
+                  <div className="relative mt-4 pt-3 border-t border-white/10 flex items-center gap-2">
+                    <span className="relative flex items-center justify-center w-3 h-3">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#C12126] shadow-[0_0_6px_rgba(193,33,38,0.8)]" />
+                    </span>
+                    <span className="text-white/40 text-xs">= has photos</span>
+                  </div>
+
+                  {/* Clear filter button */}
                   {(selectedDate || selectedEvent) && (
                     <button
                       onClick={clearFilters}
-                      className="mt-4 w-full py-2 rounded-lg bg-[#C12126] text-white text-sm font-semibold hover:bg-[#a51c21] transition-colors"
+                      className="relative mt-4 w-full py-2.5 rounded-xl bg-gradient-to-r from-[#C12126] to-[#a51c21] text-white text-sm font-semibold shadow-lg shadow-[#C12126]/20 hover:shadow-[#C12126]/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                     >
                       Clear Filter
                     </button>

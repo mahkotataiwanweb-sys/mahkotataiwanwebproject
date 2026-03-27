@@ -119,9 +119,11 @@ export default function WhereToBuySection() {
           <span className="inline-block text-red/80 text-sm font-semibold tracking-widest uppercase mb-3">
             Find Us
           </span>
-          <h2 className="text-4xl md:text-5xl font-heading font-bold text-navy">
-            Where to Buy
-          </h2>
+          <Link href={`/${locale}/where-to-buy`} className="hover:text-red transition-colors duration-300">
+            <h2 className="text-4xl md:text-5xl font-heading font-bold text-navy hover:text-red transition-colors duration-300">
+              Where to Buy
+            </h2>
+          </Link>
           <div className="w-16 h-1 bg-red mx-auto mt-4 rounded-full" />
         </div>
 

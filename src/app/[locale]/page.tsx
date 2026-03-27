@@ -1,51 +1,237 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
+import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChefHat, Sparkles, Calendar, ArrowRight } from 'lucide-react';
+import { ChefHat, Sparkles, Calendar, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import HeroSlider from '@/components/sections/HeroSlider';
 import MarqueeSection from '@/components/sections/MarqueeSection';
 import WhereToBuySection from '@/components/sections/WhereToBuySection';
+import { supabase } from '@/lib/supabase';
+import { getLocalizedField } from '@/lib/utils';
+import type { Article } from '@/types/database';
+import type { GalleryImage } from '@/types/database';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const discoverCards = [
-  {
-    key: 'recipes',
-    href: '/recipes',
-    icon: ChefHat,
-    title: 'Recipes',
-    description: 'Get inspired and cook delicious meals with our products. Easy recipes for everyone!',
-    gradient: 'from-red-dark to-red',
-  },
-  {
-    key: 'activity',
-    href: '/lifestyle',
-    icon: Sparkles,
-    title: 'Activity',
-    description: 'See how our community enjoys Mahkota Taiwan products in their everyday life.',
-    gradient: 'from-navy to-navy/80',
-  },
-  {
-    key: 'event',
-    href: '/events',
-    icon: Calendar,
-    title: 'Event',
-    description: 'Stay updated with our latest events, promotions, and community gatherings.',
-    gradient: 'from-red to-navy',
-  },
+/* ------------------------------------------------------------------ */
+/*  Category config                                                    */
+/* ------------------------------------------------------------------ */
+interface SlideItem {
+  title: string;
+  description: string;
+  imageUrl: string | null;
+}
+
+interface CategoryConfig {
+  key: string;
+  label: string;
+  href: string;
+  icon: typeof ChefHat;
+  interval: number;
+}
+
+const CATEGORIES: CategoryConfig[] = [
+  { key: 'recipes', label: 'Recipes', href: '/recipes', icon: ChefHat, interval: 4000 },
+  { key: 'event', label: 'Event', href: '/events', icon: Calendar, interval: 4500 },
+  { key: 'activity', label: 'Activity', href: '/lifestyle', icon: Sparkles, interval: 5000 },
+  { key: 'gallery', label: 'Gallery', href: '/gallery', icon: ImageIcon, interval: 5500 },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  ContentSliderCard                                                  */
+/* ------------------------------------------------------------------ */
+function ContentSliderCard({
+  category,
+  items,
+  locale,
+}: {
+  category: CategoryConfig;
+  items: SlideItem[];
+  locale: string;
+}) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const Icon = category.icon;
+
+  useEffect(() => {
+    if (items.length <= 1) return;
+    const id = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % items.length);
+    }, category.interval);
+    return () => clearInterval(id);
+  }, [items.length, category.interval]);
+
+  /* Empty state */
+  if (items.length === 0) {
+    return (
+      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-navy to-navy/80 shadow-lg ring-1 ring-white/10">
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <Icon className="w-12 h-12 text-white/30 mb-3" />
+          <span className="text-white/50 text-sm font-medium">Coming Soon</span>
+        </div>
+        {/* Category badge */}
+        <div className="absolute top-4 left-4 flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+          <Icon className="w-4 h-4 text-white" />
+          <span className="text-white text-xs font-semibold uppercase tracking-wider">{category.label}</span>
+        </div>
+      </div>
+    );
+  }
+
+  const current = items[activeIndex];
+
+  return (
+    <Link
+      href={`/${locale}${category.href}`}
+      className="group block relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 ring-1 ring-black/5 hover:ring-black/10"
+    >
+      {/* Background image with AnimatePresence crossfade */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeIndex}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: 'easeInOut' }}
+          className="absolute inset-0 will-change-transform"
+        >
+          {current.imageUrl ? (
+            <Image
+              src={current.imageUrl}
+              alt={current.title || category.label}
+              fill
+              className="object-cover transition-transform duration-[8s] ease-linear group-hover:scale-105"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-navy to-navy/80" />
+          )}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-all duration-500" />
+
+      {/* Category badge top-left */}
+      <div className="absolute top-4 left-4 flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+        <Icon className="w-4 h-4 text-white" />
+        <span className="text-white text-xs font-semibold uppercase tracking-wider">{category.label}</span>
+      </div>
+
+      {/* Content overlay bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-5">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeIndex}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h3 className="text-white font-bold text-lg mb-1 line-clamp-1">{current.title}</h3>
+            <p className="text-white/70 text-sm line-clamp-2">{current.description}</p>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Dot indicators */}
+        {items.length > 1 && (
+          <div className="flex gap-1.5 mt-3">
+            {items.map((_, i) => (
+              <div
+                key={i}
+                className={`h-1 rounded-full transition-all duration-500 ${
+                  i === activeIndex ? 'w-6 bg-red' : 'w-1.5 bg-white/40'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Hover arrow */}
+      <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <ArrowRight className="w-4 h-4 text-white" />
+      </div>
+    </Link>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  HomePage                                                           */
+/* ------------------------------------------------------------------ */
 export default function HomePage() {
   const locale = useLocale();
   const sectionRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  /* ---------- Dynamic content state ---------- */
+  const [contentMap, setContentMap] = useState<Record<string, SlideItem[]>>({
+    recipes: [],
+    event: [],
+    activity: [],
+    gallery: [],
+  });
+
+  /* ---------- Fetch all content in parallel ---------- */
+  useEffect(() => {
+    async function fetchAll() {
+      const [recipesRes, eventsRes, lifestyleRes, galleryRes] = await Promise.all([
+        supabase
+          .from('articles')
+          .select('*')
+          .eq('type', 'recipe')
+          .order('published_at', { ascending: false })
+          .limit(3),
+        supabase
+          .from('articles')
+          .select('*')
+          .eq('type', 'event')
+          .order('published_at', { ascending: false })
+          .limit(3),
+        supabase
+          .from('articles')
+          .select('*')
+          .eq('type', 'lifestyle')
+          .order('published_at', { ascending: false })
+          .limit(3),
+        supabase
+          .from('gallery_images')
+          .select('*')
+          .eq('is_active', true)
+          .order('event_date', { ascending: false })
+          .limit(3),
+      ]);
+
+      const toSlides = (articles: Article[] | null): SlideItem[] =>
+        (articles || []).map((item) => ({
+          title: getLocalizedField(item, 'title', locale) || '',
+          description: getLocalizedField(item, 'excerpt', locale) || '',
+          imageUrl: item.image_url || null,
+        }));
+
+      const gallerySlides: SlideItem[] = ((galleryRes.data as GalleryImage[] | null) || []).map((item) => ({
+        title: item.event_name || '',
+        description: getLocalizedField(item, 'description', locale) || '',
+        imageUrl: item.image_url || null,
+      }));
+
+      setContentMap({
+        recipes: toSlides(recipesRes.data as Article[] | null),
+        event: toSlides(eventsRes.data as Article[] | null),
+        activity: toSlides(lifestyleRes.data as Article[] | null),
+        gallery: gallerySlides,
+      });
+    }
+
+    fetchAll();
+  }, [locale]);
+
+  /* ---------- GSAP animations ---------- */
   useEffect(() => {
     const ctx = gsap.context(() => {
       if (headerRef.current) {
@@ -118,41 +304,20 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {discoverCards.map((card, index) => {
-              const Icon = card.icon;
-              return (
-                <div
-                  key={card.key}
-                  ref={el => { cardRefs.current[index] = el; }}
-                >
-                  <Link href={`/${locale}${card.href}`} className="group block h-full">
-                    <div className="bg-white rounded-2xl overflow-hidden hover-lift premium-shadow h-full flex flex-col transition-shadow duration-500 hover:shadow-2xl">
-                      {/* Icon Area */}
-                      <div className={`bg-gradient-to-br ${card.gradient} p-8 flex items-center justify-center`}>
-                        <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                          <Icon className="w-8 h-8 text-white" />
-                        </div>
-                      </div>
-
-                      {/* Content */}
-                      <div className="p-6 flex flex-col flex-1">
-                        <h3 className="font-heading text-xl font-bold text-navy mb-2 group-hover:text-red transition-colors duration-300">
-                          {card.title}
-                        </h3>
-                        <p className="text-navy/50 text-sm leading-relaxed flex-1">
-                          {card.description}
-                        </p>
-                        <div className="mt-4 flex items-center gap-2 text-red text-sm font-semibold uppercase tracking-wide group-hover:gap-3 transition-all duration-300">
-                          Explore <ArrowRight className="w-4 h-4" />
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              );
-            })}
+          {/* Dynamic Content Slider Cards — 2×2 Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
+            {CATEGORIES.map((category, index) => (
+              <div
+                key={category.key}
+                ref={(el) => { cardRefs.current[index] = el; }}
+              >
+                <ContentSliderCard
+                  category={category}
+                  items={contentMap[category.key] || []}
+                  locale={locale}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </section>
