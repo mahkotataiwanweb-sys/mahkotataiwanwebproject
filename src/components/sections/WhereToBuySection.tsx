@@ -78,33 +78,50 @@ export default function WhereToBuySection() {
         ease: 'power3.out',
       });
 
-      // Staggered pin pop-up
-      pinsRef.current.forEach((pin, i) => {
-        if (!pin) return;
+      // Looping pin bounce sequence:
+      // 1. Pins bounce in one-by-one slowly
+      // 2. All hold for a moment
+      // 3. All fade out simultaneously
+      // 4. Repeat
+      const validPins = pinsRef.current.filter(Boolean) as SVGGElement[];
 
-        gsap.set(pin, { scale: 0, transformOrigin: '50% 100%' });
+      // Set initial hidden state
+      validPins.forEach((pin) => {
+        gsap.set(pin, { scale: 0, opacity: 0, y: -15, transformOrigin: '50% 100%' });
+      });
 
-        gsap.to(pin, {
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 65%',
-            toggleActions: 'play none none none',
-          },
+      const pinTl = gsap.timeline({
+        repeat: -1,
+        repeatDelay: 1,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 65%',
+          toggleActions: 'play none none none',
+        },
+      });
+
+      // Bounce pins in one-by-one with gentle bounce ease
+      validPins.forEach((pin, i) => {
+        pinTl.to(pin, {
           scale: 1,
-          duration: 0.7,
-          delay: 0.6 + i * 0.25,
-          ease: 'back.out(2.5)',
-          onComplete: () => {
-            // Floating animation after pin appears
-            gsap.to(pin, {
-              y: -3,
-              duration: 1.5 + i * 0.2,
-              ease: 'sine.inOut',
-              yoyo: true,
-              repeat: -1,
-            });
-          },
-        });
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          ease: 'bounce.out',
+        }, 0.3 + i * 0.7); // staggered with 0.7s gap between each
+      });
+
+      // Hold all visible for 2.5 seconds
+      pinTl.to({}, { duration: 2.5 });
+
+      // All disappear simultaneously with a soft fade
+      pinTl.to(validPins, {
+        scale: 0,
+        opacity: 0,
+        y: -8,
+        duration: 0.6,
+        ease: 'power2.in',
+        stagger: 0, // all at once
       });
     }, sectionRef);
 
