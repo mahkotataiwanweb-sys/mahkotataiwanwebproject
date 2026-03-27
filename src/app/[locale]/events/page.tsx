@@ -397,15 +397,18 @@ export default function EventsPage() {
                           const isSel = dayIsSelected(day);
                           const isTdy = isToday(day);
                           return (
-                            <button
+                            <motion.button
                               key={day}
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: i * 0.015, duration: 0.25, ease: 'easeOut' }}
                               onClick={() => handleDayClick(day)}
                               disabled={!hasContent}
                               className={`
                                 relative flex flex-col items-center justify-center h-10 rounded-xl text-sm transition-all duration-200
                                 ${hasContent
-                                  ? 'cursor-pointer hover:bg-white/10 font-medium text-white'
-                                  : 'text-white/20 cursor-default'
+                                  ? 'cursor-pointer hover:bg-white/10 font-bold text-amber-300'
+                                  : 'text-white/40 cursor-default'
                                 }
                                 ${isSel
                                   ? 'bg-[#C12126] !text-white shadow-lg shadow-[#C12126]/30 scale-110 hover:bg-[#C12126]/90 font-bold'
@@ -418,14 +421,14 @@ export default function EventsPage() {
                               `}
                             >
                               {day}
-                              {/* Glowing red indicator for days with content */}
+                              {/* Glowing amber indicator for days with content */}
                               {hasContent && !isSel && (
                                 <span className="absolute bottom-0.5 flex items-center justify-center">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-[#C12126] shadow-[0_0_6px_rgba(193,33,38,0.8)]" />
-                                  <span className="absolute w-1.5 h-1.5 rounded-full bg-[#C12126] animate-ping opacity-40" />
+                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
+                                  <span className="absolute w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping opacity-40" />
                                 </span>
                               )}
-                            </button>
+                            </motion.button>
                           );
                         })}
                       </motion.div>
@@ -435,7 +438,7 @@ export default function EventsPage() {
                   {/* Legend */}
                   <div className="relative mt-4 pt-3 border-t border-white/10 flex items-center gap-2">
                     <span className="relative flex items-center justify-center w-3 h-3">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#C12126] shadow-[0_0_6px_rgba(193,33,38,0.8)]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
                     </span>
                     <span className="text-white/40 text-xs">= has events</span>
                   </div>
