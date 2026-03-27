@@ -3,15 +3,11 @@
 /**
  * Organic curved / bulging dividers between sections.
  * Each variant creates a convex or concave edge instead of a hard box line.
- *
- * Usage:
- *   <WaveDivider variant="bulge" fillColor="var(--color-cream)" />
- *   <WaveDivider variant="concave" fillColor="var(--color-red)" flip />
  */
 
 interface WaveDividerProps {
   /** Shape of the divider */
-  variant?: 'bulge' | 'concave' | 'wave' | 'arc' | 'blob';
+  variant?: 'bulge' | 'concave' | 'wave' | 'arc' | 'blob' | 'ribbon';
   /** CSS color of the shape — should match the NEXT section's background */
   fillColor?: string;
   /** Flip vertically (use at top of section) */
@@ -47,7 +43,43 @@ export default function WaveDivider({
     // Blob-like organic shape
     blob:
       'M0,70 C60,100 120,30 200,50 C280,70 350,20 420,60 C460,80 490,40 500,70 L500,100 L0,100 Z',
+    // Flowing ribbon S-curve — organic wave like a flowing ribbon
+    ribbon:
+      'M0,75 C50,90 100,40 180,55 C260,70 300,20 360,35 C420,50 460,85 500,70 L500,100 L0,100 Z',
   };
+
+  // Ribbon variant gets a special treatment: a stroke line on top for the 3D ribbon feel
+  if (variant === 'ribbon') {
+    return (
+      <div
+        className={`relative w-full overflow-hidden pointer-events-none ${className}`}
+        style={{ height: `${height}px`, marginTop: `-1px`, marginBottom: `-1px`, ...flipStyle }}
+      >
+        <svg
+          className="absolute bottom-0 w-full h-full"
+          viewBox="0 0 500 100"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {/* Shadow / depth layer */}
+          <path
+            d="M0,78 C50,93 100,43 180,58 C260,73 300,23 360,38 C420,53 460,88 500,73 L500,100 L0,100 Z"
+            fill="rgba(0,0,0,0.08)"
+          />
+          {/* Main fill */}
+          <path d={paths.ribbon} fill={fillColor} />
+          {/* Top stroke line for ribbon 3D feel */}
+          <path
+            d="M0,75 C50,90 100,40 180,55 C260,70 300,20 360,35 C420,50 460,85 500,70"
+            fill="none"
+            stroke="var(--color-red)"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
+        </svg>
+      </div>
+    );
+  }
 
   return (
     <div

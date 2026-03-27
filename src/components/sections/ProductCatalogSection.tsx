@@ -186,7 +186,7 @@ function InfiniteSlider({
   const trackRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);
   const velocityRef = useRef(0);
-  const baseDirectionRef = useRef(-1); // -1 = left, 1 = right
+  const baseDirectionRef = useRef(1); // 1 = right (default), -1 = left
   const isDraggingRef = useRef(false);
   const isPausedRef = useRef(false);
   const lastPointerXRef = useRef(0);
