@@ -10,6 +10,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ChefHat, Sparkles, Calendar, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import HeroSlider from '@/components/sections/HeroSlider';
 import MarqueeSection from '@/components/sections/MarqueeSection';
+import VideoShowcaseSection from '@/components/sections/VideoShowcaseSection';
 import WhereToBuySection from '@/components/sections/WhereToBuySection';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
@@ -322,6 +323,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      <VideoShowcaseSection />
       <WhereToBuySection />
     </>
   );
