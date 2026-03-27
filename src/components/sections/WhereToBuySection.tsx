@@ -45,6 +45,8 @@ export default function WhereToBuySection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<SVGSVGElement>(null);
   const pinsRef = useRef<(SVGGElement | null)[]>([]);
+  const topTextRef = useRef<HTMLParagraphElement>(null);
+  const bottomTextRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const locale = useLocale();
 
@@ -128,6 +130,55 @@ export default function WhereToBuySection() {
     return () => ctx.revert();
   }, []);
 
+  /* Letter reveal animation — triggered on scroll */
+  useEffect(() => {
+    if (!sectionRef.current) return;
+
+    const ctx = gsap.context(() => {
+      // Top text letters
+      const topLetters = topTextRef.current?.querySelectorAll('.letter-char');
+      if (topLetters?.length) {
+        gsap.set(topLetters, { opacity: 0, y: 25, rotateX: 90, filter: 'blur(8px)' });
+        gsap.to(topLetters, {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          filter: 'blur(0px)',
+          duration: 0.7,
+          stagger: 0.06,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 60%',
+            toggleActions: 'play none none none',
+          },
+        });
+      }
+
+      // Bottom text letters
+      const bottomLetters = bottomTextRef.current?.querySelectorAll('.letter-char');
+      if (bottomLetters?.length) {
+        gsap.set(bottomLetters, { opacity: 0, y: 25, rotateX: 90, filter: 'blur(8px)' });
+        gsap.to(bottomLetters, {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          filter: 'blur(0px)',
+          duration: 0.6,
+          stagger: 0.05,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 55%',
+            toggleActions: 'play none none none',
+          },
+        });
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section ref={sectionRef} className="bg-cream py-20 md:py-28 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
@@ -152,20 +203,44 @@ export default function WhereToBuySection() {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            {/* Text overlay — top left */}
+            {/* Text overlay — top left: letter-by-letter reveal */}
             <div className="absolute -top-2 -left-4 sm:left-0 z-10 pointer-events-none">
-              <p className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-navy italic leading-tight">
-                Taste so good!
+              <p ref={topTextRef} className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-navy italic leading-tight">
+                {'Taste so good!'.split('').map((char, i) => (
+                  <span
+                    key={i}
+                    className="letter-char inline-block"
+                    style={{ animationDelay: `${i * 0.08}s` }}
+                  >
+                    {char === ' ' ? '\u00A0' : char}
+                  </span>
+                ))}
               </p>
             </div>
 
-            {/* Text overlay — bottom right */}
-            <div className="absolute -bottom-2 -right-4 sm:right-0 z-10 text-right pointer-events-none">
+            {/* Text overlay — bottom right: letter-by-letter reveal */}
+            <div ref={bottomTextRef} className="absolute -bottom-2 -right-4 sm:right-0 z-10 text-right pointer-events-none">
               <p className="font-heading text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-red leading-tight">
-                300+ Store
+                {'300+ Store'.split('').map((char, i) => (
+                  <span
+                    key={`a-${i}`}
+                    className="letter-char inline-block"
+                    style={{ animationDelay: `${0.5 + i * 0.07}s` }}
+                  >
+                    {char === ' ' ? '\u00A0' : char}
+                  </span>
+                ))}
               </p>
-              <p className="font-heading text-xs sm:text-sm md:text-base text-navy/60 font-medium tracking-wide">
-                all over Taiwan
+              <p className="font-heading text-xs sm:text-sm md:text-base text-navy/60 font-medium tracking-wide ">
+                {'all over Taiwan'.split('').map((char, i) => (
+                  <span
+                    key={`b-${i}`}
+                    className="letter-char inline-block"
+                    style={{ animationDelay: `${1.2 + i * 0.06}s` }}
+                  >
+                    {char === ' ' ? '\u00A0' : char}
+                  </span>
+                ))}
               </p>
             </div>
             <svg

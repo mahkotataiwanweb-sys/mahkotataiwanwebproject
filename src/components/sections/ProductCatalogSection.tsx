@@ -563,16 +563,26 @@ export default function ProductCatalogSection() {
 
         {/* Content */}
         <div ref={contentRef} className="relative z-10">
-          {/* Category Dropdown */}
-          <div className="flex justify-center mb-8 sm:mb-12 px-4">
+          {/* Section Heading */}
+          <div className="text-center mb-6 sm:mb-8 px-4">
+            <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-cream mb-2 drop-shadow-lg">
+              Our Products
+            </h2>
+            <p className="text-cream/70 text-base sm:text-lg md:text-xl font-body tracking-wide">
+              Indonesian Taste, in Taiwan.
+            </p>
+          </div>
+
+          {/* Category Dropdown — compact */}
+          <div className="flex justify-center mb-6 sm:mb-10 px-4">
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-3 px-8 py-3.5 rounded-full bg-cream text-navy font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 min-w-[260px] justify-between"
+                className="flex items-center gap-2 px-5 py-2 rounded-full bg-cream text-navy font-semibold text-sm shadow-md hover:shadow-lg transition-all duration-300 min-w-[200px] justify-between"
               >
-                <span className="font-heading">{selectedLabel}</span>
+                <span className="font-heading text-sm">{selectedLabel}</span>
                 <ChevronDown
-                  className={`w-5 h-5 transition-transform duration-300 ${
+                  className={`w-4 h-4 transition-transform duration-300 ${
                     dropdownOpen ? 'rotate-180' : ''
                   }`}
                 />
@@ -581,11 +591,11 @@ export default function ProductCatalogSection() {
               <AnimatePresence>
                 {dropdownOpen && (
                   <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    initial={{ opacity: 0, y: -8, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full mt-2 left-0 right-0 bg-cream rounded-2xl shadow-2xl overflow-hidden z-20"
+                    className="absolute top-full mt-1.5 left-0 right-0 bg-cream rounded-xl shadow-2xl overflow-hidden z-20"
                   >
                     {CATEGORIES.map((cat) => (
                       <button
@@ -594,7 +604,7 @@ export default function ProductCatalogSection() {
                           setSelectedCategory(cat.value);
                           setDropdownOpen(false);
                         }}
-                        className={`w-full text-left px-6 py-3.5 text-sm sm:text-base font-semibold transition-all duration-200 ${
+                        className={`w-full text-left px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
                           selectedCategory === cat.value
                             ? 'bg-red/10 text-red'
                             : 'text-navy hover:bg-navy/5'
