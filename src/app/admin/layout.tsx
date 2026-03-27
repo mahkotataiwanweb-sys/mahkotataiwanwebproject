@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Toaster } from 'react-hot-toast';
 import {
   LayoutDashboard, Package, FolderOpen, FileText, Settings,
-  LogOut, Menu, X, ChevronRight, Newspaper, ImageIcon, Store, Link2, Globe, Image as ImageIconAlt, Play
+  LogOut, Menu, X, ChevronRight, Newspaper, ImageIcon, Store, Link2, Globe, Image as ImageIconAlt, Play, ShoppingBag
 } from 'lucide-react';
 
 const sidebarLinks = [
@@ -15,6 +15,7 @@ const sidebarLinks = [
   { href: '/admin/products', label: 'Products', icon: Package },
   { href: '/admin/categories', label: 'Categories', icon: FolderOpen },
   { href: '/admin/articles', label: 'Articles', icon: Newspaper },
+  { href: '/admin/showcase-products', label: 'Product Showcase', icon: ShoppingBag },
   { href: '/admin/hero-slides', label: 'Hero Slides', icon: ImageIcon },
   { href: '/admin/video-showcase', label: 'Video Showcase', icon: Play },
   { href: '/admin/navbar', label: 'Navbar Menu', icon: Menu },

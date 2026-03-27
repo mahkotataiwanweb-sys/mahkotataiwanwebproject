@@ -179,6 +179,32 @@
   }
 }
 
+/* ===== Product Catalog Wavy Background ===== */
+@keyframes wavyFlow {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.wavy-layer {
+  animation: wavyFlow 18s linear infinite;
+}
+
+@keyframes productFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  33% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(-4px) rotate(-0.5deg);
+  }
+}
+
 /* ===== Google Fonts Import ===== */
 /* Note: Fonts loaded via next/font in layout for better performance */
 
