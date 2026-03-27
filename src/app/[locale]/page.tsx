@@ -10,6 +10,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ChefHat, Sparkles, Calendar, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import HeroSlider from '@/components/sections/HeroSlider';
 import MarqueeSection from '@/components/sections/MarqueeSection';
+import ProductCatalogSection from '@/components/sections/ProductCatalogSection';
 import VideoShowcaseSection from '@/components/sections/VideoShowcaseSection';
 import WhereToBuySection from '@/components/sections/WhereToBuySection';
 import { supabase } from '@/lib/supabase';
@@ -303,6 +304,9 @@ export default function HomePage() {
       </div>
 
       <MarqueeSection />
+
+      {/* Product Catalog Showcase */}
+      <ProductCatalogSection />
 
       {/* Discover Section */}
       <section ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">

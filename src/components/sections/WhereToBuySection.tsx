@@ -152,6 +152,22 @@ export default function WhereToBuySection() {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
+            {/* Text overlay — top left */}
+            <div className="absolute -top-2 -left-4 sm:left-0 z-10 pointer-events-none">
+              <p className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-navy italic leading-tight">
+                Taste so good!
+              </p>
+            </div>
+
+            {/* Text overlay — bottom right */}
+            <div className="absolute -bottom-2 -right-4 sm:right-0 z-10 text-right pointer-events-none">
+              <p className="font-heading text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-red leading-tight">
+                300+ Store
+              </p>
+              <p className="font-heading text-xs sm:text-sm md:text-base text-navy/60 font-medium tracking-wide">
+                all over Taiwan
+              </p>
+            </div>
             <svg
               ref={mapRef}
               viewBox="0 0 200 450"
