@@ -88,7 +88,7 @@ function ContentSliderCard({
   return (
     <Link
       href={`/${locale}${category.href}`}
-      className="group block relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 ring-1 ring-black/5 hover:ring-black/10"
+      className="group block relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 ring-1 ring-black/5 hover:ring-red/20"
     >
       {/* Background image with AnimatePresence crossfade */}
       <AnimatePresence mode="wait">
@@ -282,10 +282,32 @@ export default function HomePage() {
   return (
     <>
       <HeroSlider />
+
+      {/* Elegant divider between Hero and Marquee */}
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-navy/10 to-transparent" />
+
+      {/* Scroll indicator */}
+      <div className="relative -mt-8 flex justify-center z-10 pointer-events-none">
+        <motion.div
+          className="flex flex-col items-center gap-1"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5, duration: 0.6 }}
+        >
+          <motion.div
+            className="w-px h-6 bg-gradient-to-b from-navy/30 to-transparent"
+            animate={{ scaleY: [1, 0.5, 1], opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </motion.div>
+      </div>
+
       <MarqueeSection />
 
       {/* Discover Section */}
       <section ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+        {/* Subtle background texture */}
+        <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)', backgroundSize: '32px 32px' }} />
         {/* Decorative */}
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-navy/10 to-transparent" />
         <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
@@ -296,11 +318,14 @@ export default function HomePage() {
             <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
               Discover
             </p>
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-3">
+            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">
               Explore Mahkota Taiwan
             </h2>
             <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
-            <p className="text-navy/60 max-w-lg mx-auto">
+            <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">
+              Authentic Indonesian flavors — recipes, stories &amp; community
+            </p>
+            <p className="text-navy/60 max-w-lg mx-auto mt-2">
               Dive into our world of Indonesian flavors — from recipes and lifestyle stories to exciting community events.
             </p>
           </div>
@@ -323,7 +348,14 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Divider between Discover and Video */}
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-navy/10 to-transparent" />
+
       <VideoShowcaseSection />
+
+      {/* Divider between Video and WhereToBuy */}
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-navy/10 to-transparent" />
+
       <WhereToBuySection />
     </>
   );

@@ -320,16 +320,16 @@ export default function AboutPage() {
         );
       }
 
-      // Story chapters scroll animation
+      // Story chapters scroll animation — refined, subtle
       if (storyRef.current) {
         gsap.fromTo(
           storyRef.current.querySelectorAll('.story-chapter'),
-          { opacity: 0, y: 80 },
+          { opacity: 0, y: 40 },
           {
             opacity: 1,
             y: 0,
-            duration: 1,
-            stagger: 0.3,
+            duration: 0.8,
+            stagger: 0.2,
             ease: 'power3.out',
             scrollTrigger: {
               trigger: storyRef.current,
@@ -538,68 +538,49 @@ export default function AboutPage() {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════
-          Our Story Section — Premium Editorial "Chapter" Design
+          Our Story Section — Clean Editorial Timeline
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="bg-navy py-24 md:py-32 relative overflow-hidden">
-        {/* Subtle background decorations */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-          <div className="absolute top-20 right-10 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
-          <div className="absolute bottom-20 left-10 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
-        </div>
-
-        <div ref={storyRef} className="max-w-6xl mx-auto px-6 relative z-10">
-          {/* Section header */}
-          <div className="text-center mb-20">
-            <p className="text-red/80 text-sm tracking-[0.3em] uppercase font-semibold mb-3">Our Story</p>
-            <h2 className="font-heading text-4xl sm:text-5xl font-bold text-white mb-6">The Journey So Far</h2>
-            <div className="w-20 h-[2px] bg-gradient-to-r from-transparent via-red/60 to-transparent mx-auto" />
+      <section className="py-24 md:py-32 bg-cream relative">
+        <div ref={storyRef} className="max-w-5xl mx-auto px-6">
+          {/* Simple header */}
+          <div className="text-center mb-16 md:mb-20">
+            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Our Story</p>
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-navy">The Journey So Far</h2>
           </div>
 
-          {/* Story chapters — alternating layout with large year numbers */}
-          <div className="space-y-20 md:space-y-28">
-            {milestones.map((milestone, i) => (
-              <div key={milestone.year} className="story-chapter group">
-                <div className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-8 md:gap-16`}>
-                  {/* Large year number — editorial style */}
-                  <div className="md:w-2/5 text-center">
-                    <div className="relative inline-block">
-                      <span className="text-[120px] md:text-[160px] font-heading font-bold text-white/[0.04] leading-none select-none">
-                        {milestone.year}
-                      </span>
-                      <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl md:text-6xl font-heading font-bold text-white">
+          {/* Timeline */}
+          <div className="relative">
+            {/* Vertical line */}
+            <div className="absolute left-[20px] md:left-1/2 md:-translate-x-px top-0 bottom-0 w-px bg-navy/10" />
+
+            <div className="space-y-12 md:space-y-16">
+              {milestones.map((milestone, i) => (
+                <div
+                  key={milestone.year}
+                  className="story-chapter relative"
+                >
+                  {/* Dot marker */}
+                  <div className="absolute left-[20px] md:left-1/2 -translate-x-1/2 top-1 w-2.5 h-2.5 rounded-full bg-red border-2 border-cream z-10" />
+
+                  <div className={`flex flex-col md:flex-row md:items-start gap-2 md:gap-0`}>
+                    {/* Year side */}
+                    <div className={`md:w-1/2 pl-12 md:pl-0 ${i % 2 === 0 ? 'md:text-right md:pr-14' : 'md:order-2 md:pl-14'}`}>
+                      <span className="inline-block text-xs font-bold text-red tracking-widest uppercase bg-red/5 px-3 py-1 rounded-full">
                         {milestone.year}
                       </span>
                     </div>
-                  </div>
 
-                  {/* Content card */}
-                  <div className="md:w-3/5">
-                    <div className="relative bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] rounded-3xl p-8 md:p-10 hover:bg-white/[0.07] transition-all duration-500">
-                      {/* Accent line */}
-                      <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-red/40 to-transparent" />
-
-                      {/* Chapter number */}
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 rounded-full bg-red/20 flex items-center justify-center">
-                          <span className="text-red text-xs font-bold">{String(i + 1).padStart(2, '0')}</span>
-                        </div>
-                        <div className="h-px flex-1 bg-white/10" />
-                      </div>
-
-                      <h3 className="font-heading text-2xl md:text-3xl font-bold text-white mb-4">{milestone.title}</h3>
-                      <p className="text-cream/50 text-base md:text-lg leading-relaxed">{milestone.description}</p>
-
-                      {/* Bottom decorative element */}
-                      <div className="mt-6 flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-red/60" />
-                        <div className="h-px w-12 bg-red/30" />
+                    {/* Content side */}
+                    <div className={`md:w-1/2 pl-12 md:pl-0 ${i % 2 === 0 ? 'md:pl-14' : 'md:order-1 md:text-right md:pr-14'}`}>
+                      <div className="bg-white rounded-2xl border border-navy/[0.06] p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
+                        <h3 className="font-heading text-lg font-bold text-navy mb-2">{milestone.title}</h3>
+                        <p className="text-navy/55 text-sm leading-relaxed">{milestone.description}</p>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
