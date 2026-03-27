@@ -3,6 +3,7 @@
 interface WaveDividerProps {
   variant?: 'bulge' | 'concave' | 'wave' | 'arc' | 'blob' | 'ribbon';
   fillColor?: string;
+  bgColor?: string;
   flip?: boolean;
   className?: string;
   height?: number;
@@ -11,6 +12,7 @@ interface WaveDividerProps {
 export default function WaveDivider({
   variant = 'bulge',
   fillColor = 'var(--color-cream)',
+  bgColor,
   flip = false,
   className = '',
   height = 80,
@@ -28,15 +30,21 @@ export default function WaveDivider({
       'M0,80 Q250,0 500,80 L500,100 L0,100 Z',
     blob:
       'M0,70 C60,100 120,30 200,50 C280,70 350,20 420,60 C460,80 490,40 500,70 L500,100 L0,100 Z',
-    // Perfect S-curve: left side curves down, right side curves up
+    // Gentle S-curve — subtle, not extreme
     ribbon:
-      'M0,30 C125,100 125,100 250,50 C375,0 375,0 500,70 L500,100 L0,100 Z',
+      'M0,40 C175,70 325,30 500,60 L500,100 L0,100 Z',
   };
 
   return (
     <div
       className={`relative w-full overflow-hidden pointer-events-none ${className}`}
-      style={{ height: `${height}px`, marginTop: `-1px`, marginBottom: `-1px`, ...flipStyle }}
+      style={{
+        height: `${height}px`,
+        marginTop: '-1px',
+        marginBottom: '-1px',
+        backgroundColor: bgColor || 'transparent',
+        ...flipStyle,
+      }}
     >
       <svg
         className="absolute bottom-0 w-full h-full"
