@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
@@ -11,6 +11,11 @@ import { ArrowLeft, Award, Store, Package, Users, Shield, Heart, Sparkles, Chevr
 import { supabase } from '@/lib/supabase';
 
 gsap.registerPlugin(ScrollTrigger);
+
+/* ─── Physics-based marquee constants ─── */
+const PARTNER_MARQUEE_SPEED = 1.2;
+const PARTNER_FRICTION = 0.95;
+const PARTNER_RETURN_RATE = 0.05;
 
 interface StorePartner {
   id: number;
@@ -61,8 +66,19 @@ export default function AboutPage() {
   const statsRef = useRef<HTMLDivElement>(null);
   const valuesRef = useRef<HTMLDivElement>(null);
   const partnersRef = useRef<HTMLDivElement>(null);
-  const timelineRef = useRef<HTMLDivElement>(null);
+  const storyRef = useRef<HTMLDivElement>(null);
   const counterRefs = useRef<(HTMLSpanElement | null)[]>([]);
+
+  /* ─── Physics marquee refs ─── */
+  const trackRef = useRef<HTMLDivElement>(null);
+  const offsetRef = useRef(0);
+  const velocityRef = useRef(-PARTNER_MARQUEE_SPEED);
+  const isDraggingRef = useRef(false);
+  const lastPointerXRef = useRef(0);
+  const lastMoveTimeRef = useRef(0);
+  const dragVelocityRef = useRef(0);
+  const rafRef = useRef<number>(0);
+  const singleSetWidthRef = useRef(0);
 
   const [partners, setPartners] = useState<StorePartner[]>([]);
 
@@ -85,6 +101,101 @@ export default function AboutPage() {
     fetchPartners();
   }, []);
 
+  /* ─── Physics-based marquee animation loop ─── */
+  const startMarqueeLoop = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    // Measure one set width (1/3 of track since we triple the items)
+    const totalWidth = track.scrollWidth;
+    const oneSetWidth = totalWidth / 3;
+    singleSetWidthRef.current = oneSetWidth;
+
+    const loop = () => {
+      if (!isDraggingRef.current) {
+        // Blend velocity back toward default speed
+        velocityRef.current += (-PARTNER_MARQUEE_SPEED - velocityRef.current) * PARTNER_RETURN_RATE;
+        // Apply friction to any momentum beyond default
+        const excess = velocityRef.current - (-PARTNER_MARQUEE_SPEED);
+        velocityRef.current = -PARTNER_MARQUEE_SPEED + excess * PARTNER_FRICTION;
+      }
+
+      // Update offset
+      offsetRef.current += velocityRef.current;
+
+      // Wrap offset within one set width for seamless loop
+      const setW = singleSetWidthRef.current;
+      if (setW > 0) {
+        if (offsetRef.current < -setW) {
+          offsetRef.current += setW;
+        } else if (offsetRef.current > 0) {
+          offsetRef.current -= setW;
+        }
+      }
+
+      // Apply transform
+      if (track) {
+        track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
+      }
+
+      rafRef.current = requestAnimationFrame(loop);
+    };
+
+    rafRef.current = requestAnimationFrame(loop);
+  }, []);
+
+  // Start marquee when partners load
+  useEffect(() => {
+    if (partners.length === 0) return;
+    // Small delay to let DOM render the tripled items
+    const timer = setTimeout(() => {
+      startMarqueeLoop();
+    }, 100);
+    return () => {
+      clearTimeout(timer);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [partners, startMarqueeLoop]);
+
+  /* ─── Marquee pointer handlers ─── */
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
+    isDraggingRef.current = true;
+    lastPointerXRef.current = e.clientX;
+    lastMoveTimeRef.current = Date.now();
+    dragVelocityRef.current = 0;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }, []);
+
+  const onPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isDraggingRef.current) return;
+    const now = Date.now();
+    const dx = e.clientX - lastPointerXRef.current;
+    const dt = now - lastMoveTimeRef.current;
+
+    if (dt > 0) {
+      dragVelocityRef.current = dx / Math.max(dt, 1) * 16; // normalise to ~frame time
+    }
+
+    offsetRef.current += dx;
+    lastPointerXRef.current = e.clientX;
+    lastMoveTimeRef.current = now;
+
+    // Apply transform immediately for responsiveness
+    if (trackRef.current) {
+      trackRef.current.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
+    }
+  }, []);
+
+  const onPointerUp = useCallback(() => {
+    isDraggingRef.current = false;
+    velocityRef.current = dragVelocityRef.current || -PARTNER_MARQUEE_SPEED;
+  }, []);
+
+  const onPointerCancel = useCallback(() => {
+    isDraggingRef.current = false;
+    velocityRef.current = -PARTNER_MARQUEE_SPEED;
+  }, []);
+
   // GSAP header animation
   useEffect(() => {
     if (!headerRef.current) return;
@@ -105,7 +216,7 @@ export default function AboutPage() {
     return () => ctx.revert();
   }, []);
 
-  // GSAP text + counter animations
+  // GSAP text + counter + values + partners + story animations
   useEffect(() => {
     const ctx = gsap.context(() => {
       if (textRef.current) {
@@ -190,7 +301,7 @@ export default function AboutPage() {
         );
       }
 
-      // Partners section
+      // Partners section fade-in
       if (partnersRef.current) {
         gsap.fromTo(
           partnersRef.current,
@@ -209,20 +320,19 @@ export default function AboutPage() {
         );
       }
 
-      // Timeline section
-      if (timelineRef.current) {
+      // Story chapters scroll animation
+      if (storyRef.current) {
         gsap.fromTo(
-          timelineRef.current.querySelectorAll('.timeline-item'),
-          { opacity: 0, x: (i: number) => (i % 2 === 0 ? -60 : 60), y: 20 },
+          storyRef.current.querySelectorAll('.story-chapter'),
+          { opacity: 0, y: 80 },
           {
             opacity: 1,
-            x: 0,
             y: 0,
-            duration: 0.7,
-            stagger: 0.2,
+            duration: 1,
+            stagger: 0.3,
             ease: 'power3.out',
             scrollTrigger: {
-              trigger: timelineRef.current,
+              trigger: storyRef.current,
               start: 'top 80%',
               toggleActions: 'play none none reverse',
             },
@@ -232,6 +342,11 @@ export default function AboutPage() {
     });
     return () => ctx.revert();
   }, []);
+
+  /* ─── Tripled partners list for seamless loop ─── */
+  const tripledPartners = partners.length > 0
+    ? [...partners, ...partners, ...partners]
+    : [];
 
   return (
     <div className="min-h-screen bg-cream">
@@ -355,7 +470,9 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* Our Partners Section */}
+      {/* ═══════════════════════════════════════════════════════════════
+          Our Partners Section — Physics-Based Interactive Marquee
+      ═══════════════════════════════════════════════════════════════ */}
       <div className="bg-white/50 py-20">
         <div ref={partnersRef} className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
@@ -366,25 +483,39 @@ export default function AboutPage() {
           </div>
 
           {partners.length > 0 ? (
-            <div className="relative overflow-hidden">
-              {/* Marquee container */}
-              <div className="flex gap-8 animate-marquee">
-                {[...partners, ...partners].map((partner, i) => (
-                  <motion.div
+            <div
+              className="relative overflow-hidden"
+              onPointerDown={onPointerDown}
+              onPointerMove={onPointerMove}
+              onPointerUp={onPointerUp}
+              onPointerCancel={onPointerCancel}
+            >
+              {/* Gradient fade overlays */}
+              <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white/50 to-transparent z-10 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white/50 to-transparent z-10 pointer-events-none" />
+
+              {/* Physics-driven track */}
+              <div
+                ref={trackRef}
+                className="flex whitespace-nowrap select-none touch-none cursor-grab active:cursor-grabbing gap-6"
+                style={{ willChange: 'transform' }}
+              >
+                {tripledPartners.map((partner, i) => (
+                  <div
                     key={`${partner.id}-${i}`}
-                    className="flex-shrink-0 bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 flex items-center justify-center min-w-[160px] h-24"
-                    whileHover={{ scale: 1.05 }}
+                    className="flex-shrink-0 bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 flex items-center justify-center min-w-[180px] h-24"
                   >
                     {partner.logo_url ? (
                       <img
                         src={partner.logo_url}
                         alt={partner.name}
-                        className="max-h-12 max-w-[120px] object-contain"
+                        className="max-h-12 max-w-[120px] object-contain pointer-events-none"
+                        draggable={false}
                       />
                     ) : (
-                      <span className="text-navy/60 font-semibold text-sm">{partner.name}</span>
+                      <span className="text-navy/60 font-semibold text-sm pointer-events-none">{partner.name}</span>
                     )}
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -406,63 +537,72 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* Our Journey Timeline Section */}
-      <div className="py-20 max-w-5xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Our Story</p>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-navy mb-4">Our Journey</h2>
-            <div className="w-16 h-[3px] bg-red/40 mx-auto" />
-          </motion.div>
+      {/* ═══════════════════════════════════════════════════════════════
+          Our Story Section — Premium Editorial "Chapter" Design
+      ═══════════════════════════════════════════════════════════════ */}
+      <section className="bg-navy py-24 md:py-32 relative overflow-hidden">
+        {/* Subtle background decorations */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          <div className="absolute top-20 right-10 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
+          <div className="absolute bottom-20 left-10 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
         </div>
 
-        <div ref={timelineRef} className="relative">
-          {/* Vertical line */}
-          <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-navy/10 -translate-x-1/2 hidden md:block" />
-          <div className="absolute left-6 top-0 bottom-0 w-[2px] bg-navy/10 md:hidden" />
+        <div ref={storyRef} className="max-w-6xl mx-auto px-6 relative z-10">
+          {/* Section header */}
+          <div className="text-center mb-20">
+            <p className="text-red/80 text-sm tracking-[0.3em] uppercase font-semibold mb-3">Our Story</p>
+            <h2 className="font-heading text-4xl sm:text-5xl font-bold text-white mb-6">The Journey So Far</h2>
+            <div className="w-20 h-[2px] bg-gradient-to-r from-transparent via-red/60 to-transparent mx-auto" />
+          </div>
 
-          <div className="space-y-12 md:space-y-16">
+          {/* Story chapters — alternating layout with large year numbers */}
+          <div className="space-y-20 md:space-y-28">
             {milestones.map((milestone, i) => (
-              <div
-                key={milestone.year}
-                className={`timeline-item relative flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-0 ${
-                  i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
-                }`}
-              >
-                {/* Content Card */}
-                <div className={`md:w-[calc(50%-32px)] pl-14 md:pl-0 ${i % 2 === 0 ? 'md:pr-8 md:text-right' : 'md:pl-8 md:text-left'}`}>
-                  <motion.div
-                    className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-navy/5"
-                    whileHover={{ y: -4 }}
-                  >
-                    <span className="inline-block text-red font-heading font-bold text-2xl mb-2">{milestone.year}</span>
-                    <h3 className="font-heading text-lg font-bold text-navy mb-2">{milestone.title}</h3>
-                    <p className="text-navy/60 text-sm leading-relaxed">{milestone.description}</p>
-                  </motion.div>
-                </div>
+              <div key={milestone.year} className="story-chapter group">
+                <div className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-8 md:gap-16`}>
+                  {/* Large year number — editorial style */}
+                  <div className="md:w-2/5 text-center">
+                    <div className="relative inline-block">
+                      <span className="text-[120px] md:text-[160px] font-heading font-bold text-white/[0.04] leading-none select-none">
+                        {milestone.year}
+                      </span>
+                      <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl md:text-6xl font-heading font-bold text-white">
+                        {milestone.year}
+                      </span>
+                    </div>
+                  </div>
 
-                {/* Center dot */}
-                <div className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-6 md:top-1/2 md:-translate-y-1/2 z-10">
-                  <div className="w-4 h-4 rounded-full bg-red border-4 border-cream shadow-md" />
-                </div>
+                  {/* Content card */}
+                  <div className="md:w-3/5">
+                    <div className="relative bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] rounded-3xl p-8 md:p-10 hover:bg-white/[0.07] transition-all duration-500">
+                      {/* Accent line */}
+                      <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-red/40 to-transparent" />
 
-                {/* Spacer for other side */}
-                <div className="hidden md:block md:w-[calc(50%-32px)]" />
+                      {/* Chapter number */}
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 rounded-full bg-red/20 flex items-center justify-center">
+                          <span className="text-red text-xs font-bold">{String(i + 1).padStart(2, '0')}</span>
+                        </div>
+                        <div className="h-px flex-1 bg-white/10" />
+                      </div>
+
+                      <h3 className="font-heading text-2xl md:text-3xl font-bold text-white mb-4">{milestone.title}</h3>
+                      <p className="text-cream/50 text-base md:text-lg leading-relaxed">{milestone.description}</p>
+
+                      {/* Bottom decorative element */}
+                      <div className="mt-6 flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-red/60" />
+                        <div className="h-px w-12 bg-red/30" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
-
-          {/* End dot */}
-          <div className="absolute left-6 md:left-1/2 md:-translate-x-1/2 -bottom-4">
-            <div className="w-3 h-3 rounded-full bg-navy/20" />
-          </div>
         </div>
-      </div>
+      </section>
 
       {/* Bottom CTA */}
       <div className="bg-gradient-to-r from-navy via-navy/95 to-red-dark py-16 relative overflow-hidden">
@@ -501,20 +641,6 @@ export default function AboutPage() {
           </div>
         </motion.div>
       </div>
-
-      {/* Marquee animation styles */}
-      <style jsx>{`
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-          animation: marquee 30s linear infinite;
-        }
-        .animate-marquee:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
     </div>
   );
 }
