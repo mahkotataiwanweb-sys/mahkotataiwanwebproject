@@ -416,7 +416,7 @@ export default function HomePage() {
       </div>
 
       {/* ═══ Bottom: Cream → footer ═══ */}
-      <WaveDivider variant="bulge" fillColor="var(--color-navy)" height={50} />
+      <WaveDivider variant="ribbon" fillColor="var(--color-navy)" height={90} />
     </>
   );
 }
