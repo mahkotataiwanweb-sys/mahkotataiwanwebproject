@@ -185,31 +185,31 @@
     transform: translateY(0) rotate(0deg) scale(1);
   }
   10% {
-    transform: translateY(-7px) rotate(3deg) scale(1.03);
+    transform: translateY(-6px) rotate(2.5deg) scale(1.025);
   }
   20% {
-    transform: translateY(-2px) rotate(-2.5deg) scale(0.98);
+    transform: translateY(-1.5px) rotate(-2deg) scale(0.983);
   }
   30% {
-    transform: translateY(-10px) rotate(2.5deg) scale(1.04);
+    transform: translateY(-8.5px) rotate(2deg) scale(1.035);
   }
   40% {
-    transform: translateY(-1px) rotate(-3.5deg) scale(0.97);
+    transform: translateY(-1px) rotate(-3deg) scale(0.975);
   }
   50% {
-    transform: translateY(-8px) rotate(3deg) scale(1.02);
+    transform: translateY(-7px) rotate(2.5deg) scale(1.017);
   }
   60% {
-    transform: translateY(-3px) rotate(-2deg) scale(1.03);
+    transform: translateY(-2.5px) rotate(-1.7deg) scale(1.025);
   }
   70% {
-    transform: translateY(-9px) rotate(2.5deg) scale(0.98);
+    transform: translateY(-7.5px) rotate(2deg) scale(0.983);
   }
   80% {
-    transform: translateY(-4px) rotate(-2deg) scale(1.02);
+    transform: translateY(-3.5px) rotate(-1.7deg) scale(1.017);
   }
   90% {
-    transform: translateY(-6px) rotate(1.5deg) scale(1.01);
+    transform: translateY(-5px) rotate(1.3deg) scale(1.008);
   }
   100% {
     transform: translateY(0) rotate(0deg) scale(1);
