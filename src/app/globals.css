@@ -179,30 +179,50 @@
   }
 }
 
-/* ===== Product Catalog Wavy Background ===== */
-@keyframes wavyFlow {
+/* ===== Product Catalog: Center Wobble Animation ===== */
+@keyframes productWobble {
   0% {
-    transform: translateX(0);
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  10% {
+    transform: translateY(-6px) rotate(2.5deg) scale(1.02);
+  }
+  20% {
+    transform: translateY(-2px) rotate(-2deg) scale(0.99);
+  }
+  30% {
+    transform: translateY(-8px) rotate(1.5deg) scale(1.03);
+  }
+  40% {
+    transform: translateY(-1px) rotate(-3deg) scale(0.98);
+  }
+  50% {
+    transform: translateY(-5px) rotate(2deg) scale(1.01);
+  }
+  60% {
+    transform: translateY(-3px) rotate(-1.5deg) scale(1.02);
+  }
+  70% {
+    transform: translateY(-7px) rotate(3deg) scale(0.99);
+  }
+  80% {
+    transform: translateY(-2px) rotate(-2.5deg) scale(1.01);
+  }
+  90% {
+    transform: translateY(-4px) rotate(1deg) scale(1.03);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateY(0) rotate(0deg) scale(1);
   }
 }
 
-.wavy-layer {
-  animation: wavyFlow 18s linear infinite;
+.product-wobble-active {
+  animation: productWobble 2.5s ease-in-out infinite !important;
 }
 
-@keyframes productFloat {
-  0%, 100% {
-    transform: translateY(0) rotate(-1deg);
-  }
-  33% {
-    transform: translateY(-8px) rotate(1deg);
-  }
-  66% {
-    transform: translateY(-4px) rotate(-0.5deg);
-  }
+/* ===== Card-Open Section Transitions ===== */
+.section-card-reveal {
+  transform-origin: top center;
 }
 
 /* ===== Google Fonts Import ===== */
