@@ -45,8 +45,6 @@ const CATEGORIES: CategoryOption[] = [
 /*  Static Wavy Texture Background                                     */
 /* ------------------------------------------------------------------ */
 function WavyTextureBackground() {
-  // Generate rows of wavy lines (static, no animation)
-  const rows = 22;
   const rowHeight = 30;
 
   return (
@@ -174,7 +172,7 @@ function ProductPopup({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Infinite Carousel Slider                                           */
+/*  Infinite Carousel Slider — Fixed & Improved                        */
 /* ------------------------------------------------------------------ */
 function InfiniteSlider({
   products,
@@ -187,7 +185,7 @@ function InfiniteSlider({
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);
-  const velocityRef = useRef(-2); // px per frame — negative = move left
+  const velocityRef = useRef(0);
   const baseDirectionRef = useRef(-1); // -1 = left, 1 = right
   const isDraggingRef = useRef(false);
   const isPausedRef = useRef(false);
@@ -199,12 +197,24 @@ function InfiniteSlider({
   const rafRef = useRef<number>(0);
   const singleSetWidthRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [centerIndex, setCenterIndex] = useState(-1);
+  const prevCenterIdxRef = useRef(-1);
+  const centerDwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wobbleReadyRef = useRef(false);
 
-  const DEFAULT_SPEED = 2; // faster than before
-  const FRICTION = 0.94;
-  const RETURN_RATE = 0.025;
-  const ITEM_WIDTH = 220; // smaller items for more dramatic zoom contrast
+  // --- Tuning ---
+  const DEFAULT_SPEED = 0.8; // slower, more elegant
+  const FRICTION = 0.92;
+  const RETURN_RATE = 0.02;
+  const ITEM_WIDTH_MOBILE = 160;
+  const ITEM_WIDTH_DESKTOP = 260;
+  const [itemWidth, setItemWidth] = useState(ITEM_WIDTH_DESKTOP);
+
+  useEffect(() => {
+    const update = () => setItemWidth(window.innerWidth < 640 ? ITEM_WIDTH_MOBILE : ITEM_WIDTH_DESKTOP);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   // Triple the items for seamless loop
   const items = [...products, ...products, ...products];
@@ -216,12 +226,11 @@ function InfiniteSlider({
   };
 
   const measureSetWidth = useCallback(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    singleSetWidthRef.current = track.scrollWidth / 3;
-  }, []);
+    singleSetWidthRef.current = products.length * itemWidth;
+  }, [products.length, itemWidth]);
 
-  const findCenterItem = useCallback(() => {
+  // Apply scale + wobble based on exact center distance
+  const applyItemTransforms = useCallback(() => {
     const container = containerRef.current;
     const track = trackRef.current;
     if (!container || !track) return;
@@ -235,30 +244,6 @@ function InfiniteSlider({
 
     for (let i = 0; i < children.length; i++) {
       const child = children[i] as HTMLElement;
-      const rect = child.getBoundingClientRect();
-      const childCenter = rect.left + rect.width / 2;
-      const dist = Math.abs(childCenter - centerX);
-      if (dist < closestDist) {
-        closestDist = dist;
-        closestIdx = i % products.length;
-      }
-    }
-
-    setCenterIndex(closestIdx);
-  }, [products.length]);
-
-  // Apply scale + wobble to items based on distance from center
-  const applyItemTransforms = useCallback(() => {
-    const container = containerRef.current;
-    const track = trackRef.current;
-    if (!container || !track) return;
-
-    const containerRect = container.getBoundingClientRect();
-    const centerX = containerRect.left + containerRect.width / 2;
-    const children = track.children;
-
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i] as HTMLElement;
       const imgContainer = child.querySelector('.product-img-wrap') as HTMLElement;
       const nameEl = child.querySelector('.product-name') as HTMLElement;
       if (!imgContainer || !nameEl) continue;
@@ -266,35 +251,62 @@ function InfiniteSlider({
       const rect = child.getBoundingClientRect();
       const childCenter = rect.left + rect.width / 2;
       const dist = Math.abs(childCenter - centerX);
-      const maxDist = containerRect.width / 2;
-      const proximity = Math.max(0, 1 - dist / maxDist); // 1 at center, 0 at edges
-      const isCenter = dist < ITEM_WIDTH * 0.5;
+      const maxDist = containerRect.width * 0.5;
 
-      // Scale: small (0.55) far away → very large (1.4) at center
-      const scale = 0.5 + proximity * 0.9; // 0.5 → 1.4
-      const opacity = 0.35 + proximity * 0.65; // 0.35 → 1.0
+      // Normalized 0 → 1 (1 = at center)
+      const proximity = Math.max(0, 1 - dist / maxDist);
+
+      // Scale: far = 0.4, center = 1.5 (dramatic jump)
+      const scale = 0.4 + proximity * proximity * 1.1; // quadratic for dramatic center pop
+      const opacity = 0.25 + proximity * 0.75;
 
       imgContainer.style.transform = `scale(${scale})`;
       imgContainer.style.opacity = `${opacity}`;
-      imgContainer.style.transition = 'transform 0.4s cubic-bezier(0.25,0.1,0.25,1), opacity 0.4s ease';
+      imgContainer.style.transition = 'transform 0.35s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease';
 
-      // Center product gets wobble class
-      if (isCenter) {
-        imgContainer.classList.add('product-wobble-active');
-        imgContainer.style.filter = 'drop-shadow(0 15px 35px rgba(0,0,0,0.4))';
-        nameEl.style.opacity = '1';
-        nameEl.style.transform = 'scale(1.1)';
-        nameEl.style.color = '#FAEDD3';
+      // Name styling
+      nameEl.style.opacity = `${0.2 + proximity * 0.8}`;
+      nameEl.style.transform = `scale(${0.85 + proximity * 0.25})`;
+      nameEl.style.color = `rgba(250,237,211,${0.3 + proximity * 0.7})`;
+      nameEl.style.transition = 'all 0.35s ease';
+
+      // Track closest for wobble
+      if (dist < closestDist) {
+        closestDist = dist;
+        closestIdx = i % products.length;
+      }
+
+      // Center threshold: within half an item width
+      const isCentered = dist < itemWidth * 0.35;
+
+      if (isCentered) {
+        imgContainer.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.5))';
+        // Only apply wobble if dwell time passed
+        if (wobbleReadyRef.current && closestIdx === prevCenterIdxRef.current) {
+          imgContainer.classList.add('product-wobble-active');
+        }
       } else {
         imgContainer.classList.remove('product-wobble-active');
         imgContainer.style.filter = 'none';
-        nameEl.style.opacity = `${0.3 + proximity * 0.5}`;
-        nameEl.style.transform = 'scale(1)';
-        nameEl.style.color = `rgba(250,237,211,${0.4 + proximity * 0.4})`;
       }
-      nameEl.style.transition = 'all 0.4s ease';
     }
-  }, []);
+
+    // Detect center change → start dwell timer
+    if (closestIdx !== prevCenterIdxRef.current) {
+      prevCenterIdxRef.current = closestIdx;
+      wobbleReadyRef.current = false;
+
+      // Clear previous timer
+      if (centerDwellTimerRef.current) {
+        clearTimeout(centerDwellTimerRef.current);
+      }
+
+      // Start new 0.5s dwell timer — wobble only after 500ms at center
+      centerDwellTimerRef.current = setTimeout(() => {
+        wobbleReadyRef.current = true;
+      }, 500);
+    }
+  }, [products.length, itemWidth]);
 
   const animate = useCallback(() => {
     const track = trackRef.current;
@@ -304,7 +316,7 @@ function InfiniteSlider({
     const targetSpeed = DEFAULT_SPEED * baseDirectionRef.current;
 
     if (!isDraggingRef.current && !isPausedRef.current) {
-      // Gradually return to base speed in current direction
+      // Gradually return to base speed
       velocityRef.current += (targetSpeed - velocityRef.current) * RETURN_RATE;
       const excess = velocityRef.current - targetSpeed;
       if (Math.abs(excess) > 0.01) {
@@ -329,19 +341,21 @@ function InfiniteSlider({
 
     track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
 
-    findCenterItem();
     applyItemTransforms();
     rafRef.current = requestAnimationFrame(animate);
-  }, [findCenterItem, applyItemTransforms]);
+  }, [applyItemTransforms]);
 
   useEffect(() => {
     measureSetWidth();
+    // Start with initial velocity
+    velocityRef.current = DEFAULT_SPEED * baseDirectionRef.current;
     rafRef.current = requestAnimationFrame(animate);
     const handleResize = () => measureSetWidth();
     window.addEventListener('resize', handleResize);
     return () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener('resize', handleResize);
+      if (centerDwellTimerRef.current) clearTimeout(centerDwellTimerRef.current);
     };
   }, [animate, measureSetWidth]);
 
@@ -388,14 +402,12 @@ function InfiniteSlider({
     // Transfer drag velocity and change base direction based on swipe
     if (Math.abs(dragVelocityRef.current) > 0.5) {
       velocityRef.current = dragVelocityRef.current;
-      // Change base direction to match swipe direction
       baseDirectionRef.current = dragVelocityRef.current > 0 ? 1 : -1;
     }
     isPausedRef.current = false;
   }, []);
 
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    // Only toggle pause if it wasn't a drag
+  const handleClick = useCallback(() => {
     if (dragDistRef.current > 5) return;
     isPausedRef.current = !isPausedRef.current;
   }, []);
@@ -411,16 +423,19 @@ function InfiniteSlider({
   return (
     <div
       ref={containerRef}
-      className="relative overflow-hidden py-10"
+      className="relative overflow-hidden py-8 sm:py-12"
       style={{ cursor: isDraggingRef.current ? 'grabbing' : 'grab' }}
     >
+      {/* Center line indicator (subtle) */}
+      <div className="absolute top-0 left-1/2 -translate-x-px w-[2px] h-full bg-cream/10 pointer-events-none z-0" />
+
       {/* Fade edges */}
       <div
-        className="absolute top-0 left-0 w-24 sm:w-40 h-full z-10 pointer-events-none"
+        className="absolute top-0 left-0 w-20 sm:w-36 h-full z-10 pointer-events-none"
         style={{ background: 'linear-gradient(to right, var(--color-red), transparent)' }}
       />
       <div
-        className="absolute top-0 right-0 w-24 sm:w-40 h-full z-10 pointer-events-none"
+        className="absolute top-0 right-0 w-20 sm:w-36 h-full z-10 pointer-events-none"
         style={{ background: 'linear-gradient(to left, var(--color-red), transparent)' }}
       />
 
@@ -436,18 +451,22 @@ function InfiniteSlider({
         {items.map((product, i) => (
           <div
             key={`${product.id}-${i}`}
-            className="flex-shrink-0 px-3 sm:px-5 flex flex-col items-center"
-            style={{ width: `${ITEM_WIDTH}px` }}
+            className="flex-shrink-0 flex flex-col items-center justify-end"
+            style={{ width: `${itemWidth}px`, padding: '0 12px' }}
             onClick={(e) => {
               if (dragDistRef.current > 5) return;
               e.stopPropagation();
               onProductClick(product);
             }}
           >
-            {/* Product Image Container */}
+            {/* Product Image Container — bigger base size */}
             <div
-              className="product-img-wrap relative w-28 h-28 sm:w-36 sm:h-36 cursor-pointer"
-              style={{ transformOrigin: 'center center' }}
+              className="product-img-wrap relative cursor-pointer"
+              style={{
+                width: itemWidth < 200 ? '120px' : '200px',
+                height: itemWidth < 200 ? '120px' : '200px',
+                transformOrigin: 'center bottom',
+              }}
             >
               {product.image_url ? (
                 <Image
@@ -455,18 +474,18 @@ function InfiniteSlider({
                   alt={getName(product)}
                   fill
                   className="object-contain drop-shadow-lg pointer-events-none"
-                  sizes="160px"
+                  sizes="200px"
                   unoptimized
                 />
               ) : (
                 <div className="w-full h-full rounded-full bg-cream/15 flex items-center justify-center backdrop-blur-sm">
-                  <span className="text-4xl">🍽️</span>
+                  <span className="text-5xl">🍽️</span>
                 </div>
               )}
             </div>
 
             {/* Product Name */}
-            <p className="product-name mt-4 text-center font-heading font-semibold text-sm whitespace-nowrap">
+            <p className="product-name mt-4 text-center font-heading font-semibold text-sm sm:text-base whitespace-nowrap">
               {getName(product)}
             </p>
           </div>
@@ -523,12 +542,11 @@ export default function ProductCatalogSection() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  /* GSAP card-open parallax entrance */
+  /* GSAP entrance */
   useEffect(() => {
     if (!sectionRef.current || !contentRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Content reveal — slides up and fades in
       gsap.fromTo(
         contentRef.current,
         { y: 100, opacity: 0 },
@@ -619,7 +637,7 @@ export default function ProductCatalogSection() {
             </div>
           </div>
 
-          {/* Product Slider with smooth category transition */}
+          {/* Product Slider */}
           <AnimatePresence mode="wait">
             <motion.div
               key={selectedCategory}
