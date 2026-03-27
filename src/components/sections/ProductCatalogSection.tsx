@@ -485,7 +485,15 @@ function InfiniteSlider({
             </div>
 
             {/* Product Name */}
-            <p className="product-name mt-4 text-center font-heading font-semibold text-sm sm:text-base whitespace-nowrap">
+            <p
+              className="product-name mt-4 text-center font-heading font-semibold text-sm sm:text-base sm:whitespace-nowrap"
+              style={{
+                maxWidth: itemWidth < 200 ? '120px' : '200px',
+                lineHeight: '1.3',
+                wordBreak: 'keep-all',
+                overflowWrap: 'break-word',
+              }}
+            >
               {getName(product)}
             </p>
           </div>
