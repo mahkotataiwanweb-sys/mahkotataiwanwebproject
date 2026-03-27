@@ -42,44 +42,55 @@ const CATEGORIES: CategoryOption[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Animated Wavy Background                                           */
+/*  Static Wavy Texture Background                                     */
 /* ------------------------------------------------------------------ */
-function WavyBackground() {
+function WavyTextureBackground() {
+  // Generate rows of wavy lines (static, no animation)
+  const rows = 22;
+  const rowHeight = 30;
+
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Multiple layers of animated SVG waves */}
-      {[0, 1, 2, 3, 4].map((layer) => (
-        <svg
-          key={layer}
-          className="wavy-layer absolute w-[200%] h-full left-0 top-0"
-          style={{
-            animationDelay: `${layer * -3}s`,
-            opacity: 0.08 + layer * 0.025,
-          }}
-          viewBox="0 0 2400 600"
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <pattern
-              id={`wave-${layer}`}
-              x="0"
-              y="0"
-              width="200"
-              height={28 + layer * 4}
-              patternUnits="userSpaceOnUse"
-            >
-              <path
-                d={`M0,${14 + layer * 2} Q50,${0 + layer} 100,${14 + layer * 2} Q150,${28 + layer * 4} 200,${14 + layer * 2}`}
-                fill="none"
-                stroke="rgba(0,0,0,0.35)"
-                strokeWidth={1.2 + layer * 0.15}
-              />
-            </pattern>
-          </defs>
-          <rect width="2400" height="600" fill={`url(#wave-${layer})`} />
-        </svg>
-      ))}
+      <svg
+        className="absolute inset-0 w-full h-full"
+        preserveAspectRatio="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <pattern
+            id="wavy-static"
+            x="0"
+            y="0"
+            width="180"
+            height={rowHeight}
+            patternUnits="userSpaceOnUse"
+          >
+            <path
+              d={`M0,${rowHeight / 2} Q30,${rowHeight / 2 - 8} 45,${rowHeight / 2} T90,${rowHeight / 2} Q120,${rowHeight / 2 + 8} 135,${rowHeight / 2} T180,${rowHeight / 2}`}
+              fill="none"
+              stroke="rgba(0,0,0,0.12)"
+              strokeWidth="1.5"
+            />
+          </pattern>
+          <pattern
+            id="wavy-static-2"
+            x="40"
+            y="7"
+            width="220"
+            height={rowHeight + 5}
+            patternUnits="userSpaceOnUse"
+          >
+            <path
+              d={`M0,${(rowHeight + 5) / 2} Q40,${(rowHeight + 5) / 2 - 6} 55,${(rowHeight + 5) / 2} T110,${(rowHeight + 5) / 2} Q150,${(rowHeight + 5) / 2 + 6} 165,${(rowHeight + 5) / 2} T220,${(rowHeight + 5) / 2}`}
+              fill="none"
+              stroke="rgba(0,0,0,0.07)"
+              strokeWidth="1.2"
+            />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#wavy-static)" />
+        <rect width="100%" height="100%" fill="url(#wavy-static-2)" />
+      </svg>
     </div>
   );
 }
@@ -116,10 +127,8 @@ function ProductPopup({
       exit={{ opacity: 0 }}
       onClick={onClose}
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
-      {/* Modal */}
       <motion.div
         className="relative bg-cream rounded-3xl overflow-hidden max-w-md w-full shadow-2xl"
         initial={{ scale: 0.85, y: 40, opacity: 0 }}
@@ -128,7 +137,6 @@ function ProductPopup({
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-navy/10 hover:bg-navy/20 flex items-center justify-center transition-colors"
@@ -136,7 +144,6 @@ function ProductPopup({
           <X className="w-4 h-4 text-navy" />
         </button>
 
-        {/* Product image area */}
         <div className="relative w-full h-56 bg-gradient-to-br from-red/10 to-red/5 flex items-center justify-center">
           {product.image_url ? (
             <Image
@@ -154,7 +161,6 @@ function ProductPopup({
           )}
         </div>
 
-        {/* Content */}
         <div className="p-6 pt-5">
           <span className="inline-block text-red/70 text-xs font-semibold tracking-wider uppercase mb-2">
             {CATEGORIES.find((c) => c.value === product.category)?.label || product.category}
@@ -181,21 +187,24 @@ function InfiniteSlider({
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);
-  const velocityRef = useRef(-0.8); // px per frame (slow left)
+  const velocityRef = useRef(-2); // px per frame — negative = move left
+  const baseDirectionRef = useRef(-1); // -1 = left, 1 = right
   const isDraggingRef = useRef(false);
   const isPausedRef = useRef(false);
   const lastPointerXRef = useRef(0);
   const lastMoveTimeRef = useRef(0);
   const dragVelocityRef = useRef(0);
+  const dragStartXRef = useRef(0);
+  const dragDistRef = useRef(0);
   const rafRef = useRef<number>(0);
   const singleSetWidthRef = useRef(0);
-  const itemWidthRef = useRef(260);
   const containerRef = useRef<HTMLDivElement>(null);
   const [centerIndex, setCenterIndex] = useState(-1);
 
-  const DEFAULT_SPEED = 0.8;
-  const FRICTION = 0.96;
-  const RETURN_RATE = 0.03;
+  const DEFAULT_SPEED = 2; // faster than before
+  const FRICTION = 0.94;
+  const RETURN_RATE = 0.025;
+  const ITEM_WIDTH = 220; // smaller items for more dramatic zoom contrast
 
   // Triple the items for seamless loop
   const items = [...products, ...products, ...products];
@@ -238,17 +247,68 @@ function InfiniteSlider({
     setCenterIndex(closestIdx);
   }, [products.length]);
 
+  // Apply scale + wobble to items based on distance from center
+  const applyItemTransforms = useCallback(() => {
+    const container = containerRef.current;
+    const track = trackRef.current;
+    if (!container || !track) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const centerX = containerRect.left + containerRect.width / 2;
+    const children = track.children;
+
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i] as HTMLElement;
+      const imgContainer = child.querySelector('.product-img-wrap') as HTMLElement;
+      const nameEl = child.querySelector('.product-name') as HTMLElement;
+      if (!imgContainer || !nameEl) continue;
+
+      const rect = child.getBoundingClientRect();
+      const childCenter = rect.left + rect.width / 2;
+      const dist = Math.abs(childCenter - centerX);
+      const maxDist = containerRect.width / 2;
+      const proximity = Math.max(0, 1 - dist / maxDist); // 1 at center, 0 at edges
+      const isCenter = dist < ITEM_WIDTH * 0.5;
+
+      // Scale: small (0.55) far away → very large (1.4) at center
+      const scale = 0.5 + proximity * 0.9; // 0.5 → 1.4
+      const opacity = 0.35 + proximity * 0.65; // 0.35 → 1.0
+
+      imgContainer.style.transform = `scale(${scale})`;
+      imgContainer.style.opacity = `${opacity}`;
+      imgContainer.style.transition = 'transform 0.4s cubic-bezier(0.25,0.1,0.25,1), opacity 0.4s ease';
+
+      // Center product gets wobble class
+      if (isCenter) {
+        imgContainer.classList.add('product-wobble-active');
+        imgContainer.style.filter = 'drop-shadow(0 15px 35px rgba(0,0,0,0.4))';
+        nameEl.style.opacity = '1';
+        nameEl.style.transform = 'scale(1.1)';
+        nameEl.style.color = '#FAEDD3';
+      } else {
+        imgContainer.classList.remove('product-wobble-active');
+        imgContainer.style.filter = 'none';
+        nameEl.style.opacity = `${0.3 + proximity * 0.5}`;
+        nameEl.style.transform = 'scale(1)';
+        nameEl.style.color = `rgba(250,237,211,${0.4 + proximity * 0.4})`;
+      }
+      nameEl.style.transition = 'all 0.4s ease';
+    }
+  }, []);
+
   const animate = useCallback(() => {
     const track = trackRef.current;
     if (!track) return;
 
     const setWidth = singleSetWidthRef.current;
+    const targetSpeed = DEFAULT_SPEED * baseDirectionRef.current;
 
     if (!isDraggingRef.current && !isPausedRef.current) {
-      velocityRef.current += (-DEFAULT_SPEED - velocityRef.current) * RETURN_RATE;
-      const excess = velocityRef.current - -DEFAULT_SPEED;
+      // Gradually return to base speed in current direction
+      velocityRef.current += (targetSpeed - velocityRef.current) * RETURN_RATE;
+      const excess = velocityRef.current - targetSpeed;
       if (Math.abs(excess) > 0.01) {
-        velocityRef.current = -DEFAULT_SPEED + excess * FRICTION;
+        velocityRef.current = targetSpeed + excess * FRICTION;
       }
     }
 
@@ -261,6 +321,7 @@ function InfiniteSlider({
       offsetRef.current += velocityRef.current;
     }
 
+    // Seamless wrapping
     if (setWidth > 0) {
       while (offsetRef.current < -setWidth) offsetRef.current += setWidth;
       while (offsetRef.current > 0) offsetRef.current -= setWidth;
@@ -269,8 +330,9 @@ function InfiniteSlider({
     track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
 
     findCenterItem();
+    applyItemTransforms();
     rafRef.current = requestAnimationFrame(animate);
-  }, [findCenterItem]);
+  }, [findCenterItem, applyItemTransforms]);
 
   useEffect(() => {
     measureSetWidth();
@@ -283,7 +345,6 @@ function InfiniteSlider({
     };
   }, [animate, measureSetWidth]);
 
-  // Re-measure when products change
   useEffect(() => {
     setTimeout(measureSetWidth, 100);
   }, [products, measureSetWidth]);
@@ -292,6 +353,8 @@ function InfiniteSlider({
     isDraggingRef.current = true;
     isPausedRef.current = true;
     lastPointerXRef.current = e.clientX;
+    dragStartXRef.current = e.clientX;
+    dragDistRef.current = 0;
     lastMoveTimeRef.current = performance.now();
     dragVelocityRef.current = 0;
     (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
@@ -304,6 +367,7 @@ function InfiniteSlider({
     const dt = now - lastMoveTimeRef.current;
     if (dt > 0) dragVelocityRef.current = (dx / dt) * 16;
 
+    dragDistRef.current += Math.abs(dx);
     offsetRef.current += dx;
     lastPointerXRef.current = e.clientX;
     lastMoveTimeRef.current = now;
@@ -320,13 +384,19 @@ function InfiniteSlider({
   const handlePointerUp = useCallback(() => {
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
-    // Transfer drag velocity — direction follows swipe direction
-    velocityRef.current = dragVelocityRef.current || -DEFAULT_SPEED;
-    // Resume after releasing
+
+    // Transfer drag velocity and change base direction based on swipe
+    if (Math.abs(dragVelocityRef.current) > 0.5) {
+      velocityRef.current = dragVelocityRef.current;
+      // Change base direction to match swipe direction
+      baseDirectionRef.current = dragVelocityRef.current > 0 ? 1 : -1;
+    }
     isPausedRef.current = false;
   }, []);
 
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    // Only toggle pause if it wasn't a drag
+    if (dragDistRef.current > 5) return;
     isPausedRef.current = !isPausedRef.current;
   }, []);
 
@@ -341,76 +411,66 @@ function InfiniteSlider({
   return (
     <div
       ref={containerRef}
-      className="relative overflow-hidden py-8"
+      className="relative overflow-hidden py-10"
       style={{ cursor: isDraggingRef.current ? 'grabbing' : 'grab' }}
     >
       {/* Fade edges */}
-      <div className="absolute top-0 left-0 w-20 sm:w-32 h-full bg-gradient-to-r from-red to-transparent z-10 pointer-events-none" style={{ '--tw-gradient-from': 'var(--color-red)' } as React.CSSProperties} />
-      <div className="absolute top-0 right-0 w-20 sm:w-32 h-full bg-gradient-to-l from-red to-transparent z-10 pointer-events-none" style={{ '--tw-gradient-from': 'var(--color-red)' } as React.CSSProperties} />
+      <div
+        className="absolute top-0 left-0 w-24 sm:w-40 h-full z-10 pointer-events-none"
+        style={{ background: 'linear-gradient(to right, var(--color-red), transparent)' }}
+      />
+      <div
+        className="absolute top-0 right-0 w-24 sm:w-40 h-full z-10 pointer-events-none"
+        style={{ background: 'linear-gradient(to left, var(--color-red), transparent)' }}
+      />
 
       <div
         ref={trackRef}
-        className="flex select-none touch-none"
+        className="flex select-none touch-none will-change-transform"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
         onClick={handleClick}
       >
-        {items.map((product, i) => {
-          const isCenter = i % products.length === centerIndex;
-          return (
+        {items.map((product, i) => (
+          <div
+            key={`${product.id}-${i}`}
+            className="flex-shrink-0 px-3 sm:px-5 flex flex-col items-center"
+            style={{ width: `${ITEM_WIDTH}px` }}
+            onClick={(e) => {
+              if (dragDistRef.current > 5) return;
+              e.stopPropagation();
+              onProductClick(product);
+            }}
+          >
+            {/* Product Image Container */}
             <div
-              key={`${product.id}-${i}`}
-              className="flex-shrink-0 px-4 sm:px-6 flex flex-col items-center transition-all duration-500 ease-out"
-              style={{ width: `${itemWidthRef.current}px` }}
-              onClick={(e) => {
-                e.stopPropagation();
-                onProductClick(product);
-              }}
+              className="product-img-wrap relative w-28 h-28 sm:w-36 sm:h-36 cursor-pointer"
+              style={{ transformOrigin: 'center center' }}
             >
-              {/* Product Image Container */}
-              <div
-                className={`relative w-40 h-40 sm:w-48 sm:h-48 transition-all duration-500 ease-out cursor-pointer ${
-                  isCenter
-                    ? 'scale-125 sm:scale-[1.35] drop-shadow-[0_10px_30px_rgba(0,0,0,0.3)]'
-                    : 'scale-90 opacity-70'
-                }`}
-                style={
-                  isCenter
-                    ? { animation: 'productFloat 3s ease-in-out infinite' }
-                    : undefined
-                }
-              >
-                {product.image_url ? (
-                  <Image
-                    src={product.image_url}
-                    alt={getName(product)}
-                    fill
-                    className="object-contain drop-shadow-lg"
-                    sizes="200px"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="w-full h-full rounded-full bg-cream/15 flex items-center justify-center backdrop-blur-sm">
-                    <span className="text-5xl">🍽️</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Product Name */}
-              <p
-                className={`mt-4 text-center font-heading font-semibold transition-all duration-500 ${
-                  isCenter
-                    ? 'text-cream text-base sm:text-lg scale-110'
-                    : 'text-cream/50 text-sm'
-                }`}
-              >
-                {getName(product)}
-              </p>
+              {product.image_url ? (
+                <Image
+                  src={product.image_url}
+                  alt={getName(product)}
+                  fill
+                  className="object-contain drop-shadow-lg pointer-events-none"
+                  sizes="160px"
+                  unoptimized
+                />
+              ) : (
+                <div className="w-full h-full rounded-full bg-cream/15 flex items-center justify-center backdrop-blur-sm">
+                  <span className="text-4xl">🍽️</span>
+                </div>
+              )}
             </div>
-          );
-        })}
+
+            {/* Product Name */}
+            <p className="product-name mt-4 text-center font-heading font-semibold text-sm whitespace-nowrap">
+              {getName(product)}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -463,41 +523,25 @@ export default function ProductCatalogSection() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  /* GSAP parallax entrance */
+  /* GSAP card-open parallax entrance */
   useEffect(() => {
-    if (!sectionRef.current) return;
+    if (!sectionRef.current || !contentRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Parallax: section content slides up dramatically as you scroll into it
+      // Content reveal — slides up and fades in
       gsap.fromTo(
         contentRef.current,
-        { y: 120, opacity: 0 },
+        { y: 100, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 1.5,
+          duration: 1.2,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: 'top 90%',
-            end: 'top 30%',
+            start: 'top 85%',
+            end: 'top 35%',
             scrub: 1,
-          },
-        }
-      );
-
-      // Background parallax speed difference
-      gsap.fromTo(
-        sectionRef.current,
-        { backgroundPositionY: '-50px' },
-        {
-          backgroundPositionY: '50px',
-          ease: 'none',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: true,
           },
         }
       );
@@ -514,10 +558,10 @@ export default function ProductCatalogSection() {
         ref={sectionRef}
         className="relative bg-red overflow-hidden py-16 sm:py-24"
       >
-        {/* Animated wavy background texture */}
-        <WavyBackground />
+        {/* Static wavy texture background */}
+        <WavyTextureBackground />
 
-        {/* Content with parallax */}
+        {/* Content */}
         <div ref={contentRef} className="relative z-10">
           {/* Category Dropdown */}
           <div className="flex justify-center mb-8 sm:mb-12 px-4">
@@ -565,7 +609,7 @@ export default function ProductCatalogSection() {
             </div>
           </div>
 
-          {/* Product Slider */}
+          {/* Product Slider with smooth category transition */}
           <AnimatePresence mode="wait">
             <motion.div
               key={selectedCategory}

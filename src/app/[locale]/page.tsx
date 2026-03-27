@@ -233,6 +233,12 @@ export default function HomePage() {
     fetchAll();
   }, [locale]);
 
+  /* ---------- Refs for card-open section transitions ---------- */
+  const catalogSectionRef = useRef<HTMLDivElement>(null);
+  const discoverSectionRef = useRef<HTMLDivElement>(null);
+  const videoSectionRef = useRef<HTMLDivElement>(null);
+  const mapSectionRef = useRef<HTMLDivElement>(null);
+
   /* ---------- GSAP animations ---------- */
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -276,6 +282,41 @@ export default function HomePage() {
           }
         );
       });
+
+      /* ---- Card-open reveal transitions for each section ---- */
+      const sectionEls = [
+        catalogSectionRef.current,
+        discoverSectionRef.current,
+        videoSectionRef.current,
+        mapSectionRef.current,
+      ].filter(Boolean);
+
+      sectionEls.forEach((el) => {
+        gsap.fromTo(
+          el,
+          {
+            opacity: 0,
+            rotateX: -6,
+            y: 80,
+            scale: 0.96,
+            transformPerspective: 1200,
+            transformOrigin: 'top center',
+          },
+          {
+            opacity: 1,
+            rotateX: 0,
+            y: 0,
+            scale: 1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 92%',
+              end: 'top 45%',
+              scrub: 1.2,
+            },
+          }
+        );
+      });
     }, sectionRef);
     return () => ctx.revert();
   }, []);
@@ -306,10 +347,12 @@ export default function HomePage() {
       <MarqueeSection />
 
       {/* Product Catalog Showcase */}
-      <ProductCatalogSection />
+      <div ref={catalogSectionRef} className="section-card-reveal">
+        <ProductCatalogSection />
+      </div>
 
       {/* Discover Section */}
-      <section ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+      <section ref={(el) => { sectionRef.current = el; discoverSectionRef.current = el; }} className="py-24 sm:py-32 bg-cream relative overflow-hidden section-card-reveal">
         {/* Subtle background texture */}
         <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)', backgroundSize: '32px 32px' }} />
         {/* Decorative */}
@@ -355,12 +398,16 @@ export default function HomePage() {
       {/* Divider between Discover and Video */}
       <div className="w-full h-px bg-gradient-to-r from-transparent via-navy/10 to-transparent" />
 
-      <VideoShowcaseSection />
+      <div ref={videoSectionRef} className="section-card-reveal">
+        <VideoShowcaseSection />
+      </div>
 
       {/* Divider between Video and WhereToBuy */}
       <div className="w-full h-px bg-gradient-to-r from-transparent via-navy/10 to-transparent" />
 
-      <WhereToBuySection />
+      <div ref={mapSectionRef} className="section-card-reveal">
+        <WhereToBuySection />
+      </div>
     </>
   );
 }
