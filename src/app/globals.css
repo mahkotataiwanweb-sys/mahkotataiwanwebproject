@@ -179,6 +179,15 @@
   }
 }
 
+/* ===== Sand Drift Animation ===== */
+@keyframes sandDrift {
+  0% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(-8px, -6px, 0); }
+  50% { transform: translate3d(4px, -12px, 0); }
+  75% { transform: translate3d(-4px, -6px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
 /* ===== Product Catalog: Center Wobble Animation ===== */
 @keyframes productWobble {
   0% {

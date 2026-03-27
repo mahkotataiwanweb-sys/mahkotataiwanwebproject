@@ -13,6 +13,7 @@ import MarqueeSection from '@/components/sections/MarqueeSection';
 import ProductCatalogSection from '@/components/sections/ProductCatalogSection';
 import VideoShowcaseSection from '@/components/sections/VideoShowcaseSection';
 import WhereToBuySection from '@/components/sections/WhereToBuySection';
+import SandTexture from '@/components/effects/SandTexture';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
@@ -348,6 +349,9 @@ export default function HomePage() {
 
   return (
     <>
+      {/* Global sand texture — visible through all cream-colored areas */}
+      <SandTexture fixed />
+
       <HeroSlider />
 
       {/* Elegant divider between Hero and Marquee */}
@@ -378,8 +382,6 @@ export default function HomePage() {
 
       {/* Discover Section — Single Unified Slider */}
       <section ref={(el: HTMLElement | null) => { (sectionRef as React.MutableRefObject<HTMLElement | null>).current = el; discoverSectionRef.current = el; }} className="py-24 sm:py-32 bg-cream relative overflow-hidden section-card-reveal">
-        {/* Subtle background texture */}
-        <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)', backgroundSize: '32px 32px' }} />
         {/* Decorative */}
         <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
 
