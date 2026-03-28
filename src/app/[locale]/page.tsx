@@ -191,9 +191,9 @@ function StackedCardSlider({
           );
         })}
 
-        {/* Progress bar at bottom */}
+        {/* Progress bar at bottom — pushed further from card stack */}
         {slides.length > 1 && (
-          <div className="absolute -bottom-7 left-0 right-0 flex gap-1.5 z-20">
+          <div className="absolute -bottom-12 left-0 right-0 flex gap-1.5 z-20">
             {slides.map((_, i) => (
               <button
                 key={i}
@@ -349,7 +349,7 @@ export default function HomePage() {
           </div>
 
           {/* Two Stacked Card Sliders — 30% smaller on desktop, centered */}
-          <div ref={sliderWrapRef} className="space-y-14 lg:max-w-[70%] lg:mx-auto">
+          <div ref={sliderWrapRef} className="space-y-20 lg:max-w-[70%] lg:mx-auto">
             <StackedCardSlider
               slides={eventSlides}
               locale={locale}

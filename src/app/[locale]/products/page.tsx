@@ -701,50 +701,95 @@ function ProductsContent() {
         </div>
       </div>
 
-      {/* ============ CATEGORY NAV (Sticky) ============ */}
-      <div className="sticky top-0 z-30 bg-cream/95 backdrop-blur-xl border-b border-navy/5">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 py-4">
-          {/* Row 1: All Products — centered, prominent */}
-          <div className="flex justify-center mb-3">
+      {/* ============ CATEGORY NAV (Sticky) — Ultra Luxury ============ */}
+      <div className="sticky top-0 z-30 bg-gradient-to-b from-cream via-cream/98 to-cream/90 backdrop-blur-2xl border-b border-navy/[0.04]">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 py-5">
+          {/* Row 1: All Products — floating luxury pill */}
+          <div className="flex justify-center mb-4">
             <button
               onClick={() => setActiveFilter('all')}
-              className={`px-8 py-3 rounded-2xl text-base font-bold transition-all duration-400 tracking-wide ${
-                activeFilter === 'all'
-                  ? 'bg-navy text-white shadow-xl shadow-navy/25 scale-105'
-                  : 'bg-white/60 backdrop-blur-sm text-navy/60 hover:text-navy hover:bg-white/80 border border-navy/10 hover:border-navy/20 hover:shadow-md'
-              }`}
+              className="group relative"
             >
-              <span className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4" />
-                All Products
-              </span>
+              {/* Glow aura behind button */}
+              <div className={`absolute -inset-1.5 rounded-2xl blur-xl transition-all duration-700 ${
+                activeFilter === 'all'
+                  ? 'bg-navy/25 scale-105'
+                  : 'bg-navy/0 group-hover:bg-navy/10'
+              }`} />
+              <div className={`relative px-10 py-3.5 rounded-2xl text-base font-bold tracking-wide transition-all duration-500 overflow-hidden ${
+                activeFilter === 'all'
+                  ? 'bg-gradient-to-r from-navy via-navy/95 to-navy/90 text-white shadow-[0_8px_32px_rgba(0,45,90,0.35),0_2px_8px_rgba(0,45,90,0.2)] -translate-y-0.5'
+                  : 'bg-white/70 text-navy/50 hover:text-navy border border-navy/8 hover:border-navy/15 shadow-[0_2px_12px_rgba(0,45,90,0.06)] hover:shadow-[0_6px_24px_rgba(0,45,90,0.12)] hover:-translate-y-0.5'
+              }`}>
+                {/* Glossy shine overlay */}
+                <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-transparent pointer-events-none rounded-2xl" />
+                {/* Animated shimmer */}
+                <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full pointer-events-none ${
+                  activeFilter === 'all' ? 'animate-[shimmer_3s_ease-in-out_infinite]' : 'group-hover:animate-[shimmer_3s_ease-in-out_infinite]'
+                }`} />
+                <span className="relative flex items-center gap-2.5">
+                  <Sparkles className={`w-4 h-4 transition-all duration-500 ${activeFilter === 'all' ? 'text-white/80' : 'text-navy/30 group-hover:text-navy/60'}`} />
+                  All Products
+                </span>
+              </div>
             </button>
           </div>
 
-          {/* Row 2: Category buttons — glassmorphism style */}
+          {/* Row 2: Category buttons — floating luxury chips */}
           <div
-            className="flex gap-2 sm:gap-3 overflow-x-auto justify-center -mx-2 px-2 pb-1"
+            className="flex gap-3 sm:gap-4 overflow-x-auto justify-center -mx-2 px-2 pb-2"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
 
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveFilter(cat.id)}
-                className={`shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-400 ${
-                  activeFilter === cat.id
-                    ? 'bg-gradient-to-r from-red to-red/85 text-white shadow-lg shadow-red/20 scale-105 ring-2 ring-red/20'
-                    : 'bg-white/40 backdrop-blur-md text-navy/60 hover:text-navy hover:bg-white/70 border border-white/50 hover:border-navy/15 ring-1 ring-navy/5 hover:ring-navy/10 hover:shadow-md'
-                }`}
-              >
-                {cat.icon && <span className="text-lg leading-none">{cat.icon}</span>}
-                <span>{getLocalizedField(cat, 'name', locale)}</span>
-              </button>
-            ))}
+            {categories.map((cat) => {
+              const isActive = activeFilter === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveFilter(cat.id)}
+                  className="group relative shrink-0"
+                >
+                  {/* Floating glow aura */}
+                  <div className={`absolute -inset-1 rounded-xl blur-lg transition-all duration-700 ${
+                    isActive
+                      ? 'bg-gradient-to-r from-navy/25 to-red/20 scale-105'
+                      : 'bg-navy/0 group-hover:bg-navy/8'
+                  }`} />
+                  <div className={`relative flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-500 overflow-hidden ${
+                    isActive
+                      ? 'bg-gradient-to-r from-navy via-navy/95 to-navy/85 text-white shadow-[0_6px_28px_rgba(0,45,90,0.3),0_2px_6px_rgba(0,45,90,0.15)] -translate-y-0.5'
+                      : 'bg-white/60 text-navy/45 hover:text-navy border border-navy/[0.06] hover:border-navy/12 shadow-[0_2px_10px_rgba(0,45,90,0.04)] hover:shadow-[0_6px_22px_rgba(0,45,90,0.1)] hover:-translate-y-0.5'
+                  }`}>
+                    {/* Glossy top highlight */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/[0.15] via-transparent to-transparent pointer-events-none rounded-xl" />
+                    {/* Shimmer on active */}
+                    {isActive && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/8 to-transparent animate-[shimmer_3s_ease-in-out_infinite] pointer-events-none" />
+                    )}
+                    {/* Bottom edge light — subtle glow line */}
+                    <div className={`absolute bottom-0 left-2 right-2 h-[1px] transition-all duration-500 ${
+                      isActive
+                        ? 'bg-gradient-to-r from-transparent via-white/30 to-transparent'
+                        : 'bg-gradient-to-r from-transparent via-navy/0 to-transparent group-hover:via-navy/10'
+                    }`} />
+                    {cat.icon && <span className="relative text-lg leading-none drop-shadow-sm">{cat.icon}</span>}
+                    <span className="relative tracking-wide">{getLocalizedField(cat, 'name', locale)}</span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
+
+      {/* Shimmer keyframe */}
+      <style jsx global>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}</style>
 
       {/* ============ CONTENT AREA ============ */}
       <div className="max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20">
