@@ -25,6 +25,7 @@ import {
   Users,
   Package,
 } from 'lucide-react';
+import SandTexture from '@/components/effects/SandTexture';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -191,20 +192,6 @@ export default function ContactPage() {
         );
       }
 
-      /* ── Hero Parallax (contained inside hero) ── */
-      if (heroTextRef.current && heroRef.current) {
-        gsap.to(heroTextRef.current, {
-          yPercent: 25,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: 'top top',
-            end: 'bottom top',
-            scrub: 0.5,
-          },
-        });
-      }
-
       /* ── Contact Left Column ── */
       if (contactLeftRef.current) {
         gsap.fromTo(
@@ -355,92 +342,53 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-cream">
+      <SandTexture fixed />
+
       {/* ╔═══════════════════════════════════════════╗
-          ║  1. HERO — Full Viewport Immersive        ║
+          ║  1. HERO                                   ║
           ╚═══════════════════════════════════════════╝ */}
-      <div
-        ref={heroRef}
-        className="relative min-h-[70vh] flex items-center bg-gradient-to-br from-red-dark via-red to-navy overflow-hidden"
-      >
-        {/* Grid Pattern Overlay */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)',
-            backgroundSize: '32px 32px',
-          }}
-        />
-
-        {/* Decorative Blurs */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl" />
-          <div className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-navy/20 blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-white/5 blur-3xl" />
-        </div>
-
-        {/* Floating Animated Circles */}
-        <motion.div
-          className="absolute top-[15%] right-[12%] w-16 h-16 rounded-full border border-white/10"
-          animate={{ y: [0, -18, 0], x: [0, 8, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute bottom-[20%] left-[8%] w-10 h-10 rounded-full bg-white/5"
-          animate={{ y: [0, 14, 0], x: [0, -6, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-        />
-        <motion.div
-          className="absolute top-[40%] right-[30%] w-6 h-6 rounded-full bg-white/[0.07]"
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-        />
-        <motion.div
-          className="absolute bottom-[30%] right-[18%] w-24 h-24 rounded-full border border-white/[0.06]"
-          animate={{ y: [0, 12, 0], rotate: [0, 45, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-        />
-
-        {/* Hero Content */}
-        <div className="max-w-7xl mx-auto px-6 w-full relative z-10 py-32">
+      <section ref={heroRef} className="py-24 sm:py-32 bg-navy relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6">
           <Link
             href={`/${locale}`}
-            className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm mb-10 transition-colors group"
+            className="inline-flex items-center gap-2 text-cream/70 hover:text-cream text-sm transition-colors mb-8"
           >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
-            Back to Home
+            <ArrowLeft className="w-4 h-4" /> Back to Home
           </Link>
 
-          <div ref={heroTextRef}>
-            <p className="text-white/70 text-sm tracking-[0.3em] uppercase font-semibold mb-4">
+          <div ref={heroTextRef} className="text-center">
+            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
               {t('label')}
             </p>
-            <h1 className="font-heading text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-5 max-w-3xl leading-[1.1]">
+            <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-3 leading-[1.1]">
               {t('title')}
             </h1>
-            <div className="w-24 h-[3px] bg-gradient-to-r from-white/70 to-transparent mb-7" />
-            <p className="text-white/55 max-w-lg text-lg sm:text-xl leading-relaxed">
+            <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
+            <p className="text-cream/70 max-w-lg mx-auto text-sm tracking-wide">
               {t('subtitle')}
             </p>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* ╔═══════════════════════════════════════════╗
           ║  2. CONTACT CARDS — Premium 2-Col Layout  ║
           ╚═══════════════════════════════════════════╝ */}
-      <section ref={contactSectionRef} className="py-24 overflow-hidden">
+      <section ref={contactSectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+        <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
+
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             {/* Left — Heading + Socials */}
             <div ref={contactLeftRef} className="lg:sticky lg:top-32">
-              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-4">
+              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
                 Reach Out
               </p>
-              <h2 className="font-heading text-4xl sm:text-5xl font-bold text-navy mb-5 leading-tight">
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3 leading-tight">
                 Get in Touch
               </h2>
-              <div className="w-20 h-[3px] bg-red/40 mb-6" />
-              <p className="text-navy/60 text-lg leading-relaxed max-w-md mb-10">
+              <div className="w-16 h-[2px] bg-red mb-4" />
+              <p className="text-navy/60 text-sm tracking-wide leading-relaxed max-w-md mb-10">
                 Whether you have questions about our products, partnerships, or services — we&apos;d love to hear from you. Reach out through any of these channels.
               </p>
 
@@ -481,7 +429,7 @@ export default function ContactPage() {
                     rel={card.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                     className="group bg-white rounded-3xl p-7 shadow-[0_4px_30px_rgba(0,48,72,0.06)] hover:shadow-[0_12px_40px_rgba(0,48,72,0.12)] hover:-translate-y-1 transition-all duration-400 cursor-pointer border border-navy/[0.04]"
                   >
-                    <div className={`w-13 h-13 w-[52px] h-[52px] rounded-2xl ${card.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
+                    <div className={`w-[52px] h-[52px] rounded-2xl ${card.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
                       <Icon className="w-5 h-5 text-red" />
                     </div>
                     <h4 className="font-semibold text-navy text-sm mb-2">{t(card.label)}</h4>
@@ -502,19 +450,13 @@ export default function ContactPage() {
       {/* ╔═══════════════════════════════════════════╗
           ║  3. BUSINESS HOURS — Navy Dark Section     ║
           ╚═══════════════════════════════════════════╝ */}
-      <section ref={hoursSectionRef} className="bg-navy py-24 overflow-hidden relative">
-        {/* Subtle decorative elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-1/4 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
-          <div className="absolute bottom-0 left-1/4 w-64 h-64 rounded-full bg-white/[0.03] blur-3xl" />
-        </div>
-
+      <section ref={hoursSectionRef} className="py-24 sm:py-32 bg-navy relative overflow-hidden">
         <div className="max-w-2xl mx-auto px-6 relative z-10">
           {/* Section Header */}
           <div className="text-center mb-14">
-            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-4">Availability</p>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-5">Business Hours</h2>
-            <div className="w-16 h-[3px] bg-red/40 mx-auto" />
+            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Availability</p>
+            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-3">Business Hours</h2>
+            <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
           </div>
 
           {/* Glass Card */}
@@ -566,16 +508,18 @@ export default function ContactPage() {
       {/* ╔═══════════════════════════════════════════╗
           ║  4. FAQ — Premium Accordion               ║
           ╚═══════════════════════════════════════════╝ */}
-      <section className="bg-cream py-24 overflow-hidden">
+      <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+        <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
+
         <div className="max-w-3xl mx-auto px-6">
           {/* Section Header */}
           <div ref={faqHeaderRef} className="text-center mb-14">
-            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-4">Got Questions?</p>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-navy mb-5">
+            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Got Questions?</p>
+            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">
               Frequently Asked Questions
             </h2>
-            <div className="w-16 h-[3px] bg-red/40 mx-auto mb-5" />
-            <p className="text-navy/55 text-base sm:text-lg max-w-md mx-auto leading-relaxed">
+            <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
+            <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">
               Find quick answers to common questions about our products and services
             </p>
           </div>
@@ -590,16 +534,18 @@ export default function ContactPage() {
       </section>
 
       {/* ╔═══════════════════════════════════════════╗
-          ║  5. GOOGLE MAPS — Full-Bleed              ║
+          ║  5. GOOGLE MAPS                            ║
           ╚═══════════════════════════════════════════╝ */}
-      <section className="py-24 bg-white/50 overflow-hidden">
+      <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+        <div className="absolute bottom-20 left-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
+
         <div className="max-w-6xl mx-auto px-6">
           {/* Section Header */}
           <div className="text-center mb-14">
-            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-4">Find Us</p>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-navy mb-5">Our Location</h2>
-            <div className="w-16 h-[3px] bg-red/40 mx-auto mb-5" />
-            <p className="text-navy/55 text-base sm:text-lg max-w-md mx-auto">
+            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Find Us</p>
+            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">Our Location</h2>
+            <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
+            <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">
               Visit our office in Linkou, New Taipei City
             </p>
           </div>
@@ -647,76 +593,41 @@ export default function ContactPage() {
       </section>
 
       {/* ╔═══════════════════════════════════════════╗
-          ║  6. CTA — Dramatic Full-Width             ║
+          ║  6. CTA                                    ║
           ╚═══════════════════════════════════════════╝ */}
-      <section className="relative overflow-hidden">
-        <div ref={ctaRef} className="bg-gradient-to-r from-navy via-navy/95 to-red-dark py-28 relative">
-          {/* Decorative elements */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-red/10 blur-3xl" />
-            <div className="absolute bottom-0 left-1/4 w-80 h-80 rounded-full bg-white/5 blur-3xl" />
-            <div className="absolute top-1/2 left-0 w-52 h-52 rounded-full bg-red/5 blur-2xl" />
-            {/* Lines */}
-            <div className="absolute top-10 left-10 w-24 h-[1px] bg-white/10 rotate-45" />
-            <div className="absolute bottom-10 right-10 w-24 h-[1px] bg-white/10 -rotate-45" />
-            <div className="absolute top-20 right-20 w-3 h-3 rounded-full bg-red/30" />
-            <div className="absolute bottom-16 left-20 w-2 h-2 rounded-full bg-white/20" />
+      <section className="py-24 sm:py-32 bg-navy relative overflow-hidden">
+        <div ref={ctaRef} className="max-w-3xl mx-auto px-6 text-center relative z-10">
+          <div className="w-[72px] h-[72px] rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-8">
+            <Handshake className="w-9 h-9 text-red/80" />
           </div>
 
-          {/* Floating animated circles */}
-          <motion.div
-            className="absolute top-[20%] right-[10%] w-20 h-20 rounded-full border border-white/[0.06]"
-            animate={{ y: [0, -15, 0], rotate: [0, 90, 0] }}
-            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute bottom-[15%] left-[8%] w-12 h-12 rounded-full bg-white/[0.03]"
-            animate={{ y: [0, 12, 0] }}
-            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-          />
-          <motion.div
-            className="absolute top-[55%] left-[25%] w-8 h-8 rounded-full border border-white/[0.05]"
-            animate={{ y: [0, -8, 0], x: [0, 5, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
-          />
+          <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-5 leading-tight">
+            Interested in Becoming a Partner?
+          </h2>
+          <p className="text-cream/70 text-sm tracking-wide mb-10 max-w-lg mx-auto">
+            Join 300+ stores across Taiwan selling Mahkota Taiwan products
+          </p>
 
-          <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
-            <div className="w-18 h-18 w-[72px] h-[72px] rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-8">
-              <Handshake className="w-9 h-9 text-red/80" />
-            </div>
-
-            <h2 className="font-heading text-4xl sm:text-5xl font-bold text-white mb-5 leading-tight">
-              Interested in Becoming a Partner?
-            </h2>
-            <p className="text-cream/55 text-lg sm:text-xl mb-10 max-w-lg mx-auto leading-relaxed">
-              Join 300+ stores across Taiwan selling Mahkota Taiwan products
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.a
-                href="mailto:mahkotataiwan@gmail.com?subject=Partnership%20Inquiry"
-                className="inline-flex items-center justify-center gap-2 bg-red hover:bg-red/90 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl text-base"
-                whileHover={{ scale: 1.03, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Contact Our Team
-                <ChevronRight className="w-5 h-5" />
-              </motion.a>
-              <motion.a
-                href="tel:+886226099118"
-                className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 border border-white/20 text-base"
-                whileHover={{ scale: 1.03, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Phone className="w-4 h-4" />
-                Call Us Now
-              </motion.a>
-            </div>
-
-            <p className="text-cream/25 text-xs mt-10">
-              We typically respond to partnership inquiries within 2 business days
-            </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="mailto:mahkotataiwan@gmail.com?subject=Partnership%20Inquiry"
+              className="inline-flex items-center justify-center gap-2 bg-red hover:bg-red/90 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl text-base"
+            >
+              Contact Our Team
+              <ChevronRight className="w-5 h-5" />
+            </a>
+            <a
+              href="tel:+886226099118"
+              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 border border-white/20 hover:border-white/30 text-base"
+            >
+              <Phone className="w-4 h-4" />
+              Call Us Now
+            </a>
           </div>
+
+          <p className="text-cream/25 text-xs mt-10">
+            We typically respond to partnership inquiries within 2 business days
+          </p>
         </div>
       </section>
     </div>
