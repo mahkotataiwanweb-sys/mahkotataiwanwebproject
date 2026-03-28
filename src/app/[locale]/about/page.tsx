@@ -426,14 +426,13 @@ export default function AboutPage() {
             delay: baseDelay + 0.2,
           });
           
-          // ★ BOUNCE — periodic elastic bounce that repeats
-          const bounceTl = gsap.timeline({ repeat: -1, delay: cfg.bounceDelay });
+          // ★ BOUNCE — periodic elastic bounce that repeats with pause between
+          const bounceTl = gsap.timeline({ repeat: -1, repeatDelay: cfg.bounceDelay, delay: cfg.bounceDelay });
           bounceTl
-            .to(item, { scaleY: 0.88, scaleX: 1.12, duration: 0.15, ease: 'power2.in' })  // squash
-            .to(item, { scaleY: 1.18, scaleX: 0.88, y: '-=16', duration: 0.25, ease: 'power2.out' })  // stretch up
-            .to(item, { scaleY: 0.92, scaleX: 1.08, y: '+=16', duration: 0.2, ease: 'bounce.out' })  // land squash
-            .to(item, { scaleY: 1, scaleX: 1, duration: 0.35, ease: 'elastic.out(1, 0.4)' })  // settle
-            .to(item, {}, { duration: cfg.bounceDelay - 0.95 });  // pause before next bounce
+            .to(item, { scaleY: 0.88, scaleX: 1.12, duration: 0.15, ease: 'power2.in' })
+            .to(item, { scaleY: 1.18, scaleX: 0.88, y: '-=16', duration: 0.25, ease: 'power2.out' })
+            .to(item, { scaleY: 0.92, scaleX: 1.08, y: '+=16', duration: 0.2, ease: 'bounce.out' })
+            .to(item, { scaleY: 1, scaleX: 1, duration: 0.35, ease: 'elastic.out(1, 0.4)' });
         });
       }
 
