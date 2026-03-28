@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense, useCallback } from 'react';
+import { useState, useEffect, useRef, Suspense, useCallback, useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Package, ArrowLeft, X, ChevronRight } from 'lucide-react';
+import { Package, ArrowLeft, X, ChevronLeft, ChevronRight, Shield, Award, Sparkles } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
@@ -75,12 +75,6 @@ function ProductModal({
               <span className="text-sm">No image</span>
             </div>
           )}
-
-          {product.is_featured && (
-            <div className="absolute top-4 left-4 bg-red text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
-              ★ Featured
-            </div>
-          )}
         </div>
 
         {/* Info */}
@@ -102,19 +96,107 @@ function ProductModal({
 }
 
 /* ------------------------------------------------------------------ */
-/*  3D Flip Card Component                                             */
+/*  Category Showcase Card (for "All Products" landing)                */
 /* ------------------------------------------------------------------ */
-function FlipCard({
+function CategoryShowcaseCard({
+  category,
+  locale,
+  productCount,
+  index,
+  onClick,
+}: {
+  category: Category;
+  locale: string;
+  productCount: number;
+  index: number;
+  onClick: () => void;
+}) {
+  const name = getLocalizedField(category, 'name', locale);
+  const description = getLocalizedField(category, 'description', locale);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{
+        type: 'spring',
+        stiffness: 200,
+        damping: 24,
+        delay: index * 0.08,
+      }}
+      whileHover={{ scale: 1.03, y: -8 }}
+      onClick={onClick}
+      className="cursor-pointer group relative"
+    >
+      {/* Glow effect on hover */}
+      <div className="absolute -inset-1 bg-gradient-to-br from-red/20 via-transparent to-red/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
+
+      <div className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-red/5 transition-all duration-500">
+        {/* Category Image / Gradient Background */}
+        <div className="relative h-48 sm:h-56 bg-gradient-to-br from-navy via-navy/90 to-navy/80 overflow-hidden">
+          {category.image_url ? (
+            <Image
+              src={category.image_url}
+              alt={name}
+              fill
+              className="object-cover opacity-60 group-hover:opacity-80 group-hover:scale-110 transition-all duration-700"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              unoptimized
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/95 to-red/20" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/30 to-transparent" />
+
+          {/* Icon */}
+          <div className="absolute top-5 left-5">
+            <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:bg-white/20 transition-all duration-500">
+              {category.icon || '📦'}
+            </div>
+          </div>
+
+          {/* Product count badge */}
+          <div className="absolute top-5 right-5">
+            <div className="px-3 py-1.5 rounded-full bg-red/90 backdrop-blur-sm text-white text-xs font-bold shadow-lg">
+              {productCount} {productCount === 1 ? 'Product' : 'Products'}
+            </div>
+          </div>
+
+          {/* Name overlay */}
+          <div className="absolute bottom-5 left-5 right-5">
+            <h3 className="font-heading text-2xl sm:text-3xl font-bold text-white leading-tight drop-shadow-lg">
+              {name}
+            </h3>
+          </div>
+        </div>
+
+        {/* Card Body */}
+        <div className="p-5 sm:p-6 bg-cream/95 backdrop-blur-sm">
+          <p className="text-navy/50 text-sm leading-relaxed line-clamp-2 mb-4">
+            {description || 'Discover our premium selection of authentic products in this category.'}
+          </p>
+          <div className="flex items-center gap-2 text-red group-hover:gap-3 transition-all duration-300">
+            <span className="text-sm font-semibold tracking-wide">Explore Collection</span>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Bezel Product Card (for horizontal slider)                         */
+/* ------------------------------------------------------------------ */
+function BezelCard({
   product,
   locale,
-  categoryName,
-  index,
+  isSelected,
   onClick,
 }: {
   product: Product;
   locale: string;
-  categoryName: string;
-  index: number;
+  isSelected: boolean;
   onClick: () => void;
 }) {
   const name = getLocalizedField(product, 'name', locale);
@@ -122,72 +204,296 @@ function FlipCard({
   return (
     <motion.div
       layout
-      initial={{ rotateY: 90, opacity: 0, scale: 0.8 }}
-      animate={{ rotateY: 0, opacity: 1, scale: 1 }}
-      exit={{ rotateY: -90, opacity: 0, scale: 0.8 }}
-      transition={{
-        type: 'spring',
-        stiffness: 200,
-        damping: 22,
-        delay: index * 0.04,
-      }}
-      style={{ perspective: 1200, transformStyle: 'preserve-3d' }}
-      className="cursor-pointer group"
+      initial={{ opacity: 0, scale: 0.85 }}
+      animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ y: -6 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       onClick={onClick}
+      className={`shrink-0 cursor-pointer group w-[160px] sm:w-[200px] lg:w-[220px] snap-center ${
+        isSelected ? 'z-10' : 'z-0'
+      }`}
     >
-      <div className="relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 ring-1 ring-navy/5 hover:ring-red/15">
-        {/* Image */}
-        <div className="relative aspect-[4/5] bg-gradient-to-br from-cream to-cream-dark overflow-hidden">
-          {product.image_url ? (
-            <Image
-              src={product.image_url}
-              alt={name}
-              fill
-              className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              unoptimized
-            />
-          ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-navy/15">
-              <Package className="w-16 h-16 mb-2" />
-              <span className="text-xs">No image</span>
-            </div>
-          )}
+      {/* Bezel Frame */}
+      <div
+        className={`relative rounded-2xl p-[6px] sm:p-2 transition-all duration-500 ${
+          isSelected
+            ? 'bg-gradient-to-br from-red via-red/80 to-red/60 shadow-xl shadow-red/25 scale-105'
+            : 'bg-gradient-to-br from-navy/30 via-navy/15 to-navy/5 hover:from-navy/40 hover:via-navy/20 hover:to-navy/10 shadow-md hover:shadow-lg'
+        }`}
+      >
+        {/* Inner bezel shadow */}
+        <div className="relative rounded-xl overflow-hidden bg-cream shadow-inner">
+          {/* Image */}
+          <div className="relative aspect-square bg-gradient-to-br from-cream-dark/30 to-cream overflow-hidden">
+            {product.image_url ? (
+              <Image
+                src={product.image_url}
+                alt={name}
+                fill
+                className={`object-cover transition-all duration-700 ${
+                  isSelected ? 'scale-105' : 'group-hover:scale-110'
+                }`}
+                sizes="220px"
+                unoptimized
+              />
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-navy/15">
+                <Package className="w-10 h-10" />
+              </div>
+            )}
 
-          {/* Hover Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-navy/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            {/* Subtle inner edge highlight */}
+            <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-none" />
 
-          {/* View Details CTA */}
-          <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
-            <span className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-sm text-navy text-xs font-semibold px-4 py-2 rounded-full shadow-md">
-              View Details <ChevronRight className="w-3 h-3" />
-            </span>
-          </div>
-
-          {product.is_featured && (
-            <div className="absolute top-3 left-3 bg-red text-white text-[10px] font-bold px-3 py-1 rounded-full shadow">
-              ★ Featured
-            </div>
-          )}
-        </div>
-
-        {/* Card Body */}
-        <div className="p-4 sm:p-5">
-          <span className="text-red/60 text-[10px] sm:text-xs font-semibold tracking-[0.15em] uppercase">
-            {categoryName}
-          </span>
-          <h3 className="font-heading text-sm sm:text-base lg:text-lg font-bold text-navy mt-1 group-hover:text-red transition-colors duration-300 line-clamp-2 leading-snug">
-            {name}
-          </h3>
-          <div className="flex items-center gap-2 mt-2 sm:mt-3">
-            <div className="w-5 h-[2px] bg-red/30 rounded-full group-hover:w-8 transition-all duration-500" />
-            <span className="text-navy/30 text-[10px] sm:text-xs font-medium tracking-wider uppercase">
-              Premium
-            </span>
+            {/* Selection indicator glow */}
+            {isSelected && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="absolute inset-0 ring-2 ring-inset ring-red/20 bg-red/5"
+              />
+            )}
           </div>
         </div>
       </div>
+
+      {/* Product Name below bezel */}
+      <div className="mt-3 px-1 text-center">
+        <p
+          className={`text-xs sm:text-sm font-medium leading-tight line-clamp-2 transition-colors duration-300 ${
+            isSelected ? 'text-red font-semibold' : 'text-navy/70 group-hover:text-navy'
+          }`}
+        >
+          {name}
+        </p>
+      </div>
     </motion.div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Product Detail Section (below slider)                              */
+/* ------------------------------------------------------------------ */
+function ProductDetailSection({
+  product,
+  locale,
+  categoryName,
+}: {
+  product: Product;
+  locale: string;
+  categoryName: string;
+}) {
+  const name = getLocalizedField(product, 'name', locale);
+  const description = getLocalizedField(product, 'description', locale);
+
+  return (
+    <motion.div
+      key={product.id}
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+      className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center"
+    >
+      {/* Left: Product Image in premium frame */}
+      <div className="relative">
+        {/* Decorative glow behind frame */}
+        <div className="absolute -inset-4 bg-gradient-to-br from-red/5 via-transparent to-navy/5 rounded-3xl blur-2xl" />
+
+        <div className="relative rounded-3xl p-3 sm:p-4 bg-gradient-to-br from-navy/10 via-navy/5 to-transparent shadow-2xl">
+          <div className="relative aspect-square rounded-2xl overflow-hidden bg-cream shadow-inner">
+            {product.image_url ? (
+              <Image
+                src={product.image_url}
+                alt={name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                unoptimized
+              />
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-navy/15">
+                <Package className="w-24 h-24 mb-3" />
+                <span className="text-sm">No image</span>
+              </div>
+            )}
+            {/* Inner frame highlight */}
+            <div className="absolute inset-0 ring-1 ring-inset ring-white/30" />
+          </div>
+        </div>
+      </div>
+
+      {/* Right: Product Info */}
+      <div className="py-2 lg:py-8">
+        {/* Category label */}
+        <motion.span
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          className="inline-block text-red text-xs font-bold tracking-[0.25em] uppercase mb-4"
+        >
+          {categoryName}
+        </motion.span>
+
+        {/* Product name */}
+        <motion.h2
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.15 }}
+          className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-5 leading-[1.1]"
+        >
+          {name}
+        </motion.h2>
+
+        {/* Decorative divider */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="w-20 h-[3px] bg-gradient-to-r from-red to-red/30 mb-6 rounded-full origin-left"
+        />
+
+        {/* Description */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.25 }}
+          className="text-navy/55 text-base sm:text-lg leading-relaxed mb-8 max-w-lg"
+        >
+          {description || 'Premium quality Indonesian product, crafted with authentic recipes and the finest ingredients. Experience the rich flavors and traditions passed down through generations.'}
+        </motion.p>
+
+        {/* Premium badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-navy/5 border border-navy/10"
+        >
+          <div className="w-9 h-9 rounded-xl bg-red/10 flex items-center justify-center">
+            <Shield className="w-4 h-4 text-red" />
+          </div>
+          <div>
+            <p className="text-navy text-sm font-semibold">Premium Quality</p>
+            <p className="text-navy/40 text-xs">Authentic & Certified</p>
+          </div>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Category View: Bezel Slider + Detail                               */
+/* ------------------------------------------------------------------ */
+function CategoryProductView({
+  products,
+  locale,
+  categoryName,
+}: {
+  products: Product[];
+  locale: string;
+  categoryName: string;
+}) {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const sliderRef = useRef<HTMLDivElement>(null);
+
+  // Auto-select first product when products change
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [products]);
+
+  const selectedProduct = products[selectedIndex] || null;
+
+  const scrollSlider = (direction: 'left' | 'right') => {
+    if (!sliderRef.current) return;
+    const scrollAmount = 240;
+    sliderRef.current.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth',
+    });
+  };
+
+  if (products.length === 0) return null;
+
+  return (
+    <div>
+      {/* Category Header */}
+      <motion.div
+        key={`header-${categoryName}`}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="mb-8 sm:mb-10"
+      >
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-8 h-[2px] bg-red rounded-full" />
+          <span className="text-red text-xs font-bold tracking-[0.25em] uppercase">
+            Category
+          </span>
+        </div>
+        <h2 className="font-heading text-3xl sm:text-4xl font-bold text-navy">
+          {categoryName}
+        </h2>
+        <p className="text-navy/40 text-sm mt-2">
+          {products.length} product{products.length !== 1 ? 's' : ''} — Select a product to view details
+        </p>
+      </motion.div>
+
+      {/* Bezel Card Slider */}
+      <div className="relative mb-12 sm:mb-16">
+        {/* Scroll Buttons */}
+        {products.length > 3 && (
+          <>
+            <button
+              onClick={() => scrollSlider('left')}
+              className="absolute -left-3 sm:-left-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white hover:shadow-xl flex items-center justify-center transition-all duration-300 group border border-navy/5"
+            >
+              <ChevronLeft className="w-5 h-5 text-navy/60 group-hover:text-navy transition-colors" />
+            </button>
+            <button
+              onClick={() => scrollSlider('right')}
+              className="absolute -right-3 sm:-right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white hover:shadow-xl flex items-center justify-center transition-all duration-300 group border border-navy/5"
+            >
+              <ChevronRight className="w-5 h-5 text-navy/60 group-hover:text-navy transition-colors" />
+            </button>
+          </>
+        )}
+
+        {/* Fade edges */}
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-cream to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-cream to-transparent z-10 pointer-events-none" />
+
+        {/* Slider */}
+        <div
+          ref={sliderRef}
+          className="flex gap-4 sm:gap-6 overflow-x-auto py-4 px-4 snap-x snap-mandatory"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
+          {products.map((product, i) => (
+            <BezelCard
+              key={product.id}
+              product={product}
+              locale={locale}
+              isSelected={i === selectedIndex}
+              onClick={() => setSelectedIndex(i)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Product Detail Section */}
+      <AnimatePresence mode="wait">
+        {selectedProduct && (
+          <ProductDetailSection
+            key={selectedProduct.id}
+            product={selectedProduct}
+            locale={locale}
+            categoryName={categoryName}
+          />
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -270,7 +576,16 @@ function ProductsContent() {
     [categories, locale]
   );
 
-  /* Build the displayed product list */
+  /* Count products per category */
+  const productCountByCategory = useMemo(() => {
+    const counts: Record<string, number> = {};
+    products.forEach((p) => {
+      counts[p.category_id] = (counts[p.category_id] || 0) + 1;
+    });
+    return counts;
+  }, [products]);
+
+  /* Build the displayed product list for a specific category */
   const displayedProducts =
     activeFilter === 'all'
       ? products
@@ -356,101 +671,122 @@ function ProductsContent() {
 
       {/* ============ CATEGORY NAV (Sticky) ============ */}
       <div className="sticky top-0 z-30 bg-cream/95 backdrop-blur-xl border-b border-navy/5">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 py-4">
+          {/* Row 1: All Products — centered, prominent */}
+          <div className="flex justify-center mb-3">
+            <button
+              onClick={() => setActiveFilter('all')}
+              className={`px-8 py-3 rounded-2xl text-base font-bold transition-all duration-400 tracking-wide ${
+                activeFilter === 'all'
+                  ? 'bg-navy text-white shadow-xl shadow-navy/25 scale-105'
+                  : 'bg-white/60 backdrop-blur-sm text-navy/60 hover:text-navy hover:bg-white/80 border border-navy/10 hover:border-navy/20 hover:shadow-md'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4" />
+                All Products
+              </span>
+            </button>
+          </div>
+
+          {/* Row 2: Category buttons — glassmorphism style */}
           <div
-            className="flex gap-1 overflow-x-auto py-4 -mx-2 px-2"
+            className="flex gap-2 sm:gap-3 overflow-x-auto justify-center -mx-2 px-2 pb-1"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
-
-            <button
-              onClick={() => setActiveFilter('all')}
-              className={`shrink-0 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-400 ${
-                activeFilter === 'all'
-                  ? 'bg-navy text-white shadow-lg shadow-navy/20 scale-105'
-                  : 'text-navy/50 hover:text-navy hover:bg-navy/5'
-              }`}
-            >
-              All Products
-            </button>
 
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveFilter(cat.id)}
-                className={`shrink-0 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-400 ${
+                className={`shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-400 ${
                   activeFilter === cat.id
-                    ? 'bg-navy text-white shadow-lg shadow-navy/20 scale-105'
-                    : 'text-navy/50 hover:text-navy hover:bg-navy/5'
+                    ? 'bg-gradient-to-r from-red to-red/85 text-white shadow-lg shadow-red/20 scale-105 ring-2 ring-red/20'
+                    : 'bg-white/40 backdrop-blur-md text-navy/60 hover:text-navy hover:bg-white/70 border border-white/50 hover:border-navy/15 ring-1 ring-navy/5 hover:ring-navy/10 hover:shadow-md'
                 }`}
               >
-                {cat.icon && <span className="mr-1.5">{cat.icon}</span>}
-                {getLocalizedField(cat, 'name', locale)}
+                {cat.icon && <span className="text-lg leading-none">{cat.icon}</span>}
+                <span>{getLocalizedField(cat, 'name', locale)}</span>
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ============ PRODUCT GRID ============ */}
+      {/* ============ CONTENT AREA ============ */}
       <div className="max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20">
         {loading ? (
-          /* Skeleton Grid */
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
+          /* Skeleton */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="aspect-[4/5] bg-navy/5 rounded-2xl" />
-                <div className="mt-3 h-4 bg-navy/5 rounded w-3/4" />
-                <div className="mt-2 h-3 bg-navy/5 rounded w-1/2" />
+                <div className="aspect-[4/3] bg-navy/5 rounded-3xl" />
+                <div className="mt-4 h-5 bg-navy/5 rounded-lg w-3/4" />
+                <div className="mt-2 h-4 bg-navy/5 rounded-lg w-1/2" />
               </div>
             ))}
           </div>
+        ) : activeFilter === 'all' ? (
+          /* ======== ALL PRODUCTS: CATEGORY SHOWCASE LANDING ======== */
+          <>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mb-12 sm:mb-16"
+            >
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <div className="w-12 h-[2px] bg-red/30 rounded-full" />
+                <span className="text-red text-xs font-bold tracking-[0.3em] uppercase">
+                  Explore
+                </span>
+                <div className="w-12 h-[2px] bg-red/30 rounded-full" />
+              </div>
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-4">
+                Our Collections
+              </h2>
+              <p className="text-navy/45 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+                Browse our curated categories of premium products, each crafted with authentic quality and tradition.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {categories.map((cat, i) => (
+                <CategoryShowcaseCard
+                  key={cat.id}
+                  category={cat}
+                  locale={locale}
+                  productCount={productCountByCategory[cat.id] || 0}
+                  index={i}
+                  onClick={() => setActiveFilter(cat.id)}
+                />
+              ))}
+            </div>
+
+            {/* Bottom decorative element */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="flex items-center justify-center gap-4 mt-16 sm:mt-20"
+            >
+              <div className="w-16 h-px bg-navy/10" />
+              <Award className="w-5 h-5 text-red/30" />
+              <div className="w-16 h-px bg-navy/10" />
+            </motion.div>
+          </>
         ) : displayedProducts.length === 0 ? (
           <div className="text-center py-24">
             <Package className="w-20 h-20 text-navy/10 mx-auto mb-6" />
             <p className="text-navy/40 text-xl font-heading">{t('noProducts')}</p>
           </div>
         ) : (
-          <>
-            {/* Category title when filtered */}
-            {activeFilter !== 'all' && (
-              <motion.div
-                key={`header-${activeFilter}`}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="mb-8 sm:mb-12"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-[2px] bg-red rounded-full" />
-                  <span className="text-red text-xs font-bold tracking-[0.25em] uppercase">
-                    Category
-                  </span>
-                </div>
-                <h2 className="font-heading text-3xl sm:text-4xl font-bold text-navy">
-                  {getCategoryName(activeFilter)}
-                </h2>
-                <p className="text-navy/40 text-sm mt-2">
-                  {displayedProducts.length} product{displayedProducts.length !== 1 ? 's' : ''}
-                </p>
-              </motion.div>
-            )}
-
-            {/* Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-              <AnimatePresence mode="popLayout">
-                {displayedProducts.map((product, i) => (
-                  <FlipCard
-                    key={product.id}
-                    product={product}
-                    locale={locale}
-                    categoryName={getCategoryName(product.category_id)}
-                    index={i}
-                    onClick={() => setSelectedProduct(product)}
-                  />
-                ))}
-              </AnimatePresence>
-            </div>
-          </>
+          /* ======== CATEGORY VIEW: BEZEL SLIDER + DETAIL ======== */
+          <CategoryProductView
+            products={displayedProducts}
+            locale={locale}
+            categoryName={getCategoryName(activeFilter)}
+          />
         )}
       </div>
 
