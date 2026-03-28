@@ -96,7 +96,7 @@ function ProductModal({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Category Showcase Card (for "All Products" landing)                */
+/*  Category Showcase Card — Bezelless seamless with push effect       */
 /* ------------------------------------------------------------------ */
 function CategoryShowcaseCard({
   category,
@@ -113,73 +113,105 @@ function CategoryShowcaseCard({
 }) {
   const name = getLocalizedField(category, 'name', locale);
   const description = getLocalizedField(category, 'description', locale);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setMousePos({
+      x: (e.clientX - rect.left) / rect.width,
+      y: (e.clientY - rect.top) / rect.height,
+    });
+  }, []);
+
+  // Parallax push: image moves opposite to cursor
+  const imgX = (mousePos.x - 0.5) * -20;
+  const imgY = (mousePos.y - 0.5) * -20;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40, scale: 0.95 }}
+      ref={cardRef}
+      initial={{ opacity: 0, y: 50, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{
         type: 'spring',
-        stiffness: 200,
-        damping: 24,
-        delay: index * 0.08,
+        stiffness: 180,
+        damping: 22,
+        delay: index * 0.07,
       }}
-      whileHover={{ scale: 1.03, y: -8 }}
       onClick={onClick}
-      className="cursor-pointer group relative"
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => { setIsHovered(false); setMousePos({ x: 0.5, y: 0.5 }); }}
+      className="cursor-pointer group relative overflow-hidden"
     >
-      {/* Glow effect on hover */}
-      <div className="absolute -inset-1 bg-gradient-to-br from-red/20 via-transparent to-red/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
+      {/* Full-bleed image — bezelless, no border */}
+      <div className="relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden bg-navy">
+        {category.image_url ? (
+          <Image
+            src={category.image_url}
+            alt={name}
+            fill
+            className="object-cover transition-all duration-700 ease-out will-change-transform"
+            style={{
+              transform: isHovered
+                ? `scale(1.12) translate(${imgX}px, ${imgY}px)`
+                : 'scale(1.0) translate(0px, 0px)',
+              filter: isHovered ? 'brightness(0.75) saturate(1.15)' : 'brightness(0.55) saturate(1)',
+            }}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            unoptimized
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/95 to-red/20" />
+        )}
 
-      <div className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-red/5 transition-all duration-500">
-        {/* Category Image / Gradient Background */}
-        <div className="relative h-48 sm:h-56 bg-gradient-to-br from-navy via-navy/90 to-navy/80 overflow-hidden">
-          {category.image_url ? (
-            <Image
-              src={category.image_url}
-              alt={name}
-              fill
-              className="object-cover opacity-60 group-hover:opacity-80 group-hover:scale-110 transition-all duration-700"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              unoptimized
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/95 to-red/20" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/30 to-transparent" />
+        {/* Dark vignette overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/10 transition-opacity duration-500" />
 
-          {/* Icon */}
-          <div className="absolute top-5 left-5">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:bg-white/20 transition-all duration-500">
-              {category.icon || '📦'}
-            </div>
+        {/* Radial spotlight following cursor */}
+        <div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          style={{
+            background: `radial-gradient(circle 300px at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(255,255,255,0.08), transparent)`,
+          }}
+        />
+
+        {/* Top: product count + icon */}
+        <div className="absolute top-0 left-0 right-0 p-5 sm:p-6 flex items-start justify-between z-10">
+          <div className="text-3xl sm:text-4xl opacity-80 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110 drop-shadow-lg">
+            {category.icon || '📦'}
           </div>
-
-          {/* Product count badge */}
-          <div className="absolute top-5 right-5">
-            <div className="px-3 py-1.5 rounded-full bg-red/90 backdrop-blur-sm text-white text-xs font-bold shadow-lg">
-              {productCount} {productCount === 1 ? 'Product' : 'Products'}
-            </div>
+          <div className="px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-white text-xs font-semibold tracking-wide border border-white/10 group-hover:bg-white/25 transition-all duration-500">
+            {productCount} items
           </div>
+        </div>
 
-          {/* Name overlay */}
-          <div className="absolute bottom-5 left-5 right-5">
-            <h3 className="font-heading text-2xl sm:text-3xl font-bold text-white leading-tight drop-shadow-lg">
+        {/* Bottom: category name + description INSIDE the photo */}
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7 z-10">
+          <div className="transform transition-all duration-500 group-hover:-translate-y-2">
+            <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-[1.05] mb-2 drop-shadow-lg">
               {name}
             </h3>
+            <p className="text-white/50 text-sm leading-relaxed line-clamp-2 max-w-xs group-hover:text-white/70 transition-colors duration-500">
+              {description || 'Discover our premium selection'}
+            </p>
+          </div>
+
+          {/* Explore indicator — slides up on hover */}
+          <div className="mt-4 overflow-hidden h-0 group-hover:h-10 transition-all duration-500 ease-out">
+            <div className="flex items-center gap-2 text-white/80 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out">
+              <div className="w-8 h-px bg-red" />
+              <span className="text-xs font-bold tracking-[0.2em] uppercase">Explore</span>
+              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" />
+            </div>
           </div>
         </div>
 
-        {/* Card Body */}
-        <div className="p-5 sm:p-6 bg-cream/95 backdrop-blur-sm">
-          <p className="text-navy/50 text-sm leading-relaxed line-clamp-2 mb-4">
-            {description || 'Discover our premium selection of authentic products in this category.'}
-          </p>
-          <div className="flex items-center gap-2 text-red group-hover:gap-3 transition-all duration-300">
-            <span className="text-sm font-semibold tracking-wide">Explore Collection</span>
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-          </div>
-        </div>
+        {/* Border reveal on hover — thin red line at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-red scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left z-20" />
       </div>
     </motion.div>
   );
@@ -733,24 +765,24 @@ function ProductsContent() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-12 sm:mb-16"
+              className="mb-10 sm:mb-14"
             >
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="w-12 h-[2px] bg-red/30 rounded-full" />
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-[2px] bg-red rounded-full" />
                 <span className="text-red text-xs font-bold tracking-[0.3em] uppercase">
-                  Explore
+                  Collections
                 </span>
-                <div className="w-12 h-[2px] bg-red/30 rounded-full" />
               </div>
-              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-4">
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-3 leading-[1.05]">
                 Our Collections
               </h2>
-              <p className="text-navy/45 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-                Browse our curated categories of premium products, each crafted with authentic quality and tradition.
+              <p className="text-navy/40 text-base max-w-lg leading-relaxed">
+                Tap a category to explore its products.
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {/* Seamless bezelless photo grid — minimal gap for connected feel */}
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-[3px] rounded-2xl overflow-hidden shadow-2xl shadow-navy/10">
               {categories.map((cat, i) => (
                 <CategoryShowcaseCard
                   key={cat.id}
@@ -761,6 +793,15 @@ function ProductsContent() {
                   onClick={() => setActiveFilter(cat.id)}
                 />
               ))}
+              {/* If odd number of categories, add a gradient filler */}
+              {categories.length % 3 !== 0 && categories.length % 2 !== 0 && (
+                <div className="relative aspect-[4/5] sm:aspect-[3/4] bg-gradient-to-br from-navy via-navy/90 to-red/20 flex items-center justify-center">
+                  <div className="text-center">
+                    <Sparkles className="w-8 h-8 text-white/20 mx-auto mb-3" />
+                    <p className="text-white/30 text-sm font-medium tracking-wide">More Coming</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Bottom decorative element */}

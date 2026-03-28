@@ -92,8 +92,7 @@ function StackedCardSlider({
       <div className="flex items-center gap-3 mb-6">
         <div className={`w-3 h-3 rounded-full ${accentColor} shadow-[0_0_12px_rgba(193,33,38,0.5)]`} />
         <span className="text-navy font-heading font-bold text-base sm:text-lg uppercase tracking-[0.15em]">{label}</span>
-        <div className="flex-1 h-px bg-navy/10" />
-        <span className="text-navy/40 text-sm font-mono font-semibold">
+        <span className="ml-auto text-navy/40 text-sm font-mono font-semibold">
           {String(activeIndex + 1).padStart(2, '0')}/{String(slides.length).padStart(2, '0')}
         </span>
       </div>
@@ -333,7 +332,6 @@ export default function HomePage() {
 
       {/* Discover Section — Dual Stacked Card Sliders */}
       <section ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
-        <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
 
         <div className="max-w-7xl mx-auto px-6">
           {/* Header */}
@@ -350,8 +348,8 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Two Stacked Card Sliders */}
-          <div ref={sliderWrapRef} className="space-y-16">
+          {/* Two Stacked Card Sliders — 30% smaller on desktop, centered */}
+          <div ref={sliderWrapRef} className="space-y-14 lg:max-w-[70%] lg:mx-auto">
             <StackedCardSlider
               slides={eventSlides}
               locale={locale}
