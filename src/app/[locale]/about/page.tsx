@@ -84,19 +84,19 @@ function TiltCard({ children, className }: { children: React.ReactNode; classNam
     const angle = Math.atan2(y - 0.5, x - 0.5) * (180 / Math.PI);
 
     setStyle({
-      transform: `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05) translateZ(20px)`,
+      transform: `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03) translateZ(12px)`,
       transition: 'transform 0.1s ease-out, box-shadow 0.1s ease-out',
-      boxShadow: `0 30px 60px -15px rgba(0,48,72,0.5), 0 50px 100px -30px rgba(0,0,0,0.3), ${rotateY * 0.5}px ${rotateX * -0.5}px 40px rgba(193,33,38,0.12)`,
+      boxShadow: `0 20px 40px -12px rgba(0,48,72,0.3), 0 30px 60px -20px rgba(0,0,0,0.15), ${rotateY * 0.3}px ${rotateX * -0.3}px 25px rgba(193,33,38,0.06)`,
     });
-    setGlare({ x: x * 100, y: y * 100, opacity: 0.28 });
-    setEdgeGlare({ angle, opacity: 0.5 });
+    setGlare({ x: x * 100, y: y * 100, opacity: 0.12 });
+    setEdgeGlare({ angle, opacity: 0.2 });
   }, []);
 
   const handleMouseLeave = useCallback(() => {
     setStyle({
       transform: 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1) translateZ(0px)',
       transition: 'transform 0.8s cubic-bezier(0.03, 0.98, 0.52, 0.99), box-shadow 0.8s ease',
-      boxShadow: '0 25px 50px -12px rgba(0,48,72,0.35), 0 12px 24px -8px rgba(0,0,0,0.15)',
+      boxShadow: '0 16px 32px -10px rgba(0,48,72,0.2), 0 8px 16px -6px rgba(0,0,0,0.08)',
     });
     setGlare({ x: 50, y: 50, opacity: 0 });
     setEdgeGlare({ angle: 0, opacity: 0 });
@@ -111,7 +111,7 @@ function TiltCard({ children, className }: { children: React.ReactNode; classNam
       style={{
         ...style,
         transformStyle: 'preserve-3d',
-        boxShadow: style.boxShadow || '0 25px 50px -12px rgba(0,48,72,0.35), 0 12px 24px -8px rgba(0,0,0,0.15)',
+        boxShadow: style.boxShadow || '0 16px 32px -10px rgba(0,48,72,0.2), 0 8px 16px -6px rgba(0,0,0,0.08)',
       }}
     >
       {children}
@@ -119,7 +119,7 @@ function TiltCard({ children, className }: { children: React.ReactNode; classNam
       <div
         className="absolute inset-0 rounded-3xl pointer-events-none z-20"
         style={{
-          background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,${glare.opacity}) 0%, transparent 50%)`,
+          background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,${glare.opacity}) 0%, transparent 60%)`,
           transition: 'background 0.15s ease-out',
         }}
       />
@@ -127,7 +127,7 @@ function TiltCard({ children, className }: { children: React.ReactNode; classNam
       <div
         className="absolute inset-0 rounded-3xl pointer-events-none z-20 overflow-hidden"
         style={{
-          background: `linear-gradient(${edgeGlare.angle + 90}deg, transparent 30%, rgba(255,255,255,${edgeGlare.opacity * 0.12}) 50%, transparent 70%)`,
+          background: `linear-gradient(${edgeGlare.angle + 90}deg, transparent 35%, rgba(255,255,255,${edgeGlare.opacity * 0.06}) 50%, transparent 65%)`,
           transition: 'background 0.15s ease-out',
         }}
       />

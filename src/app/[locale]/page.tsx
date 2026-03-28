@@ -45,23 +45,31 @@ function StackedCardSlider({
   locale, 
   label,
   accentColor = 'bg-red',
+  delayOffset = 0,
 }: { 
   slides: UnifiedSlide[]; 
   locale: string; 
   label: string;
   accentColor?: string;
+  delayOffset?: number;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const VISIBLE = Math.min(4, slides.length);
 
   useEffect(() => {
     if (slides.length <= 1 || isHovered) return;
-    const timer = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % slides.length);
-    }, 2500);
-    return () => clearInterval(timer);
-  }, [slides.length, isHovered]);
+    const timer = setTimeout(() => {
+      const interval = setInterval(() => {
+        setIsAnimating(true);
+        setActiveIndex((prev) => (prev + 1) % slides.length);
+        setTimeout(() => setIsAnimating(false), 1200);
+      }, 4000);
+      return () => clearInterval(interval);
+    }, delayOffset);
+    return () => clearTimeout(timer);
+  }, [slides.length, isHovered, delayOffset]);
 
   if (slides.length === 0) {
     return (
@@ -80,12 +88,12 @@ function StackedCardSlider({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Section label */}
-      <div className="flex items-center gap-2.5 mb-5">
-        <div className={`w-2 h-2 rounded-full ${accentColor} shadow-[0_0_8px_rgba(193,33,38,0.4)]`} />
-        <span className="text-navy font-semibold text-xs uppercase tracking-[0.2em]">{label}</span>
+      {/* Section label — larger, bolder, more prominent */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className={`w-3 h-3 rounded-full ${accentColor} shadow-[0_0_12px_rgba(193,33,38,0.5)]`} />
+        <span className="text-navy font-heading font-bold text-base sm:text-lg uppercase tracking-[0.15em]">{label}</span>
         <div className="flex-1 h-px bg-navy/10" />
-        <span className="text-navy/30 text-xs font-mono">
+        <span className="text-navy/40 text-sm font-mono font-semibold">
           {String(activeIndex + 1).padStart(2, '0')}/{String(slides.length).padStart(2, '0')}
         </span>
       </div>
@@ -100,23 +108,23 @@ function StackedCardSlider({
 
           return (
             <motion.div
-              key={i}
+              key={`${label}-${i}`}
               className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden will-change-transform"
               animate={{
-                y: isVisible ? pos * 16 : -60,
-                x: isVisible ? pos * 4 : 0,
-                scale: isVisible ? 1 - pos * 0.04 : 0.88,
-                opacity: isVisible ? 1 - pos * 0.25 : 0,
-                rotateX: isVisible ? pos * -1.5 : -8,
+                y: isVisible ? pos * 18 : -80,
+                x: isVisible ? pos * 5 : 0,
+                scale: isVisible ? 1 - pos * 0.035 : 0.85,
+                opacity: isVisible ? 1 - pos * 0.2 : 0,
+                rotateX: isVisible ? pos * -1.8 : -10,
                 zIndex: isVisible ? VISIBLE - pos + 1 : 0,
-                filter: isFront ? 'blur(0px)' : `blur(${pos * 0.5}px)`,
+                filter: isFront ? 'blur(0px) brightness(1)' : `blur(${pos * 0.6}px) brightness(${1 - pos * 0.05})`,
               }}
               transition={{
-                duration: 0.7,
-                ease: [0.32, 0.72, 0, 1],
+                duration: 1.1,
+                ease: [0.22, 0.68, 0, 1.04],
               }}
               style={{ 
-                transformOrigin: 'center 80%',
+                transformOrigin: 'center 85%',
                 transformStyle: 'preserve-3d',
               }}
             >
@@ -130,7 +138,7 @@ function StackedCardSlider({
                     src={slide.imageUrl}
                     alt={slide.title || label}
                     fill
-                    className="object-cover transition-transform duration-[6s] ease-linear group-hover:scale-105"
+                    className="object-cover transition-transform duration-[8s] ease-linear group-hover:scale-105"
                     sizes="(max-width: 640px) 100vw, 90vw"
                   />
                 ) : (
@@ -143,16 +151,19 @@ function StackedCardSlider({
                 {/* Glossy top reflection */}
                 <div className="absolute inset-0 bg-gradient-to-b from-white/[0.07] via-transparent to-transparent pointer-events-none" />
 
+                {/* Subtle edge shadow for each stacked card */}
+                <div className="absolute inset-0 rounded-2xl sm:rounded-3xl shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] pointer-events-none" />
+
                 {/* Content overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7">
+                <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
                   <AnimatePresence mode="wait">
                     {isFront && (
                       <motion.div
-                        key={activeIndex}
-                        initial={{ opacity: 0, y: 16, filter: 'blur(4px)' }}
+                        key={`content-${activeIndex}`}
+                        initial={{ opacity: 0, y: 24, filter: 'blur(6px)' }}
                         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                        exit={{ opacity: 0, y: -12, filter: 'blur(4px)' }}
-                        transition={{ duration: 0.45, delay: 0.15 }}
+                        exit={{ opacity: 0, y: -16, filter: 'blur(6px)' }}
+                        transition={{ duration: 0.65, delay: 0.2, ease: [0.22, 0.68, 0, 1] }}
                       >
                         <h3 className="text-white font-bold text-lg sm:text-xl lg:text-2xl mb-1.5 line-clamp-1 drop-shadow-lg">
                           {slide.title}
@@ -173,9 +184,9 @@ function StackedCardSlider({
                 )}
               </Link>
 
-              {/* Edge shadow for depth */}
+              {/* Edge shadow for depth on stacked cards */}
               {!isFront && isVisible && (
-                <div className="absolute inset-0 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] rounded-2xl sm:rounded-3xl pointer-events-none" />
+                <div className="absolute inset-0 shadow-[inset_0_2px_6px_rgba(0,0,0,0.15)] rounded-2xl sm:rounded-3xl pointer-events-none" />
               )}
             </motion.div>
           );
@@ -183,25 +194,25 @@ function StackedCardSlider({
 
         {/* Progress bar at bottom */}
         {slides.length > 1 && (
-          <div className="absolute -bottom-6 left-0 right-0 flex gap-1.5 z-20">
+          <div className="absolute -bottom-7 left-0 right-0 flex gap-1.5 z-20">
             {slides.map((_, i) => (
               <button
                 key={i}
-                onClick={() => setActiveIndex(i)}
+                onClick={() => { setActiveIndex(i); setIsAnimating(true); setTimeout(() => setIsAnimating(false), 1200); }}
                 className="relative h-1 flex-1 rounded-full overflow-hidden bg-navy/10"
               >
                 {i === activeIndex && (
                   <motion.div
-                    className="absolute inset-0 bg-red rounded-full"
+                    className={`absolute inset-0 rounded-full ${accentColor === 'bg-navy' ? 'bg-navy' : 'bg-red'}`}
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: 1 }}
-                    transition={{ duration: 2.5, ease: 'linear' }}
+                    transition={{ duration: 4, ease: 'linear' }}
                     style={{ transformOrigin: 'left' }}
-                    key={activeIndex}
+                    key={`progress-${activeIndex}`}
                   />
                 )}
                 {i < activeIndex && (
-                  <div className="absolute inset-0 bg-red/40 rounded-full" />
+                  <div className={`absolute inset-0 rounded-full ${accentColor === 'bg-navy' ? 'bg-navy/40' : 'bg-red/40'}`} />
                 )}
               </button>
             ))}
@@ -346,12 +357,14 @@ export default function HomePage() {
               locale={locale}
               label="Events"
               accentColor="bg-red"
+              delayOffset={0}
             />
             <StackedCardSlider
               slides={activitySlides}
               locale={locale}
               label="Activities"
               accentColor="bg-navy"
+              delayOffset={2000}
             />
           </div>
         </div>
