@@ -6,6 +6,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import SmoothScrollProvider from '@/components/layout/SmoothScrollProvider';
 import LoadingScreen from '@/components/layout/LoadingScreen';
+import ScrollProgress from '@/components/effects/ScrollProgress';
 
 type Props = {
   children: React.ReactNode;
@@ -26,6 +27,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <NextIntlClientProvider messages={messages}>
       <LoadingScreen />
+      <ScrollProgress />
       <SmoothScrollProvider>
         <Navbar />
         <main className="min-h-screen">{children}</main>

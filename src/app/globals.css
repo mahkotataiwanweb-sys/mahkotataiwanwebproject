@@ -443,4 +443,129 @@
   .glow-navy {
     box-shadow: 0 0 20px rgba(0, 48, 72, 0.3), 0 0 40px rgba(0, 48, 72, 0.1);
   }
+
+  /* ===== Premium Scroll Effect Utilities ===== */
+
+  /* GPU-accelerated transform hint */
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  /* 3D perspective container */
+  .perspective-1200 {
+    perspective: 1200px;
+  }
+
+  /* Section reveal performance */
+  .section-reveal {
+    will-change: transform, clip-path, opacity;
+  }
+
+  /* Smooth velocity-reactive skew transition */
+  .velocity-skew {
+    will-change: transform;
+  }
+
+  /* Premium gradient dividers */
+  .divider-gradient {
+    background: linear-gradient(90deg, transparent, var(--color-navy) / 0.1, transparent);
+  }
+
+  .divider-gradient-red {
+    background: linear-gradient(90deg, transparent, var(--color-red) / 0.08, transparent);
+  }
+
+  /* Elegant text reveal mask */
+  .text-reveal-mask {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  .text-reveal-mask.revealed {
+    clip-path: inset(0 0% 0 0);
+  }
+
+  /* Cinematic section clip-path reveal */
+  .clip-circle-reveal {
+    clip-path: circle(0% at 50% 50%);
+  }
+
+  .clip-circle-revealed {
+    clip-path: circle(150% at 50% 50%);
+  }
+
+  /* SVG path drawing base */
+  .draw-path {
+    stroke-dasharray: var(--path-length, 1000);
+    stroke-dashoffset: var(--path-length, 1000);
+    transition: stroke-dashoffset 2s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  .draw-path.drawn {
+    stroke-dashoffset: 0;
+  }
+
+  /* Frosted glass effect for overlays */
+  .glass-frost {
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(250, 246, 237, 0.7);
+  }
+
+  /* Magnetic hover effect base */
+  .magnetic-hover {
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* Smooth scroll snap hint */
+  .scroll-snap-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  /* Premium image reveal mask */
+  .image-reveal {
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+  }
+
+  .image-reveal.visible {
+    clip-path: inset(0 0 0% 0);
+  }
+
+  /* Floating animation for decorative elements */
+  @keyframes float-subtle {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-8px) rotate(1deg); }
+    50% { transform: translateY(-4px) rotate(-0.5deg); }
+    75% { transform: translateY(-12px) rotate(0.5deg); }
+  }
+
+  .animate-float-subtle {
+    animation: float-subtle 8s ease-in-out infinite;
+  }
+
+  /* Shimmer loading effect */
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(193, 33, 38, 0.05) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  /* Premium focus ring */
+  .focus-ring-premium:focus-visible {
+    outline: 2px solid var(--color-red);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
 }

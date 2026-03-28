@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useCallback } from 'react';
 import { Crown } from 'lucide-react';
+import { getScrollVelocity } from '@/lib/scrollStore';
 
 const marqueeItems = [
   'Mahkota Taiwan',
@@ -13,8 +14,8 @@ const marqueeItems = [
 ];
 
 const DEFAULT_SPEED = 1.5; // px per frame (leftward)
-const FRICTION = 0.95; // momentum decay per frame
-const RETURN_RATE = 0.05; // how fast velocity returns to default after release
+const FRICTION = 0.95;     // momentum decay per frame
+const RETURN_RATE = 0.05;  // how fast velocity returns to default after release
 
 export default function MarqueeSection() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -27,13 +28,15 @@ export default function MarqueeSection() {
   const rafRef = useRef<number>(0);
   const singleSetWidthRef = useRef(0);
 
+  // ✨ Smooth scroll velocity tracking for premium skew effect
+  const currentSkewRef = useRef(0);
+
   // Tripled items for seamless infinite loop
   const items = [...marqueeItems, ...marqueeItems, ...marqueeItems];
 
   const measureSetWidth = useCallback(() => {
     const track = trackRef.current;
     if (!track) return;
-    // Total width is 3 sets; one set = total / 3
     singleSetWidthRef.current = track.scrollWidth / 3;
   }, []);
 
@@ -43,14 +46,23 @@ export default function MarqueeSection() {
 
     const setWidth = singleSetWidthRef.current;
 
-    if (!isDraggingRef.current) {
-      // Blend velocity back toward default speed
-      velocityRef.current += (-DEFAULT_SPEED - velocityRef.current) * RETURN_RATE;
+    // ✨ Read scroll velocity for reactive behavior
+    const scrollVel = getScrollVelocity();
+    // Scroll down (positive) → marquee accelerates left; Scroll up → slows/reverses
+    const velocityBoost = -scrollVel * 0.12;
+    // Smooth skew interpolation — buttery transition
+    const targetSkew = Math.max(-6, Math.min(6, scrollVel * 0.03));
+    currentSkewRef.current += (targetSkew - currentSkewRef.current) * 0.08;
 
-      // Apply friction to any momentum beyond default
-      const excess = velocityRef.current - (-DEFAULT_SPEED);
+    if (!isDraggingRef.current) {
+      // Blend velocity toward scroll-influenced target speed
+      const targetSpeed = -DEFAULT_SPEED + velocityBoost;
+      velocityRef.current += (targetSpeed - velocityRef.current) * RETURN_RATE;
+
+      // Apply friction to any momentum beyond target
+      const excess = velocityRef.current - targetSpeed;
       if (Math.abs(excess) > 0.01) {
-        velocityRef.current = -DEFAULT_SPEED + excess * FRICTION;
+        velocityRef.current = targetSpeed + excess * FRICTION;
       }
     }
 
@@ -60,7 +72,6 @@ export default function MarqueeSection() {
 
     // Seamless loop: wrap offset within one set width
     if (setWidth > 0) {
-      // Keep offset in range (-setWidth, 0]
       while (offsetRef.current < -setWidth) {
         offsetRef.current += setWidth;
       }
@@ -69,7 +80,9 @@ export default function MarqueeSection() {
       }
     }
 
-    track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
+    // ✨ Apply transform with velocity-reactive skew for premium feel
+    const skew = currentSkewRef.current.toFixed(3);
+    track.style.transform = `translate3d(${offsetRef.current}px, 0, 0) skewX(${skew}deg)`;
 
     rafRef.current = requestAnimationFrame(animate);
   }, []);
@@ -103,7 +116,6 @@ export default function MarqueeSection() {
     const dt = now - lastMoveTimeRef.current;
 
     if (dt > 0) {
-      // Convert to per-frame velocity (assuming ~16ms frames)
       dragVelocityRef.current = (dx / dt) * 16;
     }
 
@@ -111,7 +123,6 @@ export default function MarqueeSection() {
     lastPointerXRef.current = e.clientX;
     lastMoveTimeRef.current = now;
 
-    // Apply transform immediately for responsive feel
     const track = trackRef.current;
     const setWidth = singleSetWidthRef.current;
     if (track && setWidth > 0) {
@@ -128,8 +139,6 @@ export default function MarqueeSection() {
   const handlePointerUp = useCallback(() => {
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
-
-    // Transfer drag velocity as momentum
     velocityRef.current = dragVelocityRef.current || -DEFAULT_SPEED;
   }, []);
 
@@ -141,8 +150,9 @@ export default function MarqueeSection() {
       <div className="absolute top-0 right-0 w-24 h-full bg-gradient-to-l from-navy to-transparent z-10 pointer-events-none" />
 
       <div
-        className="flex whitespace-nowrap select-none touch-none cursor-grab active:cursor-grabbing"
+        className="flex whitespace-nowrap select-none touch-none cursor-grab active:cursor-grabbing will-change-transform"
         ref={trackRef}
+        style={{ transformOrigin: 'center center' }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
