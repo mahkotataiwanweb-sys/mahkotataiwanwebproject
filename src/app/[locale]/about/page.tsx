@@ -374,56 +374,66 @@ export default function AboutPage() {
           }
         );
 
-        // Dramatic continuous floating — each bubble has unique organic movement
+        // Advanced floating with bounce — each bubble has unique organic movement
         const floatConfigs = [
-          { y: -18, x: 6, rotate: 3, scale: 1.04, dur: 3.2 },
-          { y: -22, x: -8, rotate: -2.5, scale: 1.05, dur: 3.8 },
-          { y: -16, x: 7, rotate: 2, scale: 1.03, dur: 3.5 },
-          { y: -20, x: -5, rotate: -3, scale: 1.06, dur: 4.0 },
+          { y: -20, x: 8, rotate: 4, dur: 3.0, bounceDelay: 4.5 },
+          { y: -26, x: -10, rotate: -3, dur: 3.6, bounceDelay: 5.8 },
+          { y: -18, x: 9, rotate: 3.5, dur: 3.3, bounceDelay: 6.5 },
+          { y: -24, x: -7, rotate: -4, dur: 3.9, bounceDelay: 5.0 },
         ];
         
         bubbleItems.forEach((item, i) => {
           const cfg = floatConfigs[i % floatConfigs.length];
+          const baseDelay = 1.5 + (i * 0.3);
           
-          // Primary float — Y axis bob
+          // Primary float — Y axis bob (larger range)
           gsap.to(item, {
             y: cfg.y,
             duration: cfg.dur,
             ease: 'sine.inOut',
             repeat: -1,
             yoyo: true,
-            delay: 1.5 + (i * 0.3),
+            delay: baseDelay,
           });
           
-          // Secondary drift — slight X sway
+          // Secondary drift — X sway (wider)
           gsap.to(item, {
             x: cfg.x,
-            duration: cfg.dur * 1.3,
+            duration: cfg.dur * 1.2,
             ease: 'sine.inOut',
             repeat: -1,
             yoyo: true,
-            delay: 1.8 + (i * 0.4),
+            delay: baseDelay + 0.3,
           });
           
-          // Gentle rotation wobble
+          // Rotation wobble (more dramatic)
           gsap.to(item, {
             rotation: cfg.rotate,
-            duration: cfg.dur * 0.9,
+            duration: cfg.dur * 0.85,
             ease: 'sine.inOut',
             repeat: -1,
             yoyo: true,
-            delay: 2.0 + (i * 0.25),
+            delay: baseDelay + 0.5,
           });
           
-          // Subtle scale breathing
+          // Scale breathing
           gsap.to(item, {
-            scale: cfg.scale,
+            scale: 1.06,
             duration: cfg.dur * 1.1,
             ease: 'sine.inOut',
             repeat: -1,
             yoyo: true,
-            delay: 1.6 + (i * 0.35),
+            delay: baseDelay + 0.2,
           });
+          
+          // ★ BOUNCE — periodic elastic bounce that repeats
+          const bounceTl = gsap.timeline({ repeat: -1, delay: cfg.bounceDelay });
+          bounceTl
+            .to(item, { scaleY: 0.88, scaleX: 1.12, duration: 0.15, ease: 'power2.in' })  // squash
+            .to(item, { scaleY: 1.18, scaleX: 0.88, y: '-=16', duration: 0.25, ease: 'power2.out' })  // stretch up
+            .to(item, { scaleY: 0.92, scaleX: 1.08, y: '+=16', duration: 0.2, ease: 'bounce.out' })  // land squash
+            .to(item, { scaleY: 1, scaleX: 1, duration: 0.35, ease: 'elastic.out(1, 0.4)' })  // settle
+            .to(item, {}, { duration: cfg.bounceDelay - 0.95 });  // pause before next bounce
         });
       }
 
@@ -676,56 +686,37 @@ export default function AboutPage() {
               const Icon = stat.icon;
               return (
                 <div key={stat.key} className="flex flex-col items-center group stat-bubble-item">
-                  {/* ── Ultra Luxury Floating Red Glossy Bubble ── */}
-                  <div className="relative mb-7">
-                    {/* Deep outer glow — large diffused red aura */}
-                    <div className="absolute -inset-6 rounded-full bg-red/15 blur-2xl group-hover:bg-red/25 transition-all duration-1000" />
-                    {/* Mid glow ring */}
-                    <div className="absolute -inset-3 rounded-full bg-red/10 blur-xl" />
+                  {/* ── Floating Red Bubble (refined) ── */}
+                  <div className="relative mb-6">
+                    {/* Soft outer glow */}
+                    <div className="absolute -inset-4 rounded-full bg-red/10 blur-2xl group-hover:bg-red/15 transition-all duration-700" />
                     
-                    {/* Main glossy sphere */}
-                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden shadow-[0_12px_40px_rgba(180,30,30,0.45),0_4px_16px_rgba(180,30,30,0.3),0_0_80px_rgba(220,38,38,0.12),inset_0_-6px_16px_rgba(0,0,0,0.35),inset_0_2px_4px_rgba(255,255,255,0.15)]">
-                      {/* Base gradient — rich deep red spectrum */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-red-400 via-red-500 to-red-900 rounded-full" />
+                    {/* Main sphere — 20% smaller, subtler glass */}
+                    <div className="relative w-20 h-20 sm:w-[5.5rem] sm:h-[5.5rem] rounded-full overflow-hidden shadow-[0_8px_28px_rgba(180,30,30,0.35),0_2px_10px_rgba(180,30,30,0.2),inset_0_-4px_12px_rgba(0,0,0,0.25),inset_0_2px_3px_rgba(255,255,255,0.1)]">
+                      {/* Base gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-red-500 via-red to-red-800 rounded-full" />
                       
-                      {/* Radial depth overlay */}
-                      <div className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(ellipse at 35% 25%, rgba(255,120,120,0.25) 0%, transparent 55%)' }} />
+                      {/* Subtle top highlight — refined, not flashy */}
+                      <div className="absolute top-0 left-[12%] right-[12%] h-[40%] rounded-t-full bg-gradient-to-b from-white/25 via-white/8 to-transparent" />
                       
-                      {/* Primary glossy dome — top highlight arc */}
-                      <div className="absolute top-0 left-[8%] right-[8%] h-[50%] rounded-t-full bg-gradient-to-b from-white/50 via-white/20 to-transparent" />
+                      {/* Tiny specular dot */}
+                      <div className="absolute top-[12%] left-[22%] w-[18%] h-[14%] bg-white/20 rounded-full blur-[4px]" />
                       
-                      {/* Hot spot — bright specular reflection */}
-                      <div className="absolute top-[10%] left-[18%] w-[30%] h-[22%] bg-white/40 rounded-full blur-[5px]" />
+                      {/* Inner ring for depth */}
+                      <div className="absolute inset-[2px] rounded-full ring-1 ring-white/10" />
                       
-                      {/* Small secondary glint */}
-                      <div className="absolute top-[6%] left-[22%] w-[12%] h-[10%] bg-white/60 rounded-full blur-[3px]" />
-                      
-                      {/* Rim light — bottom edge catch */}
-                      <div className="absolute bottom-[2%] left-[12%] right-[12%] h-[12%] bg-gradient-to-t from-white/15 via-white/5 to-transparent rounded-b-full" />
-                      
-                      {/* Left edge rim light */}
-                      <div className="absolute top-[20%] left-0 w-[8%] h-[40%] bg-gradient-to-r from-white/10 to-transparent" />
-                      
-                      {/* Inner ring for glass depth */}
-                      <div className="absolute inset-[2px] rounded-full ring-1 ring-white/15" />
-                      <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-red-300/20" />
-                      
-                      {/* Navy icon — clean, no glow */}
+                      {/* Navy icon — clean */}
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <Icon className="w-9 h-9 sm:w-11 sm:h-11 text-navy relative z-10" />
+                        <Icon className="w-7 h-7 sm:w-9 sm:h-9 text-navy relative z-10" />
                       </div>
                     </div>
                     
-                    {/* Floor shadow — elliptical for 3D realism */}
-                    <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-16 h-4 bg-red-900/25 rounded-full blur-lg" />
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-10 h-2 bg-red-800/30 rounded-full blur-md" />
+                    {/* Floor shadow */}
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-3 bg-red-900/20 rounded-full blur-md" />
                   </div>
 
                   {/* ── Number — dark text on cream ── */}
-                  <div className="text-4xl sm:text-5xl font-heading font-bold text-navy mb-1.5 relative">
-                    <span className="absolute inset-0 text-red/10 blur-lg select-none pointer-events-none" aria-hidden="true">
-                      {stat.prefix}{stat.value}{stat.suffix}
-                    </span>
+                  <div className="text-3xl sm:text-4xl font-heading font-bold text-navy mb-1.5 relative">
                     <span className="relative">
                       {stat.prefix}
                       <span ref={(el) => { counterRefs.current[i] = el; }}>0</span>
