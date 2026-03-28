@@ -9,6 +9,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Award, Store, Package, Users, Shield, Heart, Sparkles, ChevronRight } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import SandTexture from '@/components/effects/SandTexture';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -63,7 +64,6 @@ export default function AboutPage() {
   const t = useTranslations('about');
   const locale = useLocale();
   const heroRef = useRef<HTMLDivElement>(null);
-  const heroTextRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const redLineRef = useRef<HTMLDivElement>(null);
@@ -220,20 +220,6 @@ export default function AboutPage() {
           ease: 'power3.out',
         }
       );
-
-      // Hero parallax — text moves up at 50% speed on scroll
-      if (heroTextRef.current) {
-        gsap.to(heroTextRef.current, {
-          y: -80,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: 'top top',
-            end: 'bottom top',
-            scrub: 0.5,
-          },
-        });
-      }
     });
     return () => ctx.revert();
   }, []);
@@ -458,103 +444,58 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-cream">
+      <SandTexture fixed />
+
       {/* ═══════════════════════════════════════════════════════════════
-          Hero Section — Full Viewport Immersive
+          Hero Section
       ═══════════════════════════════════════════════════════════════ */}
-      <div
-        ref={heroRef}
-        className="relative min-h-[70vh] flex items-center bg-gradient-to-br from-navy via-navy/90 to-red-dark overflow-hidden"
-      >
-        {/* Grid pattern overlay */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)',
-            backgroundSize: '32px 32px',
-          }}
-        />
-
-        {/* Animated decorative shapes */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <motion.div
-            className="absolute top-20 right-10 w-72 h-72 rounded-full bg-white/[0.07] blur-3xl"
-            animate={{ y: [0, -20, 0], x: [0, 10, 0] }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-red/[0.08] blur-3xl"
-            animate={{ y: [0, 15, 0], x: [0, -10, 0] }}
-            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-red/5 blur-3xl"
-            animate={{ scale: [1, 1.08, 1] }}
-            transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          {/* Floating circle decoration */}
-          <motion.div
-            className="absolute top-[15%] right-[15%] w-24 h-24 rounded-full border border-white/10"
-            animate={{ y: [0, -15, 0], rotate: [0, 90, 0] }}
-            transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          {/* Diagonal lines */}
-          <motion.div
-            className="absolute bottom-[20%] right-[25%] w-px h-32 bg-gradient-to-b from-transparent via-white/10 to-transparent origin-center rotate-[30deg]"
-            animate={{ opacity: [0.3, 0.7, 0.3] }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute top-[30%] left-[20%] w-px h-24 bg-gradient-to-b from-transparent via-white/10 to-transparent origin-center -rotate-[20deg]"
-            animate={{ opacity: [0.2, 0.6, 0.2] }}
-            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-          />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10 w-full pt-32 pb-20" ref={heroTextRef}>
+      <section ref={heroRef} className="py-24 sm:py-32 bg-navy relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6">
           <Link
             href={`/${locale}`}
-            className="inline-flex items-center gap-2 text-cream/60 hover:text-cream text-sm mb-10 transition-colors group"
+            className="inline-flex items-center gap-2 text-cream/70 hover:text-cream text-sm transition-colors mb-8"
           >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            Back to Home
+            <ArrowLeft className="w-4 h-4" /> Back to Home
           </Link>
 
-          <div ref={headerRef}>
-            <p className="text-red/80 text-sm tracking-[0.3em] uppercase font-semibold mb-4">
+          <div ref={headerRef} className="text-center">
+            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
               {t('label')}
             </p>
-            <h1 className="font-heading text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-5 leading-[1.1]">
+            <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-3 leading-[1.1]">
               {t('title')}
             </h1>
-            <div className="w-24 h-[3px] bg-gradient-to-r from-white/70 to-white/0 mb-8" />
-            <p className="text-cream/60 max-w-xl text-lg sm:text-xl leading-relaxed">
+            <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
+            <p className="text-cream/70 max-w-lg mx-auto text-sm tracking-wide">
               {t('mission')}
             </p>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* ═══════════════════════════════════════════════════════════════
-          Mission / Description Section — Large Typography
+          Mission / Description Section
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 bg-cream overflow-hidden">
-        <div className="max-w-5xl mx-auto px-6">
+      <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+        <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
+
+        <div className="max-w-7xl mx-auto px-6">
           <div ref={textRef} className="text-center">
-            <p className="text-navy/70 leading-relaxed text-lg sm:text-xl max-w-3xl mx-auto mb-8">
+            <p className="text-navy/60 leading-relaxed text-sm tracking-wide max-w-3xl mx-auto mb-8">
               {t('description')}
             </p>
 
             {/* Decorative red line that draws on scroll */}
             <div
               ref={redLineRef}
-              className="w-24 h-[3px] bg-gradient-to-r from-red/20 via-red to-red/20 mx-auto mb-10 origin-left"
+              className="w-16 h-[2px] bg-red mx-auto mb-10 origin-left"
             />
 
-            <div className="flex flex-wrap justify-center gap-x-10 gap-y-4 mb-0">
+            <div className="flex flex-wrap justify-center gap-x-10 gap-y-4">
               {['highlight1', 'highlight2', 'highlight3'].map((key) => (
                 <div key={key} className="flex items-center gap-3">
                   <div className="w-2.5 h-2.5 rounded-full bg-red shrink-0 shadow-[0_0_8px_rgba(193,33,38,0.3)]" />
-                  <p className="text-navy/60 text-sm sm:text-base">{t(key)}</p>
+                  <p className="text-navy/60 text-sm">{t(key)}</p>
                 </div>
               ))}
             </div>
@@ -563,54 +504,27 @@ export default function AboutPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════
-          Stats Section — Full-Width Navy Strip
+          Stats Section — Navy Strip
       ═══════════════════════════════════════════════════════════════ */}
-      <section ref={statsSectionRef} className="relative bg-navy py-20 md:py-24 overflow-hidden">
-        {/* Subtle animated background pattern */}
-        <div
-          className="absolute inset-0 pointer-events-none opacity-30"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.07) 1px, transparent 0)',
-            backgroundSize: '40px 40px',
-          }}
-        />
-        <div className="absolute inset-0 pointer-events-none">
-          <motion.div
-            className="absolute top-0 right-1/4 w-80 h-80 rounded-full bg-red/[0.06] blur-3xl"
-            animate={{ x: [0, 20, 0] }}
-            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute bottom-0 left-1/3 w-64 h-64 rounded-full bg-white/[0.03] blur-3xl"
-            animate={{ x: [0, -15, 0] }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </div>
-
-        <div className="max-w-6xl mx-auto px-6 relative z-10">
+      <section ref={statsSectionRef} className="py-24 sm:py-32 bg-navy relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6">
           <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
             {stats.map((stat, i) => {
               const Icon = stat.icon;
               return (
-                <motion.div
-                  key={stat.key}
-                  className="text-center group relative"
-                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                >
-                  {/* Subtle glow behind card */}
-                  <div className="absolute inset-0 -m-4 rounded-3xl bg-white/[0.02] group-hover:bg-white/[0.04] transition-colors duration-500" />
+                <div key={stat.key} className="text-center group relative">
                   <div className="relative z-10">
-                    <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-5 group-hover:bg-white/15 transition-colors duration-500 shadow-[0_0_20px_rgba(255,255,255,0.05)]">
+                    <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-5 group-hover:bg-white/15 transition-colors duration-500">
                       <Icon className="w-7 h-7 text-red" />
                     </div>
-                    <div className="text-5xl sm:text-6xl font-heading font-bold text-white mb-2">
+                    <div className="text-4xl sm:text-5xl font-heading font-bold text-white mb-2">
                       {stat.prefix}
                       <span ref={(el) => { counterRefs.current[i] = el; }}>0</span>
                       {stat.suffix}
                     </div>
                     <p className="text-cream/50 text-sm font-medium tracking-wide">{t(`stats.${stat.key}`)}</p>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -618,11 +532,13 @@ export default function AboutPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════
-          Values Section — Premium Cards with 3D Hover
+          Values Section
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-24 md:py-32 bg-cream overflow-hidden">
-        <div ref={valuesRef} className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
+      <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+        <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
+
+        <div ref={valuesRef} className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-14">
             <motion.div
               initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
               whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -630,33 +546,22 @@ export default function AboutPage() {
               transition={{ duration: 0.6 }}
             >
               <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">What We Stand For</p>
-              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-5">Our Values</h2>
-              <div className="w-16 h-[3px] bg-red/40 mx-auto" />
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">Our Values</h2>
+              <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8" style={{ perspective: '1200px' }}>
-            {values.map((val, i) => {
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {values.map((val) => {
               const Icon = val.icon;
               return (
-                <motion.div
+                <div
                   key={val.title}
                   className="value-card relative bg-navy rounded-3xl p-10 text-center group cursor-default overflow-hidden"
-                  whileHover={{
-                    y: -8,
-                    rotateY: i === 0 ? 3 : i === 2 ? -3 : 0,
-                    transition: { duration: 0.3 },
-                  }}
-                  style={{ transformStyle: 'preserve-3d' }}
                 >
                   {/* Decorative glow */}
                   <div className="absolute top-0 right-0 w-40 h-40 bg-red/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
-
-                  {/* Animated gradient border on hover */}
-                  <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 p-px">
-                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-red/40 via-transparent to-white/10 opacity-50" />
-                  </div>
 
                   <div className="relative z-10">
                     <div className="w-20 h-20 rounded-3xl bg-red/20 flex items-center justify-center mx-auto mb-6 group-hover:bg-red/30 transition-colors duration-500 shadow-[0_0_30px_rgba(193,33,38,0.15)]">
@@ -669,7 +574,7 @@ export default function AboutPage() {
 
                   {/* Bottom accent line */}
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-red/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -679,8 +584,10 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Our Partners Section — Physics-Based Interactive Marquee
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="bg-gradient-to-b from-cream to-white/50 py-24 md:py-28 overflow-hidden">
-        <div ref={partnersRef} className="max-w-6xl mx-auto px-6">
+      <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+        <div className="absolute bottom-20 left-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
+
+        <div ref={partnersRef} className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <motion.div
               initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
@@ -689,9 +596,9 @@ export default function AboutPage() {
               transition={{ duration: 0.6 }}
             >
               <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Collaboration</p>
-              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-5">Trusted Partners</h2>
-              <div className="w-16 h-[3px] bg-red/40 mx-auto mb-5" />
-              <p className="text-navy/60 text-base sm:text-lg max-w-lg mx-auto">Working with Taiwan&apos;s leading retailers to bring you the best Indonesian products</p>
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">Trusted Partners</h2>
+              <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
+              <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">Working with Taiwan&apos;s leading retailers to bring you the best Indonesian products</p>
             </motion.div>
           </div>
 
@@ -704,8 +611,8 @@ export default function AboutPage() {
               onPointerCancel={onPointerCancel}
             >
               {/* Gradient fade overlays */}
-              <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white/50 to-transparent z-10 pointer-events-none" />
-              <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white/50 to-transparent z-10 pointer-events-none" />
+              <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-cream to-transparent z-10 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-cream to-transparent z-10 pointer-events-none" />
 
               {/* Physics-driven track */}
               <div
@@ -773,12 +680,14 @@ export default function AboutPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════
-          Our Story Section — Cinematic Editorial Timeline
+          Our Story Section — Timeline
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-24 md:py-32 bg-cream relative overflow-hidden">
+      <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+        <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
+
         <div ref={storyRef} className="max-w-5xl mx-auto px-6">
           {/* Header */}
-          <div className="text-center mb-16 md:mb-20">
+          <div className="text-center mb-14">
             <motion.div
               initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
               whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -786,8 +695,8 @@ export default function AboutPage() {
               transition={{ duration: 0.6 }}
             >
               <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Our Story</p>
-              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-5">The Journey So Far</h2>
-              <div className="w-16 h-[3px] bg-red/40 mx-auto" />
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">The Journey So Far</h2>
+              <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
             </motion.div>
           </div>
 
@@ -837,45 +746,18 @@ export default function AboutPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════
-          Bottom CTA — Full-Width Dramatic
+          Bottom CTA
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="relative bg-gradient-to-br from-navy via-navy/95 to-red-dark py-24 md:py-28 overflow-hidden">
-        {/* Animated background shapes */}
-        <div className="absolute inset-0 pointer-events-none">
-          <motion.div
-            className="absolute top-0 right-1/4 w-72 h-72 rounded-full bg-red/10 blur-3xl"
-            animate={{ y: [0, -20, 0], x: [0, 15, 0] }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute bottom-0 left-1/4 w-56 h-56 rounded-full bg-white/5 blur-3xl"
-            animate={{ y: [0, 10, 0], x: [0, -10, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-red/[0.04] blur-3xl"
-            animate={{ scale: [1, 1.1, 1] }}
-            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          {/* Grid pattern */}
-          <div
-            className="absolute inset-0 opacity-20"
-            style={{
-              backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0)',
-              backgroundSize: '48px 48px',
-            }}
-          />
-        </div>
-
+      <section className="py-24 sm:py-32 bg-navy relative overflow-hidden">
         <div
           ref={ctaRef}
           className="max-w-4xl mx-auto px-6 text-center relative z-10"
         >
           <Sparkles className="w-10 h-10 text-red/60 mx-auto mb-5" />
-          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight">
+          <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-5 leading-tight">
             Want to Learn More?
           </h2>
-          <p className="text-cream/60 mb-10 max-w-lg mx-auto text-lg">
+          <p className="text-cream/70 mb-10 max-w-lg mx-auto text-sm tracking-wide">
             Discover our products or get in touch with our team today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
