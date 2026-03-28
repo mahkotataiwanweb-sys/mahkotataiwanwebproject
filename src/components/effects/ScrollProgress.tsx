@@ -47,25 +47,24 @@ export default function ScrollProgress() {
     <div className="fixed top-0 left-0 right-0 h-[2px] z-[9999] pointer-events-none">
       <div
         ref={barRef}
-        className="h-full w-full origin-left relative"
+        className="h-full w-full origin-left"
         style={{
           transform: 'scaleX(0)',
           background:
             'linear-gradient(90deg, var(--color-red) 0%, var(--color-red-light) 50%, var(--color-red) 100%)',
         }}
-      >
-        {/* Glow dot at the tip */}
-        <div
-          ref={glowRef}
-          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full"
-          style={{
-            left: '0%',
-            background: 'var(--color-red-light)',
-            boxShadow: '0 0 12px 4px rgba(224, 51, 56, 0.6), 0 0 24px 8px rgba(224, 51, 56, 0.3)',
-            transform: 'translate(50%, -50%)',
-          }}
-        />
-      </div>
+      />
+      {/* Glow dot — positioned outside the scaled bar so it tracks correctly */}
+      <div
+        ref={glowRef}
+        className="absolute top-1/2 w-2 h-2 rounded-full"
+        style={{
+          left: '0%',
+          transform: 'translate(-50%, -50%)',
+          background: 'var(--color-red-light)',
+          boxShadow: '0 0 8px 3px rgba(224, 51, 56, 0.5)',
+        }}
+      />
     </div>
   );
 }

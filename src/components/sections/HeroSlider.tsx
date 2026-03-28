@@ -212,34 +212,18 @@ export default function HeroSlider() {
     };
   }, [isPaused, nextSlide, slides.length]);
 
-  /* ✨ Premium scroll zoom-out parallax — hero shrinks into the distance */
+  /* ✨ Subtle scroll parallax — text layers move at different speeds for depth */
   useEffect(() => {
     const heroEl = document.getElementById('hero');
     if (!heroEl) return;
 
     const ctx = gsap.context(() => {
-      // Hero section zooms out, rounds corners, darkens as user scrolls past
-      gsap.to(heroEl, {
-        scale: 0.9,
-        borderRadius: '28px',
-        y: -50,
-        filter: 'brightness(0.6) saturate(0.8)',
-        ease: 'none',
-        scrollTrigger: {
-          trigger: heroEl,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: true,
-        },
-      });
-
       // Inner text content parallaxes at a slower rate — creates depth
       const textContent = heroEl.querySelector('.hero-text-content');
       if (textContent) {
         gsap.to(textContent, {
-          y: '-35%',
-          opacity: 0.15,
-          scale: 0.95,
+          y: '-18%',
+          opacity: 0.2,
           ease: 'none',
           scrollTrigger: {
             trigger: heroEl,
@@ -250,7 +234,7 @@ export default function HeroSlider() {
         });
       }
 
-      // Navigation dots and arrows fade out faster
+      // Navigation dots and arrows fade out as you scroll past
       const navElements = heroEl.querySelectorAll('[aria-label]');
       navElements.forEach((el) => {
         gsap.to(el, {
@@ -259,7 +243,7 @@ export default function HeroSlider() {
           scrollTrigger: {
             trigger: heroEl,
             start: 'top top',
-            end: '30% top',
+            end: '40% top',
             scrub: true,
           },
         });
@@ -414,7 +398,7 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full h-[55vh] md:h-[75vh] min-h-[400px] max-h-[900px] overflow-hidden will-change-transform"
+      className="relative w-full h-[55vh] md:h-[75vh] min-h-[400px] max-h-[900px] overflow-hidden"
       style={{ transformOrigin: 'center center' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}

@@ -54,20 +54,16 @@ export default function WhereToBuySection() {
     if (!sectionRef.current || !mapRef.current) return;
 
     const ctx = gsap.context(() => {
-      // ✨ Section entrance with perspective rise + blur deblur
+      // Elegant fade + rise entrance
       gsap.from(sectionRef.current, {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: 'top 85%',
-          toggleActions: 'play none none none',
+          toggleActions: 'play none none reverse',
         },
         opacity: 0,
-        y: 80,
-        rotateX: -4,
-        transformPerspective: 1000,
-        transformOrigin: 'bottom center',
-        filter: 'blur(3px)',
-        duration: 1.2,
+        y: 50,
+        duration: 1,
         ease: 'power3.out',
       });
 
