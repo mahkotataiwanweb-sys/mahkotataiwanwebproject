@@ -710,10 +710,9 @@ export default function AboutPage() {
                       <div className="absolute inset-[2px] rounded-full ring-1 ring-white/15" />
                       <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-red-300/20" />
                       
-                      {/* Blue icon — glowing center */}
+                      {/* Navy icon — clean, no glow */}
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="absolute w-12 h-12 sm:w-14 sm:h-14 bg-blue-400/20 rounded-full blur-lg" />
-                        <Icon className="w-9 h-9 sm:w-11 sm:h-11 text-blue-200 drop-shadow-[0_0_12px_rgba(147,197,253,0.8)] relative z-10" />
+                        <Icon className="w-9 h-9 sm:w-11 sm:h-11 text-navy relative z-10" />
                       </div>
                     </div>
                     
