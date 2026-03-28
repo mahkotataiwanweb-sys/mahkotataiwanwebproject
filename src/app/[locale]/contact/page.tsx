@@ -27,12 +27,21 @@ import {
 } from 'lucide-react';
 import SandTexture from '@/components/effects/SandTexture';
 
+function LineIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .348-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .349-.281.631-.63.631h-2.386c-.345 0-.627-.282-.627-.631V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.627-.631.627-.346 0-.626-.283-.626-.627V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.627-.631.627-.345 0-.627-.283-.627-.627V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.627H4.917c-.345 0-.63-.282-.63-.627V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .349-.281.631-.629.631M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
+    </svg>
+  );
+}
+
 gsap.registerPlugin(ScrollTrigger);
 
 const socials = [
   { icon: Music2, href: 'https://www.tiktok.com/@mahkotataiwan', label: 'TikTok' },
   { icon: Facebook, href: 'https://www.facebook.com/share/1DhYShuL19/?mibextid=wwXIfr', label: 'Facebook' },
   { icon: Instagram, href: 'https://www.instagram.com/mahkotatw', label: 'Instagram' },
+  { icon: LineIcon, href: 'https://line.me/ti/p/@mahkotataiwan', label: 'LINE' },
 ];
 
 // Google Maps links
@@ -315,26 +324,6 @@ export default function ContactPage() {
           }
         );
       }
-
-      /* ── CTA Section ── */
-      if (ctaRef.current) {
-        gsap.fromTo(
-          ctaRef.current,
-          { opacity: 0, y: 40, filter: 'blur(8px)' },
-          {
-            opacity: 1,
-            y: 0,
-            filter: 'blur(0px)',
-            duration: 0.9,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: ctaRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
-      }
     });
 
     return () => ctx.revert();
@@ -343,6 +332,17 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-cream">
       <SandTexture fixed />
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes floatSubtle {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+        }
+        @keyframes shimmerSlide {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      ` }} />
 
       {/* ╔═══════════════════════════════════════════╗
           ║  1. HERO                                   ║
@@ -405,11 +405,11 @@ export default function ContactPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={s.label}
-                        className="w-12 h-12 rounded-full border-2 border-navy/15 flex items-center justify-center text-navy/60 hover:bg-red hover:text-white hover:border-red transition-all duration-300"
+                        className="w-[58px] h-[58px] rounded-full border-2 border-navy/15 flex items-center justify-center text-navy/60 hover:bg-red hover:text-white hover:border-red transition-all duration-300"
                         whileHover={{ scale: 1.1, y: -2 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        <Icon className="w-5 h-5" />
+                        <Icon className="w-6 h-6" />
                       </motion.a>
                     );
                   })}
@@ -593,42 +593,81 @@ export default function ContactPage() {
       </section>
 
       {/* ╔═══════════════════════════════════════════╗
-          ║  6. CTA                                    ║
+          ║  6. CTA — Premium Floating Box             ║
           ╚═══════════════════════════════════════════╝ */}
-      <section className="py-24 sm:py-32 bg-navy relative overflow-hidden">
-        <div ref={ctaRef} className="max-w-3xl mx-auto px-6 text-center relative z-10">
-          <div className="w-[72px] h-[72px] rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-8">
-            <Handshake className="w-9 h-9 text-red/80" />
+      <section className="py-20 sm:py-28 bg-cream relative overflow-hidden">
+        <div className="absolute bottom-20 left-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
+
+        <motion.div
+          ref={ctaRef}
+          initial={{ opacity: 0, y: 60, scale: 0.95 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.9, ease: [0.32, 0.72, 0, 1] }}
+          className="max-w-4xl mx-auto px-6 sm:px-8"
+        >
+          <div className="relative bg-navy rounded-[2rem] p-10 sm:p-14 lg:p-16 text-center overflow-hidden shadow-[0_40px_100px_-25px_rgba(0,48,72,0.5),0_0_0_1px_rgba(255,255,255,0.05)_inset]"
+            style={{ animation: 'floatSubtle 6s ease-in-out infinite' }}
+          >
+            {/* Glossy shine overlays */}
+            <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white/[0.1] via-transparent to-white/[0.02] pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+            <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+            
+            {/* Animated gradient orbs */}
+            <div className="absolute top-0 right-0 w-72 h-72 bg-red/15 rounded-full blur-[80px] animate-pulse" />
+            <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/[0.06] rounded-full blur-[60px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-32 bg-red/5 rounded-full blur-[100px] rotate-12" />
+            
+            {/* Moving shimmer effect */}
+            <div className="absolute inset-0 rounded-[2rem] overflow-hidden pointer-events-none">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" style={{ animation: 'shimmerSlide 4s ease-in-out infinite' }} />
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10">
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3, type: 'spring', stiffness: 200 }}
+                className="w-[72px] h-[72px] rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-8 backdrop-blur-sm border border-white/[0.08]"
+              >
+                <Handshake className="w-9 h-9 text-red/80" />
+              </motion.div>
+
+              <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-5 leading-tight">
+                Interested in Becoming a Partner?
+              </h2>
+              <p className="text-cream/70 text-sm tracking-wide mb-10 max-w-lg mx-auto">
+                Join 300+ stores across Taiwan selling Mahkota Taiwan products
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href="mailto:mahkotataiwan@gmail.com?subject=Partnership%20Inquiry"
+                  className="inline-flex items-center justify-center gap-2 bg-red hover:bg-red/90 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-red/20 text-base"
+                >
+                  Contact Our Team
+                  <ChevronRight className="w-5 h-5" />
+                </a>
+                <a
+                  href="tel:+886226099118"
+                  className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 border border-white/20 hover:border-white/30 text-base backdrop-blur-sm"
+                >
+                  <Phone className="w-4 h-4" />
+                  Call Us Now
+                </a>
+              </div>
+
+              <p className="text-cream/25 text-xs mt-10">
+                We typically respond to partnership inquiries within 2 business days
+              </p>
+            </div>
           </div>
-
-          <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-5 leading-tight">
-            Interested in Becoming a Partner?
-          </h2>
-          <p className="text-cream/70 text-sm tracking-wide mb-10 max-w-lg mx-auto">
-            Join 300+ stores across Taiwan selling Mahkota Taiwan products
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="mailto:mahkotataiwan@gmail.com?subject=Partnership%20Inquiry"
-              className="inline-flex items-center justify-center gap-2 bg-red hover:bg-red/90 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl text-base"
-            >
-              Contact Our Team
-              <ChevronRight className="w-5 h-5" />
-            </a>
-            <a
-              href="tel:+886226099118"
-              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 border border-white/20 hover:border-white/30 text-base"
-            >
-              <Phone className="w-4 h-4" />
-              Call Us Now
-            </a>
-          </div>
-
-          <p className="text-cream/25 text-xs mt-10">
-            We typically respond to partnership inquiries within 2 business days
-          </p>
-        </div>
+        </motion.div>
       </section>
     </div>
   );
