@@ -675,8 +675,8 @@ export default function AboutPage() {
       <section ref={statsSectionRef} className="py-28 sm:py-36 relative overflow-hidden">
         {/* Subtle ambient glow on cream background */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/3 left-[15%] w-72 h-72 bg-red/[0.06] rounded-full blur-[120px]" />
-          <div className="absolute bottom-1/3 right-[15%] w-72 h-72 bg-red/[0.04] rounded-full blur-[120px]" />
+          <div className="absolute top-1/3 left-[15%] w-72 h-72 bg-navy/[0.04] rounded-full blur-[120px]" />
+          <div className="absolute bottom-1/3 right-[15%] w-72 h-72 bg-red/[0.03] rounded-full blur-[120px]" />
         </div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -685,33 +685,33 @@ export default function AboutPage() {
               const Icon = stat.icon;
               return (
                 <div key={stat.key} className="flex flex-col items-center group stat-bubble-item">
-                  {/* ── Floating Red Bubble (refined) ── */}
+                  {/* ── Floating Navy Bubble ── */}
                   <div className="relative mb-6">
-                    {/* Soft outer glow */}
-                    <div className="absolute -inset-4 rounded-full bg-red/10 blur-2xl group-hover:bg-red/15 transition-all duration-700" />
+                    {/* Soft warm glow */}
+                    <div className="absolute -inset-4 rounded-full bg-navy/10 blur-2xl group-hover:bg-navy/15 transition-all duration-700" />
                     
-                    {/* Main sphere — 20% smaller, subtler glass */}
-                    <div className="relative w-20 h-20 sm:w-[5.5rem] sm:h-[5.5rem] rounded-full overflow-hidden shadow-[0_8px_28px_rgba(180,30,30,0.35),0_2px_10px_rgba(180,30,30,0.2),inset_0_-4px_12px_rgba(0,0,0,0.25),inset_0_2px_3px_rgba(255,255,255,0.1)]">
-                      {/* Base gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-red-500 via-red to-red-800 rounded-full" />
+                    {/* Main sphere */}
+                    <div className="relative w-20 h-20 sm:w-[5.5rem] sm:h-[5.5rem] rounded-full overflow-hidden shadow-[0_8px_28px_rgba(0,48,72,0.4),0_2px_10px_rgba(0,48,72,0.25),inset_0_-4px_12px_rgba(0,0,0,0.3),inset_0_2px_3px_rgba(255,255,255,0.08)]">
+                      {/* Base gradient — deep navy spectrum */}
+                      <div className="absolute inset-0 rounded-full" style={{ background: 'linear-gradient(135deg, #004A6E 0%, #003048 40%, #001E2E 100%)' }} />
                       
-                      {/* Subtle top highlight — refined, not flashy */}
-                      <div className="absolute top-0 left-[12%] right-[12%] h-[40%] rounded-t-full bg-gradient-to-b from-white/25 via-white/8 to-transparent" />
+                      {/* Subtle top highlight */}
+                      <div className="absolute top-0 left-[12%] right-[12%] h-[38%] rounded-t-full bg-gradient-to-b from-white/18 via-white/6 to-transparent" />
                       
                       {/* Tiny specular dot */}
-                      <div className="absolute top-[12%] left-[22%] w-[18%] h-[14%] bg-white/20 rounded-full blur-[4px]" />
+                      <div className="absolute top-[12%] left-[22%] w-[16%] h-[12%] bg-white/15 rounded-full blur-[4px]" />
                       
-                      {/* Inner ring for depth */}
-                      <div className="absolute inset-[2px] rounded-full ring-1 ring-white/10" />
+                      {/* Red accent ring — subtle brand warmth */}
+                      <div className="absolute inset-[2px] rounded-full ring-1 ring-red/15" />
                       
-                      {/* Navy icon — clean */}
+                      {/* White icon — clean contrast */}
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <Icon className="w-7 h-7 sm:w-9 sm:h-9 text-navy relative z-10" />
+                        <Icon className="w-7 h-7 sm:w-9 sm:h-9 text-white/90 relative z-10" />
                       </div>
                     </div>
                     
-                    {/* Floor shadow */}
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-3 bg-red-900/20 rounded-full blur-md" />
+                    {/* Floor shadow — navy tint */}
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-3 bg-navy/20 rounded-full blur-md" />
                   </div>
 
                   {/* ── Number — dark text on cream ── */}
