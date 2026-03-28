@@ -102,166 +102,92 @@ function ProductModal({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Category Card (Horizontal Showcase)                                */
+/*  3D Flip Card Component                                             */
 /* ------------------------------------------------------------------ */
-function CategoryShowcase({
-  category,
-  products,
+function FlipCard({
+  product,
   locale,
+  categoryName,
   index,
-  onProductClick,
+  onClick,
 }: {
-  category: Category;
-  products: Product[];
+  product: Product;
   locale: string;
+  categoryName: string;
   index: number;
-  onProductClick: (p: Product) => void;
+  onClick: () => void;
 }) {
-  const rowRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const catName = getLocalizedField(category, 'name', locale);
-  const isEven = index % 2 === 0;
-
-  /* GSAP reveal */
-  useEffect(() => {
-    if (!rowRef.current) return;
-    const ctx = gsap.context(() => {
-      const elements = rowRef.current!.querySelectorAll('.reveal-item');
-      gsap.fromTo(
-        elements,
-        { opacity: 0, y: 50, scale: 0.92 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: rowRef.current,
-            start: 'top 80%',
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-    }, rowRef);
-    return () => ctx.revert();
-  }, [products]);
-
-  if (products.length === 0) return null;
+  const name = getLocalizedField(product, 'name', locale);
 
   return (
-    <div ref={rowRef} className="mb-20 sm:mb-28 last:mb-0">
-      {/* Category Header */}
-      <div className={`flex items-end gap-4 mb-8 sm:mb-10 reveal-item ${isEven ? '' : 'sm:flex-row-reverse sm:text-right'}`}>
-        <div className="flex-1">
-          <div className={`flex items-center gap-3 mb-2 ${!isEven ? 'sm:justify-end' : ''}`}>
-            {category.icon && (
-              <span className="text-2xl">{category.icon}</span>
-            )}
-            <span className="text-red text-xs font-bold tracking-[0.25em] uppercase">
-              Category {String(index + 1).padStart(2, '0')}
+    <motion.div
+      layout
+      initial={{ rotateY: 90, opacity: 0, scale: 0.8 }}
+      animate={{ rotateY: 0, opacity: 1, scale: 1 }}
+      exit={{ rotateY: -90, opacity: 0, scale: 0.8 }}
+      transition={{
+        type: 'spring',
+        stiffness: 200,
+        damping: 22,
+        delay: index * 0.04,
+      }}
+      style={{ perspective: 1200, transformStyle: 'preserve-3d' }}
+      className="cursor-pointer group"
+      onClick={onClick}
+    >
+      <div className="relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 ring-1 ring-navy/5 hover:ring-red/15">
+        {/* Image */}
+        <div className="relative aspect-[4/5] bg-gradient-to-br from-cream to-cream-dark overflow-hidden">
+          {product.image_url ? (
+            <Image
+              src={product.image_url}
+              alt={name}
+              fill
+              className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              unoptimized
+            />
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-navy/15">
+              <Package className="w-16 h-16 mb-2" />
+              <span className="text-xs">No image</span>
+            </div>
+          )}
+
+          {/* Hover Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-navy/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+          {/* View Details CTA */}
+          <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
+            <span className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-sm text-navy text-xs font-semibold px-4 py-2 rounded-full shadow-md">
+              View Details <ChevronRight className="w-3 h-3" />
             </span>
           </div>
-          <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-navy leading-tight">
-            {catName}
-          </h2>
-          <div className={`w-16 h-[3px] bg-red mt-3 rounded-full ${!isEven ? 'sm:ml-auto' : ''}`} />
+
+          {product.is_featured && (
+            <div className="absolute top-3 left-3 bg-red text-white text-[10px] font-bold px-3 py-1 rounded-full shadow">
+              ★ Featured
+            </div>
+          )}
         </div>
-        <div className="hidden sm:block">
-          <span className="text-navy/20 font-heading text-7xl md:text-8xl font-bold leading-none">
-            {String(index + 1).padStart(2, '0')}
+
+        {/* Card Body */}
+        <div className="p-4 sm:p-5">
+          <span className="text-red/60 text-[10px] sm:text-xs font-semibold tracking-[0.15em] uppercase">
+            {categoryName}
           </span>
+          <h3 className="font-heading text-sm sm:text-base lg:text-lg font-bold text-navy mt-1 group-hover:text-red transition-colors duration-300 line-clamp-2 leading-snug">
+            {name}
+          </h3>
+          <div className="flex items-center gap-2 mt-2 sm:mt-3">
+            <div className="w-5 h-[2px] bg-red/30 rounded-full group-hover:w-8 transition-all duration-500" />
+            <span className="text-navy/30 text-[10px] sm:text-xs font-medium tracking-wider uppercase">
+              Premium
+            </span>
+          </div>
         </div>
       </div>
-
-      {/* Horizontal Scrollable Product Row */}
-      <div className="relative reveal-item">
-        {/* Fade edges */}
-        <div className="absolute top-0 left-0 w-8 sm:w-16 h-full bg-gradient-to-r from-cream to-transparent z-10 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-8 sm:w-16 h-full bg-gradient-to-l from-cream to-transparent z-10 pointer-events-none" />
-
-        <div
-          ref={scrollContainerRef}
-          className="flex gap-5 sm:gap-7 overflow-x-auto pb-4 px-2 snap-x snap-mandatory"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
-
-          {products.map((product, pi) => {
-            const name = getLocalizedField(product, 'name', locale);
-            return (
-              <motion.div
-                key={product.id}
-                className="flex-shrink-0 w-[260px] sm:w-[300px] snap-center group cursor-pointer"
-                onClick={() => onProductClick(product)}
-                whileHover={{ y: -8 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              >
-                {/* Card */}
-                <div className="relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-shadow duration-500">
-                  {/* Image */}
-                  <div className="relative aspect-[4/5] bg-gradient-to-br from-cream to-cream-dark overflow-hidden">
-                    {product.image_url ? (
-                      <Image
-                        src={product.image_url}
-                        alt={name}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                        sizes="300px"
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-navy/15">
-                        <Package className="w-16 h-16 mb-2" />
-                        <span className="text-xs">No image</span>
-                      </div>
-                    )}
-
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                    {/* View Details CTA */}
-                    <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
-                      <span className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-sm text-navy text-xs font-semibold px-4 py-2 rounded-full">
-                        View Details <ChevronRight className="w-3 h-3" />
-                      </span>
-                    </div>
-
-                    {product.is_featured && (
-                      <div className="absolute top-3 left-3 bg-red text-white text-[10px] font-bold px-3 py-1 rounded-full shadow">
-                        ★ Featured
-                      </div>
-                    )}
-
-                    {/* Number Badge */}
-                    <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-navy/10 backdrop-blur-sm flex items-center justify-center">
-                      <span className="text-white/70 text-xs font-bold">{String(pi + 1).padStart(2, '0')}</span>
-                    </div>
-                  </div>
-
-                  {/* Card Body */}
-                  <div className="p-5">
-                    <h3 className="font-heading text-base sm:text-lg font-bold text-navy group-hover:text-red transition-colors duration-300 line-clamp-2 leading-snug">
-                      {name}
-                    </h3>
-                    <div className="flex items-center gap-2 mt-3">
-                      <div className="w-6 h-[2px] bg-red/40 rounded-full group-hover:w-10 transition-all duration-500" />
-                      <span className="text-navy/40 text-xs font-medium tracking-wider uppercase">
-                        {catName}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-
-          {/* End spacer for scroll padding */}
-          <div className="flex-shrink-0 w-4" />
-        </div>
-      </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -279,7 +205,6 @@ function ProductsContent() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const headerRef = useRef<HTMLDivElement>(null);
-  const navRef = useRef<HTMLDivElement>(null);
 
   // Fetch data
   useEffect(() => {
@@ -345,15 +270,11 @@ function ProductsContent() {
     [categories, locale]
   );
 
-  const filteredCategories =
+  /* Build the displayed product list */
+  const displayedProducts =
     activeFilter === 'all'
-      ? categories
-      : categories.filter((c) => c.id === activeFilter);
-
-  const getProductsForCategory = useCallback(
-    (catId: string) => products.filter((p) => p.category_id === catId),
-    [products]
-  );
+      ? products
+      : products.filter((p) => p.category_id === activeFilter);
 
   const totalProducts = products.length;
 
@@ -365,7 +286,6 @@ function ProductsContent() {
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-red/8 blur-[120px]" />
           <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-cream/5 blur-[100px]" />
-          {/* Grid pattern */}
           <div
             className="absolute inset-0 opacity-[0.025]"
             style={{
@@ -374,7 +294,6 @@ function ProductsContent() {
               backgroundSize: '80px 80px',
             }}
           />
-          {/* Diagonal accent line */}
           <div className="absolute top-0 right-[20%] w-px h-full bg-gradient-to-b from-transparent via-red/20 to-transparent" />
         </div>
 
@@ -436,7 +355,7 @@ function ProductsContent() {
       </div>
 
       {/* ============ CATEGORY NAV (Sticky) ============ */}
-      <div ref={navRef} className="sticky top-0 z-30 bg-cream/95 backdrop-blur-xl border-b border-navy/5">
+      <div className="sticky top-0 z-30 bg-cream/95 backdrop-blur-xl border-b border-navy/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-10">
           <div
             className="flex gap-1 overflow-x-auto py-4 -mx-2 px-2"
@@ -473,52 +392,65 @@ function ProductsContent() {
         </div>
       </div>
 
-      {/* ============ PRODUCT CATEGORIES SHOWCASE ============ */}
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 py-16 sm:py-24">
+      {/* ============ PRODUCT GRID ============ */}
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20">
         {loading ? (
-          /* Skeleton */
-          <div className="space-y-20">
-            {[1, 2, 3].map((i) => (
+          /* Skeleton Grid */
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-6 bg-navy/5 rounded w-24 mb-3" />
-                <div className="h-10 bg-navy/5 rounded w-64 mb-8" />
-                <div className="flex gap-6 overflow-hidden">
-                  {[1, 2, 3, 4].map((j) => (
-                    <div key={j} className="flex-shrink-0 w-[280px]">
-                      <div className="aspect-[4/5] bg-navy/5 rounded-2xl" />
-                      <div className="mt-4 h-5 bg-navy/5 rounded w-40" />
-                    </div>
-                  ))}
-                </div>
+                <div className="aspect-[4/5] bg-navy/5 rounded-2xl" />
+                <div className="mt-3 h-4 bg-navy/5 rounded w-3/4" />
+                <div className="mt-2 h-3 bg-navy/5 rounded w-1/2" />
               </div>
             ))}
           </div>
-        ) : filteredCategories.length === 0 ? (
+        ) : displayedProducts.length === 0 ? (
           <div className="text-center py-24">
             <Package className="w-20 h-20 text-navy/10 mx-auto mb-6" />
             <p className="text-navy/40 text-xl font-heading">{t('noProducts')}</p>
           </div>
         ) : (
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeFilter}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-            >
-              {filteredCategories.map((cat, i) => (
-                <CategoryShowcase
-                  key={cat.id}
-                  category={cat}
-                  products={getProductsForCategory(cat.id)}
-                  locale={locale}
-                  index={i}
-                  onProductClick={setSelectedProduct}
-                />
-              ))}
-            </motion.div>
-          </AnimatePresence>
+          <>
+            {/* Category title when filtered */}
+            {activeFilter !== 'all' && (
+              <motion.div
+                key={`header-${activeFilter}`}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="mb-8 sm:mb-12"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-8 h-[2px] bg-red rounded-full" />
+                  <span className="text-red text-xs font-bold tracking-[0.25em] uppercase">
+                    Category
+                  </span>
+                </div>
+                <h2 className="font-heading text-3xl sm:text-4xl font-bold text-navy">
+                  {getCategoryName(activeFilter)}
+                </h2>
+                <p className="text-navy/40 text-sm mt-2">
+                  {displayedProducts.length} product{displayedProducts.length !== 1 ? 's' : ''}
+                </p>
+              </motion.div>
+            )}
+
+            {/* Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+              <AnimatePresence mode="popLayout">
+                {displayedProducts.map((product, i) => (
+                  <FlipCard
+                    key={product.id}
+                    product={product}
+                    locale={locale}
+                    categoryName={getCategoryName(product.category_id)}
+                    index={i}
+                    onClick={() => setSelectedProduct(product)}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+          </>
         )}
       </div>
 
