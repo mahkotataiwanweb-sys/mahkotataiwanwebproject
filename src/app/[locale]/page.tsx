@@ -190,14 +190,9 @@ function UnifiedDiscoverSlider({ slides, locale }: { slides: UnifiedSlide[]; loc
 /* ------------------------------------------------------------------ */
 export default function HomePage() {
   const locale = useLocale();
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const sliderWrapRef = useRef<HTMLDivElement>(null);
-
-  /* ✨ Parallax decorative orb refs */
-  const orb1Ref = useRef<HTMLDivElement>(null);
-  const orb2Ref = useRef<HTMLDivElement>(null);
-  const orb3Ref = useRef<HTMLDivElement>(null);
 
   /* ---------- Dynamic content state ---------- */
   const [allSlides, setAllSlides] = useState<UnifiedSlide[]>([]);
@@ -266,27 +261,20 @@ export default function HomePage() {
     fetchAll();
   }, [locale]);
 
-  /* ---------- Refs for card-open section transitions ---------- */
-  const discoverSectionRef = useRef<HTMLElement>(null);
-  const videoSectionRef = useRef<HTMLDivElement>(null);
-  const mapSectionRef = useRef<HTMLDivElement>(null);
-
-  /* ---------- ✨ Premium GSAP scroll orchestration ---------- */
+  /* ---------- ✨ GSAP scroll entrance for discover section ---------- */
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // ✨ Header: staggered blur-deblur + scale entrance
+      // Header: staggered fade-in entrance
       if (headerRef.current) {
         gsap.fromTo(
           headerRef.current.children,
-          { opacity: 0, y: 60, filter: 'blur(8px)', scale: 0.96 },
+          { opacity: 0, y: 40 },
           {
             opacity: 1,
             y: 0,
-            filter: 'blur(0px)',
-            scale: 1,
-            duration: 1.2,
-            stagger: 0.15,
-            ease: 'power4.out',
+            duration: 1,
+            stagger: 0.12,
+            ease: 'power3.out',
             scrollTrigger: {
               trigger: headerRef.current,
               start: 'top 85%',
@@ -296,131 +284,24 @@ export default function HomePage() {
         );
       }
 
-      // ✨ Slider: dramatic scale + perspective entrance
+      // Slider: scale + fade entrance
       if (sliderWrapRef.current) {
         gsap.fromTo(sliderWrapRef.current,
-          {
-            opacity: 0,
-            y: 80,
-            scale: 0.88,
-            rotateX: -4,
-            transformPerspective: 1200,
-            transformOrigin: 'center top',
-            filter: 'blur(4px)',
-          },
+          { opacity: 0, y: 50, scale: 0.95 },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            rotateX: 0,
-            filter: 'blur(0px)',
             duration: 1,
             ease: 'power3.out',
             scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top 70%',
+              trigger: sliderWrapRef.current,
+              start: 'top 85%',
               toggleActions: 'play none none reverse',
             },
           }
         );
       }
-
-      // ✨ Discover section: enhanced perspective card-open
-      if (discoverSectionRef.current) {
-        gsap.fromTo(
-          discoverSectionRef.current,
-          {
-            opacity: 0,
-            rotateX: -8,
-            y: 100,
-            scale: 0.94,
-            transformPerspective: 1200,
-            transformOrigin: 'top center',
-          },
-          {
-            opacity: 1,
-            rotateX: 0,
-            y: 0,
-            scale: 1,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: discoverSectionRef.current,
-              start: 'top 95%',
-              end: 'top 40%',
-              scrub: 1.2,
-            },
-          }
-        );
-      }
-
-      // ✨ Video section: gentle rise (cinematic clip-path reveal handled internally)
-      if (videoSectionRef.current) {
-        gsap.fromTo(
-          videoSectionRef.current,
-          { opacity: 0, y: 60, scale: 0.98 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: videoSectionRef.current,
-              start: 'top 92%',
-              end: 'top 55%',
-              scrub: 1,
-            },
-          }
-        );
-      }
-
-      // ✨ Map section: perspective rise from bottom origin
-      if (mapSectionRef.current) {
-        gsap.fromTo(
-          mapSectionRef.current,
-          {
-            opacity: 0,
-            rotateX: -5,
-            y: 100,
-            scale: 0.96,
-            transformPerspective: 1000,
-            transformOrigin: 'bottom center',
-          },
-          {
-            opacity: 1,
-            rotateX: 0,
-            y: 0,
-            scale: 1,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: mapSectionRef.current,
-              start: 'top 95%',
-              end: 'top 45%',
-              scrub: 1.2,
-            },
-          }
-        );
-      }
-
-      // ✨ Parallax decorative orbs — different speeds create perceived depth
-      [
-        { ref: orb1Ref, speed: -150, rot: 45 },
-        { ref: orb2Ref, speed: -200, rot: -30 },
-        { ref: orb3Ref, speed: -100, rot: 20 },
-      ].forEach(({ ref, speed, rot }) => {
-        if (ref.current) {
-          gsap.to(ref.current, {
-            y: speed,
-            rotate: rot,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: document.documentElement,
-              start: 'top top',
-              end: 'bottom bottom',
-              scrub: 2,
-            },
-          });
-        }
-      });
     }, sectionRef);
     return () => ctx.revert();
   }, []);
@@ -429,13 +310,6 @@ export default function HomePage() {
     <>
       {/* Global sand texture — visible through all cream-colored areas */}
       <SandTexture fixed />
-
-      {/* ✨ Parallax depth orbs — ethereal background elements moving at different speeds */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-        <div ref={orb1Ref} className="absolute w-[500px] h-[500px] rounded-full blur-[100px] top-[15%] -left-[10%]" style={{ background: 'radial-gradient(circle, rgba(193,33,38,0.06) 0%, transparent 70%)' }} />
-        <div ref={orb2Ref} className="absolute w-[400px] h-[400px] rounded-full blur-[80px] top-[45%] -right-[8%]" style={{ background: 'radial-gradient(circle, rgba(0,48,72,0.05) 0%, transparent 70%)' }} />
-        <div ref={orb3Ref} className="absolute w-[600px] h-[600px] rounded-full blur-[120px] top-[75%] left-[15%]" style={{ background: 'radial-gradient(circle, rgba(193,33,38,0.04) 0%, transparent 70%)' }} />
-      </div>
 
       <HeroSlider />
 
@@ -472,7 +346,7 @@ export default function HomePage() {
       <ProductCatalogSection />
 
       {/* Discover Section — Single Unified Slider */}
-      <section ref={(el: HTMLElement | null) => { (sectionRef as React.MutableRefObject<HTMLElement | null>).current = el; discoverSectionRef.current = el; }} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+      <section ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
         {/* Decorative */}
         <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
 
@@ -501,13 +375,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div ref={videoSectionRef} className="will-change-transform">
-        <VideoShowcaseSection />
-      </div>
-
-      <div ref={mapSectionRef} className="will-change-transform">
-        <WhereToBuySection />
-      </div>
+      <VideoShowcaseSection />
+      <WhereToBuySection />
 
     </>
   );

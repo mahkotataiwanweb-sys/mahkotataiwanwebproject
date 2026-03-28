@@ -83,63 +83,22 @@ export default function VideoShowcaseSection() {
   useEffect(() => {
     if (!sectionRef.current) return;
     const ctx = gsap.context(() => {
-      // ✨ Cinematic circular clip-path reveal — expands from center
+      // Elegant fade + rise entrance
       gsap.fromTo(
         sectionRef.current,
-        { clipPath: 'circle(0% at 50% 50%)' },
+        { opacity: 0, y: 50 },
         {
-          clipPath: 'circle(150% at 50% 50%)',
-          ease: 'power2.inOut',
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: 'power3.out',
           scrollTrigger: {
             trigger: sectionRef.current,
             start: 'top 85%',
-            end: 'top 15%',
-            scrub: 1.5,
+            toggleActions: 'play none none reverse',
           },
         }
       );
-
-      // ✨ Inner content rises with deblur after reveal starts
-      const innerContent = sectionRef.current?.querySelector('.max-w-7xl');
-      if (innerContent) {
-        gsap.fromTo(
-          innerContent,
-          { opacity: 0, y: 60, filter: 'blur(4px)' },
-          {
-            opacity: 1,
-            y: 0,
-            filter: 'blur(0px)',
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top 60%',
-              end: 'top 20%',
-              scrub: 1,
-            },
-          }
-        );
-      }
-
-      // ✨ Video player has subtle depth parallax
-      const videoPlayer = sectionRef.current?.querySelector('[style*="aspect-ratio"]');
-      if (videoPlayer) {
-        gsap.fromTo(
-          videoPlayer,
-          { y: 40, scale: 0.96, borderRadius: '32px' },
-          {
-            y: 0,
-            scale: 1,
-            borderRadius: '16px',
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top 50%',
-              end: 'top 10%',
-              scrub: 1,
-            },
-          }
-        );
-      }
     }, sectionRef);
     return () => ctx.revert();
   }, []);

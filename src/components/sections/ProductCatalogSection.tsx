@@ -555,47 +555,22 @@ export default function ProductCatalogSection() {
     if (!sectionRef.current || !contentRef.current) return;
 
     const ctx = gsap.context(() => {
-      // ✨ Premium entrance: perspective rotation + blur deblur
+      // Elegant fade + rise entrance
       gsap.fromTo(
         contentRef.current,
-        {
-          y: 120,
-          opacity: 0,
-          rotateX: -6,
-          filter: 'blur(6px)',
-          transformPerspective: 1200,
-          transformOrigin: 'center top',
-        },
+        { y: 40, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          rotateX: 0,
-          filter: 'blur(0px)',
-          duration: 1.2,
+          duration: 1,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: 'top 90%',
-            end: 'top 35%',
-            scrub: 1.2,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
           },
         }
       );
-
-      // ✨ Background wavy texture parallax
-      const bgTexture = sectionRef.current?.querySelector('svg');
-      if (bgTexture) {
-        gsap.to(bgTexture, {
-          y: -60,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: 2,
-          },
-        });
-      }
     }, sectionRef);
 
     return () => ctx.revert();
