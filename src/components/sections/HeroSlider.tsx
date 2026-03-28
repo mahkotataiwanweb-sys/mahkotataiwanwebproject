@@ -5,7 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { supabase } from '@/lib/supabase';
+
+gsap.registerPlugin(ScrollTrigger);
 import { getLocalizedField } from '@/lib/utils';
 import type { HeroSlide } from '@/types/database';
 
@@ -208,6 +212,63 @@ export default function HeroSlider() {
     };
   }, [isPaused, nextSlide, slides.length]);
 
+  /* ✨ Premium scroll zoom-out parallax — hero shrinks into the distance */
+  useEffect(() => {
+    const heroEl = document.getElementById('hero');
+    if (!heroEl) return;
+
+    const ctx = gsap.context(() => {
+      // Hero section zooms out, rounds corners, darkens as user scrolls past
+      gsap.to(heroEl, {
+        scale: 0.9,
+        borderRadius: '28px',
+        y: -50,
+        filter: 'brightness(0.6) saturate(0.8)',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: heroEl,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+        },
+      });
+
+      // Inner text content parallaxes at a slower rate — creates depth
+      const textContent = heroEl.querySelector('.hero-text-content');
+      if (textContent) {
+        gsap.to(textContent, {
+          y: '-35%',
+          opacity: 0.15,
+          scale: 0.95,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroEl,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: true,
+          },
+        });
+      }
+
+      // Navigation dots and arrows fade out faster
+      const navElements = heroEl.querySelectorAll('[aria-label]');
+      navElements.forEach((el) => {
+        gsap.to(el, {
+          opacity: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroEl,
+            start: 'top top',
+            end: '30% top',
+            scrub: true,
+          },
+        });
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
+
   const goToSlide = (index: number) => {
     setDirection(index > currentIndex ? 1 : -1);
     setCurrentIndex(index);
@@ -353,7 +414,8 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full h-[55vh] md:h-[75vh] min-h-[400px] max-h-[900px] overflow-hidden"
+      className="relative w-full h-[55vh] md:h-[75vh] min-h-[400px] max-h-[900px] overflow-hidden will-change-transform"
+      style={{ transformOrigin: 'center center' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -377,7 +439,7 @@ export default function HeroSlider() {
           {/* Slide content */}
           <div className="absolute inset-0 flex items-center justify-center">
             <motion.div
-              className="max-w-4xl mx-auto px-6 text-center"
+              className="max-w-4xl mx-auto px-6 text-center hero-text-content"
               variants={textContainerVariants}
               initial="hidden"
               animate="visible"

@@ -54,20 +54,41 @@ export default function WhereToBuySection() {
     if (!sectionRef.current || !mapRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Entrance animation for the whole section
+      // ✨ Section entrance with perspective rise + blur deblur
       gsap.from(sectionRef.current, {
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 80%',
+          start: 'top 85%',
           toggleActions: 'play none none none',
         },
         opacity: 0,
-        y: 60,
-        duration: 1,
+        y: 80,
+        rotateX: -4,
+        transformPerspective: 1000,
+        transformOrigin: 'bottom center',
+        filter: 'blur(3px)',
+        duration: 1.2,
         ease: 'power3.out',
       });
 
-      // Map entrance
+      // ✨ Map clip-path reveal — dramatic bottom-to-top wipe
+      if (mapRef.current) {
+        gsap.fromTo(mapRef.current,
+          { clipPath: 'inset(100% 0 0 0)' },
+          {
+            clipPath: 'inset(0% 0 0 0)',
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 75%',
+              end: 'top 35%',
+              scrub: 1.2,
+            },
+          }
+        );
+      }
+
+      // Map scale entrance with perspective
       gsap.from('.taiwan-map-group', {
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -79,6 +100,31 @@ export default function WhereToBuySection() {
         duration: 1.2,
         ease: 'power3.out',
       });
+
+      // ✨ SVG boundary lines draw themselves on scroll
+      const boundaryLines = mapRef.current?.querySelectorAll('.boundary-line');
+      if (boundaryLines?.length) {
+        boundaryLines.forEach((line, idx) => {
+          const pathEl = line as SVGPathElement;
+          try {
+            const length = pathEl.getTotalLength();
+            gsap.set(pathEl, { strokeDasharray: length, strokeDashoffset: length });
+            gsap.to(pathEl, {
+              strokeDashoffset: 0,
+              duration: 2,
+              delay: 0.5 + idx * 0.3,
+              ease: 'power2.inOut',
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: 'top 55%',
+                toggleActions: 'play none none reverse',
+              },
+            });
+          } catch {
+            /* path length not available in SSR */
+          }
+        });
+      }
 
       // Looping pin bounce sequence:
       // 1. Pins bounce in one-by-one slowly
@@ -300,12 +346,12 @@ export default function WhereToBuySection() {
                 {BOUNDARIES.map((d, i) => (
                   <path
                     key={`boundary-${i}`}
+                    className="boundary-line"
                     d={d}
                     fill="none"
                     stroke="white"
                     strokeWidth="0.5"
-                    strokeOpacity="0.2"
-                    strokeDasharray="none"
+                    strokeOpacity="0.25"
                   />
                 ))}
               </g>

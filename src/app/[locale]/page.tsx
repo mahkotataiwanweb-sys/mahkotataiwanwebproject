@@ -194,6 +194,11 @@ export default function HomePage() {
   const headerRef = useRef<HTMLDivElement>(null);
   const sliderWrapRef = useRef<HTMLDivElement>(null);
 
+  /* ✨ Parallax decorative orb refs */
+  const orb1Ref = useRef<HTMLDivElement>(null);
+  const orb2Ref = useRef<HTMLDivElement>(null);
+  const orb3Ref = useRef<HTMLDivElement>(null);
+
   /* ---------- Dynamic content state ---------- */
   const [allSlides, setAllSlides] = useState<UnifiedSlide[]>([]);
 
@@ -266,19 +271,21 @@ export default function HomePage() {
   const videoSectionRef = useRef<HTMLDivElement>(null);
   const mapSectionRef = useRef<HTMLDivElement>(null);
 
-  /* ---------- GSAP animations ---------- */
+  /* ---------- ✨ Premium GSAP scroll orchestration ---------- */
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // ✨ Header: staggered blur-deblur + scale entrance
       if (headerRef.current) {
         gsap.fromTo(
           headerRef.current.children,
-          { opacity: 0, y: 50, filter: 'blur(4px)' },
+          { opacity: 0, y: 60, filter: 'blur(8px)', scale: 0.96 },
           {
             opacity: 1,
             y: 0,
             filter: 'blur(0px)',
-            duration: 1,
-            stagger: 0.12,
+            scale: 1,
+            duration: 1.2,
+            stagger: 0.15,
             ease: 'power4.out',
             scrollTrigger: {
               trigger: headerRef.current,
@@ -289,15 +296,25 @@ export default function HomePage() {
         );
       }
 
-      // Slider card animation
+      // ✨ Slider: dramatic scale + perspective entrance
       if (sliderWrapRef.current) {
         gsap.fromTo(sliderWrapRef.current,
-          { opacity: 0, y: 60, scale: 0.94 },
+          {
+            opacity: 0,
+            y: 80,
+            scale: 0.88,
+            rotateX: -4,
+            transformPerspective: 1200,
+            transformOrigin: 'center top',
+            filter: 'blur(4px)',
+          },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 0.9,
+            rotateX: 0,
+            filter: 'blur(0px)',
+            duration: 1,
             ease: 'power3.out',
             scrollTrigger: {
               trigger: sectionRef.current,
@@ -308,21 +325,15 @@ export default function HomePage() {
         );
       }
 
-      /* ---- Card-open reveal transitions for each section ---- */
-      const sectionEls = [
-        discoverSectionRef.current,
-        videoSectionRef.current,
-        mapSectionRef.current,
-      ].filter(Boolean);
-
-      sectionEls.forEach((el) => {
+      // ✨ Discover section: enhanced perspective card-open
+      if (discoverSectionRef.current) {
         gsap.fromTo(
-          el,
+          discoverSectionRef.current,
           {
             opacity: 0,
-            rotateX: -6,
-            y: 80,
-            scale: 0.96,
+            rotateX: -8,
+            y: 100,
+            scale: 0.94,
             transformPerspective: 1200,
             transformOrigin: 'top center',
           },
@@ -333,13 +344,82 @@ export default function HomePage() {
             scale: 1,
             ease: 'power3.out',
             scrollTrigger: {
-              trigger: el,
+              trigger: discoverSectionRef.current,
+              start: 'top 95%',
+              end: 'top 40%',
+              scrub: 1.2,
+            },
+          }
+        );
+      }
+
+      // ✨ Video section: gentle rise (cinematic clip-path reveal handled internally)
+      if (videoSectionRef.current) {
+        gsap.fromTo(
+          videoSectionRef.current,
+          { opacity: 0, y: 60, scale: 0.98 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: videoSectionRef.current,
               start: 'top 92%',
+              end: 'top 55%',
+              scrub: 1,
+            },
+          }
+        );
+      }
+
+      // ✨ Map section: perspective rise from bottom origin
+      if (mapSectionRef.current) {
+        gsap.fromTo(
+          mapSectionRef.current,
+          {
+            opacity: 0,
+            rotateX: -5,
+            y: 100,
+            scale: 0.96,
+            transformPerspective: 1000,
+            transformOrigin: 'bottom center',
+          },
+          {
+            opacity: 1,
+            rotateX: 0,
+            y: 0,
+            scale: 1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: mapSectionRef.current,
+              start: 'top 95%',
               end: 'top 45%',
               scrub: 1.2,
             },
           }
         );
+      }
+
+      // ✨ Parallax decorative orbs — different speeds create perceived depth
+      [
+        { ref: orb1Ref, speed: -150, rot: 45 },
+        { ref: orb2Ref, speed: -200, rot: -30 },
+        { ref: orb3Ref, speed: -100, rot: 20 },
+      ].forEach(({ ref, speed, rot }) => {
+        if (ref.current) {
+          gsap.to(ref.current, {
+            y: speed,
+            rotate: rot,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: document.documentElement,
+              start: 'top top',
+              end: 'bottom bottom',
+              scrub: 2,
+            },
+          });
+        }
       });
     }, sectionRef);
     return () => ctx.revert();
@@ -350,23 +430,38 @@ export default function HomePage() {
       {/* Global sand texture — visible through all cream-colored areas */}
       <SandTexture fixed />
 
+      {/* ✨ Parallax depth orbs — ethereal background elements moving at different speeds */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+        <div ref={orb1Ref} className="absolute w-[500px] h-[500px] rounded-full blur-[100px] top-[15%] -left-[10%]" style={{ background: 'radial-gradient(circle, rgba(193,33,38,0.06) 0%, transparent 70%)' }} />
+        <div ref={orb2Ref} className="absolute w-[400px] h-[400px] rounded-full blur-[80px] top-[45%] -right-[8%]" style={{ background: 'radial-gradient(circle, rgba(0,48,72,0.05) 0%, transparent 70%)' }} />
+        <div ref={orb3Ref} className="absolute w-[600px] h-[600px] rounded-full blur-[120px] top-[75%] left-[15%]" style={{ background: 'radial-gradient(circle, rgba(193,33,38,0.04) 0%, transparent 70%)' }} />
+      </div>
+
       <HeroSlider />
 
-      {/* Elegant divider between Hero and Marquee */}
-      <div className="w-full h-px bg-gradient-to-r from-transparent via-navy/10 to-transparent" />
+      {/* ✨ Enhanced elegant double-line divider */}
+      <div className="relative w-full">
+        <div className="h-px bg-gradient-to-r from-transparent via-navy/15 to-transparent" />
+        <div className="h-px bg-gradient-to-r from-transparent via-red/10 to-transparent mt-px" />
+      </div>
 
-      {/* Scroll indicator */}
+      {/* ✨ Enhanced scroll indicator with elegant pulse + dot */}
       <div className="relative -mt-8 flex justify-center z-10 pointer-events-none">
         <motion.div
-          className="flex flex-col items-center gap-1"
-          initial={{ opacity: 0, y: -8 }}
+          className="flex flex-col items-center gap-1.5"
+          initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.5, duration: 0.6 }}
+          transition={{ delay: 1.5, duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
           <motion.div
-            className="w-px h-6 bg-gradient-to-b from-navy/30 to-transparent"
-            animate={{ scaleY: [1, 0.5, 1], opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            className="w-[1px] h-8 bg-gradient-to-b from-navy/40 to-transparent"
+            animate={{ scaleY: [1, 0.4, 1], opacity: [0.6, 1, 0.6] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="w-1.5 h-1.5 rounded-full bg-red/50"
+            animate={{ scale: [1, 1.5, 1], opacity: [0.4, 1, 0.4] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
           />
         </motion.div>
       </div>
@@ -377,7 +472,7 @@ export default function HomePage() {
       <ProductCatalogSection />
 
       {/* Discover Section — Single Unified Slider */}
-      <section ref={(el: HTMLElement | null) => { (sectionRef as React.MutableRefObject<HTMLElement | null>).current = el; discoverSectionRef.current = el; }} className="py-24 sm:py-32 bg-cream relative overflow-hidden section-card-reveal">
+      <section ref={(el: HTMLElement | null) => { (sectionRef as React.MutableRefObject<HTMLElement | null>).current = el; discoverSectionRef.current = el; }} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
         {/* Decorative */}
         <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
 
@@ -406,11 +501,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div ref={videoSectionRef} className="section-card-reveal">
+      <div ref={videoSectionRef} className="will-change-transform">
         <VideoShowcaseSection />
       </div>
 
-      <div ref={mapSectionRef} className="section-card-reveal">
+      <div ref={mapSectionRef} className="will-change-transform">
         <WhereToBuySection />
       </div>
 
