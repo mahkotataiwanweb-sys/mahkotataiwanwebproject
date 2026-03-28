@@ -64,8 +64,8 @@ function StackedCardSlider({
       const interval = setInterval(() => {
         setIsAnimating(true);
         setActiveIndex((prev) => (prev + 1) % slides.length);
-        setTimeout(() => setIsAnimating(false), 1200);
-      }, 4000);
+        setTimeout(() => setIsAnimating(false), 1600);
+      }, 5500);
       return () => clearInterval(interval);
     }, delayOffset);
     return () => clearTimeout(timer);
@@ -120,7 +120,7 @@ function StackedCardSlider({
                 filter: isFront ? 'blur(0px) brightness(1)' : `blur(${pos * 0.6}px) brightness(${1 - pos * 0.05})`,
               }}
               transition={{
-                duration: 1.1,
+                duration: 1.5,
                 ease: [0.22, 0.68, 0, 1.04],
               }}
               style={{ 
@@ -163,7 +163,7 @@ function StackedCardSlider({
                         initial={{ opacity: 0, y: 24, filter: 'blur(6px)' }}
                         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                         exit={{ opacity: 0, y: -16, filter: 'blur(6px)' }}
-                        transition={{ duration: 0.65, delay: 0.2, ease: [0.22, 0.68, 0, 1] }}
+                        transition={{ duration: 0.9, delay: 0.4, ease: [0.22, 0.68, 0, 1] }}
                       >
                         <h3 className="text-white font-bold text-lg sm:text-xl lg:text-2xl mb-1.5 line-clamp-1 drop-shadow-lg">
                           {slide.title}
@@ -198,7 +198,7 @@ function StackedCardSlider({
             {slides.map((_, i) => (
               <button
                 key={i}
-                onClick={() => { setActiveIndex(i); setIsAnimating(true); setTimeout(() => setIsAnimating(false), 1200); }}
+                onClick={() => { setActiveIndex(i); setIsAnimating(true); setTimeout(() => setIsAnimating(false), 1600); }}
                 className="relative h-1 flex-1 rounded-full overflow-hidden bg-navy/10"
               >
                 {i === activeIndex && (
@@ -206,7 +206,7 @@ function StackedCardSlider({
                     className={`absolute inset-0 rounded-full ${accentColor === 'bg-navy' ? 'bg-navy' : 'bg-red'}`}
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: 1 }}
-                    transition={{ duration: 4, ease: 'linear' }}
+                    transition={{ duration: 5.5, ease: 'linear' }}
                     style={{ transformOrigin: 'left' }}
                     key={`progress-${activeIndex}`}
                   />
@@ -364,7 +364,7 @@ export default function HomePage() {
               locale={locale}
               label="Activities"
               accentColor="bg-navy"
-              delayOffset={2000}
+              delayOffset={4000}
             />
           </div>
         </div>
