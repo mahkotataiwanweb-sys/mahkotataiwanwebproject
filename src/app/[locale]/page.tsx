@@ -312,34 +312,6 @@ export default function HomePage() {
       <SandTexture fixed />
 
       <HeroSlider />
-
-      {/* ✨ Enhanced elegant double-line divider */}
-      <div className="relative w-full">
-        <div className="h-px bg-gradient-to-r from-transparent via-navy/15 to-transparent" />
-        <div className="h-px bg-gradient-to-r from-transparent via-red/10 to-transparent mt-px" />
-      </div>
-
-      {/* ✨ Enhanced scroll indicator with elegant pulse + dot */}
-      <div className="relative -mt-8 flex justify-center z-10 pointer-events-none">
-        <motion.div
-          className="flex flex-col items-center gap-1.5"
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.5, duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-        >
-          <motion.div
-            className="w-[1px] h-8 bg-gradient-to-b from-navy/40 to-transparent"
-            animate={{ scaleY: [1, 0.4, 1], opacity: [0.6, 1, 0.6] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="w-1.5 h-1.5 rounded-full bg-red/50"
-            animate={{ scale: [1, 1.5, 1], opacity: [0.4, 1, 0.4] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-          />
-        </motion.div>
-      </div>
-
       <MarqueeSection />
 
       {/* Product Catalog Showcase — flush with marquee, no card-reveal gap */}
