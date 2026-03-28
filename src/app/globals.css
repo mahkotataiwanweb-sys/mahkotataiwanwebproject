@@ -569,3 +569,7 @@
     border-radius: 4px;
   }
 }
+
+/* Utility: hide scrollbar but keep scrolling */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
