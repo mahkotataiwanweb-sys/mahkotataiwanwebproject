@@ -68,32 +68,38 @@ const milestones = [
 function TiltCard({ children, className }: { children: React.ReactNode; className?: string }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [style, setStyle] = useState<React.CSSProperties>({
-    transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)',
-    transition: 'transform 0.4s cubic-bezier(0.03, 0.98, 0.52, 0.99)',
+    transform: 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1)',
+    transition: 'transform 0.6s cubic-bezier(0.03, 0.98, 0.52, 0.99), box-shadow 0.6s ease',
   });
   const [glare, setGlare] = useState({ x: 50, y: 50, opacity: 0 });
+  const [edgeGlare, setEdgeGlare] = useState({ angle: 0, opacity: 0 });
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
-    const rotateX = (y - 0.5) * -16;
-    const rotateY = (x - 0.5) * 16;
+    const rotateX = (y - 0.5) * -20;
+    const rotateY = (x - 0.5) * 20;
+    const angle = Math.atan2(y - 0.5, x - 0.5) * (180 / Math.PI);
 
     setStyle({
-      transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`,
-      transition: 'transform 0.1s ease-out',
+      transform: `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05) translateZ(20px)`,
+      transition: 'transform 0.1s ease-out, box-shadow 0.1s ease-out',
+      boxShadow: `0 30px 60px -15px rgba(0,48,72,0.5), 0 50px 100px -30px rgba(0,0,0,0.3), ${rotateY * 0.5}px ${rotateX * -0.5}px 40px rgba(193,33,38,0.12)`,
     });
-    setGlare({ x: x * 100, y: y * 100, opacity: 0.2 });
+    setGlare({ x: x * 100, y: y * 100, opacity: 0.28 });
+    setEdgeGlare({ angle, opacity: 0.5 });
   }, []);
 
   const handleMouseLeave = useCallback(() => {
     setStyle({
-      transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)',
-      transition: 'transform 0.6s cubic-bezier(0.03, 0.98, 0.52, 0.99)',
+      transform: 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1) translateZ(0px)',
+      transition: 'transform 0.8s cubic-bezier(0.03, 0.98, 0.52, 0.99), box-shadow 0.8s ease',
+      boxShadow: '0 25px 50px -12px rgba(0,48,72,0.35), 0 12px 24px -8px rgba(0,0,0,0.15)',
     });
     setGlare({ x: 50, y: 50, opacity: 0 });
+    setEdgeGlare({ angle: 0, opacity: 0 });
   }, []);
 
   return (
@@ -102,15 +108,35 @@ function TiltCard({ children, className }: { children: React.ReactNode; classNam
       className={className}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{ ...style, transformStyle: 'preserve-3d' }}
+      style={{
+        ...style,
+        transformStyle: 'preserve-3d',
+        boxShadow: style.boxShadow || '0 25px 50px -12px rgba(0,48,72,0.35), 0 12px 24px -8px rgba(0,0,0,0.15)',
+      }}
     >
       {children}
-      {/* Mouse-following glare/shine */}
+      {/* Mouse-following radial glare */}
       <div
         className="absolute inset-0 rounded-3xl pointer-events-none z-20"
         style={{
-          background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,${glare.opacity}) 0%, transparent 55%)`,
+          background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,${glare.opacity}) 0%, transparent 50%)`,
           transition: 'background 0.15s ease-out',
+        }}
+      />
+      {/* Edge shine reflection */}
+      <div
+        className="absolute inset-0 rounded-3xl pointer-events-none z-20 overflow-hidden"
+        style={{
+          background: `linear-gradient(${edgeGlare.angle + 90}deg, transparent 30%, rgba(255,255,255,${edgeGlare.opacity * 0.12}) 50%, transparent 70%)`,
+          transition: 'background 0.15s ease-out',
+        }}
+      />
+      {/* Subtle border shimmer */}
+      <div
+        className="absolute inset-0 rounded-3xl pointer-events-none z-20"
+        style={{
+          border: `1px solid rgba(255,255,255,${glare.opacity > 0 ? 0.1 : 0.04})`,
+          transition: 'border-color 0.3s ease',
         }}
       />
     </div>
@@ -366,26 +392,54 @@ export default function AboutPage() {
         });
       });
 
-      // Values section staggered blur-deblur
+      // Values section — ultra premium cinematic reveal
       if (valuesRef.current) {
-        gsap.fromTo(
-          valuesRef.current.querySelectorAll('.value-card'),
-          { opacity: 0, y: 60, scale: 0.9, filter: 'blur(8px)' },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            filter: 'blur(0px)',
-            duration: 0.7,
-            stagger: 0.15,
-            ease: 'back.out(1.4)',
-            scrollTrigger: {
-              trigger: valuesRef.current,
-              start: 'top 80%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
+        const cards = valuesRef.current.querySelectorAll('.value-card');
+
+        // Set initial state
+        gsap.set(cards, {
+          opacity: 0,
+          y: 120,
+          scale: 0.7,
+          rotationX: 25,
+          rotationY: -8,
+          filter: 'blur(16px) brightness(0.4)',
+          transformPerspective: 1200,
+          transformOrigin: 'center bottom',
+        });
+
+        // Staggered cinematic entrance
+        gsap.to(cards, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          rotationX: 0,
+          rotationY: 0,
+          filter: 'blur(0px) brightness(1)',
+          duration: 1.2,
+          stagger: {
+            each: 0.18,
+            from: 'start',
+          },
+          ease: 'expo.out',
+          scrollTrigger: {
+            trigger: valuesRef.current,
+            start: 'top 82%',
+            toggleActions: 'play none none reverse',
+          },
+        });
+
+        // Subtle floating animation after entrance (continuous)
+        cards.forEach((card, i) => {
+          gsap.to(card, {
+            y: -6,
+            duration: 2.5 + i * 0.3,
+            ease: 'sine.inOut',
+            repeat: -1,
+            yoyo: true,
+            delay: 1.5 + i * 0.18,
+          });
+        });
       }
 
       // Partners section fade-in
@@ -598,29 +652,36 @@ export default function AboutPage() {
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
             {values.map((val) => {
               const Icon = val.icon;
               return (
                 <TiltCard
                   key={val.title}
-                  className="value-card relative bg-navy rounded-3xl p-8 sm:p-10 text-center group cursor-default overflow-hidden"
+                  className="value-card relative bg-navy rounded-3xl p-8 sm:p-10 text-center group cursor-default overflow-hidden ring-1 ring-white/[0.06]"
                 >
-                  {/* Decorative glow */}
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-red/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
+                  {/* Ambient glow underneath card */}
+                  <div className="absolute -inset-1 bg-gradient-to-b from-navy/40 via-red/[0.07] to-navy/40 rounded-[1.6rem] blur-xl -z-10 opacity-70 group-hover:opacity-100 transition-opacity duration-700" />
+
+                  {/* Top-right decorative glow */}
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-red/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                  {/* Bottom-left soft light */}
+                  <div className="absolute bottom-0 left-0 w-36 h-36 bg-white/5 rounded-full blur-2xl" />
+                  {/* Top-edge highlight line */}
+                  <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
                   <div className="relative z-10" style={{ transform: 'translateZ(40px)' }}>
-                    <div className="w-[72px] h-[72px] sm:w-20 sm:h-20 rounded-3xl bg-red/20 flex items-center justify-center mx-auto mb-5 sm:mb-6 group-hover:bg-red/30 transition-colors duration-500 shadow-[0_0_30px_rgba(193,33,38,0.15)]">
-                      <Icon className="w-8 h-8 sm:w-9 sm:h-9 text-red" />
+                    <div className="w-[72px] h-[72px] sm:w-20 sm:h-20 rounded-3xl bg-red/20 flex items-center justify-center mx-auto mb-5 sm:mb-6 group-hover:bg-red/30 transition-all duration-500 shadow-[0_0_40px_rgba(193,33,38,0.2)] group-hover:shadow-[0_0_50px_rgba(193,33,38,0.35)]">
+                      <Icon className="w-8 h-8 sm:w-9 sm:h-9 text-red group-hover:scale-110 transition-transform duration-500" />
                     </div>
                     <h3 className="font-heading text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">{val.title}</h3>
-                    <div className="w-10 h-[2px] bg-red/50 mx-auto mb-4 sm:mb-5" />
+                    <div className="w-10 h-[2px] bg-red/50 mx-auto mb-4 sm:mb-5 group-hover:w-16 transition-all duration-500" />
                     <p className="text-cream/60 text-xs sm:text-sm leading-relaxed">{val.description}</p>
                   </div>
 
-                  {/* Bottom accent line */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-red/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  {/* Bottom accent glow bar */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-red/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute bottom-0 left-1/4 right-1/4 h-8 bg-red/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 </TiltCard>
               );
             })}
