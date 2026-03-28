@@ -7,7 +7,7 @@ import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Award, Store, Package, Users, Shield, Heart, Sparkles, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Award, Store, Package, Users, Shield, Heart, Sparkles, ChevronRight, Star } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import SandTexture from '@/components/effects/SandTexture';
 
@@ -50,6 +50,11 @@ const values = [
     title: 'Community',
     description: 'Building a strong community of over 1 million customers who trust us to deliver the tastes of home.',
   },
+  {
+    icon: Star,
+    title: 'Integrity',
+    description: 'Operating with transparency and trust in every partnership and transaction, ensuring lasting relationships built on mutual respect.',
+  },
 ];
 
 const milestones = [
@@ -59,6 +64,58 @@ const milestones = [
   { year: '2024', title: 'Expanded Product Lines', description: 'Introduced new product categories including beverages, snacks, and household essentials.' },
   { year: '2025', title: '1 Million+ Customers', description: 'Proudly serving over 1 million customers, a testament to our quality and community trust.' },
 ];
+
+function TiltCard({ children, className }: { children: React.ReactNode; className?: string }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [style, setStyle] = useState<React.CSSProperties>({
+    transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)',
+    transition: 'transform 0.4s cubic-bezier(0.03, 0.98, 0.52, 0.99)',
+  });
+  const [glare, setGlare] = useState({ x: 50, y: 50, opacity: 0 });
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    const rotateX = (y - 0.5) * -16;
+    const rotateY = (x - 0.5) * 16;
+
+    setStyle({
+      transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`,
+      transition: 'transform 0.1s ease-out',
+    });
+    setGlare({ x: x * 100, y: y * 100, opacity: 0.2 });
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setStyle({
+      transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)',
+      transition: 'transform 0.6s cubic-bezier(0.03, 0.98, 0.52, 0.99)',
+    });
+    setGlare({ x: 50, y: 50, opacity: 0 });
+  }, []);
+
+  return (
+    <div
+      ref={cardRef}
+      className={className}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ ...style, transformStyle: 'preserve-3d' }}
+    >
+      {children}
+      {/* Mouse-following glare/shine */}
+      <div
+        className="absolute inset-0 rounded-3xl pointer-events-none z-20"
+        style={{
+          background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,${glare.opacity}) 0%, transparent 55%)`,
+          transition: 'background 0.15s ease-out',
+        }}
+      />
+    </div>
+  );
+}
 
 export default function AboutPage() {
   const t = useTranslations('about');
@@ -412,27 +469,6 @@ export default function AboutPage() {
           );
         });
       }
-
-      // CTA section entrance
-      if (ctaRef.current) {
-        gsap.fromTo(
-          ctaRef.current.children,
-          { opacity: 0, y: 30, filter: 'blur(6px)' },
-          {
-            opacity: 1,
-            y: 0,
-            filter: 'blur(0px)',
-            duration: 0.7,
-            stagger: 0.1,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: ctaRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
-      }
     });
     return () => ctx.revert();
   }, []);
@@ -445,6 +481,17 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-cream">
       <SandTexture fixed />
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes floatSubtle {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+        }
+        @keyframes shimmerSlide {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      ` }} />
 
       {/* ═══════════════════════════════════════════════════════════════
           Hero Section
@@ -551,30 +598,30 @@ export default function AboutPage() {
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((val) => {
               const Icon = val.icon;
               return (
-                <div
+                <TiltCard
                   key={val.title}
-                  className="value-card relative bg-navy rounded-3xl p-10 text-center group cursor-default overflow-hidden"
+                  className="value-card relative bg-navy rounded-3xl p-8 sm:p-10 text-center group cursor-default overflow-hidden"
                 >
                   {/* Decorative glow */}
                   <div className="absolute top-0 right-0 w-40 h-40 bg-red/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
 
-                  <div className="relative z-10">
-                    <div className="w-20 h-20 rounded-3xl bg-red/20 flex items-center justify-center mx-auto mb-6 group-hover:bg-red/30 transition-colors duration-500 shadow-[0_0_30px_rgba(193,33,38,0.15)]">
-                      <Icon className="w-9 h-9 text-red" />
+                  <div className="relative z-10" style={{ transform: 'translateZ(40px)' }}>
+                    <div className="w-[72px] h-[72px] sm:w-20 sm:h-20 rounded-3xl bg-red/20 flex items-center justify-center mx-auto mb-5 sm:mb-6 group-hover:bg-red/30 transition-colors duration-500 shadow-[0_0_30px_rgba(193,33,38,0.15)]">
+                      <Icon className="w-8 h-8 sm:w-9 sm:h-9 text-red" />
                     </div>
-                    <h3 className="font-heading text-xl sm:text-2xl font-bold text-white mb-3">{val.title}</h3>
-                    <div className="w-10 h-[2px] bg-red/50 mx-auto mb-5" />
-                    <p className="text-cream/60 text-sm sm:text-base leading-relaxed">{val.description}</p>
+                    <h3 className="font-heading text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">{val.title}</h3>
+                    <div className="w-10 h-[2px] bg-red/50 mx-auto mb-4 sm:mb-5" />
+                    <p className="text-cream/60 text-xs sm:text-sm leading-relaxed">{val.description}</p>
                   </div>
 
                   {/* Bottom accent line */}
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-red/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                </div>
+                </TiltCard>
               );
             })}
           </div>
@@ -746,36 +793,75 @@ export default function AboutPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════
-          Bottom CTA
+          Bottom CTA — Premium Floating Box
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-24 sm:py-32 bg-navy relative overflow-hidden">
-        <div
+      <section className="py-20 sm:py-28 bg-cream relative overflow-hidden">
+        <div className="absolute bottom-20 left-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
+
+        <motion.div
           ref={ctaRef}
-          className="max-w-4xl mx-auto px-6 text-center relative z-10"
+          initial={{ opacity: 0, y: 60, scale: 0.95 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.9, ease: [0.32, 0.72, 0, 1] }}
+          className="max-w-4xl mx-auto px-6 sm:px-8"
         >
-          <Sparkles className="w-10 h-10 text-red/60 mx-auto mb-5" />
-          <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-5 leading-tight">
-            Want to Learn More?
-          </h2>
-          <p className="text-cream/70 mb-10 max-w-lg mx-auto text-sm tracking-wide">
-            Discover our products or get in touch with our team today.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href={`/${locale}/products`}
-              className="inline-flex items-center justify-center gap-2 bg-red hover:bg-red/90 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-red/20 text-base"
-            >
-              Browse Products
-              <ChevronRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href={`/${locale}/contact`}
-              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 border border-white/20 hover:border-white/30 text-base"
-            >
-              Contact Us
-            </Link>
+          <div
+            className="relative bg-navy rounded-[2rem] p-10 sm:p-14 lg:p-16 text-center overflow-hidden shadow-[0_40px_100px_-25px_rgba(0,48,72,0.5),0_0_0_1px_rgba(255,255,255,0.05)_inset]"
+            style={{ animation: 'floatSubtle 6s ease-in-out infinite' }}
+          >
+            {/* Glossy shine overlays */}
+            <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white/[0.1] via-transparent to-white/[0.02] pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+            <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+
+            {/* Animated gradient orbs */}
+            <div className="absolute top-0 right-0 w-72 h-72 bg-red/15 rounded-full blur-[80px] animate-pulse" />
+            <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/[0.06] rounded-full blur-[60px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-32 bg-red/5 rounded-full blur-[100px] rotate-12" />
+
+            {/* Moving shimmer */}
+            <div className="absolute inset-0 rounded-[2rem] overflow-hidden pointer-events-none">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" style={{ animation: 'shimmerSlide 4s ease-in-out infinite' }} />
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10">
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3, type: 'spring', stiffness: 200 }}
+              >
+                <Sparkles className="w-10 h-10 text-red/60 mx-auto mb-5" />
+              </motion.div>
+
+              <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-5 leading-tight">
+                Want to Learn More?
+              </h2>
+              <p className="text-cream/70 mb-10 max-w-lg mx-auto text-sm tracking-wide">
+                Discover our products or get in touch with our team today.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href={`/${locale}/products`}
+                  className="inline-flex items-center justify-center gap-2 bg-red hover:bg-red/90 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-red/20 text-base"
+                >
+                  Browse Products
+                  <ChevronRight className="w-5 h-5" />
+                </Link>
+                <Link
+                  href={`/${locale}/contact`}
+                  className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 border border-white/20 hover:border-white/30 text-base backdrop-blur-sm"
+                >
+                  Contact Us
+                </Link>
+              </div>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </section>
     </div>
   );

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChefHat, Sparkles, Calendar, ArrowRight, Image as ImageIcon } from 'lucide-react';
+import { Sparkles, Calendar, ArrowRight } from 'lucide-react';
 import HeroSlider from '@/components/sections/HeroSlider';
 import MarqueeSection from '@/components/sections/MarqueeSection';
 import ProductCatalogSection from '@/components/sections/ProductCatalogSection';
@@ -17,7 +17,6 @@ import SandTexture from '@/components/effects/SandTexture';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
-import type { GalleryImage } from '@/types/database';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -30,57 +29,43 @@ interface UnifiedSlide {
   imageUrl: string | null;
   categoryLabel: string;
   categoryHref: string;
-  categoryIcon: typeof ChefHat;
+  categoryIcon: typeof Calendar;
 }
 
-const CATEGORY_META: Record<string, { label: string; href: string; icon: typeof ChefHat }> = {
-  recipes: { label: 'Recipes', href: '/recipes', icon: ChefHat },
+const CATEGORY_META: Record<string, { label: string; href: string; icon: typeof Calendar }> = {
   event: { label: 'Event', href: '/events', icon: Calendar },
   activity: { label: 'Activity', href: '/lifestyle', icon: Sparkles },
-  gallery: { label: 'Gallery', href: '/gallery', icon: ImageIcon },
 };
 
-/* Fisher-Yates shuffle */
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 /* ------------------------------------------------------------------ */
-/*  UnifiedDiscoverSlider                                              */
+/*  StackedCardSlider                                                  */
 /* ------------------------------------------------------------------ */
-function UnifiedDiscoverSlider({ slides, locale }: { slides: UnifiedSlide[]; locale: string }) {
+function StackedCardSlider({ 
+  slides, 
+  locale, 
+  label,
+  accentColor = 'bg-red',
+}: { 
+  slides: UnifiedSlide[]; 
+  locale: string; 
+  label: string;
+  accentColor?: string;
+}) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [direction, setDirection] = useState(1); // 1 = forward, -1 = back
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const startTimer = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setDirection(1);
-      setActiveIndex((prev) => (prev + 1) % slides.length);
-    }, 5000);
-  }, [slides.length]);
+  const [isHovered, setIsHovered] = useState(false);
+  const VISIBLE = Math.min(4, slides.length);
 
   useEffect(() => {
-    if (slides.length <= 1) return;
-    startTimer();
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [slides.length, startTimer]);
-
-  const goTo = (i: number) => {
-    setDirection(i > activeIndex ? 1 : -1);
-    setActiveIndex(i);
-    startTimer();
-  };
+    if (slides.length <= 1 || isHovered) return;
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % slides.length);
+    }, 2500);
+    return () => clearInterval(timer);
+  }, [slides.length, isHovered]);
 
   if (slides.length === 0) {
     return (
-      <div className="relative w-full aspect-[16/7] sm:aspect-[16/6] rounded-2xl overflow-hidden bg-gradient-to-br from-navy to-navy/80 shadow-lg ring-1 ring-white/10">
+      <div className="relative w-full aspect-[16/9] rounded-3xl overflow-hidden bg-gradient-to-br from-navy to-navy/80 shadow-lg ring-1 ring-white/10">
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <Sparkles className="w-12 h-12 text-white/30 mb-3" />
           <span className="text-white/50 text-sm font-medium">Coming Soon</span>
@@ -89,97 +74,139 @@ function UnifiedDiscoverSlider({ slides, locale }: { slides: UnifiedSlide[]; loc
     );
   }
 
-  const current = slides[activeIndex];
-  const Icon = current.categoryIcon;
-
-  const variants = {
-    enter: (d: number) => ({ opacity: 0, x: d > 0 ? 80 : -80, scale: 0.97 }),
-    center: { opacity: 1, x: 0, scale: 1 },
-    exit: (d: number) => ({ opacity: 0, x: d > 0 ? -80 : 80, scale: 0.97 }),
-  };
-
   return (
-    <div className="relative w-full">
-      <Link
-        href={`/${locale}${current.categoryHref}`}
-        className="group block relative w-full aspect-[16/7] sm:aspect-[16/6] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 ring-1 ring-black/5 hover:ring-red/20"
-      >
-        {/* Background image crossfade */}
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.div
-            key={activeIndex}
-            custom={direction}
-            variants={variants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
-            className="absolute inset-0 will-change-transform"
-          >
-            {current.imageUrl ? (
-              <Image
-                src={current.imageUrl}
-                alt={current.title || current.categoryLabel}
-                fill
-                className="object-cover transition-transform duration-[8s] ease-linear group-hover:scale-105"
-                sizes="(max-width: 640px) 100vw, 90vw"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-navy to-navy/80" />
-            )}
-          </motion.div>
-        </AnimatePresence>
+    <div
+      className="relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Section label */}
+      <div className="flex items-center gap-2.5 mb-5">
+        <div className={`w-2 h-2 rounded-full ${accentColor} shadow-[0_0_8px_rgba(193,33,38,0.4)]`} />
+        <span className="text-navy font-semibold text-xs uppercase tracking-[0.2em]">{label}</span>
+        <div className="flex-1 h-px bg-navy/10" />
+        <span className="text-navy/30 text-xs font-mono">
+          {String(activeIndex + 1).padStart(2, '0')}/{String(slides.length).padStart(2, '0')}
+        </span>
+      </div>
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-all duration-500" />
+      {/* Card stack container */}
+      <div className="relative w-full aspect-[16/9] sm:aspect-[2/1]" style={{ perspective: '1200px' }}>
+        {slides.map((slide, i) => {
+          let pos = i - activeIndex;
+          if (pos < 0) pos += slides.length;
+          const isVisible = pos < VISIBLE;
+          const isFront = pos === 0;
 
-        {/* Category badge top-left */}
-        <div className="absolute top-4 sm:top-6 left-4 sm:left-6 flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
-          <Icon className="w-4 h-4 text-white" />
-          <span className="text-white text-xs font-semibold uppercase tracking-wider">{current.categoryLabel}</span>
-        </div>
-
-        {/* Content overlay bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
-          <AnimatePresence mode="wait" custom={direction}>
+          return (
             <motion.div
-              key={activeIndex}
-              custom={direction}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              key={i}
+              className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden will-change-transform"
+              animate={{
+                y: isVisible ? pos * 16 : -60,
+                x: isVisible ? pos * 4 : 0,
+                scale: isVisible ? 1 - pos * 0.04 : 0.88,
+                opacity: isVisible ? 1 - pos * 0.25 : 0,
+                rotateX: isVisible ? pos * -1.5 : -8,
+                zIndex: isVisible ? VISIBLE - pos + 1 : 0,
+                filter: isFront ? 'blur(0px)' : `blur(${pos * 0.5}px)`,
+              }}
+              transition={{
+                duration: 0.7,
+                ease: [0.32, 0.72, 0, 1],
+              }}
+              style={{ 
+                transformOrigin: 'center 80%',
+                transformStyle: 'preserve-3d',
+              }}
             >
-              <h3 className="text-white font-bold text-xl sm:text-2xl lg:text-3xl mb-2 line-clamp-1">{current.title}</h3>
-              <p className="text-white/70 text-sm sm:text-base line-clamp-2 max-w-2xl">{current.description}</p>
+              {/* Card background */}
+              <Link
+                href={`/${locale}${slide.categoryHref}`}
+                className="block absolute inset-0 group"
+              >
+                {slide.imageUrl ? (
+                  <Image
+                    src={slide.imageUrl}
+                    alt={slide.title || label}
+                    fill
+                    className="object-cover transition-transform duration-[6s] ease-linear group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, 90vw"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/90 to-navy-dark" />
+                )}
+
+                {/* Overlay gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/5 group-hover:from-black/85 transition-all duration-500" />
+
+                {/* Glossy top reflection */}
+                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.07] via-transparent to-transparent pointer-events-none" />
+
+                {/* Content overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7">
+                  <AnimatePresence mode="wait">
+                    {isFront && (
+                      <motion.div
+                        key={activeIndex}
+                        initial={{ opacity: 0, y: 16, filter: 'blur(4px)' }}
+                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                        exit={{ opacity: 0, y: -12, filter: 'blur(4px)' }}
+                        transition={{ duration: 0.45, delay: 0.15 }}
+                      >
+                        <h3 className="text-white font-bold text-lg sm:text-xl lg:text-2xl mb-1.5 line-clamp-1 drop-shadow-lg">
+                          {slide.title}
+                        </h3>
+                        <p className="text-white/65 text-xs sm:text-sm line-clamp-2 max-w-xl">
+                          {slide.description}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Hover arrow indicator */}
+                {isFront && (
+                  <div className="absolute top-4 sm:top-5 right-4 sm:right-5 w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
+                    <ArrowRight className="w-4 h-4 text-white" />
+                  </div>
+                )}
+              </Link>
+
+              {/* Edge shadow for depth */}
+              {!isFront && isVisible && (
+                <div className="absolute inset-0 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] rounded-2xl sm:rounded-3xl pointer-events-none" />
+              )}
             </motion.div>
-          </AnimatePresence>
+          );
+        })}
 
-          {/* Progress dots */}
-          {slides.length > 1 && (
-            <div className="flex gap-2 mt-4">
-              {slides.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo(i); }}
-                  className={`h-1.5 rounded-full transition-all duration-500 ${
-                    i === activeIndex ? 'w-8 bg-red' : 'w-2 bg-white/40 hover:bg-white/60'
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Hover arrow */}
-        <div className="absolute top-4 sm:top-6 right-4 sm:right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <ArrowRight className="w-5 h-5 text-white" />
-        </div>
-      </Link>
-
-      {/* Slide counter */}
-      <div className="absolute bottom-4 sm:bottom-8 right-5 sm:right-8 text-white/40 text-xs font-mono pointer-events-none">
-        {String(activeIndex + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
+        {/* Progress bar at bottom */}
+        {slides.length > 1 && (
+          <div className="absolute -bottom-6 left-0 right-0 flex gap-1.5 z-20">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setActiveIndex(i)}
+                className="relative h-1 flex-1 rounded-full overflow-hidden bg-navy/10"
+              >
+                {i === activeIndex && (
+                  <motion.div
+                    className="absolute inset-0 bg-red rounded-full"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 2.5, ease: 'linear' }}
+                    style={{ transformOrigin: 'left' }}
+                    key={activeIndex}
+                  />
+                )}
+                {i < activeIndex && (
+                  <div className="absolute inset-0 bg-red/40 rounded-full" />
+                )}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -195,67 +222,43 @@ export default function HomePage() {
   const sliderWrapRef = useRef<HTMLDivElement>(null);
 
   /* ---------- Dynamic content state ---------- */
-  const [allSlides, setAllSlides] = useState<UnifiedSlide[]>([]);
+  const [eventSlides, setEventSlides] = useState<UnifiedSlide[]>([]);
+  const [activitySlides, setActivitySlides] = useState<UnifiedSlide[]>([]);
 
   /* ---------- Fetch all content in parallel ---------- */
   useEffect(() => {
     async function fetchAll() {
-      const [recipesRes, eventsRes, lifestyleRes, galleryRes] = await Promise.all([
-        supabase
-          .from('articles')
-          .select('*')
-          .eq('type', 'recipe')
-          .order('published_at', { ascending: false })
-          .limit(5),
+      const [eventsRes, lifestyleRes] = await Promise.all([
         supabase
           .from('articles')
           .select('*')
           .eq('type', 'event')
           .order('published_at', { ascending: false })
-          .limit(5),
+          .limit(4),
         supabase
           .from('articles')
           .select('*')
           .eq('type', 'lifestyle')
           .order('published_at', { ascending: false })
-          .limit(5),
-        supabase
-          .from('gallery_images')
-          .select('*')
-          .eq('is_active', true)
-          .order('event_date', { ascending: false })
-          .limit(5),
+          .limit(4),
       ]);
 
-      const toUnified = (articles: Article[] | null, catKey: string): UnifiedSlide[] => {
+      const toSlides = (articles: Article[] | null, catKey: string): UnifiedSlide[] => {
         const meta = CATEGORY_META[catKey];
-        return (articles || []).map((item) => ({
-          title: getLocalizedField(item, 'title', locale) || '',
-          description: getLocalizedField(item, 'excerpt', locale) || '',
-          imageUrl: item.image_url || null,
-          categoryLabel: meta.label,
-          categoryHref: meta.href,
-          categoryIcon: meta.icon,
-        }));
+        return (articles || [])
+          .filter((item) => getLocalizedField(item, 'title', locale))
+          .map((item) => ({
+            title: getLocalizedField(item, 'title', locale) || '',
+            description: getLocalizedField(item, 'excerpt', locale) || '',
+            imageUrl: item.image_url || null,
+            categoryLabel: meta.label,
+            categoryHref: meta.href,
+            categoryIcon: meta.icon,
+          }));
       };
 
-      const gallerySlides: UnifiedSlide[] = ((galleryRes.data as GalleryImage[] | null) || []).map((item) => ({
-        title: item.event_name || '',
-        description: getLocalizedField(item, 'description', locale) || '',
-        imageUrl: item.image_url || null,
-        categoryLabel: CATEGORY_META.gallery.label,
-        categoryHref: CATEGORY_META.gallery.href,
-        categoryIcon: CATEGORY_META.gallery.icon,
-      }));
-
-      const combined = [
-        ...toUnified(recipesRes.data as Article[] | null, 'recipes'),
-        ...toUnified(eventsRes.data as Article[] | null, 'event'),
-        ...toUnified(lifestyleRes.data as Article[] | null, 'activity'),
-        ...gallerySlides,
-      ].filter((s) => s.title); // Only items with titles
-
-      setAllSlides(shuffle(combined));
+      setEventSlides(toSlides(eventsRes.data as Article[] | null, 'event'));
+      setActivitySlides(toSlides(lifestyleRes.data as Article[] | null, 'activity'));
     }
 
     fetchAll();
@@ -317,14 +320,13 @@ export default function HomePage() {
       {/* Product Catalog Showcase — flush with marquee, no card-reveal gap */}
       <ProductCatalogSection />
 
-      {/* Discover Section — Single Unified Slider */}
+      {/* Discover Section — Dual Stacked Card Sliders */}
       <section ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
-        {/* Decorative */}
         <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
 
         <div className="max-w-7xl mx-auto px-6">
           {/* Header */}
-          <div ref={headerRef} className="text-center mb-14">
+          <div ref={headerRef} className="text-center mb-16">
             <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
               Discover
             </p>
@@ -333,16 +335,24 @@ export default function HomePage() {
             </h2>
             <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
             <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">
-              Authentic Indonesian flavors — recipes, stories &amp; community
-            </p>
-            <p className="text-navy/60 max-w-lg mx-auto mt-2">
-              Dive into our world of Indonesian flavors — from recipes and lifestyle stories to exciting community events.
+              Stay up to date with our latest events and community activities
             </p>
           </div>
 
-          {/* Single Unified Slider */}
-          <div ref={sliderWrapRef}>
-            <UnifiedDiscoverSlider slides={allSlides} locale={locale} />
+          {/* Two Stacked Card Sliders */}
+          <div ref={sliderWrapRef} className="space-y-16">
+            <StackedCardSlider
+              slides={eventSlides}
+              locale={locale}
+              label="Events"
+              accentColor="bg-red"
+            />
+            <StackedCardSlider
+              slides={activitySlides}
+              locale={locale}
+              label="Activities"
+              accentColor="bg-navy"
+            />
           </div>
         </div>
       </section>
