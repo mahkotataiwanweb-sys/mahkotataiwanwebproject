@@ -349,19 +349,21 @@ export default function AboutPage() {
         );
       }
 
-      // Stats scale-in with blur
+      // Stats — cinematic bubble entrance
       if (statsRef.current) {
+        const bubbleItems = statsRef.current.querySelectorAll('.stat-bubble-item');
+        
         gsap.fromTo(
-          statsRef.current.children,
-          { opacity: 0, scale: 0.8, y: 30, filter: 'blur(8px)' },
+          bubbleItems,
+          { opacity: 0, scale: 0.5, y: 60, filter: 'blur(12px)' },
           {
             opacity: 1,
             scale: 1,
             y: 0,
             filter: 'blur(0px)',
-            duration: 0.6,
-            stagger: 0.12,
-            ease: 'back.out(1.4)',
+            duration: 0.9,
+            stagger: 0.15,
+            ease: 'elastic.out(1, 0.6)',
             scrollTrigger: {
               trigger: statsRef.current,
               start: 'top 85%',
@@ -369,9 +371,21 @@ export default function AboutPage() {
             },
           }
         );
+
+        // Continuous floating animation for each bubble (different rhythm per bubble)
+        bubbleItems.forEach((item, i) => {
+          gsap.to(item, {
+            y: -10 - (i * 2),
+            duration: 2.8 + (i * 0.4),
+            ease: 'sine.inOut',
+            repeat: -1,
+            yoyo: true,
+            delay: 1.2 + (i * 0.2),
+          });
+        });
       }
 
-      // Counter animation
+      // Counter animation with dramatic counting
       counterRefs.current.forEach((el, i) => {
         if (!el) return;
         const stat = stats[i];
@@ -379,15 +393,15 @@ export default function AboutPage() {
         const obj = { val: 0 };
         gsap.to(obj, {
           val: target,
-          duration: stat.displayType === 'million' ? 1.5 : 2,
-          ease: 'power2.out',
+          duration: stat.displayType === 'million' ? 1.8 : 2.5,
+          ease: 'power3.out',
           scrollTrigger: {
             trigger: statsRef.current,
             start: 'top 85%',
             toggleActions: 'play none none reverse',
           },
           onUpdate: () => {
-            if (el) el.textContent = Math.round(obj.val).toString();
+            if (el) el.textContent = Math.round(obj.val).toLocaleString();
           },
         });
       });
@@ -607,24 +621,65 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Stats Section — Navy Strip
       ═══════════════════════════════════════════════════════════════ */}
-      <section ref={statsSectionRef} className="py-24 sm:py-32 bg-navy relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+      <section ref={statsSectionRef} className="py-28 sm:py-36 bg-navy relative overflow-hidden">
+        {/* Background ambient glow */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-64 bg-red/8 rounded-full blur-[100px]" />
+          <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-64 h-64 bg-blue-500/6 rounded-full blur-[100px]" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-14">
             {stats.map((stat, i) => {
               const Icon = stat.icon;
               return (
-                <div key={stat.key} className="text-center group relative">
-                  <div className="relative z-10">
-                    <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-5 group-hover:bg-white/15 transition-colors duration-500">
-                      <Icon className="w-7 h-7 text-red" />
+                <div key={stat.key} className="flex flex-col items-center group stat-bubble-item">
+                  {/* ── Floating Red Glossy Bubble ── */}
+                  <div className="relative mb-6">
+                    {/* Outer glow aura */}
+                    <div className="absolute -inset-3 rounded-full bg-red/20 blur-xl group-hover:bg-red/30 transition-all duration-700" />
+                    
+                    {/* Main red bubble */}
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden shadow-[0_8px_32px_rgba(220,38,38,0.4),0_0_60px_rgba(220,38,38,0.15),inset_0_-4px_12px_rgba(0,0,0,0.3)]">
+                      {/* Gradient fill — deep red to vibrant */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-red-400 via-red to-red-800 rounded-full" />
+                      
+                      {/* Top glossy reflection arc */}
+                      <div className="absolute top-0 left-[10%] right-[10%] h-[45%] bg-gradient-to-b from-white/40 via-white/15 to-transparent rounded-t-full" />
+                      
+                      {/* Secondary inner shine */}
+                      <div className="absolute top-[8%] left-[15%] w-[35%] h-[25%] bg-white/25 rounded-full blur-[6px]" />
+                      
+                      {/* Bottom rim reflection */}
+                      <div className="absolute bottom-0 left-[15%] right-[15%] h-[15%] bg-gradient-to-t from-white/10 to-transparent rounded-b-full" />
+                      
+                      {/* Edge light ring */}
+                      <div className="absolute inset-0 rounded-full ring-1 ring-white/20 ring-inset" />
+                      
+                      {/* Blue icon in center */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Icon className="w-8 h-8 sm:w-10 sm:h-10 text-blue-300 drop-shadow-[0_2px_8px_rgba(96,165,250,0.6)] relative z-10" />
+                      </div>
                     </div>
-                    <div className="text-4xl sm:text-5xl font-heading font-bold text-white mb-2">
+                    
+                    {/* Subtle bottom shadow for 3D depth */}
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-14 h-3 bg-red/30 rounded-full blur-md" />
+                  </div>
+
+                  {/* ── Number with glow effect ── */}
+                  <div className="text-4xl sm:text-5xl font-heading font-bold text-white mb-1.5 relative">
+                    <span className="absolute inset-0 text-red/20 blur-lg select-none pointer-events-none" aria-hidden="true">
+                      {stat.prefix}{stat.value}{stat.suffix}
+                    </span>
+                    <span className="relative">
                       {stat.prefix}
                       <span ref={(el) => { counterRefs.current[i] = el; }}>0</span>
                       {stat.suffix}
-                    </div>
-                    <p className="text-cream/50 text-sm font-medium tracking-wide">{t(`stats.${stat.key}`)}</p>
+                    </span>
                   </div>
+
+                  {/* ── Label ── */}
+                  <p className="text-white/60 text-sm font-medium tracking-[0.15em] uppercase">{t(`stats.${stat.key}`)}</p>
                 </div>
               );
             })}

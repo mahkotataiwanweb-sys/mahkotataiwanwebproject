@@ -291,6 +291,7 @@ export default function Navbar() {
           onMouseLeave={handleMouseLeave}
         >
           <button
+            onClick={() => setOpenDropdown(openDropdown === item.id ? null : item.id)}
             className={cn(
               'flex items-center gap-1 text-base font-medium tracking-wide uppercase transition-colors duration-300',
               linkColor(isChildActive || isActive)
@@ -477,6 +478,7 @@ export default function Navbar() {
           onMouseLeave={handleMouseLeave}
         >
           <button
+            onClick={() => setOpenDropdown(openDropdown === item.key ? null : item.key)}
             className={cn(
               'flex items-center gap-1 text-base font-medium tracking-wide uppercase transition-colors duration-300',
               linkColor(isDropdownActiveFallback(item))
