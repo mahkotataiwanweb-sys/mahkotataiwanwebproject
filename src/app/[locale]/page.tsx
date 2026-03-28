@@ -262,7 +262,6 @@ export default function HomePage() {
   }, [locale]);
 
   /* ---------- Refs for card-open section transitions ---------- */
-  const catalogSectionRef = useRef<HTMLDivElement>(null);
   const discoverSectionRef = useRef<HTMLElement>(null);
   const videoSectionRef = useRef<HTMLDivElement>(null);
   const mapSectionRef = useRef<HTMLDivElement>(null);
@@ -311,7 +310,6 @@ export default function HomePage() {
 
       /* ---- Card-open reveal transitions for each section ---- */
       const sectionEls = [
-        catalogSectionRef.current,
         discoverSectionRef.current,
         videoSectionRef.current,
         mapSectionRef.current,
@@ -375,10 +373,8 @@ export default function HomePage() {
 
       <MarqueeSection />
 
-      {/* Product Catalog Showcase */}
-      <div ref={catalogSectionRef} className="section-card-reveal">
-        <ProductCatalogSection />
-      </div>
+      {/* Product Catalog Showcase — flush with marquee, no card-reveal gap */}
+      <ProductCatalogSection />
 
       {/* Discover Section — Single Unified Slider */}
       <section ref={(el: HTMLElement | null) => { (sectionRef as React.MutableRefObject<HTMLElement | null>).current = el; discoverSectionRef.current = el; }} className="py-24 sm:py-32 bg-cream relative overflow-hidden section-card-reveal">
