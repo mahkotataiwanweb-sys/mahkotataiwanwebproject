@@ -62,13 +62,20 @@ const milestones = [
 export default function AboutPage() {
   const t = useTranslations('about');
   const locale = useLocale();
+  const heroRef = useRef<HTMLDivElement>(null);
+  const heroTextRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
+  const redLineRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
+  const statsSectionRef = useRef<HTMLDivElement>(null);
   const valuesRef = useRef<HTMLDivElement>(null);
   const partnersRef = useRef<HTMLDivElement>(null);
   const storyRef = useRef<HTMLDivElement>(null);
+  const timelineLineRef = useRef<HTMLDivElement>(null);
+  const dotRefs = useRef<(HTMLDivElement | null)[]>([]);
   const counterRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const ctaRef = useRef<HTMLDivElement>(null);
 
   /* ─── Physics marquee refs ─── */
   const trackRef = useRef<HTMLDivElement>(null);
@@ -197,7 +204,7 @@ export default function AboutPage() {
     velocityRef.current = -PARTNER_MARQUEE_SPEED;
   }, []);
 
-  // GSAP header animation
+  // GSAP hero entrance animation
   useEffect(() => {
     if (!headerRef.current) return;
     const ctx = gsap.context(() => {
@@ -213,13 +220,28 @@ export default function AboutPage() {
           ease: 'power3.out',
         }
       );
+
+      // Hero parallax — text moves up at 50% speed on scroll
+      if (heroTextRef.current) {
+        gsap.to(heroTextRef.current, {
+          y: -80,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 0.5,
+          },
+        });
+      }
     });
     return () => ctx.revert();
   }, []);
 
-  // GSAP text + counter + values + partners + story animations
+  // GSAP scroll-triggered animations
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // Description section blur-deblur
       if (textRef.current) {
         gsap.fromTo(
           textRef.current.children,
@@ -240,15 +262,34 @@ export default function AboutPage() {
         );
       }
 
-      // Stats scale-in
+      // Red decorative line draw on scroll
+      if (redLineRef.current) {
+        gsap.fromTo(
+          redLineRef.current,
+          { scaleX: 0 },
+          {
+            scaleX: 1,
+            duration: 1,
+            ease: 'power2.inOut',
+            scrollTrigger: {
+              trigger: redLineRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
+
+      // Stats scale-in with blur
       if (statsRef.current) {
         gsap.fromTo(
           statsRef.current.children,
-          { opacity: 0, scale: 0.8, y: 30 },
+          { opacity: 0, scale: 0.8, y: 30, filter: 'blur(8px)' },
           {
             opacity: 1,
             scale: 1,
             y: 0,
+            filter: 'blur(0px)',
             duration: 0.6,
             stagger: 0.12,
             ease: 'back.out(1.4)',
@@ -261,6 +302,7 @@ export default function AboutPage() {
         );
       }
 
+      // Counter animation
       counterRefs.current.forEach((el, i) => {
         if (!el) return;
         const stat = stats[i];
@@ -281,15 +323,16 @@ export default function AboutPage() {
         });
       });
 
-      // Values section
+      // Values section staggered blur-deblur
       if (valuesRef.current) {
         gsap.fromTo(
           valuesRef.current.querySelectorAll('.value-card'),
-          { opacity: 0, y: 60, scale: 0.9 },
+          { opacity: 0, y: 60, scale: 0.9, filter: 'blur(8px)' },
           {
             opacity: 1,
             y: 0,
             scale: 1,
+            filter: 'blur(0px)',
             duration: 0.7,
             stagger: 0.15,
             ease: 'back.out(1.4)',
@@ -306,10 +349,11 @@ export default function AboutPage() {
       if (partnersRef.current) {
         gsap.fromTo(
           partnersRef.current,
-          { opacity: 0, y: 40 },
+          { opacity: 0, y: 40, filter: 'blur(6px)' },
           {
             opacity: 1,
             y: 0,
+            filter: 'blur(0px)',
             duration: 0.8,
             ease: 'power3.out',
             scrollTrigger: {
@@ -321,20 +365,83 @@ export default function AboutPage() {
         );
       }
 
-      // Story chapters scroll animation — refined, subtle
-      if (storyRef.current) {
+      // Timeline line draws itself on scroll
+      if (timelineLineRef.current && storyRef.current) {
         gsap.fromTo(
-          storyRef.current.querySelectorAll('.story-chapter'),
-          { opacity: 0, y: 40 },
+          timelineLineRef.current,
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: storyRef.current,
+              start: 'top 70%',
+              end: 'bottom 60%',
+              scrub: 0.3,
+            },
+          }
+        );
+      }
+
+      // Timeline dot markers scale in
+      dotRefs.current.forEach((dot, i) => {
+        if (!dot) return;
+        gsap.fromTo(
+          dot,
+          { scale: 0, opacity: 0 },
+          {
+            scale: 1,
+            opacity: 1,
+            duration: 0.4,
+            ease: 'back.out(2)',
+            scrollTrigger: {
+              trigger: dot,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      });
+
+      // Story chapters stagger from alternating sides
+      if (storyRef.current) {
+        const chapters = storyRef.current.querySelectorAll('.story-chapter');
+        chapters.forEach((chapter, i) => {
+          const fromLeft = i % 2 === 0;
+          gsap.fromTo(
+            chapter,
+            { opacity: 0, x: fromLeft ? -40 : 40, filter: 'blur(6px)' },
+            {
+              opacity: 1,
+              x: 0,
+              filter: 'blur(0px)',
+              duration: 0.8,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: chapter,
+                start: 'top 82%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          );
+        });
+      }
+
+      // CTA section entrance
+      if (ctaRef.current) {
+        gsap.fromTo(
+          ctaRef.current.children,
+          { opacity: 0, y: 30, filter: 'blur(6px)' },
           {
             opacity: 1,
             y: 0,
-            duration: 0.8,
-            stagger: 0.2,
+            filter: 'blur(0px)',
+            duration: 0.7,
+            stagger: 0.1,
             ease: 'power3.out',
             scrollTrigger: {
-              trigger: storyRef.current,
-              start: 'top 80%',
+              trigger: ctaRef.current,
+              start: 'top 85%',
               toggleActions: 'play none none reverse',
             },
           }
@@ -351,136 +458,241 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-cream">
-      {/* Hero Banner */}
-      <div className="relative bg-gradient-to-br from-navy via-navy/90 to-red-dark pt-32 pb-20 overflow-hidden">
-        {/* Decorative */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl" />
-          <div className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-red/10 blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-red/5 blur-3xl" />
+      {/* ═══════════════════════════════════════════════════════════════
+          Hero Section — Full Viewport Immersive
+      ═══════════════════════════════════════════════════════════════ */}
+      <div
+        ref={heroRef}
+        className="relative min-h-[70vh] flex items-center bg-gradient-to-br from-navy via-navy/90 to-red-dark overflow-hidden"
+      >
+        {/* Grid pattern overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)',
+            backgroundSize: '32px 32px',
+          }}
+        />
+
+        {/* Animated decorative shapes */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <motion.div
+            className="absolute top-20 right-10 w-72 h-72 rounded-full bg-white/[0.07] blur-3xl"
+            animate={{ y: [0, -20, 0], x: [0, 10, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-red/[0.08] blur-3xl"
+            animate={{ y: [0, 15, 0], x: [0, -10, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-red/5 blur-3xl"
+            animate={{ scale: [1, 1.08, 1] }}
+            transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          {/* Floating circle decoration */}
+          <motion.div
+            className="absolute top-[15%] right-[15%] w-24 h-24 rounded-full border border-white/10"
+            animate={{ y: [0, -15, 0], rotate: [0, 90, 0] }}
+            transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          {/* Diagonal lines */}
+          <motion.div
+            className="absolute bottom-[20%] right-[25%] w-px h-32 bg-gradient-to-b from-transparent via-white/10 to-transparent origin-center rotate-[30deg]"
+            animate={{ opacity: [0.3, 0.7, 0.3] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute top-[30%] left-[20%] w-px h-24 bg-gradient-to-b from-transparent via-white/10 to-transparent origin-center -rotate-[20deg]"
+            animate={{ opacity: [0.2, 0.6, 0.2] }}
+            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+          />
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="max-w-7xl mx-auto px-6 relative z-10 w-full pt-32 pb-20" ref={heroTextRef}>
           <Link
             href={`/${locale}`}
-            className="inline-flex items-center gap-2 text-cream/60 hover:text-cream text-sm mb-8 transition-colors"
+            className="inline-flex items-center gap-2 text-cream/60 hover:text-cream text-sm mb-10 transition-colors group"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Back to Home
           </Link>
 
           <div ref={headerRef}>
-            <p className="text-red/80 text-sm tracking-[0.3em] uppercase font-semibold mb-3">
+            <p className="text-red/80 text-sm tracking-[0.3em] uppercase font-semibold mb-4">
               {t('label')}
             </p>
-            <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
+            <h1 className="font-heading text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-5 leading-[1.1]">
               {t('title')}
             </h1>
-            <div className="w-20 h-[3px] bg-white/50 mb-6" />
-            <p className="text-cream/60 max-w-lg text-lg">
+            <div className="w-24 h-[3px] bg-gradient-to-r from-white/70 to-white/0 mb-8" />
+            <p className="text-cream/60 max-w-xl text-lg sm:text-xl leading-relaxed">
               {t('mission')}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-5xl mx-auto px-6 py-16">
-        {/* Description */}
-        <div ref={textRef} className="text-center">
-          <p className="text-navy/70 leading-relaxed text-base sm:text-lg max-w-2xl mx-auto mb-8">
-            {t('description')}
-          </p>
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mb-0">
-            {['highlight1', 'highlight2', 'highlight3'].map((key) => (
-              <div key={key} className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-red shrink-0" />
-                <p className="text-navy/60 text-sm">{t(key)}</p>
-              </div>
-            ))}
+      {/* ═══════════════════════════════════════════════════════════════
+          Mission / Description Section — Large Typography
+      ═══════════════════════════════════════════════════════════════ */}
+      <section className="py-20 md:py-28 bg-cream overflow-hidden">
+        <div className="max-w-5xl mx-auto px-6">
+          <div ref={textRef} className="text-center">
+            <p className="text-navy/70 leading-relaxed text-lg sm:text-xl max-w-3xl mx-auto mb-8">
+              {t('description')}
+            </p>
+
+            {/* Decorative red line that draws on scroll */}
+            <div
+              ref={redLineRef}
+              className="w-24 h-[3px] bg-gradient-to-r from-red/20 via-red to-red/20 mx-auto mb-10 origin-left"
+            />
+
+            <div className="flex flex-wrap justify-center gap-x-10 gap-y-4 mb-0">
+              {['highlight1', 'highlight2', 'highlight3'].map((key) => (
+                <div key={key} className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red shrink-0 shadow-[0_0_8px_rgba(193,33,38,0.3)]" />
+                  <p className="text-navy/60 text-sm sm:text-base">{t(key)}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Stats Row */}
-        <div ref={statsRef} className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat, i) => {
-            const Icon = stat.icon;
-            return (
-              <motion.div
-                key={stat.key}
-                className="text-center group"
-                whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              >
-                <div className="w-14 h-14 rounded-2xl bg-red/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-red/20 transition-colors duration-500">
-                  <Icon className="w-6 h-6 text-red" />
-                </div>
-                <div className="text-3xl sm:text-4xl font-heading font-bold text-navy mb-1">
-                  {stat.prefix}
-                  <span ref={(el) => { counterRefs.current[i] = el; }}>0</span>
-                  {stat.suffix}
-                </div>
-                <p className="text-navy/50 text-sm font-medium">{t(`stats.${stat.key}`)}</p>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Our Values Section */}
-      <div ref={valuesRef} className="max-w-6xl mx-auto px-6 pb-20">
-        <div className="text-center mb-12">
+      {/* ═══════════════════════════════════════════════════════════════
+          Stats Section — Full-Width Navy Strip
+      ═══════════════════════════════════════════════════════════════ */}
+      <section ref={statsSectionRef} className="relative bg-navy py-20 md:py-24 overflow-hidden">
+        {/* Subtle animated background pattern */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-30"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.07) 1px, transparent 0)',
+            backgroundSize: '40px 40px',
+          }}
+        />
+        <div className="absolute inset-0 pointer-events-none">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">What We Stand For</p>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-navy mb-4">Our Values</h2>
-            <div className="w-16 h-[3px] bg-red/40 mx-auto" />
-          </motion.div>
+            className="absolute top-0 right-1/4 w-80 h-80 rounded-full bg-red/[0.06] blur-3xl"
+            animate={{ x: [0, 20, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute bottom-0 left-1/3 w-64 h-64 rounded-full bg-white/[0.03] blur-3xl"
+            animate={{ x: [0, -15, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {values.map((val, i) => {
-            const Icon = val.icon;
-            return (
-              <motion.div
-                key={val.title}
-                className="value-card relative bg-navy rounded-3xl p-8 text-center group cursor-default overflow-hidden"
-                whileHover={{ y: -6, transition: { duration: 0.3 } }}
-              >
-                {/* Decorative glow */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-red/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full blur-2xl" />
-
-                <div className="relative z-10">
-                  <div className="w-16 h-16 rounded-2xl bg-red/20 flex items-center justify-center mx-auto mb-5 group-hover:bg-red/30 transition-colors duration-500">
-                    <Icon className="w-7 h-7 text-red" />
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
+          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+            {stats.map((stat, i) => {
+              const Icon = stat.icon;
+              return (
+                <motion.div
+                  key={stat.key}
+                  className="text-center group relative"
+                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                >
+                  {/* Subtle glow behind card */}
+                  <div className="absolute inset-0 -m-4 rounded-3xl bg-white/[0.02] group-hover:bg-white/[0.04] transition-colors duration-500" />
+                  <div className="relative z-10">
+                    <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-5 group-hover:bg-white/15 transition-colors duration-500 shadow-[0_0_20px_rgba(255,255,255,0.05)]">
+                      <Icon className="w-7 h-7 text-red" />
+                    </div>
+                    <div className="text-5xl sm:text-6xl font-heading font-bold text-white mb-2">
+                      {stat.prefix}
+                      <span ref={(el) => { counterRefs.current[i] = el; }}>0</span>
+                      {stat.suffix}
+                    </div>
+                    <p className="text-cream/50 text-sm font-medium tracking-wide">{t(`stats.${stat.key}`)}</p>
                   </div>
-                  <h3 className="font-heading text-xl font-bold text-white mb-3">{val.title}</h3>
-                  <div className="w-8 h-[2px] bg-red/50 mx-auto mb-4" />
-                  <p className="text-cream/60 text-sm leading-relaxed">{val.description}</p>
-                </div>
-
-                {/* Bottom accent line */}
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-red/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              </motion.div>
-            );
-          })}
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          Values Section — Premium Cards with 3D Hover
+      ═══════════════════════════════════════════════════════════════ */}
+      <section className="py-24 md:py-32 bg-cream overflow-hidden">
+        <div ref={valuesRef} className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">What We Stand For</p>
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-5">Our Values</h2>
+              <div className="w-16 h-[3px] bg-red/40 mx-auto" />
+            </motion.div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8" style={{ perspective: '1200px' }}>
+            {values.map((val, i) => {
+              const Icon = val.icon;
+              return (
+                <motion.div
+                  key={val.title}
+                  className="value-card relative bg-navy rounded-3xl p-10 text-center group cursor-default overflow-hidden"
+                  whileHover={{
+                    y: -8,
+                    rotateY: i === 0 ? 3 : i === 2 ? -3 : 0,
+                    transition: { duration: 0.3 },
+                  }}
+                  style={{ transformStyle: 'preserve-3d' }}
+                >
+                  {/* Decorative glow */}
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-red/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
+
+                  {/* Animated gradient border on hover */}
+                  <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 p-px">
+                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-red/40 via-transparent to-white/10 opacity-50" />
+                  </div>
+
+                  <div className="relative z-10">
+                    <div className="w-20 h-20 rounded-3xl bg-red/20 flex items-center justify-center mx-auto mb-6 group-hover:bg-red/30 transition-colors duration-500 shadow-[0_0_30px_rgba(193,33,38,0.15)]">
+                      <Icon className="w-9 h-9 text-red" />
+                    </div>
+                    <h3 className="font-heading text-xl sm:text-2xl font-bold text-white mb-3">{val.title}</h3>
+                    <div className="w-10 h-[2px] bg-red/50 mx-auto mb-5" />
+                    <p className="text-cream/60 text-sm sm:text-base leading-relaxed">{val.description}</p>
+                  </div>
+
+                  {/* Bottom accent line */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-red/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
       {/* ═══════════════════════════════════════════════════════════════
           Our Partners Section — Physics-Based Interactive Marquee
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="bg-white/50 py-20">
+      <section className="bg-gradient-to-b from-cream to-white/50 py-24 md:py-28 overflow-hidden">
         <div ref={partnersRef} className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Collaboration</p>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-navy mb-4">Trusted Partners</h2>
-            <div className="w-16 h-[3px] bg-red/40 mx-auto mb-4" />
-            <p className="text-navy/60 text-base max-w-lg mx-auto">Working with Taiwan&apos;s leading retailers to bring you the best Indonesian products</p>
+          <div className="text-center mb-14">
+            <motion.div
+              initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Collaboration</p>
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-5">Trusted Partners</h2>
+              <div className="w-16 h-[3px] bg-red/40 mx-auto mb-5" />
+              <p className="text-navy/60 text-base sm:text-lg max-w-lg mx-auto">Working with Taiwan&apos;s leading retailers to bring you the best Indonesian products</p>
+            </motion.div>
           </div>
 
           {partners.length > 0 ? (
@@ -558,23 +770,34 @@ export default function AboutPage() {
             </div>
           )}
         </div>
-      </div>
+      </section>
 
       {/* ═══════════════════════════════════════════════════════════════
-          Our Story Section — Clean Editorial Timeline
+          Our Story Section — Cinematic Editorial Timeline
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-24 md:py-32 bg-cream relative">
+      <section className="py-24 md:py-32 bg-cream relative overflow-hidden">
         <div ref={storyRef} className="max-w-5xl mx-auto px-6">
-          {/* Simple header */}
+          {/* Header */}
           <div className="text-center mb-16 md:mb-20">
-            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Our Story</p>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-navy">The Journey So Far</h2>
+            <motion.div
+              initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Our Story</p>
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-5">The Journey So Far</h2>
+              <div className="w-16 h-[3px] bg-red/40 mx-auto" />
+            </motion.div>
           </div>
 
           {/* Timeline */}
           <div className="relative">
-            {/* Vertical line */}
-            <div className="absolute left-[20px] md:left-1/2 md:-translate-x-px top-0 bottom-0 w-px bg-navy/10" />
+            {/* Vertical line that draws on scroll */}
+            <div
+              ref={timelineLineRef}
+              className="absolute left-[20px] md:left-1/2 md:-translate-x-px top-0 bottom-0 w-px bg-gradient-to-b from-red/30 via-navy/20 to-red/30 origin-top"
+            />
 
             <div className="space-y-12 md:space-y-16">
               {milestones.map((milestone, i) => (
@@ -582,21 +805,26 @@ export default function AboutPage() {
                   key={milestone.year}
                   className="story-chapter relative"
                 >
-                  {/* Dot marker */}
-                  <div className="absolute left-[20px] md:left-1/2 -translate-x-1/2 top-1 w-2.5 h-2.5 rounded-full bg-red border-2 border-cream z-10" />
+                  {/* Dot marker — scales in on scroll */}
+                  <div
+                    ref={(el) => { dotRefs.current[i] = el; }}
+                    className="absolute left-[20px] md:left-1/2 -translate-x-1/2 top-1 z-10"
+                  >
+                    <div className="w-3.5 h-3.5 rounded-full bg-red border-[3px] border-cream shadow-[0_0_12px_rgba(193,33,38,0.3)]" />
+                  </div>
 
                   <div className={`flex flex-col md:flex-row md:items-start gap-2 md:gap-0`}>
                     {/* Year side */}
                     <div className={`md:w-1/2 pl-12 md:pl-0 ${i % 2 === 0 ? 'md:text-right md:pr-14' : 'md:order-2 md:pl-14'}`}>
-                      <span className="inline-block text-xs font-bold text-red tracking-widest uppercase bg-red/5 px-3 py-1 rounded-full">
+                      <span className="inline-block text-xs font-bold text-red tracking-widest uppercase bg-red/5 px-3 py-1.5 rounded-full border border-red/10">
                         {milestone.year}
                       </span>
                     </div>
 
                     {/* Content side */}
                     <div className={`md:w-1/2 pl-12 md:pl-0 ${i % 2 === 0 ? 'md:pl-14' : 'md:order-1 md:text-right md:pr-14'}`}>
-                      <div className="bg-white rounded-2xl border border-navy/[0.06] p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
-                        <h3 className="font-heading text-lg font-bold text-navy mb-2">{milestone.title}</h3>
+                      <div className="bg-white rounded-2xl border border-navy/[0.06] p-7 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                        <h3 className="font-heading text-lg sm:text-xl font-bold text-navy mb-2">{milestone.title}</h3>
                         <p className="text-navy/55 text-sm leading-relaxed">{milestone.description}</p>
                       </div>
                     </div>
@@ -608,43 +836,65 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Bottom CTA */}
-      <div className="bg-gradient-to-r from-navy via-navy/95 to-red-dark py-16 relative overflow-hidden">
+      {/* ═══════════════════════════════════════════════════════════════
+          Bottom CTA — Full-Width Dramatic
+      ═══════════════════════════════════════════════════════════════ */}
+      <section className="relative bg-gradient-to-br from-navy via-navy/95 to-red-dark py-24 md:py-28 overflow-hidden">
+        {/* Animated background shapes */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-1/4 w-64 h-64 rounded-full bg-red/10 blur-3xl" />
-          <div className="absolute bottom-0 left-1/4 w-48 h-48 rounded-full bg-white/5 blur-3xl" />
+          <motion.div
+            className="absolute top-0 right-1/4 w-72 h-72 rounded-full bg-red/10 blur-3xl"
+            animate={{ y: [0, -20, 0], x: [0, 15, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute bottom-0 left-1/4 w-56 h-56 rounded-full bg-white/5 blur-3xl"
+            animate={{ y: [0, 10, 0], x: [0, -10, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-red/[0.04] blur-3xl"
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          {/* Grid pattern */}
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0)',
+              backgroundSize: '48px 48px',
+            }}
+          />
         </div>
-        <motion.div
-          className="max-w-3xl mx-auto px-6 text-center relative z-10"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
+
+        <div
+          ref={ctaRef}
+          className="max-w-4xl mx-auto px-6 text-center relative z-10"
         >
-          <Sparkles className="w-8 h-8 text-red/60 mx-auto mb-4" />
-          <h2 className="font-heading text-2xl sm:text-3xl font-bold text-white mb-4">
+          <Sparkles className="w-10 h-10 text-red/60 mx-auto mb-5" />
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight">
             Want to Learn More?
           </h2>
-          <p className="text-cream/60 mb-8 max-w-md mx-auto">
+          <p className="text-cream/60 mb-10 max-w-lg mx-auto text-lg">
             Discover our products or get in touch with our team today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href={`/${locale}/products`}
-              className="inline-flex items-center justify-center gap-2 bg-red hover:bg-red/90 text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="inline-flex items-center justify-center gap-2 bg-red hover:bg-red/90 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-red/20 text-base"
             >
               Browse Products
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-5 h-5" />
             </Link>
             <Link
               href={`/${locale}/contact`}
-              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 border border-white/20"
+              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 border border-white/20 hover:border-white/30 text-base"
             >
               Contact Us
             </Link>
           </div>
-        </motion.div>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
