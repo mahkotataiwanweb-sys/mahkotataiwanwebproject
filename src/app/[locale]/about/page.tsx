@@ -349,21 +349,23 @@ export default function AboutPage() {
         );
       }
 
-      // Stats — cinematic bubble entrance
+      // Stats — dramatic cinematic bubble entrance
       if (statsRef.current) {
         const bubbleItems = statsRef.current.querySelectorAll('.stat-bubble-item');
         
+        // Entrance: bubbles fly in from below with dramatic spring
         gsap.fromTo(
           bubbleItems,
-          { opacity: 0, scale: 0.5, y: 60, filter: 'blur(12px)' },
+          { opacity: 0, scale: 0.3, y: 100, rotation: -15, filter: 'blur(16px)' },
           {
             opacity: 1,
             scale: 1,
             y: 0,
+            rotation: 0,
             filter: 'blur(0px)',
-            duration: 0.9,
-            stagger: 0.15,
-            ease: 'elastic.out(1, 0.6)',
+            duration: 1.4,
+            stagger: 0.2,
+            ease: 'elastic.out(1, 0.45)',
             scrollTrigger: {
               trigger: statsRef.current,
               start: 'top 85%',
@@ -372,15 +374,55 @@ export default function AboutPage() {
           }
         );
 
-        // Continuous floating animation for each bubble (different rhythm per bubble)
+        // Dramatic continuous floating — each bubble has unique organic movement
+        const floatConfigs = [
+          { y: -18, x: 6, rotate: 3, scale: 1.04, dur: 3.2 },
+          { y: -22, x: -8, rotate: -2.5, scale: 1.05, dur: 3.8 },
+          { y: -16, x: 7, rotate: 2, scale: 1.03, dur: 3.5 },
+          { y: -20, x: -5, rotate: -3, scale: 1.06, dur: 4.0 },
+        ];
+        
         bubbleItems.forEach((item, i) => {
+          const cfg = floatConfigs[i % floatConfigs.length];
+          
+          // Primary float — Y axis bob
           gsap.to(item, {
-            y: -10 - (i * 2),
-            duration: 2.8 + (i * 0.4),
+            y: cfg.y,
+            duration: cfg.dur,
             ease: 'sine.inOut',
             repeat: -1,
             yoyo: true,
-            delay: 1.2 + (i * 0.2),
+            delay: 1.5 + (i * 0.3),
+          });
+          
+          // Secondary drift — slight X sway
+          gsap.to(item, {
+            x: cfg.x,
+            duration: cfg.dur * 1.3,
+            ease: 'sine.inOut',
+            repeat: -1,
+            yoyo: true,
+            delay: 1.8 + (i * 0.4),
+          });
+          
+          // Gentle rotation wobble
+          gsap.to(item, {
+            rotation: cfg.rotate,
+            duration: cfg.dur * 0.9,
+            ease: 'sine.inOut',
+            repeat: -1,
+            yoyo: true,
+            delay: 2.0 + (i * 0.25),
+          });
+          
+          // Subtle scale breathing
+          gsap.to(item, {
+            scale: cfg.scale,
+            duration: cfg.dur * 1.1,
+            ease: 'sine.inOut',
+            repeat: -1,
+            yoyo: true,
+            delay: 1.6 + (i * 0.35),
           });
         });
       }
@@ -621,54 +663,68 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Stats Section — Navy Strip
       ═══════════════════════════════════════════════════════════════ */}
-      <section ref={statsSectionRef} className="py-28 sm:py-36 bg-navy relative overflow-hidden">
-        {/* Background ambient glow */}
+      <section ref={statsSectionRef} className="py-28 sm:py-36 relative overflow-hidden">
+        {/* Subtle ambient glow on cream background */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-64 bg-red/8 rounded-full blur-[100px]" />
-          <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-64 h-64 bg-blue-500/6 rounded-full blur-[100px]" />
+          <div className="absolute top-1/3 left-[15%] w-72 h-72 bg-red/[0.06] rounded-full blur-[120px]" />
+          <div className="absolute bottom-1/3 right-[15%] w-72 h-72 bg-red/[0.04] rounded-full blur-[120px]" />
         </div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-14">
+          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-16">
             {stats.map((stat, i) => {
               const Icon = stat.icon;
               return (
                 <div key={stat.key} className="flex flex-col items-center group stat-bubble-item">
-                  {/* ── Floating Red Glossy Bubble ── */}
-                  <div className="relative mb-6">
-                    {/* Outer glow aura */}
-                    <div className="absolute -inset-3 rounded-full bg-red/20 blur-xl group-hover:bg-red/30 transition-all duration-700" />
+                  {/* ── Ultra Luxury Floating Red Glossy Bubble ── */}
+                  <div className="relative mb-7">
+                    {/* Deep outer glow — large diffused red aura */}
+                    <div className="absolute -inset-6 rounded-full bg-red/15 blur-2xl group-hover:bg-red/25 transition-all duration-1000" />
+                    {/* Mid glow ring */}
+                    <div className="absolute -inset-3 rounded-full bg-red/10 blur-xl" />
                     
-                    {/* Main red bubble */}
-                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden shadow-[0_8px_32px_rgba(220,38,38,0.4),0_0_60px_rgba(220,38,38,0.15),inset_0_-4px_12px_rgba(0,0,0,0.3)]">
-                      {/* Gradient fill — deep red to vibrant */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-red-400 via-red to-red-800 rounded-full" />
+                    {/* Main glossy sphere */}
+                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden shadow-[0_12px_40px_rgba(180,30,30,0.45),0_4px_16px_rgba(180,30,30,0.3),0_0_80px_rgba(220,38,38,0.12),inset_0_-6px_16px_rgba(0,0,0,0.35),inset_0_2px_4px_rgba(255,255,255,0.15)]">
+                      {/* Base gradient — rich deep red spectrum */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-red-400 via-red-500 to-red-900 rounded-full" />
                       
-                      {/* Top glossy reflection arc */}
-                      <div className="absolute top-0 left-[10%] right-[10%] h-[45%] bg-gradient-to-b from-white/40 via-white/15 to-transparent rounded-t-full" />
+                      {/* Radial depth overlay */}
+                      <div className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(ellipse at 35% 25%, rgba(255,120,120,0.25) 0%, transparent 55%)' }} />
                       
-                      {/* Secondary inner shine */}
-                      <div className="absolute top-[8%] left-[15%] w-[35%] h-[25%] bg-white/25 rounded-full blur-[6px]" />
+                      {/* Primary glossy dome — top highlight arc */}
+                      <div className="absolute top-0 left-[8%] right-[8%] h-[50%] rounded-t-full bg-gradient-to-b from-white/50 via-white/20 to-transparent" />
                       
-                      {/* Bottom rim reflection */}
-                      <div className="absolute bottom-0 left-[15%] right-[15%] h-[15%] bg-gradient-to-t from-white/10 to-transparent rounded-b-full" />
+                      {/* Hot spot — bright specular reflection */}
+                      <div className="absolute top-[10%] left-[18%] w-[30%] h-[22%] bg-white/40 rounded-full blur-[5px]" />
                       
-                      {/* Edge light ring */}
-                      <div className="absolute inset-0 rounded-full ring-1 ring-white/20 ring-inset" />
+                      {/* Small secondary glint */}
+                      <div className="absolute top-[6%] left-[22%] w-[12%] h-[10%] bg-white/60 rounded-full blur-[3px]" />
                       
-                      {/* Blue icon in center */}
+                      {/* Rim light — bottom edge catch */}
+                      <div className="absolute bottom-[2%] left-[12%] right-[12%] h-[12%] bg-gradient-to-t from-white/15 via-white/5 to-transparent rounded-b-full" />
+                      
+                      {/* Left edge rim light */}
+                      <div className="absolute top-[20%] left-0 w-[8%] h-[40%] bg-gradient-to-r from-white/10 to-transparent" />
+                      
+                      {/* Inner ring for glass depth */}
+                      <div className="absolute inset-[2px] rounded-full ring-1 ring-white/15" />
+                      <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-red-300/20" />
+                      
+                      {/* Blue icon — glowing center */}
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <Icon className="w-8 h-8 sm:w-10 sm:h-10 text-blue-300 drop-shadow-[0_2px_8px_rgba(96,165,250,0.6)] relative z-10" />
+                        <div className="absolute w-12 h-12 sm:w-14 sm:h-14 bg-blue-400/20 rounded-full blur-lg" />
+                        <Icon className="w-9 h-9 sm:w-11 sm:h-11 text-blue-200 drop-shadow-[0_0_12px_rgba(147,197,253,0.8)] relative z-10" />
                       </div>
                     </div>
                     
-                    {/* Subtle bottom shadow for 3D depth */}
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-14 h-3 bg-red/30 rounded-full blur-md" />
+                    {/* Floor shadow — elliptical for 3D realism */}
+                    <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-16 h-4 bg-red-900/25 rounded-full blur-lg" />
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-10 h-2 bg-red-800/30 rounded-full blur-md" />
                   </div>
 
-                  {/* ── Number with glow effect ── */}
-                  <div className="text-4xl sm:text-5xl font-heading font-bold text-white mb-1.5 relative">
-                    <span className="absolute inset-0 text-red/20 blur-lg select-none pointer-events-none" aria-hidden="true">
+                  {/* ── Number — dark text on cream ── */}
+                  <div className="text-4xl sm:text-5xl font-heading font-bold text-navy mb-1.5 relative">
+                    <span className="absolute inset-0 text-red/10 blur-lg select-none pointer-events-none" aria-hidden="true">
                       {stat.prefix}{stat.value}{stat.suffix}
                     </span>
                     <span className="relative">
@@ -678,8 +734,8 @@ export default function AboutPage() {
                     </span>
                   </div>
 
-                  {/* ── Label ── */}
-                  <p className="text-white/60 text-sm font-medium tracking-[0.15em] uppercase">{t(`stats.${stat.key}`)}</p>
+                  {/* ── Label — muted dark ── */}
+                  <p className="text-navy/50 text-sm font-medium tracking-[0.15em] uppercase">{t(`stats.${stat.key}`)}</p>
                 </div>
               );
             })}
