@@ -66,7 +66,7 @@ function WavyTextureBackground() {
             <path
               d={`M0,${rowHeight / 2} Q30,${rowHeight / 2 - 8} 45,${rowHeight / 2} T90,${rowHeight / 2} Q120,${rowHeight / 2 + 8} 135,${rowHeight / 2} T180,${rowHeight / 2}`}
               fill="none"
-              stroke="rgba(0,0,0,0.12)"
+              stroke="rgba(0,0,0,0.08)"
               strokeWidth="1.5"
             />
           </pattern>
@@ -81,7 +81,7 @@ function WavyTextureBackground() {
             <path
               d={`M0,${(rowHeight + 5) / 2} Q40,${(rowHeight + 5) / 2 - 6} 55,${(rowHeight + 5) / 2} T110,${(rowHeight + 5) / 2} Q150,${(rowHeight + 5) / 2 + 6} 165,${(rowHeight + 5) / 2} T220,${(rowHeight + 5) / 2}`}
               fill="none"
-              stroke="rgba(0,0,0,0.07)"
+              stroke="rgba(0,0,0,0.05)"
               strokeWidth="1.2"
             />
           </pattern>
@@ -267,7 +267,7 @@ function InfiniteSlider({
       // Name styling
       nameEl.style.opacity = `${0.2 + proximity * 0.8}`;
       nameEl.style.transform = `scale(${0.85 + proximity * 0.25})`;
-      nameEl.style.color = `rgba(250,237,211,${0.3 + proximity * 0.7})`;
+      nameEl.style.color = `rgba(0,48,72,${0.3 + proximity * 0.7})`;
       nameEl.style.transition = 'all 0.35s ease';
 
       // Track closest for wobble
@@ -414,7 +414,7 @@ function InfiniteSlider({
 
   if (products.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-cream/50">
+      <div className="flex items-center justify-center h-64 text-navy/40">
         <p className="text-lg">No products in this category yet</p>
       </div>
     );
@@ -427,16 +427,16 @@ function InfiniteSlider({
       style={{ cursor: isDraggingRef.current ? 'grabbing' : 'grab' }}
     >
       {/* Center line indicator (subtle) */}
-      <div className="absolute top-0 left-1/2 -translate-x-px w-[2px] h-full bg-cream/10 pointer-events-none z-0" />
+      <div className="absolute top-0 left-1/2 -translate-x-px w-[2px] h-full bg-navy/8 pointer-events-none z-0" />
 
       {/* Fade edges */}
       <div
         className="absolute top-0 left-0 w-20 sm:w-36 h-full z-10 pointer-events-none"
-        style={{ background: 'linear-gradient(to right, var(--color-red), transparent)' }}
+        style={{ background: 'linear-gradient(to right, var(--color-cream-deeper), transparent)' }}
       />
       <div
         className="absolute top-0 right-0 w-20 sm:w-36 h-full z-10 pointer-events-none"
-        style={{ background: 'linear-gradient(to left, var(--color-red), transparent)' }}
+        style={{ background: 'linear-gradient(to left, var(--color-cream-deeper), transparent)' }}
       />
 
       <div
@@ -478,7 +478,7 @@ function InfiniteSlider({
                   unoptimized
                 />
               ) : (
-                <div className="w-full h-full rounded-full bg-cream/15 flex items-center justify-center backdrop-blur-sm">
+                <div className="w-full h-full rounded-full bg-navy/10 flex items-center justify-center backdrop-blur-sm">
                   <span className="text-5xl">🍽️</span>
                 </div>
               )}
@@ -582,7 +582,8 @@ export default function ProductCatalogSection() {
     <>
       <section
         ref={sectionRef}
-        className="relative bg-red overflow-hidden py-16 sm:py-24"
+        className="relative overflow-hidden py-16 sm:py-24"
+        style={{ backgroundColor: 'var(--color-cream-deeper)' }}
       >
         {/* Static wavy texture background */}
         <WavyTextureBackground />
@@ -591,10 +592,10 @@ export default function ProductCatalogSection() {
         <div ref={contentRef} className="relative z-10">
           {/* Section Heading */}
           <div className="text-center mb-6 sm:mb-8 px-4">
-            <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-cream mb-2 drop-shadow-lg">
+            <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-navy mb-2 drop-shadow-sm">
               Our Products
             </h2>
-            <p className="text-cream/70 text-base sm:text-lg md:text-xl font-body tracking-wide">
+            <p className="text-navy/60 text-base sm:text-lg md:text-xl font-body tracking-wide">
               Indonesian Taste, in Taiwan.
             </p>
           </div>

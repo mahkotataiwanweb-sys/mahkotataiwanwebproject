@@ -130,50 +130,69 @@ export default function WhereToBuySection() {
     return () => ctx.revert();
   }, []);
 
-  /* Letter reveal animation — triggered on scroll */
+  /* Looping bounce-in per letter animation */
   useEffect(() => {
     if (!sectionRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Top text letters
       const topLetters = topTextRef.current?.querySelectorAll('.letter-char');
-      if (topLetters?.length) {
-        gsap.set(topLetters, { opacity: 0, y: 25, rotateX: 90, filter: 'blur(8px)' });
-        gsap.to(topLetters, {
-          opacity: 1,
-          y: 0,
-          rotateX: 0,
-          filter: 'blur(0px)',
-          duration: 0.7,
-          stagger: 0.06,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 60%',
-            toggleActions: 'play none none none',
-          },
-        });
-      }
+      const bottomLettersA = bottomTextRef.current?.querySelectorAll('.letter-line-a .letter-char');
+      const bottomLettersB = bottomTextRef.current?.querySelectorAll('.letter-line-b .letter-char');
 
-      // Bottom text letters
-      const bottomLetters = bottomTextRef.current?.querySelectorAll('.letter-char');
-      if (bottomLetters?.length) {
-        gsap.set(bottomLetters, { opacity: 0, y: 25, rotateX: 90, filter: 'blur(8px)' });
-        gsap.to(bottomLetters, {
+      const allGroups = [
+        { els: topLetters, stagger: 0.08 },
+        { els: bottomLettersA, stagger: 0.07 },
+        { els: bottomLettersB, stagger: 0.06 },
+      ];
+
+      // Set all hidden initially
+      allGroups.forEach(({ els }) => {
+        if (els?.length) {
+          gsap.set(els, { opacity: 0, y: 30, scale: 0.3, rotateX: 60 });
+        }
+      });
+
+      // Build a looping master timeline
+      const masterTl = gsap.timeline({
+        repeat: -1,
+        repeatDelay: 1.5,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 65%',
+          toggleActions: 'play pause resume pause',
+        },
+      });
+
+      // Phase 1: Bounce-in all letters slowly, group by group
+      let offset = 0;
+      allGroups.forEach(({ els, stagger }) => {
+        if (!els?.length) return;
+        masterTl.to(els, {
           opacity: 1,
           y: 0,
+          scale: 1,
           rotateX: 0,
-          filter: 'blur(0px)',
           duration: 0.6,
-          stagger: 0.05,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 55%',
-            toggleActions: 'play none none none',
-          },
-        });
-      }
+          stagger: stagger,
+          ease: 'bounce.out',
+        }, offset);
+        offset += els.length * stagger * 0.6; // overlap groups slightly
+      });
+
+      // Phase 2: Hold all visible for 3 seconds
+      masterTl.to({}, { duration: 3 });
+
+      // Phase 3: Fade all out together softly
+      allGroups.forEach(({ els }) => {
+        if (!els?.length) return;
+        masterTl.to(els, {
+          opacity: 0,
+          y: -15,
+          scale: 0.8,
+          duration: 0.5,
+          ease: 'power2.in',
+        }, `>-0.5`); // overlap the fade-outs
+      });
     }, sectionRef);
 
     return () => ctx.revert();
@@ -210,7 +229,6 @@ export default function WhereToBuySection() {
                   <span
                     key={i}
                     className="letter-char inline-block"
-                    style={{ animationDelay: `${i * 0.08}s` }}
                   >
                     {char === ' ' ? '\u00A0' : char}
                   </span>
@@ -220,23 +238,21 @@ export default function WhereToBuySection() {
 
             {/* Text overlay — bottom right: letter-by-letter reveal */}
             <div ref={bottomTextRef} className="absolute -bottom-2 -right-4 sm:right-0 z-10 text-right pointer-events-none">
-              <p className="font-heading text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-red leading-tight">
+              <p className="letter-line-a font-heading text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-red leading-tight">
                 {'300+ Store'.split('').map((char, i) => (
                   <span
                     key={`a-${i}`}
                     className="letter-char inline-block"
-                    style={{ animationDelay: `${0.5 + i * 0.07}s` }}
                   >
                     {char === ' ' ? '\u00A0' : char}
                   </span>
                 ))}
               </p>
-              <p className="font-heading text-xs sm:text-sm md:text-base text-navy/60 font-medium tracking-wide ">
+              <p className="letter-line-b font-heading text-xs sm:text-sm md:text-base text-navy/60 font-medium tracking-wide">
                 {'all over Taiwan'.split('').map((char, i) => (
                   <span
                     key={`b-${i}`}
                     className="letter-char inline-block"
-                    style={{ animationDelay: `${1.2 + i * 0.06}s` }}
                   >
                     {char === ' ' ? '\u00A0' : char}
                   </span>
