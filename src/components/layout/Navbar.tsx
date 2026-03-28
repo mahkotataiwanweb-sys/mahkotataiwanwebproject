@@ -61,7 +61,7 @@ const fallbackNavItems: FallbackNavItem[] = [
 ];
 
 // Pages that have dark navy hero headers (non-homepage pages)
-const darkHeaderPages = ['/products', '/lifestyle', '/events', '/about', '/gallery', '/where-to-buy'];
+const darkHeaderPages = ['/products', '/lifestyle', '/events', '/about', '/gallery', '/where-to-buy', '/contact'];
 
 export default function Navbar() {
   const t = useTranslations('nav');
@@ -257,7 +257,7 @@ export default function Navbar() {
               key={item.id}
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className={cn(
-                'text-sm font-medium tracking-wide uppercase line-reveal transition-colors',
+                'text-base font-medium tracking-wide uppercase line-reveal transition-colors',
                 useLightText
                   ? 'text-white font-bold border-b-2 border-white pb-0.5'
                   : 'text-navy font-bold border-b-2 border-red pb-0.5'
@@ -273,7 +273,7 @@ export default function Navbar() {
             key={item.id}
             href={buildHref(item.url)}
             className={cn(
-              'text-sm font-medium tracking-wide uppercase line-reveal transition-colors duration-300',
+              'text-base font-medium tracking-wide uppercase line-reveal transition-colors duration-300',
               linkColor(isActive)
             )}
           >
@@ -292,7 +292,7 @@ export default function Navbar() {
         >
           <button
             className={cn(
-              'flex items-center gap-1 text-sm font-medium tracking-wide uppercase transition-colors duration-300',
+              'flex items-center gap-1 text-base font-medium tracking-wide uppercase transition-colors duration-300',
               linkColor(isChildActive || isActive)
             )}
           >
@@ -443,7 +443,7 @@ export default function Navbar() {
               key={item.key}
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className={cn(
-                'text-sm font-medium tracking-wide uppercase line-reveal transition-colors',
+                'text-base font-medium tracking-wide uppercase line-reveal transition-colors',
                 useLightText
                   ? 'text-white font-bold border-b-2 border-white pb-0.5'
                   : 'text-navy font-bold border-b-2 border-red pb-0.5'
@@ -459,7 +459,7 @@ export default function Navbar() {
             key={item.key}
             href={buildHref(item.href)}
             className={cn(
-              'text-sm font-medium tracking-wide uppercase line-reveal transition-colors duration-300',
+              'text-base font-medium tracking-wide uppercase line-reveal transition-colors duration-300',
               linkColor(isLinkActive(item.href))
             )}
           >
@@ -478,7 +478,7 @@ export default function Navbar() {
         >
           <button
             className={cn(
-              'flex items-center gap-1 text-sm font-medium tracking-wide uppercase transition-colors duration-300',
+              'flex items-center gap-1 text-base font-medium tracking-wide uppercase transition-colors duration-300',
               linkColor(isDropdownActiveFallback(item))
             )}
           >
