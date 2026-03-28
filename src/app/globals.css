@@ -227,7 +227,7 @@
 }
 
 .product-wobble-active {
-  animation: productWobble 2s ease-in-out infinite !important;
+  animation: productWobble 2.4s ease-in-out infinite !important;
 }
 
 /* ===== Letter-by-Letter Reveal ===== */
