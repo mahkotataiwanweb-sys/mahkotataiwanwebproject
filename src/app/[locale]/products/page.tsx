@@ -498,10 +498,8 @@ function CategoryProductView({
         {/* Slider */}
         <div
           ref={sliderRef}
-          className="flex gap-4 sm:gap-6 overflow-x-auto py-4 px-4 snap-x snap-mandatory"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="flex gap-4 sm:gap-6 overflow-x-auto py-4 px-4 snap-x snap-mandatory scrollbar-hide"
         >
-          <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
           {products.map((product, i) => (
             <BezelCard
               key={product.id}
@@ -737,10 +735,9 @@ function ProductsContent() {
 
           {/* Row 2: Category buttons — floating luxury chips */}
           <div
-            className="flex gap-3 sm:gap-4 overflow-x-auto justify-center -mx-2 px-2 pb-2"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="flex gap-3 sm:gap-4 overflow-x-auto justify-center -mx-2 px-2 pb-2 scrollbar-hide"
           >
-            <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
+
 
             {categories.map((cat) => {
               const isActive = activeFilter === cat.id;
@@ -783,13 +780,7 @@ function ProductsContent() {
         </div>
       </div>
 
-      {/* Shimmer keyframe */}
-      <style jsx global>{`
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-      `}</style>
+
 
       {/* ============ CONTENT AREA ============ */}
       <div className="max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20">
