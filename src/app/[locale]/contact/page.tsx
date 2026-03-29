@@ -85,7 +85,7 @@ const GREEN_D = mkArc(9, 6, GREEN_ARC_R);
 // Saturday: 9 AM → 1 PM (120° arc, inner ring)
 const YELLOW_D = mkArc(9, 1, YELLOW_ARC_R);
 // Label midpoints
-const greenMid = pol(hToA(1.5), GREEN_ARC_R);
+const greenMid = pol(hToA(3.5), GREEN_ARC_R);
 const yellowMid = pol(hToA(11), YELLOW_ARC_R);
 
 
@@ -335,18 +335,18 @@ export default function ContactPage() {
         arcTl.set(yArc, { strokeDashoffset: yLen, opacity: 1 });
         arcTl.set([gLabel, yLabel], { opacity: 0, scale: 0.7 });
 
-        // ── Navy blue draws slowly — 20s constant speed to crawl from 9→6 ──
-        arcTl.to(gArc, { strokeDashoffset: 0, duration: 20, ease: 'none' }, 0);
+        // ── Navy blue draws slowly — 18s constant speed to crawl from 9→6 ──
+        arcTl.to(gArc, { strokeDashoffset: 0, duration: 18, ease: 'none' }, 0);
 
-        // ── Red starts 1.5s after blue, 18.5s duration — BOTH FINISH at t=20 ──
-        arcTl.to(yArc, { strokeDashoffset: 0, duration: 18.5, ease: 'none' }, 1.5);
+        // ── Red starts 1.5s after blue, 16.5s duration — BOTH FINISH at t=18 ──
+        arcTl.to(yArc, { strokeDashoffset: 0, duration: 16.5, ease: 'none' }, 1.5);
 
         // ── Labels appear at START together with their liner (not at end) ──
         arcTl.to(gLabel, { opacity: 1, scale: 1, duration: 1, ease: 'back.out(1.7)' }, 0.3);
         arcTl.to(yLabel, { opacity: 1, scale: 1, duration: 1, ease: 'back.out(1.7)' }, 1.8);
 
         // ── Hold both visible for 5s after arcs complete ──
-        arcTl.to({}, { duration: 5 }, 20);
+        arcTl.to({}, { duration: 5 }, 18);
 
         // ── Both fade out together ──
         arcTl.to([gArc, yArc, gLabel, yLabel], {
