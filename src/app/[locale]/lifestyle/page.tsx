@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Sparkles, ArrowLeft, X } from 'lucide-react';
+import { Sparkles, ArrowLeft, X, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
@@ -25,6 +25,153 @@ function formatElegantDate(dateStr: string): string {
   return `${monthNames[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 }
 
+
+
+function getDaysInMonth(year: number, month: number) {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+function getFirstDayOfMonth(year: number, month: number) {
+  return new Date(year, month, 1).getDay();
+}
+
+function getEventDatesSet(articles: Article[]) {
+  const s = new Set<string>();
+  articles.forEach((a) => {
+    if (a.published_at) s.add(a.published_at.slice(0, 10));
+  });
+  return s;
+}
+
+/* ───────────── Calendar Dropdown ───────────── */
+
+function CalendarDropdown({
+  articles,
+  selectedDate,
+  onSelectDate,
+  onClear,
+}: {
+  articles: Article[];
+  selectedDate: string | null;
+  onSelectDate: (d: string) => void;
+  onClear: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [viewYear, setViewYear] = useState(new Date().getFullYear());
+  const [viewMonth, setViewMonth] = useState(new Date().getMonth());
+  const ref = useRef<HTMLDivElement>(null);
+
+  const eventDates = useMemo(() => getEventDatesSet(articles), [articles]);
+  const days = getDaysInMonth(viewYear, viewMonth);
+  const firstDay = getFirstDayOfMonth(viewYear, viewMonth);
+  const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const monthLabel = new Date(viewYear, viewMonth).toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+  });
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border ${
+          selectedDate
+            ? 'bg-[#C12126] text-white border-[#C12126]'
+            : 'bg-white/80 text-[#003048] border-[#003048]/20 hover:border-[#003048]/50'
+        }`}
+      >
+        <CalendarIcon className="w-4 h-4" />
+        {selectedDate ? formatElegantDate(selectedDate) : 'Calendar'}
+        {selectedDate && (
+          <span
+            onClick={(e) => { e.stopPropagation(); onClear(); }}
+            className="ml-1 hover:bg-white/20 rounded-full p-0.5"
+          >
+            <X className="w-3 h-3" />
+          </span>
+        )}
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="absolute right-0 top-full mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-[#003048]/10 p-4 z-50"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <button
+                onClick={() => {
+                  if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
+                  else setViewMonth(viewMonth - 1);
+                }}
+                className="p-1 rounded-lg hover:bg-[#FAEDD3] text-[#003048] transition"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-sm font-semibold text-[#003048]">{monthLabel}</span>
+              <button
+                onClick={() => {
+                  if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); }
+                  else setViewMonth(viewMonth + 1);
+                }}
+                className="p-1 rounded-lg hover:bg-[#FAEDD3] text-[#003048] transition"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-7 gap-1 mb-1">
+              {dayNames.map((d) => (
+                <span key={d} className="text-[10px] text-center text-[#003048]/40 font-medium">{d}</span>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7 gap-1">
+              {Array.from({ length: firstDay }).map((_, i) => (
+                <span key={`e-${i}`} />
+              ))}
+              {Array.from({ length: days }).map((_, i) => {
+                const day = i + 1;
+                const iso = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const hasEvent = eventDates.has(iso);
+                const isSelected = selectedDate === iso;
+                return (
+                  <button
+                    key={day}
+                    disabled={!hasEvent}
+                    onClick={() => { onSelectDate(iso); setOpen(false); }}
+                    className={`w-8 h-8 rounded-lg text-xs flex items-center justify-center transition-all duration-200 ${
+                      isSelected
+                        ? 'bg-[#C12126] text-white font-bold'
+                        : hasEvent
+                          ? 'bg-[#003048]/10 text-[#003048] font-semibold hover:bg-[#003048] hover:text-white cursor-pointer'
+                          : 'text-[#003048]/20 cursor-default'
+                    }`}
+                  >
+                    {day}
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 /* ───────────── page ───────────── */
 
 export default function LifestylePage() {
@@ -35,6 +182,7 @@ export default function LifestylePage() {
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   /* refs */
   const heroRef = useRef<HTMLDivElement>(null);
@@ -62,14 +210,17 @@ export default function LifestylePage() {
 
   /* sorted articles */
   const sortedArticles = useMemo(() => {
-    const list = [...articles];
+    let list = [...articles];
+    if (selectedDate) {
+      list = list.filter((a) => a.published_at?.slice(0, 10) === selectedDate);
+    }
     list.sort((a, b) => {
       const dateA = new Date(a.published_at).getTime();
       const dateB = new Date(b.published_at).getTime();
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
     return list;
-  }, [articles, sortOrder]);
+  }, [articles, sortOrder, selectedDate]);
 
   /* GSAP hero entrance */
   useEffect(() => {
@@ -230,30 +381,51 @@ export default function LifestylePage() {
           CONTENT SECTION
       ═══════════════════════════════════════════════ */}
       <section className="mx-auto max-w-7xl px-6 py-12 md:py-16">
-        {/* Sort Toggle */}
-        <div className="flex items-center gap-2 mb-10">
-          <span className="text-[#003048]/40 text-sm mr-1">Sort by:</span>
-          <button
-            onClick={() => setSortOrder('newest')}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
-              sortOrder === 'newest'
-                ? 'bg-[#003048] text-white shadow-md'
-                : 'border border-[#003048]/15 text-[#003048]/60 hover:border-[#003048]/30'
-            }`}
-          >
-            Newest
-          </button>
-          <button
-            onClick={() => setSortOrder('oldest')}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
-              sortOrder === 'oldest'
-                ? 'bg-[#003048] text-white shadow-md'
-                : 'border border-[#003048]/15 text-[#003048]/60 hover:border-[#003048]/30'
-            }`}
-          >
-            Oldest
-          </button>
+        {/* Sort + Calendar */}
+        <div className="flex items-center justify-between mb-10">
+          <div className="flex items-center gap-2">
+            <span className="text-[#003048]/40 text-sm mr-1">Sort by:</span>
+            <button
+              onClick={() => setSortOrder('newest')}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
+                sortOrder === 'newest'
+                  ? 'bg-[#003048] text-white shadow-md'
+                  : 'border border-[#003048]/15 text-[#003048]/60 hover:border-[#003048]/30'
+              }`}
+            >
+              Newest
+            </button>
+            <button
+              onClick={() => setSortOrder('oldest')}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
+                sortOrder === 'oldest'
+                  ? 'bg-[#003048] text-white shadow-md'
+                  : 'border border-[#003048]/15 text-[#003048]/60 hover:border-[#003048]/30'
+              }`}
+            >
+              Oldest
+            </button>
+          </div>
+          <CalendarDropdown
+            articles={articles}
+            selectedDate={selectedDate}
+            onSelectDate={(d) => setSelectedDate(d)}
+            onClear={() => setSelectedDate(null)}
+          />
         </div>
+
+        {/* Active date filter */}
+        {selectedDate && (
+          <div className="flex items-center gap-2 mb-6">
+            <span className="text-xs text-[#003048]/40">Filtered:</span>
+            <span className="inline-flex items-center gap-1 bg-[#C12126]/10 text-[#C12126] text-xs px-3 py-1 rounded-full">
+              {formatElegantDate(selectedDate)}
+              <button onClick={() => setSelectedDate(null)} className="hover:text-[#003048] transition">
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          </div>
+        )}
 
         {loading ? (
           /* ── Skeleton Loader ── */
