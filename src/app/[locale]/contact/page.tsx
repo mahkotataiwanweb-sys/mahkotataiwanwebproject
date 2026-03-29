@@ -83,7 +83,7 @@ const YELLOW_SW = 7;          // yellow stroke width
 // Mon–Fri: 9 AM → 6 PM (270° arc, outer ring)
 const GREEN_D = mkArc(9, 6, GREEN_ARC_R);
 // Saturday: 9 AM → 1 PM (120° arc, inner ring)
-const YELLOW_D = mkArc(9, 1.3, YELLOW_ARC_R);
+const YELLOW_D = mkArc(9, 1, YELLOW_ARC_R);
 // Label midpoints
 const greenMid = pol(hToA(3.5), GREEN_ARC_R);
 const yellowMid = pol(hToA(11), YELLOW_ARC_R);
@@ -337,20 +337,20 @@ export default function ContactPage() {
 
         // ── Show blue arc the instant it starts drawing ──
         arcTl.set(gArc, { opacity: 1 }, 0);
-        // ── Navy blue draws — 9s constant speed ──
-        arcTl.to(gArc, { strokeDashoffset: 0, duration: 9, ease: 'none' }, 0);
+        // ── Navy blue draws — 8s constant speed ──
+        arcTl.to(gArc, { strokeDashoffset: 0, duration: 8, ease: 'none' }, 0);
 
         // ── Show red arc the instant it starts drawing ──
         arcTl.set(yArc, { opacity: 1 }, 1.5);
-        // ── Red starts 1.5s after blue, 7.5s duration — BOTH FINISH at t=9 ──
-        arcTl.to(yArc, { strokeDashoffset: 0, duration: 7.5, ease: 'none' }, 1.5);
+        // ── Red starts 1.5s after blue, 6.5s duration — BOTH FINISH at t=8 ──
+        arcTl.to(yArc, { strokeDashoffset: 0, duration: 6.5, ease: 'none' }, 1.5);
 
         // ── Labels pop up at exactly t=4 ──
         arcTl.to(gLabel, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)' }, 4);
         arcTl.to(yLabel, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)' }, 4);
 
         // ── Hold both visible for 5s after arcs complete ──
-        arcTl.to({}, { duration: 5 }, 9);
+        arcTl.to({}, { duration: 5 }, 8);
 
         // ── Both fade out together ──
         arcTl.to([gArc, yArc, gLabel, yLabel], {
@@ -604,14 +604,20 @@ export default function ContactPage() {
                       <feMergeNode in="SourceGraphic" />
                     </feMerge>
                   </filter>
+                  {/* Dramatic shadow for the clock face */}
+                  <filter id="clockShadow" x="-15%" y="-15%" width="130%" height="130%">
+                    <feDropShadow dx="0" dy="4" stdDeviation="12" floodColor="#000000" floodOpacity="0.45" />
+                    <feDropShadow dx="0" dy="1" stdDeviation="4" floodColor="#000000" floodOpacity="0.3" />
+                  </filter>
                 </defs>
 
-                {/* ── Moon clock face image (no background) ── */}
+                {/* ── Moon clock face image with dramatic shadow ── */}
                 <image
                   href="/images/clock-face.png"
                   x={FACE_OFFSET} y={FACE_OFFSET}
                   width={FACE_SIZE} height={FACE_SIZE}
                   preserveAspectRatio="xMidYMid meet"
+                  filter="url(#clockShadow)"
                 />
 
 
