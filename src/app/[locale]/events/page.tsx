@@ -1,678 +1,668 @@
 'use client';
-
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
-import { Calendar as CalendarIcon, ArrowLeft, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Calendar as CalendarIcon, ArrowLeft, X, ChevronLeft, ChevronRight, Clock, MapPin } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
 
-/* ------------------------------------------------------------------ */
-/*  Helper: extract YYYY-MM-DD from an ISO date string                */
-/* ------------------------------------------------------------------ */
-function extractDateKey(isoStr: string): string {
-  try {
-    return new Date(isoStr).toISOString().slice(0, 10);
-  } catch {
-    return '';
-  }
+gsap.registerPlugin(ScrollTrigger);
+
+/* ───────────── helpers ───────────── */
+
+function extractDateKey(dateStr: string): string {
+  const d = new Date(dateStr);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Helper: group articles by published_at date                       */
-/* ------------------------------------------------------------------ */
-interface DateGroup {
-  key: string;
-  date: string;
-  articles: Article[];
+function groupByDate(events: Article[]): Record<string, Article[]> {
+  const groups: Record<string, Article[]> = {};
+  events.forEach((e) => {
+    const key = extractDateKey(e.published_at);
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(e);
+  });
+  return groups;
 }
 
-function groupByDate(articles: Article[]): DateGroup[] {
-  const map = new Map<string, DateGroup>();
-  for (const article of articles) {
-    const dateKey = extractDateKey(article.published_at);
-    if (!dateKey) continue;
-    if (!map.has(dateKey)) {
-      map.set(dateKey, { key: dateKey, date: dateKey, articles: [] });
-    }
-    map.get(dateKey)!.articles.push(article);
-  }
-  return Array.from(map.values()).sort((a, b) => b.date.localeCompare(a.date));
+function formatDateDisplay(dateKey: string): string {
+  const d = new Date(dateKey + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-/* ------------------------------------------------------------------ */
-/*  Helper: format a YYYY-MM-DD string for display                    */
-/* ------------------------------------------------------------------ */
-function formatDateDisplay(dateStr: string, locale: string) {
-  try {
-    const d = new Date(dateStr + 'T00:00:00');
-    return d.toLocaleDateString(
-      locale === 'id' ? 'id-ID' : locale === 'zh' ? 'zh-TW' : 'en-US',
-      { year: 'numeric', month: 'long', day: 'numeric' }
-    );
-  } catch {
-    return dateStr;
-  }
-}
-
-/* ------------------------------------------------------------------ */
-/*  Calendar helpers                                                   */
-/* ------------------------------------------------------------------ */
-function getDaysInMonth(year: number, month: number) {
+function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month + 1, 0).getDate();
 }
 
-function getFirstDayOfMonth(year: number, month: number) {
-  return new Date(year, month, 1).getDay(); // 0=Sun
+function getFirstDayOfMonth(year: number, month: number): number {
+  return new Date(year, month, 1).getDay();
 }
 
-const MONTH_NAMES = [
+const monthNames = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
-const DAY_LABELS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const dayLabels = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
-/* ------------------------------------------------------------------ */
-/*  Page Component                                                     */
-/* ------------------------------------------------------------------ */
+/* ───────────── page ───────────── */
+
 export default function EventsPage() {
   const locale = useLocale();
 
-  /* ---------- state ---------- */
+  /* state */
   const [events, setEvents] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
-  const [modalEvent, setModalEvent] = useState<Article | null>(null);
+  const [nameFilter, setNameFilter] = useState<string | null>(null);
+  const [dateFilter, setDateFilter] = useState<string | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Article | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calMonth, setCalMonth] = useState(new Date().getMonth());
+  const [calYear, setCalYear] = useState(new Date().getFullYear());
 
-  // Calendar state
-  const today = new Date();
-  const [calYear, setCalYear] = useState(today.getFullYear());
-  const [calMonth, setCalMonth] = useState(today.getMonth());
-  const [calOpen, setCalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-
-  // Event name filter
-  const [selectedEventName, setSelectedEventName] = useState<string | null>(null);
-
-  // Calendar transition direction
-  const [calDirection, setCalDirection] = useState(0);
-
-  // Refs
-  const headerRef = useRef<HTMLDivElement>(null);
+  /* refs */
+  const heroRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const calBtnRef = useRef<HTMLButtonElement>(null);
 
-  /* ---------- fetch ---------- */
+  /* fetch */
   useEffect(() => {
-    async function fetchEvents() {
-      try {
-        const { data, error } = await supabase
-          .from('articles')
-          .select('*')
-          .eq('type', 'event')
-          .eq('is_active', true)
-          .order('published_at', { ascending: false });
-
-        if (!error && data) {
-          setEvents(data as Article[]);
-        }
-      } catch {
-        // Silent fail
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchEvents();
+    (async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .eq('type', 'event')
+        .eq('is_active', true)
+        .order('published_at', { ascending: false });
+      if (!error && data) setEvents(data as Article[]);
+      setLoading(false);
+    })();
   }, []);
 
-  // GSAP header animation
+  /* GSAP hero entrance */
   useEffect(() => {
-    if (!headerRef.current) return;
+    if (!heroRef.current) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headerRef.current!.children,
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.12,
-          ease: 'power3.out',
-        }
-      );
-    });
+      gsap.from('[data-hero-anim]', {
+        opacity: 0,
+        y: 40,
+        duration: 0.9,
+        ease: 'power3.out',
+        stagger: 0.12,
+      });
+    }, heroRef);
     return () => ctx.revert();
   }, []);
 
-  /* ---------- GSAP grid animation ---------- */
+  /* GSAP grid stagger on filter change */
+  const filteredEvents = useCallback(() => {
+    let list = [...events];
+    if (nameFilter) {
+      list = list.filter((e) => getLocalizedField(e, 'title', locale) === nameFilter);
+    }
+    if (dateFilter) {
+      list = list.filter((e) => extractDateKey(e.published_at) === dateFilter);
+    }
+    return list;
+  }, [events, nameFilter, dateFilter, locale]);
+
+  const filtered = filteredEvents();
+  const grouped = groupByDate(filtered);
+  const sortedDateKeys = Object.keys(grouped).sort((a, b) => (a > b ? -1 : 1));
+
+  /* flat list for grid */
+  const flatFiltered = sortedDateKeys.flatMap((k) => grouped[k]);
+  const featuredEvent = flatFiltered[0] || null;
+  const restEvents = flatFiltered.slice(1);
+
+  /* unique names for pills */
+  const uniqueNames = Array.from(new Set(events.map((e) => getLocalizedField(e, 'title', locale))));
+
+  /* dates that have events (for calendar dots) */
+  const eventDateKeys = new Set(events.map((e) => extractDateKey(e.published_at)));
+
+  /* GSAP grid reveal */
   useEffect(() => {
-    if (!loading && gridRef.current) {
-      const cards = gridRef.current.querySelectorAll('.event-card');
+    if (!gridRef.current) return;
+    const ctx = gsap.context(() => {
+      const cards = gridRef.current?.querySelectorAll('[data-card]');
+      if (!cards || cards.length === 0) return;
       gsap.fromTo(
         cards,
-        { opacity: 0, y: 40, scale: 0.95 },
+        { opacity: 0, y: 50 },
         {
           opacity: 1,
           y: 0,
-          scale: 1,
-          duration: 0.5,
-          stagger: 0.07,
-          ease: 'power3.out',
-        }
+          duration: 0.6,
+          ease: 'power2.out',
+          stagger: 0.08,
+          scrollTrigger: {
+            trigger: gridRef.current,
+            start: 'top 85%',
+          },
+        },
       );
+    }, gridRef);
+    return () => ctx.revert();
+  }, [filtered.length, nameFilter, dateFilter]);
+
+  /* close calendar on outside click */
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (
+        calendarOpen &&
+        calBtnRef.current &&
+        !calBtnRef.current.contains(e.target as Node) &&
+        !(e.target as HTMLElement).closest('[data-cal-dropdown]')
+      ) {
+        setCalendarOpen(false);
+      }
     }
-  }, [loading, selectedDate, selectedEventName]);
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [calendarOpen]);
 
-  /* ---------- format date for card display ---------- */
-  const formatDate = (dateStr: string) => {
-    try {
-      const date = new Date(dateStr);
-      return date.toLocaleDateString(
-        locale === 'zh-TW' ? 'zh-TW' : locale === 'id' ? 'id-ID' : 'en-US',
-        {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }
-      );
-    } catch {
-      return dateStr;
-    }
-  };
-
-  /* ---------- derived data ---------- */
-  // Dates that have events (YYYY-MM-DD strings)
-  const datesWithContent = new Set(events.map((ev) => extractDateKey(ev.published_at)));
-
-  // Unique event titles for pills
-  const eventTitles = Array.from(
-    new Set(events.map((ev) => getLocalizedField(ev, 'title', locale)))
-  );
-
-  // Filtered events
-  const filtered = events.filter((ev) => {
-    if (selectedDate && extractDateKey(ev.published_at) !== selectedDate) return false;
-    if (selectedEventName && getLocalizedField(ev, 'title', locale) !== selectedEventName)
-      return false;
-    return true;
-  });
-
-  const groups = groupByDate(filtered);
-
-  /* ---------- calendar navigation ---------- */
-  function prevMonth() {
-    setCalDirection(-1);
-    if (calMonth === 0) {
-      setCalMonth(11);
-      setCalYear((y) => y - 1);
+  /* lock scroll when modal open */
+  useEffect(() => {
+    if (selectedEvent) {
+      document.body.style.overflow = 'hidden';
     } else {
-      setCalMonth((m) => m - 1);
+      document.body.style.overflow = '';
     }
-  }
-  function nextMonth() {
-    setCalDirection(1);
-    if (calMonth === 11) {
-      setCalMonth(0);
-      setCalYear((y) => y + 1);
-    } else {
-      setCalMonth((m) => m + 1);
-    }
-  }
+    return () => { document.body.style.overflow = ''; };
+  }, [selectedEvent]);
 
-  function handleDayClick(day: number) {
-    const mm = String(calMonth + 1).padStart(2, '0');
-    const dd = String(day).padStart(2, '0');
-    const dateStr = `${calYear}-${mm}-${dd}`;
-    if (datesWithContent.has(dateStr)) {
-      setSelectedDate(dateStr === selectedDate ? null : dateStr);
-      setSelectedEventName(null);
-    }
-  }
-
-  function clearFilters() {
-    setSelectedDate(null);
-    setSelectedEventName(null);
-  }
-
-  /* ---------- calendar grid ---------- */
+  /* calendar helpers */
   const daysInMonth = getDaysInMonth(calYear, calMonth);
   const firstDay = getFirstDayOfMonth(calYear, calMonth);
-  const calendarCells: (number | null)[] = [];
-  for (let i = 0; i < firstDay; i++) calendarCells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) calendarCells.push(d);
 
-  const isToday = (day: number) =>
-    day === today.getDate() &&
-    calMonth === today.getMonth() &&
-    calYear === today.getFullYear();
+  function prevMonth() {
+    if (calMonth === 0) { setCalMonth(11); setCalYear(calYear - 1); }
+    else setCalMonth(calMonth - 1);
+  }
+  function nextMonth() {
+    if (calMonth === 11) { setCalMonth(0); setCalYear(calYear + 1); }
+    else setCalMonth(calMonth + 1);
+  }
+  function handleDayClick(day: number) {
+    const m = String(calMonth + 1).padStart(2, '0');
+    const d = String(day).padStart(2, '0');
+    const key = `${calYear}-${m}-${d}`;
+    setDateFilter(key === dateFilter ? null : key);
+    setCalendarOpen(false);
+  }
 
-  const dayHasContent = (day: number) => {
-    const mm = String(calMonth + 1).padStart(2, '0');
-    const dd = String(day).padStart(2, '0');
-    return datesWithContent.has(`${calYear}-${mm}-${dd}`);
-  };
+  function formatBadgeDate(dateStr: string) {
+    const d = new Date(dateStr);
+    return { day: d.getDate(), month: monthNames[d.getMonth()].slice(0, 3).toUpperCase(), year: d.getFullYear() };
+  }
 
-  const dayIsSelected = (day: number) => {
-    const mm = String(calMonth + 1).padStart(2, '0');
-    const dd = String(day).padStart(2, '0');
-    return selectedDate === `${calYear}-${mm}-${dd}`;
-  };
-
-  /* Calendar month slide variants */
-  const calSlideVariants = {
-    enter: (dir: number) => ({ x: dir > 0 ? 80 : -80, opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (dir: number) => ({ x: dir > 0 ? -80 : 80, opacity: 0 }),
-  };
-
-  /* ================================================================ */
-  /*  RENDER                                                           */
-  /* ================================================================ */
+  /* ─── render ─── */
   return (
-    <div className="min-h-screen bg-cream">
-      {/* ===================== HERO BANNER ===================== */}
-      <div className="relative bg-navy pt-32 pb-20 overflow-hidden">
-        {/* Decorative */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-10 w-72 h-72 rounded-full bg-red/10 blur-3xl" />
-          <div className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-cream/5 blur-3xl" />
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage:
-                'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-              backgroundSize: '60px 60px',
-            }}
-          />
-        </div>
+    <main className="min-h-screen bg-[#FFF8EE]">
+      {/* ═══════ HERO ═══════ */}
+      <section
+        ref={heroRef}
+        className="relative overflow-hidden bg-[#003048] pt-28 pb-20 md:pt-36 md:pb-28"
+      >
+        {/* grid overlay */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        />
 
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <Link
-            href={`/${locale}`}
-            className="inline-flex items-center gap-2 text-cream/60 hover:text-cream text-sm mb-8 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
+        {/* decorative blurred circles */}
+        <div className="pointer-events-none absolute -top-20 -left-20 h-72 w-72 rounded-full bg-[#C12126]/20 blur-[100px]" />
+        <div className="pointer-events-none absolute bottom-10 right-10 h-56 w-56 rounded-full bg-[#FAEDD3]/15 blur-[90px]" />
+        <div className="pointer-events-none absolute top-1/2 left-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#C12126]/10 blur-[80px]" />
 
-          <div ref={headerRef}>
-            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
-              What&apos;s Happening
-            </p>
-            <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
-              Event
-            </h1>
-            <div className="w-20 h-[3px] bg-red mb-6" />
-            <p className="text-cream/60 max-w-lg text-lg">
-              Stay updated with our latest events, promotions, and community gatherings.
-            </p>
+        {/* animated vertical line on right */}
+        <motion.div
+          className="absolute right-12 top-16 bottom-16 hidden w-px bg-gradient-to-b from-transparent via-[#FAEDD3]/20 to-transparent lg:block"
+          initial={{ scaleY: 0 }}
+          animate={{ scaleY: 1 }}
+          transition={{ duration: 1.2, ease: 'easeOut', delay: 0.6 }}
+          style={{ transformOrigin: 'top' }}
+        />
+
+        <div className="relative mx-auto max-w-7xl px-6">
+          {/* back */}
+          <div data-hero-anim>
+            <Link
+              href={`/${locale}`}
+              className="group mb-10 inline-flex items-center gap-2 text-sm text-[#FAEDD3]/60 transition hover:text-[#FAEDD3]"
+            >
+              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+              Back to Home
+            </Link>
           </div>
-        </div>
-      </div>
 
-      {/* ===================== CONTENT ===================== */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        {/* ---------- Calendar Toggle (mobile) ---------- */}
-        <div className="mb-6 lg:hidden">
-          <button
-            onClick={() => setCalOpen(!calOpen)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#003048] text-white text-sm font-medium shadow hover:bg-[#003048]/90 transition-colors"
+          {/* label */}
+          <p
+            data-hero-anim
+            className="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-[#C12126]"
           >
-            <CalendarIcon className="w-4 h-4" />
-            {calOpen ? 'Hide Calendar' : 'Show Calendar'}
-          </button>
+            What&apos;s Happening
+          </p>
+
+          {/* heading */}
+          <h1
+            data-hero-anim
+            className="font-heading text-5xl font-bold text-[#FAEDD3] md:text-7xl lg:text-8xl"
+          >
+            Events
+          </h1>
+
+          {/* accent line */}
+          <div data-hero-anim className="mt-6 h-[3px] w-20 bg-[#C12126] rounded-full" />
+
+          {/* subtitle */}
+          <p
+            data-hero-anim
+            className="mt-6 max-w-lg text-base leading-relaxed text-[#FAEDD3]/60 md:text-lg"
+          >
+            Discover our latest events, cultural celebrations, and community gatherings.
+          </p>
         </div>
+      </section>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* ---------- PREMIUM CALENDAR SIDEBAR ---------- */}
-          <AnimatePresence>
-            {(calOpen || typeof window !== 'undefined') && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className={`${calOpen ? 'block' : 'hidden'} lg:block lg:w-80 flex-shrink-0`}
+      {/* ═══════ STICKY FILTER BAR ═══════ */}
+      <div className="sticky top-0 z-30 border-b border-[#003048]/5 bg-[#FFF8EE]/90 backdrop-blur-lg">
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-6 py-3">
+          {/* scrollable pills */}
+          <div className="flex flex-1 items-center gap-2 overflow-x-auto scrollbar-hide">
+            <button
+              onClick={() => setNameFilter(null)}
+              className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition ${
+                !nameFilter
+                  ? 'bg-[#003048] text-white shadow-md'
+                  : 'border border-[#003048]/10 bg-white text-[#003048]/70 hover:border-[#003048]/30'
+              }`}
+            >
+              All Events
+            </button>
+            {uniqueNames.map((name) => (
+              <button
+                key={name}
+                onClick={() => setNameFilter(name === nameFilter ? null : name)}
+                className={`shrink-0 truncate rounded-full px-4 py-2 text-sm font-medium transition ${
+                  nameFilter === name
+                    ? 'bg-[#003048] text-white shadow-md'
+                    : 'border border-[#003048]/10 bg-white text-[#003048]/70 hover:border-[#003048]/30'
+                }`}
               >
-                <div className="sticky top-24 bg-gradient-to-br from-[#003048] to-[#00425e] rounded-2xl shadow-2xl ring-1 ring-white/10 p-6 relative overflow-hidden">
-                  {/* Decorative glassmorphism reflections */}
-                  <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-white/5 blur-2xl pointer-events-none" />
-                  <div className="absolute -bottom-16 -left-16 w-36 h-36 rounded-full bg-[#C12126]/10 blur-2xl pointer-events-none" />
-                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                {name}
+              </button>
+            ))}
+          </div>
 
-                  {/* Month header */}
-                  <div className="relative flex items-center justify-between mb-5">
-                    <button
-                      onClick={prevMonth}
-                      className="p-2 rounded-xl hover:bg-white/10 transition-all duration-200 active:scale-95"
-                      aria-label="Previous month"
-                    >
-                      <ChevronLeft className="w-5 h-5 text-white/80" />
+          {/* calendar toggle */}
+          <div className="relative">
+            <button
+              ref={calBtnRef}
+              onClick={() => setCalendarOpen(!calendarOpen)}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition ${
+                calendarOpen || dateFilter
+                  ? 'bg-[#003048] text-white'
+                  : 'border border-[#003048]/10 bg-white text-[#003048]/60 hover:border-[#003048]/30'
+              }`}
+              aria-label="Toggle calendar"
+            >
+              <CalendarIcon className="h-4 w-4" />
+            </button>
+
+            {/* calendar dropdown */}
+            <AnimatePresence>
+              {calendarOpen && (
+                <motion.div
+                  data-cal-dropdown
+                  initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 top-14 z-40 w-72 overflow-hidden rounded-2xl bg-[#003048] p-4 shadow-2xl"
+                >
+                  {/* month nav */}
+                  <div className="mb-3 flex items-center justify-between">
+                    <button onClick={prevMonth} className="rounded-full p-1 text-[#FAEDD3]/70 hover:text-[#FAEDD3] transition">
+                      <ChevronLeft className="h-4 w-4" />
                     </button>
-                    <h3 className="font-bold text-white text-lg tracking-wide">
-                      {MONTH_NAMES[calMonth]} {calYear}
-                    </h3>
-                    <button
-                      onClick={nextMonth}
-                      className="p-2 rounded-xl hover:bg-white/10 transition-all duration-200 active:scale-95"
-                      aria-label="Next month"
-                    >
-                      <ChevronRight className="w-5 h-5 text-white/80" />
+                    <span className="text-sm font-semibold text-[#FAEDD3]">
+                      {monthNames[calMonth]} {calYear}
+                    </span>
+                    <button onClick={nextMonth} className="rounded-full p-1 text-[#FAEDD3]/70 hover:text-[#FAEDD3] transition">
+                      <ChevronRight className="h-4 w-4" />
                     </button>
                   </div>
 
-                  {/* Day labels */}
-                  <div className="relative grid grid-cols-7 mb-2 pb-2 border-b border-white/10">
-                    {DAY_LABELS.map((d) => (
-                      <div
-                        key={d}
-                        className="text-center text-[10px] font-semibold text-white/40 uppercase tracking-wider py-1"
-                      >
+                  {/* day labels */}
+                  <div className="mb-1 grid grid-cols-7 gap-1">
+                    {dayLabels.map((d) => (
+                      <div key={d} className="text-center text-[10px] font-medium uppercase text-[#FAEDD3]/40">
                         {d}
                       </div>
                     ))}
                   </div>
 
-                  {/* Day cells with month transition */}
-                  <div className="relative overflow-hidden min-h-[240px]">
-                    <AnimatePresence mode="wait" custom={calDirection}>
-                      <motion.div
-                        key={`${calYear}-${calMonth}`}
-                        custom={calDirection}
-                        variants={calSlideVariants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{ duration: 0.25, ease: 'easeInOut' }}
-                        className="grid grid-cols-7 gap-y-1 will-change-transform"
-                      >
-                        {calendarCells.map((day, i) => {
-                          if (day === null) {
-                            return <div key={`empty-${i}`} className="h-10" />;
-                          }
-                          const hasContent = dayHasContent(day);
-                          const isSel = dayIsSelected(day);
-                          const isTdy = isToday(day);
-                          return (
-                            <motion.button
-                              key={day}
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: i * 0.015, duration: 0.25, ease: 'easeOut' }}
-                              onClick={() => handleDayClick(day)}
-                              disabled={!hasContent}
-                              className={`
-                                relative flex flex-col items-center justify-center h-10 rounded-xl text-sm transition-all duration-200
-                                ${hasContent
-                                  ? 'cursor-pointer hover:bg-white/10 font-bold text-amber-300'
-                                  : 'text-white/40 cursor-default'
-                                }
-                                ${isSel
-                                  ? 'bg-[#C12126] !text-white shadow-lg shadow-[#C12126]/30 scale-110 hover:bg-[#C12126]/90 font-bold'
-                                  : ''
-                                }
-                                ${isTdy && !isSel
-                                  ? 'ring-2 ring-white/30 rounded-xl'
-                                  : ''
-                                }
-                              `}
-                            >
-                              {day}
-                              {/* Glowing amber indicator for days with content */}
-                              {hasContent && !isSel && (
-                                <span className="absolute bottom-0.5 flex items-center justify-center">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
-                                  <span className="absolute w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping opacity-40" />
-                                </span>
-                              )}
-                            </motion.button>
-                          );
-                        })}
-                      </motion.div>
-                    </AnimatePresence>
+                  {/* days grid */}
+                  <div className="grid grid-cols-7 gap-1">
+                    {Array.from({ length: firstDay }).map((_, i) => (
+                      <div key={`empty-${i}`} />
+                    ))}
+                    {Array.from({ length: daysInMonth }).map((_, i) => {
+                      const day = i + 1;
+                      const m = String(calMonth + 1).padStart(2, '0');
+                      const d = String(day).padStart(2, '0');
+                      const key = `${calYear}-${m}-${d}`;
+                      const hasEvent = eventDateKeys.has(key);
+                      const isActive = dateFilter === key;
+                      return (
+                        <button
+                          key={day}
+                          onClick={() => handleDayClick(day)}
+                          className={`relative flex h-8 w-full items-center justify-center rounded-lg text-xs transition ${
+                            isActive
+                              ? 'bg-[#C12126] text-white font-bold'
+                              : hasEvent
+                              ? 'text-[#FAEDD3] hover:bg-[#FAEDD3]/10 font-medium'
+                              : 'text-[#FAEDD3]/30 hover:bg-[#FAEDD3]/5'
+                          }`}
+                        >
+                          {day}
+                          {hasEvent && !isActive && (
+                            <span className="absolute bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-[#C12126]" />
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
 
-                  {/* Legend */}
-                  <div className="relative mt-4 pt-3 border-t border-white/10 flex items-center gap-2">
-                    <span className="relative flex items-center justify-center w-3 h-3">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
-                    </span>
-                    <span className="text-white/40 text-xs">= has events</span>
-                  </div>
-
-                  {/* Clear filter button */}
-                  {(selectedDate || selectedEventName) && (
+                  {/* clear date */}
+                  {dateFilter && (
                     <button
-                      onClick={clearFilters}
-                      className="relative mt-4 w-full py-2.5 rounded-xl bg-gradient-to-r from-[#C12126] to-[#a51c21] text-white text-sm font-semibold shadow-lg shadow-[#C12126]/20 hover:shadow-[#C12126]/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                      onClick={() => { setDateFilter(null); setCalendarOpen(false); }}
+                      className="mt-3 w-full rounded-lg bg-[#FAEDD3]/10 py-1.5 text-xs font-medium text-[#FAEDD3] transition hover:bg-[#FAEDD3]/20"
                     >
-                      Clear Filter
+                      Clear date filter
                     </button>
                   )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* active filter badges */}
+        {(nameFilter || dateFilter) && (
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-6 pb-3">
+            {nameFilter && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#003048]/10 px-3 py-1 text-xs font-medium text-[#003048]">
+                {nameFilter}
+                <button onClick={() => setNameFilter(null)} className="text-[#003048]/50 hover:text-[#003048] transition">
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {dateFilter && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#C12126]/10 px-3 py-1 text-xs font-medium text-[#C12126]">
+                {formatDateDisplay(dateFilter)}
+                <button onClick={() => setDateFilter(null)} className="text-[#C12126]/50 hover:text-[#C12126] transition">
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ═══════ CONTENT ═══════ */}
+      <section className="mx-auto max-w-7xl px-6 py-12 md:py-16">
+        {loading ? (
+          /* skeleton loader */
+          <div className="space-y-8">
+            <div className="h-64 w-full animate-pulse rounded-2xl bg-[#003048]/5" />
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((n) => (
+                <div key={n} className="h-80 animate-pulse rounded-2xl bg-[#003048]/5" />
+              ))}
+            </div>
+          </div>
+        ) : flatFiltered.length === 0 ? (
+          /* empty state */
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center py-24 text-center"
+          >
+            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#003048]/5">
+              <CalendarIcon className="h-8 w-8 text-[#003048]/30" />
+            </div>
+            <h3 className="font-heading text-2xl font-bold text-[#003048]">No events found</h3>
+            <p className="mt-2 max-w-sm text-[#003048]/50">
+              Try adjusting your filters or check back later for upcoming events.
+            </p>
+            <button
+              onClick={() => { setNameFilter(null); setDateFilter(null); }}
+              className="mt-6 rounded-full bg-[#003048] px-6 py-2.5 text-sm font-medium text-white transition hover:bg-[#003048]/90"
+            >
+              Clear all filters
+            </button>
+          </motion.div>
+        ) : (
+          <div ref={gridRef}>
+            {/* FEATURED EVENT */}
+            {featuredEvent && (
+              <motion.div
+                data-card
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
+                className="group relative mb-10 cursor-pointer overflow-hidden rounded-2xl premium-shadow"
+                onClick={() => setSelectedEvent(featuredEvent)}
+              >
+                <div className="relative aspect-[21/9] w-full">
+                  {featuredEvent.image_url ? (
+                    <Image
+                      src={featuredEvent.image_url}
+                      alt={getLocalizedField(featuredEvent, 'title', locale)}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-gradient-to-br from-[#003048] to-[#003048]/80" />
+                  )}
+                  {/* gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+                  {/* date badge */}
+                  {(() => {
+                    const bd = formatBadgeDate(featuredEvent.published_at);
+                    return (
+                      <div className="absolute bottom-6 left-6 flex flex-col items-center rounded-xl bg-[#C12126] px-3 py-2 text-white shadow-lg md:px-4 md:py-3">
+                        <span className="text-lg font-bold leading-none md:text-2xl">{bd.day}</span>
+                        <span className="text-[10px] font-semibold uppercase tracking-wider md:text-xs">{bd.month}</span>
+                      </div>
+                    );
+                  })()}
+
+                  {/* title overlay */}
+                  <div className="absolute bottom-6 left-24 right-6 md:left-28">
+                    <span className="mb-2 inline-block rounded-full bg-[#C12126]/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#C12126] backdrop-blur-sm">
+                      Featured
+                    </span>
+                    <h2 className="font-heading text-xl font-bold leading-tight text-white md:text-3xl lg:text-4xl">
+                      {getLocalizedField(featuredEvent, 'title', locale)}
+                    </h2>
+                    <p className="mt-2 hidden max-w-2xl text-sm leading-relaxed text-white/70 md:line-clamp-2 md:block">
+                      {getLocalizedField(featuredEvent, 'excerpt', locale)}
+                    </p>
+                  </div>
                 </div>
               </motion.div>
             )}
-          </AnimatePresence>
 
-          {/* ---------- MAIN CONTENT ---------- */}
-          <div className="flex-1 min-w-0">
-            {/* Event name pills */}
-            <div className="flex gap-2 overflow-x-auto pb-3 mb-8 scrollbar-hide">
-              <button
-                onClick={() => {
-                  setSelectedEventName(null);
-                  setSelectedDate(null);
-                }}
-                className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap ${
-                  !selectedEventName
-                    ? 'bg-[#003048] text-white shadow-lg'
-                    : 'bg-white text-[#003048] border border-[#003048]/20 hover:border-[#003048]/50'
-                }`}
-              >
-                All Events
-              </button>
-              {eventTitles.map((name) => (
-                <button
-                  key={name}
-                  onClick={() => {
-                    setSelectedEventName(name === selectedEventName ? null : name);
-                    setSelectedDate(null);
-                  }}
-                  className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap ${
-                    selectedEventName === name
-                      ? 'bg-[#003048] text-white shadow-lg'
-                      : 'bg-white text-[#003048] border border-[#003048]/20 hover:border-[#003048]/50'
-                  }`}
-                >
-                  {name}
-                </button>
-              ))}
-            </div>
-
-            {/* Active filter indicator */}
-            {selectedDate && (
-              <div className="mb-6 flex items-center gap-2">
-                <span className="text-sm text-[#003048]/70">Showing events from:</span>
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#003048] text-white text-sm rounded-full font-medium">
-                  <CalendarIcon className="w-3.5 h-3.5" />
-                  {formatDateDisplay(selectedDate, locale)}
-                  <button
-                    onClick={() => setSelectedDate(null)}
-                    className="ml-1 hover:text-white/70 transition-colors"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </span>
-              </div>
-            )}
-
-            {/* Loading */}
-            {loading && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={`skeleton-${i}`} className="rounded-2xl overflow-hidden animate-pulse">
-                    <div className="aspect-[16/10] bg-cream-dark" />
-                    <div className="p-6 bg-white space-y-3">
-                      <div className="h-3 bg-cream-dark rounded w-24" />
-                      <div className="h-5 bg-cream-dark rounded w-48" />
-                      <div className="h-3 bg-cream-dark rounded w-full" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Empty */}
-            {!loading && groups.length === 0 && (
-              <div className="text-center py-24">
-                <CalendarIcon className="w-16 h-16 text-[#003048]/20 mx-auto mb-4" />
-                <p className="text-[#003048]/50 text-lg font-medium">No events found</p>
-                {(selectedDate || selectedEventName) && (
-                  <button
-                    onClick={clearFilters}
-                    className="mt-4 text-[#C12126] font-semibold text-sm hover:underline"
-                  >
-                    Clear all filters
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Events grouped by date */}
-            <div ref={gridRef} className="space-y-12">
-              {groups.map((group) => (
-                <div key={group.key}>
-                  {/* Section header */}
-                  <div className="mb-5">
-                    <p className="text-[#003048]/50 text-sm">
-                      {formatDateDisplay(group.date, locale)}
-                    </p>
+            {/* DATE-GROUPED REMAINING CARDS */}
+            {sortedDateKeys.map((dateKey) => {
+              const groupEvents = grouped[dateKey].filter((e) => e.id !== featuredEvent?.id);
+              if (groupEvents.length === 0) return null;
+              return (
+                <div key={dateKey} className="mb-12">
+                  <div className="mb-6 flex items-center gap-3">
+                    <Clock className="h-4 w-4 text-[#C12126]" />
+                    <h3 className="font-heading text-lg font-semibold text-[#003048]">
+                      {formatDateDisplay(dateKey)}
+                    </h3>
+                    <div className="h-px flex-1 bg-[#003048]/10" />
                   </div>
 
-                  {/* Event cards grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {group.articles.map((event, index) => (
-                      <motion.div
-                        key={event.id}
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: index * 0.08, duration: 0.5 }}
-                        className="event-card group cursor-pointer"
-                        onClick={() => setModalEvent(event)}
-                      >
-                        <div className="bg-white rounded-2xl overflow-hidden hover-lift premium-shadow h-full">
-                          {/* Image */}
-                          <div className="aspect-[16/10] relative overflow-hidden bg-gradient-to-br from-cream to-cream-dark">
+                  <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    {groupEvents.map((event, idx) => {
+                      const bd = formatBadgeDate(event.published_at);
+                      return (
+                        <motion.article
+                          data-card
+                          key={event.id}
+                          initial={{ opacity: 0, y: 40 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, margin: '-40px' }}
+                          transition={{ duration: 0.5, delay: idx * 0.07, ease: 'easeOut' }}
+                          className="group cursor-pointer overflow-hidden rounded-2xl bg-white premium-shadow hover-lift"
+                          onClick={() => setSelectedEvent(event)}
+                        >
+                          {/* image */}
+                          <div className="relative aspect-[16/10] w-full overflow-hidden">
                             {event.image_url ? (
                               <Image
                                 src={event.image_url}
                                 alt={getLocalizedField(event, 'title', locale)}
                                 fill
-                                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                className="object-cover transition-transform duration-500 group-hover:scale-105"
                               />
                             ) : (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <CalendarIcon className="w-16 h-16 text-navy/10" />
-                              </div>
+                              <div className="h-full w-full bg-gradient-to-br from-[#003048]/80 to-[#003048]/50" />
                             )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-navy/50 via-transparent to-transparent" />
-                            {/* Date badge */}
-                            <div className="absolute bottom-4 left-4 bg-red px-3 py-1.5 rounded-lg shadow-lg">
-                              <span className="text-white text-xs font-semibold">
-                                {formatDate(event.published_at)}
-                              </span>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+
+                            {/* date badge bottom-left of image */}
+                            <div className="absolute bottom-3 left-3 flex flex-col items-center rounded-lg bg-[#C12126] px-2.5 py-1.5 text-white shadow-md">
+                              <span className="text-base font-bold leading-none">{bd.day}</span>
+                              <span className="text-[9px] font-semibold uppercase tracking-wider">{bd.month}</span>
                             </div>
                           </div>
 
-                          {/* Content */}
-                          <div className="p-6">
-                            <h3 className="font-heading text-xl font-bold text-navy mb-2 group-hover:text-red transition-colors duration-300 line-clamp-2">
+                          {/* content */}
+                          <div className="p-5">
+                            <h4 className="font-heading text-lg font-bold leading-snug text-[#003048] transition-colors group-hover:text-[#C12126]">
                               {getLocalizedField(event, 'title', locale)}
-                            </h3>
-                            <p className="text-navy/50 text-sm leading-relaxed line-clamp-3">
+                            </h4>
+                            <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[#003048]/60">
                               {getLocalizedField(event, 'excerpt', locale)}
                             </p>
-                            <div className="mt-4 text-red text-sm font-semibold uppercase tracking-wide group-hover:underline">
-                              Read More →
-                            </div>
+                            <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#C12126] transition-all group-hover:gap-2">
+                              Read More <span aria-hidden>→</span>
+                            </span>
                           </div>
-                        </div>
-                      </motion.div>
-                    ))}
+                        </motion.article>
+                      );
+                    })}
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
-        </div>
-      </div>
+        )}
+      </section>
 
-      {/* ===================== EVENT DETAIL MODAL ===================== */}
+      {/* ═══════ MODAL ═══════ */}
       <AnimatePresence>
-        {modalEvent && (
+        {selectedEvent && (
           <motion.div
+            key="modal-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
-            onClick={() => setModalEvent(null)}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-md"
+            onClick={() => setSelectedEvent(null)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              key="modal-content"
+              initial={{ opacity: 0, scale: 0.9, y: 40 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 340 }}
               onClick={(e) => e.stopPropagation()}
+              className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden overflow-y-auto rounded-2xl bg-white shadow-2xl"
             >
-              {/* Modal Header */}
-              <div className="relative">
-                {modalEvent.image_url ? (
-                  <div className="aspect-[16/9] relative">
-                    <Image
-                      src={modalEvent.image_url}
-                      alt={getLocalizedField(modalEvent, 'title', locale)}
-                      fill
-                      className="object-cover rounded-t-2xl"
-                      sizes="(max-width: 768px) 100vw, 768px"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-navy/60 to-transparent rounded-t-2xl" />
-                  </div>
+              {/* image header */}
+              <div className="relative aspect-[16/9] w-full">
+                {selectedEvent.image_url ? (
+                  <Image
+                    src={selectedEvent.image_url}
+                    alt={getLocalizedField(selectedEvent, 'title', locale)}
+                    fill
+                    className="object-cover"
+                  />
                 ) : (
-                  <div className="aspect-[16/9] bg-gradient-to-br from-navy to-red-dark rounded-t-2xl flex items-center justify-center">
-                    <CalendarIcon className="w-20 h-20 text-white/30" />
-                  </div>
+                  <div className="h-full w-full bg-gradient-to-br from-[#003048] to-[#003048]/70" />
                 )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
+                {/* close button */}
                 <button
-                  onClick={() => setModalEvent(null)}
-                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-colors"
+                  onClick={() => setSelectedEvent(null)}
+                  className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/30 hover:rotate-90"
+                  aria-label="Close"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="h-5 w-5" />
                 </button>
 
-                {/* Date badge */}
-                <div className="absolute bottom-4 left-6 bg-red px-4 py-2 rounded-lg shadow-lg">
-                  <span className="text-white text-sm font-semibold">
-                    {formatDate(modalEvent.published_at)}
-                  </span>
-                </div>
+                {/* date badge on image */}
+                {(() => {
+                  const bd = formatBadgeDate(selectedEvent.published_at);
+                  return (
+                    <div className="absolute bottom-4 left-4 flex flex-col items-center rounded-xl bg-[#C12126] px-4 py-2.5 text-white shadow-lg">
+                      <span className="text-2xl font-bold leading-none">{bd.day}</span>
+                      <span className="text-[10px] font-semibold uppercase tracking-wider">{bd.month}</span>
+                      <span className="text-[10px] text-white/70">{bd.year}</span>
+                    </div>
+                  );
+                })()}
               </div>
 
-              {/* Modal Content */}
-              <div className="p-8">
-                <h2 className="font-heading text-2xl sm:text-3xl font-bold text-navy mt-2 mb-4">
-                  {getLocalizedField(modalEvent, 'title', locale)}
+              {/* body */}
+              <div className="p-6 md:p-8">
+                <h2 className="font-heading text-2xl font-bold text-[#003048] md:text-3xl">
+                  {getLocalizedField(selectedEvent, 'title', locale)}
                 </h2>
-                <div className="w-16 h-[2px] bg-red mb-6" />
+
+                {/* red divider */}
+                <div className="mt-4 h-[3px] w-16 rounded-full bg-[#C12126]" />
+
+                {/* excerpt */}
+                <p className="mt-4 text-sm leading-relaxed text-[#003048]/60">
+                  {getLocalizedField(selectedEvent, 'excerpt', locale)}
+                </p>
+
+                {/* HTML content */}
                 <div
-                  className="prose prose-navy max-w-none text-navy/70 leading-relaxed"
+                  className="prose prose-sm mt-6 max-w-none text-[#003048]/80 prose-headings:font-heading prose-headings:text-[#003048] prose-a:text-[#C12126]"
                   dangerouslySetInnerHTML={{
-                    __html: getLocalizedField(modalEvent, 'content', locale),
+                    __html: getLocalizedField(selectedEvent, 'content', locale),
                   }}
                 />
               </div>
@@ -680,6 +670,6 @@ export default function EventsPage() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </main>
   );
 }
