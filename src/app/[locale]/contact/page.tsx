@@ -70,11 +70,8 @@ const mkArc = (h1: number, h2: number, r: number) => {
   return `M ${p1.x.toFixed(1)},${p1.y.toFixed(1)} A ${r},${r} 0 ${span > 180 ? 1 : 0},1 ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
 };
 
-/* ── SVG clock-face dimensions ── */
-const FACE_R = 135;          // outer edge of tick marks
-const TICK_LEN_MAJOR = 18;   // length of 12,3,6,9 ticks
-const TICK_LEN_MINOR = 10;   // length of other hour ticks
-const NUM_R = 105;            // radius for hour numbers
+/* ── Clock image radius in SVG coords ── */
+const CLOCK_IMG_R = 140;       // approx visual edge of clock face in SVG
 
 /* ── Arc rings — sit concentrically outside the clock face ── */
 const GREEN_ARC_R = 175;     // Mon–Fri outer ring
@@ -90,16 +87,7 @@ const YELLOW_D = mkArc(9, 1, YELLOW_ARC_R);
 const greenMid = pol(hToA(1.5), GREEN_ARC_R);
 const yellowMid = pol(hToA(11), YELLOW_ARC_R);
 
-/* ── Pre-compute tick marks & numbers for SVG clock face ── */
-const HOURS_ALL = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-const MAJOR_SET = new Set([12, 3, 6, 9]);
-const clockTicks = HOURS_ALL.map((h) => {
-  const a = hToA(h);
-  const isMajor = MAJOR_SET.has(h);
-  const len = isMajor ? TICK_LEN_MAJOR : TICK_LEN_MINOR;
-  return { h, isMajor, p1: pol(a, FACE_R), p2: pol(a, FACE_R - len) };
-});
-const clockNums = [12, 3, 6, 9].map((h) => ({ h, ...pol(hToA(h), NUM_R) }));
+/* Clock image used instead of SVG-drawn ticks/numbers */
 
 const faqs = [
   {
@@ -342,12 +330,12 @@ export default function ContactPage() {
         arcTl.set([gLabel, yLabel], { opacity: 0, scale: 0.7 });
 
         // ── 1. Green arc draws in very slowly (dramatic) ──
-        arcTl.to(gArc, { strokeDashoffset: 0, duration: 8, ease: 'power1.inOut' });
+        arcTl.to(gArc, { strokeDashoffset: 0, duration: 8, ease: 'none' });
         // Green label appears near end of draw
         arcTl.to(gLabel, { opacity: 1, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }, '-=2.5');
 
         // ── 2. Yellow arc draws in slowly (after green) ──
-        arcTl.to(yArc, { strokeDashoffset: 0, duration: 6, ease: 'power1.inOut' }, '+=0.8');
+        arcTl.to(yArc, { strokeDashoffset: 0, duration: 6, ease: 'none' }, '+=0.8');
         // Yellow label appears
         arcTl.to(yLabel, { opacity: 1, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }, '-=2.5');
 
@@ -582,7 +570,7 @@ export default function ContactPage() {
             <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
           </div>
 
-          {/* Clock with animated arcs — pure SVG, no background */}
+          {/* Clock with animated arcs — moon clock face image + SVG arcs */}
           <div ref={hoursCardRef} className="flex justify-center">
             <div
               className="relative mx-auto"
@@ -608,45 +596,21 @@ export default function ContactPage() {
                   </filter>
                 </defs>
 
-                {/* ── Subtle outer reference circle ── */}
-                <circle cx={CC} cy={CC} r={FACE_R + 3} fill="none" stroke="rgba(0,48,72,0.06)" strokeWidth={0.5} />
+                {/* ── Moon clock face image (no background) ── */}
+                <image
+                  href="/images/clock-face.png"
+                  x="0" y="0"
+                  width={CLK} height={CLK}
+                  preserveAspectRatio="xMidYMid meet"
+                />
 
-                {/* ── Minute dots (every minute except on-the-hour) ── */}
-                {Array.from({ length: 60 }, (_, i) => {
-                  if (i % 5 === 0) return null;
-                  const a = i * 6 - 90;
-                  const p = pol(a, FACE_R - 1);
-                  return <circle key={`md${i}`} cx={p.x} cy={p.y} r={0.7} fill="rgba(0,48,72,0.1)" />;
-                })}
 
-                {/* ── Hour tick marks ── */}
-                {clockTicks.map((tk) => (
-                  <line
-                    key={`tk${tk.h}`}
-                    x1={tk.p1.x} y1={tk.p1.y}
-                    x2={tk.p2.x} y2={tk.p2.y}
-                    stroke={tk.isMajor ? 'rgba(0,48,72,0.75)' : 'rgba(0,48,72,0.28)'}
-                    strokeWidth={tk.isMajor ? 3 : 1.5}
-                    strokeLinecap="round"
-                  />
-                ))}
 
-                {/* ── Hour numbers: 12, 3, 6, 9 ── */}
-                {clockNums.map((n) => (
-                  <text
-                    key={`n${n.h}`}
-                    x={n.x}
-                    y={n.y}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fontSize="22"
-                    fontWeight="800"
-                    fill="rgba(0,48,72,0.82)"
-                    style={{ fontFamily: 'system-ui, -apple-system, sans-serif', letterSpacing: '-0.02em' }}
-                  >
-                    {n.h}
-                  </text>
-                ))}
+
+
+
+
+
 
                 {/* ── Green arc (Mon-Fri 9 AM → 6 PM) ── */}
                 <path
