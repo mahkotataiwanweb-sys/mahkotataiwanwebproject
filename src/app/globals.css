@@ -570,6 +570,18 @@
   }
 }
 
+/* YouTube IFrame Player — fill container, hide branding */
+#yt-showcase-player {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute;
+  inset: 0;
+}
+#yt-showcase-player iframe {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 /* Utility: hide scrollbar but keep scrolling */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
