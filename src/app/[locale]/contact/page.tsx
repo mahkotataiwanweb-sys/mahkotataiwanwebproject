@@ -54,22 +54,29 @@ const businessHours = [
   { day: 'Sunday', hours: 'Closed', open: false },
 ];
 
-/* ── Clock / Arc geometry constants ── */
-const CLOCK_SVG_SIZE = 400;
-const CLOCK_CENTER = CLOCK_SVG_SIZE / 2; // 200
-const CLOCK_RADIUS = 160;
-
-// Yellow arc (inner ring, closer to clock) – Saturday 9 AM → 1 PM = 120°
-const YELLOW_R = CLOCK_RADIUS + 14; // 174
-const YELLOW_CIRC = 2 * Math.PI * YELLOW_R;
-const YELLOW_ARC_DEG = 120;
-const YELLOW_ARC_LEN = (YELLOW_ARC_DEG / 360) * YELLOW_CIRC;
-
-// Green arc (outer ring) – Mon-Fri 9 AM → 6 PM = 270°
-const GREEN_R = CLOCK_RADIUS + 28; // 188
-const GREEN_CIRC = 2 * Math.PI * GREEN_R;
-const GREEN_ARC_DEG = 270;
-const GREEN_ARC_LEN = (GREEN_ARC_DEG / 360) * GREEN_CIRC;
+/* ── Clock / Arc geometry ── */
+const CLK = 400;
+const CC = CLK / 2; // 200
+const toRad = (d: number) => (d * Math.PI) / 180;
+const hToA = (h: number) => h * 30 - 90; // clock hour → SVG angle (12=top=-90°)
+const pol = (a: number, r: number) => ({
+  x: CC + r * Math.cos(toRad(a)),
+  y: CC + r * Math.sin(toRad(a)),
+});
+const mkArc = (h1: number, h2: number, r: number) => {
+  const a1 = hToA(h1), a2 = hToA(h2);
+  const p1 = pol(a1, r), p2 = pol(a2, r);
+  let span = a2 - a1;
+  if (span <= 0) span += 360;
+  return `M ${p1.x.toFixed(1)},${p1.y.toFixed(1)} A ${r},${r} 0 ${span > 180 ? 1 : 0},1 ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+};
+// Mon–Fri: 9 AM → 6 PM on clock face (9→6, 270° arc, outer ring)
+const GREEN_D = mkArc(9, 6, 180);
+// Saturday: 9 AM → 1 PM on clock face (9→1, 120° arc, inner ring)
+const YELLOW_D = mkArc(9, 1, 160);
+// Label midpoints
+const greenMid = pol(hToA(1.5), 180);  // ~1:30 position on clock
+const yellowMid = pol(hToA(11), 160);   // ~11:00 position on clock
 
 const faqs = [
   {
@@ -195,8 +202,10 @@ export default function ContactPage() {
   const faqRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const greenArcRef = useRef<SVGCircleElement>(null);
-  const yellowArcRef = useRef<SVGCircleElement>(null);
+  const greenArcRef = useRef<SVGPathElement>(null);
+  const yellowArcRef = useRef<SVGPathElement>(null);
+  const greenLabelRef = useRef<SVGGElement>(null);
+  const yellowLabelRef = useRef<SVGGElement>(null);
 
   /* ── Live Taiwan clock state ── */
   const [clockTime, setClockTime] = useState<{ h: number; m: number; s: number } | null>(null);
@@ -294,36 +303,31 @@ export default function ContactPage() {
 
       /* ── Business Hour Arcs Draw-in ── */
       if (greenArcRef.current) {
-        gsap.fromTo(
-          greenArcRef.current,
-          { strokeDashoffset: GREEN_CIRC },
-          {
-            strokeDashoffset: GREEN_CIRC - GREEN_ARC_LEN,
-            duration: 1.5,
-            ease: 'power3.inOut',
-            scrollTrigger: {
-              trigger: hoursSectionRef.current,
-              start: 'top 75%',
-              toggleActions: 'play none none reverse',
-            },
-          }
+        gsap.fromTo(greenArcRef.current,
+          { strokeDashoffset: 1 },
+          { strokeDashoffset: 0, duration: 2, ease: 'power3.inOut',
+            scrollTrigger: { trigger: hoursSectionRef.current, start: 'top 75%', toggleActions: 'play none none reverse' } }
         );
       }
       if (yellowArcRef.current) {
-        gsap.fromTo(
-          yellowArcRef.current,
-          { strokeDashoffset: YELLOW_CIRC },
-          {
-            strokeDashoffset: YELLOW_CIRC - YELLOW_ARC_LEN,
-            duration: 1.2,
-            ease: 'power3.inOut',
-            delay: 0.3,
-            scrollTrigger: {
-              trigger: hoursSectionRef.current,
-              start: 'top 75%',
-              toggleActions: 'play none none reverse',
-            },
-          }
+        gsap.fromTo(yellowArcRef.current,
+          { strokeDashoffset: 1 },
+          { strokeDashoffset: 0, duration: 1.5, ease: 'power3.inOut', delay: 0.4,
+            scrollTrigger: { trigger: hoursSectionRef.current, start: 'top 75%', toggleActions: 'play none none reverse' } }
+        );
+      }
+      if (greenLabelRef.current) {
+        gsap.fromTo(greenLabelRef.current,
+          { opacity: 0, scale: 0.7 },
+          { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(2)', delay: 1.8,
+            scrollTrigger: { trigger: hoursSectionRef.current, start: 'top 75%', toggleActions: 'play none none reverse' } }
+        );
+      }
+      if (yellowLabelRef.current) {
+        gsap.fromTo(yellowLabelRef.current,
+          { opacity: 0, scale: 0.7 },
+          { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(2)', delay: 1.6,
+            scrollTrigger: { trigger: hoursSectionRef.current, start: 'top 75%', toggleActions: 'play none none reverse' } }
         );
       }
 
@@ -528,10 +532,10 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* ╔═══════════════════════════════════════════╗
+            {/* ╔═══════════════════════════════════════════╗
           ║  3. BUSINESS HOURS — Analog Clock Design   ║
           ╚═══════════════════════════════════════════╝ */}
-      <section ref={hoursSectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+      <section ref={hoursSectionRef} className="py-24 sm:py-32 relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-6">
           {/* Section Header */}
           <div className="text-center mb-14">
@@ -540,104 +544,145 @@ export default function ContactPage() {
             <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
           </div>
 
-          {/* Clock with arcs — centered */}
+          {/* Clock with animated arcs */}
           <div ref={hoursCardRef} className="flex justify-center">
             <div
               className="relative mx-auto"
-              style={{ width: 'min(400px, 80vw)', aspectRatio: '1' }}
+              style={{ width: 'min(420px, 85vw)', aspectRatio: '1' }}
             >
-              {/* Clock face image (circular, 80 % of container) */}
+              {/* Clock face — transparent PNG, no background, floating with shadow */}
               <div
-                className="absolute inset-[10%] rounded-full overflow-hidden"
-                style={{ filter: 'drop-shadow(0 20px 40px rgba(0,48,72,0.15))' }}
+                className="absolute inset-[13%] rounded-full"
+                style={{ filter: 'drop-shadow(0 12px 30px rgba(0,48,72,0.18)) drop-shadow(0 4px 12px rgba(0,48,72,0.10))' }}
               >
                 <Image
-                  src="/images/clock.jpg"
+                  src="/images/clock-face.png"
                   alt="Analog clock showing Taiwan time"
                   fill
-                  className="object-cover"
-                  sizes="320px"
+                  className="object-contain"
+                  sizes="340px"
                   priority
                 />
               </div>
 
-              {/* SVG overlay — hands + arcs */}
+              {/* SVG overlay — arcs + hands */}
               <svg
                 className="absolute inset-0 w-full h-full"
-                viewBox={`0 0 ${CLOCK_SVG_SIZE} ${CLOCK_SVG_SIZE}`}
-                xmlns="http://www.w3.org/2000/svg"
+                viewBox={`0 0 ${CLK} ${CLK}`}
               >
                 {/* ── Green arc (outer) — Mon-Fri 9 AM → 6 PM ── */}
-                <circle
+                <path
                   ref={greenArcRef}
-                  cx={CLOCK_CENTER}
-                  cy={CLOCK_CENTER}
-                  r={GREEN_R}
+                  d={GREEN_D}
                   fill="none"
-                  stroke="#4ADE80"
-                  strokeWidth={6}
+                  stroke="rgba(134,239,172,0.7)"
+                  strokeWidth={20}
                   strokeLinecap="round"
-                  strokeDasharray={GREEN_CIRC}
-                  strokeDashoffset={GREEN_CIRC}
-                  opacity={0.85}
-                  style={{ transform: 'rotate(180deg)', transformOrigin: '50% 50%' }}
+                  pathLength={1}
+                  strokeDasharray={1}
+                  strokeDashoffset={1}
                 />
 
                 {/* ── Yellow arc (inner) — Saturday 9 AM → 1 PM ── */}
-                <circle
+                <path
                   ref={yellowArcRef}
-                  cx={CLOCK_CENTER}
-                  cy={CLOCK_CENTER}
-                  r={YELLOW_R}
+                  d={YELLOW_D}
                   fill="none"
-                  stroke="#FACC15"
-                  strokeWidth={6}
+                  stroke="rgba(250,204,21,0.7)"
+                  strokeWidth={18}
                   strokeLinecap="round"
-                  strokeDasharray={YELLOW_CIRC}
-                  strokeDashoffset={YELLOW_CIRC}
-                  opacity={0.85}
-                  style={{ transform: 'rotate(180deg)', transformOrigin: '50% 50%' }}
+                  pathLength={1}
+                  strokeDasharray={1}
+                  strokeDashoffset={1}
                 />
+
+                {/* ── Green arc label ── */}
+                <g ref={greenLabelRef} style={{ opacity: 0 }}>
+                  <rect
+                    x={greenMid.x - 38}
+                    y={greenMid.y - 11}
+                    width={76}
+                    height={22}
+                    rx={11}
+                    fill="rgba(134,239,172,0.92)"
+                  />
+                  <text
+                    x={greenMid.x}
+                    y={greenMid.y + 1}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fontSize="10.5"
+                    fontWeight="700"
+                    fill="#14532d"
+                    letterSpacing="0.3"
+                  >
+                    Mon – Fri
+                  </text>
+                </g>
+
+                {/* ── Yellow arc label ── */}
+                <g ref={yellowLabelRef} style={{ opacity: 0 }}>
+                  <rect
+                    x={yellowMid.x - 34}
+                    y={yellowMid.y - 10}
+                    width={68}
+                    height={20}
+                    rx={10}
+                    fill="rgba(250,204,21,0.92)"
+                  />
+                  <text
+                    x={yellowMid.x}
+                    y={yellowMid.y + 1}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fontSize="10"
+                    fontWeight="700"
+                    fill="#713f12"
+                    letterSpacing="0.3"
+                  >
+                    Saturday
+                  </text>
+                </g>
 
                 {/* ── Hour hand ── */}
                 <line
-                  x1={CLOCK_CENTER}
-                  y1={CLOCK_CENTER}
-                  x2={CLOCK_CENTER}
-                  y2={CLOCK_CENTER - 55}
+                  x1={CC}
+                  y1={CC}
+                  x2={CC}
+                  y2={CC - 70}
                   stroke="#1a1a1a"
-                  strokeWidth={6}
+                  strokeWidth={5.5}
                   strokeLinecap="round"
-                  transform={`rotate(${hourAngle}, ${CLOCK_CENTER}, ${CLOCK_CENTER})`}
+                  transform={`rotate(${hourAngle}, ${CC}, ${CC})`}
                 />
 
                 {/* ── Minute hand ── */}
                 <line
-                  x1={CLOCK_CENTER}
-                  y1={CLOCK_CENTER}
-                  x2={CLOCK_CENTER}
-                  y2={CLOCK_CENTER - 75}
+                  x1={CC}
+                  y1={CC}
+                  x2={CC}
+                  y2={CC - 100}
                   stroke="#1a1a1a"
-                  strokeWidth={4}
+                  strokeWidth={3.5}
                   strokeLinecap="round"
-                  transform={`rotate(${minuteAngle}, ${CLOCK_CENTER}, ${CLOCK_CENTER})`}
+                  transform={`rotate(${minuteAngle}, ${CC}, ${CC})`}
                 />
 
                 {/* ── Second hand ── */}
                 <line
-                  x1={CLOCK_CENTER}
-                  y1={CLOCK_CENTER + 15}
-                  x2={CLOCK_CENTER}
-                  y2={CLOCK_CENTER - 85}
+                  x1={CC}
+                  y1={CC + 18}
+                  x2={CC}
+                  y2={CC - 110}
                   stroke="#C12126"
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                   strokeLinecap="round"
-                  transform={`rotate(${secondAngle}, ${CLOCK_CENTER}, ${CLOCK_CENTER})`}
+                  transform={`rotate(${secondAngle}, ${CC}, ${CC})`}
                 />
 
                 {/* ── Center pivot ── */}
-                <circle cx={CLOCK_CENTER} cy={CLOCK_CENTER} r={5} fill="#C12126" />
-                <circle cx={CLOCK_CENTER} cy={CLOCK_CENTER} r={2} fill="#fff" />
+                <circle cx={CC} cy={CC} r={5} fill="#C12126" />
+                <circle cx={CC} cy={CC} r={2} fill="#fff" />
               </svg>
             </div>
           </div>
@@ -645,7 +690,7 @@ export default function ContactPage() {
           {/* Business-hours legend */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-10 mt-10">
             <div className="flex items-center gap-3">
-              <span className="w-8 h-[3px] rounded-full bg-[#4ADE80]" />
+              <span className="w-8 h-[3px] rounded-full bg-[#86efac]" />
               <span className="text-navy text-sm font-semibold">Mon &ndash; Fri</span>
               <span className="text-navy/50 text-sm">9:00 AM &ndash; 6:00 PM</span>
             </div>
@@ -669,6 +714,7 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+
 
       {/* ╔═══════════════════════════════════════════╗
           ║  4. FAQ — Premium Accordion               ║
