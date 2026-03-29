@@ -323,29 +323,29 @@ export default function ContactPage() {
         gsap.set([gArc, yArc], { strokeDashoffset: 1, opacity: 1 });
         gsap.set([gLabel, yLabel], { opacity: 0, scale: 0.7 });
 
-        const arcTl = gsap.timeline({ repeat: -1, repeatDelay: 2.5, paused: true });
+        const arcTl = gsap.timeline({ repeat: -1, repeatDelay: 3, paused: true });
 
         // ── Reset at start of each cycle ──
         arcTl.set([gArc, yArc], { opacity: 1, strokeDashoffset: 1 });
         arcTl.set([gLabel, yLabel], { opacity: 0, scale: 0.7 });
 
-        // ── Green starts drawing first — constant speed, 10s to cover 270° ──
-        arcTl.to(gArc, { strokeDashoffset: 0, duration: 10, ease: 'none' }, 0);
+        // ── Green draws VERY slowly — 20s constant speed to crawl 270° ──
+        arcTl.to(gArc, { strokeDashoffset: 0, duration: 20, ease: 'none' }, 0);
 
-        // ── Yellow starts 0.8s later, 9.2s duration — BOTH FINISH at t=10 ──
-        arcTl.to(yArc, { strokeDashoffset: 0, duration: 9.2, ease: 'none' }, 0.8);
+        // ── Yellow starts 1.5s later, 18.5s — BOTH FINISH at t=20 ──
+        arcTl.to(yArc, { strokeDashoffset: 0, duration: 18.5, ease: 'none' }, 1.5);
 
-        // ── Labels pop in near the end (t=9) ──
-        arcTl.to(gLabel, { opacity: 1, scale: 1, duration: 1, ease: 'back.out(1.7)' }, 9);
-        arcTl.to(yLabel, { opacity: 1, scale: 1, duration: 1, ease: 'back.out(1.7)' }, 9.2);
+        // ── Labels pop in near the end (t=18) ──
+        arcTl.to(gLabel, { opacity: 1, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }, 18);
+        arcTl.to(yLabel, { opacity: 1, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }, 18.5);
 
-        // ── Hold both visible for 3s after arcs complete ──
-        arcTl.to({}, { duration: 3 }, 10);
+        // ── Hold both visible for 5s after arcs complete ──
+        arcTl.to({}, { duration: 5 }, 20);
 
-        // ── Both fade out together — dramatic ──
+        // ── Both fade out together ──
         arcTl.to([gArc, yArc, gLabel, yLabel], {
           opacity: 0,
-          duration: 2,
+          duration: 2.5,
           ease: 'power2.inOut',
         });
 
