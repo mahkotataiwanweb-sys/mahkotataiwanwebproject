@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
+import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,7 +16,6 @@ import {
   Facebook,
   Instagram,
   Music2,
-  Clock,
   ChevronDown,
   HelpCircle,
   Handshake,
@@ -53,6 +53,23 @@ const businessHours = [
   { day: 'Saturday', hours: '9:00 AM - 1:00 PM', open: true },
   { day: 'Sunday', hours: 'Closed', open: false },
 ];
+
+/* ── Clock / Arc geometry constants ── */
+const CLOCK_SVG_SIZE = 400;
+const CLOCK_CENTER = CLOCK_SVG_SIZE / 2; // 200
+const CLOCK_RADIUS = 160;
+
+// Yellow arc (inner ring, closer to clock) – Saturday 9 AM → 1 PM = 120°
+const YELLOW_R = CLOCK_RADIUS + 14; // 174
+const YELLOW_CIRC = 2 * Math.PI * YELLOW_R;
+const YELLOW_ARC_DEG = 120;
+const YELLOW_ARC_LEN = (YELLOW_ARC_DEG / 360) * YELLOW_CIRC;
+
+// Green arc (outer ring) – Mon-Fri 9 AM → 6 PM = 270°
+const GREEN_R = CLOCK_RADIUS + 28; // 188
+const GREEN_CIRC = 2 * Math.PI * GREEN_R;
+const GREEN_ARC_DEG = 270;
+const GREEN_ARC_LEN = (GREEN_ARC_DEG / 360) * GREEN_CIRC;
 
 const faqs = [
   {
@@ -178,6 +195,18 @@ export default function ContactPage() {
   const faqRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
+  const greenArcRef = useRef<SVGCircleElement>(null);
+  const yellowArcRef = useRef<SVGCircleElement>(null);
+
+  /* ── Live Taiwan clock state ── */
+  const [clockTime, setClockTime] = useState<{ h: number; m: number; s: number } | null>(null);
+
+  const hours12 = clockTime ? clockTime.h % 12 : 0;
+  const mins = clockTime?.m ?? 0;
+  const secs = clockTime?.s ?? 0;
+  const secondAngle = secs * 6;
+  const minuteAngle = mins * 6 + secs * 0.1;
+  const hourAngle = hours12 * 30 + mins * 0.5;
 
   /* ═══════════════════════════════════════════
      GSAP — All animations in a single effect
@@ -243,7 +272,7 @@ export default function ContactPage() {
         );
       }
 
-      /* ── Business Hours Card ── */
+      /* ── Business Hours Clock ── */
       if (hoursCardRef.current) {
         gsap.fromTo(
           hoursCardRef.current,
@@ -257,6 +286,41 @@ export default function ContactPage() {
             scrollTrigger: {
               trigger: hoursSectionRef.current,
               start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
+
+      /* ── Business Hour Arcs Draw-in ── */
+      if (greenArcRef.current) {
+        gsap.fromTo(
+          greenArcRef.current,
+          { strokeDashoffset: GREEN_CIRC },
+          {
+            strokeDashoffset: GREEN_CIRC - GREEN_ARC_LEN,
+            duration: 1.5,
+            ease: 'power3.inOut',
+            scrollTrigger: {
+              trigger: hoursSectionRef.current,
+              start: 'top 75%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
+      if (yellowArcRef.current) {
+        gsap.fromTo(
+          yellowArcRef.current,
+          { strokeDashoffset: YELLOW_CIRC },
+          {
+            strokeDashoffset: YELLOW_CIRC - YELLOW_ARC_LEN,
+            duration: 1.2,
+            ease: 'power3.inOut',
+            delay: 0.3,
+            scrollTrigger: {
+              trigger: hoursSectionRef.current,
+              start: 'top 75%',
               toggleActions: 'play none none reverse',
             },
           }
@@ -327,6 +391,23 @@ export default function ContactPage() {
     });
 
     return () => ctx.revert();
+  }, []);
+
+  /* ── Live clock tick (Taiwan time UTC+8) ── */
+  useEffect(() => {
+    const tick = () => {
+      const now = new Date(
+        new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' })
+      );
+      setClockTime({
+        h: now.getHours(),
+        m: now.getMinutes(),
+        s: now.getSeconds(),
+      });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
   }, []);
 
   return (
@@ -448,59 +529,143 @@ export default function ContactPage() {
       </section>
 
       {/* ╔═══════════════════════════════════════════╗
-          ║  3. BUSINESS HOURS — Navy Dark Section     ║
+          ║  3. BUSINESS HOURS — Analog Clock Design   ║
           ╚═══════════════════════════════════════════╝ */}
-      <section ref={hoursSectionRef} className="py-24 sm:py-32 bg-navy relative overflow-hidden">
-        <div className="max-w-2xl mx-auto px-6 relative z-10">
+      <section ref={hoursSectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+        <div className="max-w-4xl mx-auto px-6">
           {/* Section Header */}
           <div className="text-center mb-14">
             <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Availability</p>
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-3">Business Hours</h2>
+            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">Business Hours</h2>
             <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
           </div>
 
-          {/* Glass Card */}
-          <div ref={hoursCardRef}>
-            <div className="bg-white/[0.06] backdrop-blur-xl rounded-3xl p-8 sm:p-10 border border-white/[0.08] relative overflow-hidden">
-              {/* Decorative glow inside card */}
-              <div className="absolute top-0 right-0 w-40 h-40 bg-red/10 rounded-full blur-3xl" />
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
-
-              <div className="relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-8">
-                  <Clock className="w-6 h-6 text-red/80" />
-                </div>
-
-                <div className="space-y-1">
-                  {businessHours.map((item) => (
-                    <div
-                      key={item.day}
-                      className="flex items-center justify-between py-4 border-b border-white/[0.06] last:border-0"
-                    >
-                      <span className="font-semibold text-white text-sm sm:text-base">{item.day}</span>
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`w-2 h-2 rounded-full ${item.open ? 'bg-green-400' : 'bg-red/60'}`}
-                        />
-                        <span
-                          className={`text-sm sm:text-base font-medium ${
-                            item.open ? 'text-white/70' : 'text-red/70'
-                          }`}
-                        >
-                          {item.hours}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-8 pt-5 border-t border-white/[0.06]">
-                  <p className="text-white/30 text-xs text-center">
-                    * Taiwan Standard Time (GMT+8) · Closed on national holidays
-                  </p>
-                </div>
+          {/* Clock with arcs — centered */}
+          <div ref={hoursCardRef} className="flex justify-center">
+            <div
+              className="relative mx-auto"
+              style={{ width: 'min(400px, 80vw)', aspectRatio: '1' }}
+            >
+              {/* Clock face image (circular, 80 % of container) */}
+              <div
+                className="absolute inset-[10%] rounded-full overflow-hidden"
+                style={{ filter: 'drop-shadow(0 20px 40px rgba(0,48,72,0.15))' }}
+              >
+                <Image
+                  src="/images/clock.jpg"
+                  alt="Analog clock showing Taiwan time"
+                  fill
+                  className="object-cover"
+                  sizes="320px"
+                  priority
+                />
               </div>
+
+              {/* SVG overlay — hands + arcs */}
+              <svg
+                className="absolute inset-0 w-full h-full"
+                viewBox={`0 0 ${CLOCK_SVG_SIZE} ${CLOCK_SVG_SIZE}`}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* ── Green arc (outer) — Mon-Fri 9 AM → 6 PM ── */}
+                <circle
+                  ref={greenArcRef}
+                  cx={CLOCK_CENTER}
+                  cy={CLOCK_CENTER}
+                  r={GREEN_R}
+                  fill="none"
+                  stroke="#4ADE80"
+                  strokeWidth={6}
+                  strokeLinecap="round"
+                  strokeDasharray={GREEN_CIRC}
+                  strokeDashoffset={GREEN_CIRC}
+                  opacity={0.85}
+                  style={{ transform: 'rotate(180deg)', transformOrigin: '50% 50%' }}
+                />
+
+                {/* ── Yellow arc (inner) — Saturday 9 AM → 1 PM ── */}
+                <circle
+                  ref={yellowArcRef}
+                  cx={CLOCK_CENTER}
+                  cy={CLOCK_CENTER}
+                  r={YELLOW_R}
+                  fill="none"
+                  stroke="#FACC15"
+                  strokeWidth={6}
+                  strokeLinecap="round"
+                  strokeDasharray={YELLOW_CIRC}
+                  strokeDashoffset={YELLOW_CIRC}
+                  opacity={0.85}
+                  style={{ transform: 'rotate(180deg)', transformOrigin: '50% 50%' }}
+                />
+
+                {/* ── Hour hand ── */}
+                <line
+                  x1={CLOCK_CENTER}
+                  y1={CLOCK_CENTER}
+                  x2={CLOCK_CENTER}
+                  y2={CLOCK_CENTER - 55}
+                  stroke="#1a1a1a"
+                  strokeWidth={6}
+                  strokeLinecap="round"
+                  transform={`rotate(${hourAngle}, ${CLOCK_CENTER}, ${CLOCK_CENTER})`}
+                />
+
+                {/* ── Minute hand ── */}
+                <line
+                  x1={CLOCK_CENTER}
+                  y1={CLOCK_CENTER}
+                  x2={CLOCK_CENTER}
+                  y2={CLOCK_CENTER - 75}
+                  stroke="#1a1a1a"
+                  strokeWidth={4}
+                  strokeLinecap="round"
+                  transform={`rotate(${minuteAngle}, ${CLOCK_CENTER}, ${CLOCK_CENTER})`}
+                />
+
+                {/* ── Second hand ── */}
+                <line
+                  x1={CLOCK_CENTER}
+                  y1={CLOCK_CENTER + 15}
+                  x2={CLOCK_CENTER}
+                  y2={CLOCK_CENTER - 85}
+                  stroke="#C12126"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  transform={`rotate(${secondAngle}, ${CLOCK_CENTER}, ${CLOCK_CENTER})`}
+                />
+
+                {/* ── Center pivot ── */}
+                <circle cx={CLOCK_CENTER} cy={CLOCK_CENTER} r={5} fill="#C12126" />
+                <circle cx={CLOCK_CENTER} cy={CLOCK_CENTER} r={2} fill="#fff" />
+              </svg>
             </div>
+          </div>
+
+          {/* Business-hours legend */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-10 mt-10">
+            <div className="flex items-center gap-3">
+              <span className="w-8 h-[3px] rounded-full bg-[#4ADE80]" />
+              <span className="text-navy text-sm font-semibold">Mon &ndash; Fri</span>
+              <span className="text-navy/50 text-sm">9:00 AM &ndash; 6:00 PM</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="w-8 h-[3px] rounded-full bg-[#FACC15]" />
+              <span className="text-navy text-sm font-semibold">Saturday</span>
+              <span className="text-navy/50 text-sm">9:00 AM &ndash; 1:00 PM</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="w-8 h-[3px] rounded-full bg-red/40" />
+              <span className="text-navy text-sm font-semibold">Sunday</span>
+              <span className="text-navy/50 text-sm">Closed</span>
+            </div>
+          </div>
+
+          {/* Footnote */}
+          <div className="text-center mt-8">
+            <p className="text-navy/40 text-xs">
+              * Taiwan Standard Time (GMT+8) &middot; Closed on Sundays &amp; national holidays
+            </p>
           </div>
         </div>
       </section>
