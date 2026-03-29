@@ -319,25 +319,31 @@ export default function ContactPage() {
         const gLabel = greenLabelRef.current;
         const yLabel = yellowLabelRef.current;
 
-        // Initial hidden state
-        gsap.set([gArc, yArc], { strokeDashoffset: 1, opacity: 1 });
+        // Get ACTUAL path lengths for reliable stroke-draw animation
+        const gLen = gArc.getTotalLength();
+        const yLen = yArc.getTotalLength();
+
+        // Set up stroke-dasharray = full length, offset = full length (hidden)
+        gsap.set(gArc, { strokeDasharray: gLen, strokeDashoffset: gLen, opacity: 1 });
+        gsap.set(yArc, { strokeDasharray: yLen, strokeDashoffset: yLen, opacity: 1 });
         gsap.set([gLabel, yLabel], { opacity: 0, scale: 0.7 });
 
         const arcTl = gsap.timeline({ repeat: -1, repeatDelay: 3, paused: true });
 
         // ── Reset at start of each cycle ──
-        arcTl.set([gArc, yArc], { opacity: 1, strokeDashoffset: 1 });
+        arcTl.set(gArc, { strokeDashoffset: gLen, opacity: 1 });
+        arcTl.set(yArc, { strokeDashoffset: yLen, opacity: 1 });
         arcTl.set([gLabel, yLabel], { opacity: 0, scale: 0.7 });
 
-        // ── Green draws VERY slowly — 20s constant speed to crawl 270° ──
+        // ── Navy blue draws slowly — 20s constant speed to crawl from 9→6 ──
         arcTl.to(gArc, { strokeDashoffset: 0, duration: 20, ease: 'none' }, 0);
 
-        // ── Yellow starts 1.5s later, 18.5s — BOTH FINISH at t=20 ──
+        // ── Red starts 1.5s after blue, 18.5s duration — BOTH FINISH at t=20 ──
         arcTl.to(yArc, { strokeDashoffset: 0, duration: 18.5, ease: 'none' }, 1.5);
 
-        // ── Labels pop in near the end (t=18) ──
-        arcTl.to(gLabel, { opacity: 1, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }, 18);
-        arcTl.to(yLabel, { opacity: 1, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }, 18.5);
+        // ── Labels appear at START together with their liner (not at end) ──
+        arcTl.to(gLabel, { opacity: 1, scale: 1, duration: 1, ease: 'back.out(1.7)' }, 0.3);
+        arcTl.to(yLabel, { opacity: 1, scale: 1, duration: 1, ease: 'back.out(1.7)' }, 1.8);
 
         // ── Hold both visible for 5s after arcs complete ──
         arcTl.to({}, { duration: 5 }, 20);
@@ -617,12 +623,9 @@ export default function ContactPage() {
                   ref={greenArcRef}
                   d={GREEN_D}
                   fill="none"
-                  stroke="rgba(134,239,172,0.72)"
+                  stroke="rgba(0,48,72,0.85)"
                   strokeWidth={GREEN_SW}
                   strokeLinecap="round"
-                  pathLength={1}
-                  strokeDasharray={1}
-                  strokeDashoffset={1}
                   filter="url(#arcGlow)"
                 />
 
@@ -631,12 +634,9 @@ export default function ContactPage() {
                   ref={yellowArcRef}
                   d={YELLOW_D}
                   fill="none"
-                  stroke="rgba(250,204,21,0.72)"
+                  stroke="rgba(193,33,38,0.85)"
                   strokeWidth={YELLOW_SW}
                   strokeLinecap="round"
-                  pathLength={1}
-                  strokeDasharray={1}
-                  strokeDashoffset={1}
                   filter="url(#arcGlow)"
                 />
 
@@ -645,12 +645,12 @@ export default function ContactPage() {
                   <rect
                     x={greenMid.x - 40} y={greenMid.y - 12}
                     width={80} height={24} rx={12}
-                    fill="rgba(134,239,172,0.92)"
+                    fill="rgba(0,48,72,0.92)"
                   />
                   <text
                     x={greenMid.x} y={greenMid.y}
                     textAnchor="middle" dominantBaseline="central"
-                    fontSize="11" fontWeight="700" fill="#14532d"
+                    fontSize="11" fontWeight="700" fill="#ffffff"
                     letterSpacing="0.3"
                   >
                     Mon – Fri
@@ -662,12 +662,12 @@ export default function ContactPage() {
                   <rect
                     x={yellowMid.x - 36} y={yellowMid.y - 11}
                     width={72} height={22} rx={11}
-                    fill="rgba(250,204,21,0.92)"
+                    fill="rgba(193,33,38,0.92)"
                   />
                   <text
                     x={yellowMid.x} y={yellowMid.y}
                     textAnchor="middle" dominantBaseline="central"
-                    fontSize="10.5" fontWeight="700" fill="#713f12"
+                    fontSize="10.5" fontWeight="700" fill="#ffffff"
                     letterSpacing="0.3"
                   >
                     Saturday
@@ -711,12 +711,12 @@ export default function ContactPage() {
           {/* Business-hours legend */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-10 mt-10">
             <div className="flex items-center gap-3">
-              <span className="w-8 h-[3px] rounded-full bg-[#86efac]" />
+              <span className="w-8 h-[3px] rounded-full bg-navy" />
               <span className="text-navy text-sm font-semibold">Mon &ndash; Fri</span>
               <span className="text-navy/50 text-sm">9:00 AM &ndash; 6:00 PM</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="w-8 h-[3px] rounded-full bg-[#FACC15]" />
+              <span className="w-8 h-[3px] rounded-full bg-red" />
               <span className="text-navy text-sm font-semibold">Saturday</span>
               <span className="text-navy/50 text-sm">9:00 AM &ndash; 1:00 PM</span>
             </div>
