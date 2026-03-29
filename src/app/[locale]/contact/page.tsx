@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
-import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -56,9 +55,9 @@ const businessHours = [
 
 /* ── Clock / Arc geometry ── */
 const CLK = 400;
-const CC = CLK / 2; // 200
+const CC = CLK / 2;
 const toRad = (d: number) => (d * Math.PI) / 180;
-const hToA = (h: number) => h * 30 - 90; // clock hour → SVG angle (12=top=-90°)
+const hToA = (h: number) => h * 30 - 90;
 const pol = (a: number, r: number) => ({
   x: CC + r * Math.cos(toRad(a)),
   y: CC + r * Math.sin(toRad(a)),
@@ -70,13 +69,37 @@ const mkArc = (h1: number, h2: number, r: number) => {
   if (span <= 0) span += 360;
   return `M ${p1.x.toFixed(1)},${p1.y.toFixed(1)} A ${r},${r} 0 ${span > 180 ? 1 : 0},1 ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
 };
-// Mon–Fri: 9 AM → 6 PM on clock face (9→6, 270° arc, outer ring)
-const GREEN_D = mkArc(9, 6, 180);
-// Saturday: 9 AM → 1 PM on clock face (9→1, 120° arc, inner ring)
-const YELLOW_D = mkArc(9, 1, 160);
+
+/* ── SVG clock-face dimensions ── */
+const FACE_R = 135;          // outer edge of tick marks
+const TICK_LEN_MAJOR = 18;   // length of 12,3,6,9 ticks
+const TICK_LEN_MINOR = 10;   // length of other hour ticks
+const NUM_R = 105;            // radius for hour numbers
+
+/* ── Arc rings — sit concentrically outside the clock face ── */
+const GREEN_ARC_R = 175;     // Mon–Fri outer ring
+const YELLOW_ARC_R = 153;    // Saturday inner ring
+const GREEN_SW = 14;         // green stroke width
+const YELLOW_SW = 12;        // yellow stroke width
+
+// Mon–Fri: 9 AM → 6 PM (270° arc, outer ring)
+const GREEN_D = mkArc(9, 6, GREEN_ARC_R);
+// Saturday: 9 AM → 1 PM (120° arc, inner ring)
+const YELLOW_D = mkArc(9, 1, YELLOW_ARC_R);
 // Label midpoints
-const greenMid = pol(hToA(1.5), 180);  // ~1:30 position on clock
-const yellowMid = pol(hToA(11), 160);   // ~11:00 position on clock
+const greenMid = pol(hToA(1.5), GREEN_ARC_R);
+const yellowMid = pol(hToA(11), YELLOW_ARC_R);
+
+/* ── Pre-compute tick marks & numbers for SVG clock face ── */
+const HOURS_ALL = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+const MAJOR_SET = new Set([12, 3, 6, 9]);
+const clockTicks = HOURS_ALL.map((h) => {
+  const a = hToA(h);
+  const isMajor = MAJOR_SET.has(h);
+  const len = isMajor ? TICK_LEN_MAJOR : TICK_LEN_MINOR;
+  return { h, isMajor, p1: pol(a, FACE_R), p2: pol(a, FACE_R - len) };
+});
+const clockNums = [12, 3, 6, 9].map((h) => ({ h, ...pol(hToA(h), NUM_R) }));
 
 const faqs = [
   {
@@ -301,34 +324,49 @@ export default function ContactPage() {
         );
       }
 
-      /* ── Business Hour Arcs Draw-in ── */
-      if (greenArcRef.current) {
-        gsap.fromTo(greenArcRef.current,
-          { strokeDashoffset: 1 },
-          { strokeDashoffset: 0, duration: 2, ease: 'power3.inOut',
-            scrollTrigger: { trigger: hoursSectionRef.current, start: 'top 75%', toggleActions: 'play none none reverse' } }
-        );
-      }
-      if (yellowArcRef.current) {
-        gsap.fromTo(yellowArcRef.current,
-          { strokeDashoffset: 1 },
-          { strokeDashoffset: 0, duration: 1.5, ease: 'power3.inOut', delay: 0.4,
-            scrollTrigger: { trigger: hoursSectionRef.current, start: 'top 75%', toggleActions: 'play none none reverse' } }
-        );
-      }
-      if (greenLabelRef.current) {
-        gsap.fromTo(greenLabelRef.current,
-          { opacity: 0, scale: 0.7 },
-          { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(2)', delay: 1.8,
-            scrollTrigger: { trigger: hoursSectionRef.current, start: 'top 75%', toggleActions: 'play none none reverse' } }
-        );
-      }
-      if (yellowLabelRef.current) {
-        gsap.fromTo(yellowLabelRef.current,
-          { opacity: 0, scale: 0.7 },
-          { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(2)', delay: 1.6,
-            scrollTrigger: { trigger: hoursSectionRef.current, start: 'top 75%', toggleActions: 'play none none reverse' } }
-        );
+      /* ── Business Hour Arcs — Slow Dramatic Loop ── */
+      if (greenArcRef.current && yellowArcRef.current && greenLabelRef.current && yellowLabelRef.current) {
+        const gArc = greenArcRef.current;
+        const yArc = yellowArcRef.current;
+        const gLabel = greenLabelRef.current;
+        const yLabel = yellowLabelRef.current;
+
+        // Initial hidden state
+        gsap.set([gArc, yArc], { strokeDashoffset: 1, opacity: 1 });
+        gsap.set([gLabel, yLabel], { opacity: 0, scale: 0.7 });
+
+        const arcTl = gsap.timeline({ repeat: -1, repeatDelay: 2, paused: true });
+
+        // ── Reset at start of each cycle ──
+        arcTl.set([gArc, yArc], { opacity: 1, strokeDashoffset: 1 });
+        arcTl.set([gLabel, yLabel], { opacity: 0, scale: 0.7 });
+
+        // ── 1. Green arc draws in very slowly (dramatic) ──
+        arcTl.to(gArc, { strokeDashoffset: 0, duration: 8, ease: 'power1.inOut' });
+        // Green label appears near end of draw
+        arcTl.to(gLabel, { opacity: 1, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }, '-=2.5');
+
+        // ── 2. Yellow arc draws in slowly (after green) ──
+        arcTl.to(yArc, { strokeDashoffset: 0, duration: 6, ease: 'power1.inOut' }, '+=0.8');
+        // Yellow label appears
+        arcTl.to(yLabel, { opacity: 1, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }, '-=2.5');
+
+        // ── 3. Hold both visible ──
+        arcTl.to({}, { duration: 3 });
+
+        // ── 4. Both fade out together — dramatic ──
+        arcTl.to([gArc, yArc, gLabel, yLabel], {
+          opacity: 0,
+          duration: 2.5,
+          ease: 'power2.inOut',
+        });
+
+        // Play when section scrolls into view
+        ScrollTrigger.create({
+          trigger: hoursSectionRef.current,
+          start: 'top 85%',
+          onEnter: () => arcTl.restart(),
+        });
       }
 
       /* ── FAQ Header ── */
@@ -544,76 +582,111 @@ export default function ContactPage() {
             <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
           </div>
 
-          {/* Clock with animated arcs */}
+          {/* Clock with animated arcs — pure SVG, no background */}
           <div ref={hoursCardRef} className="flex justify-center">
             <div
               className="relative mx-auto"
               style={{ width: 'min(420px, 85vw)', aspectRatio: '1' }}
             >
-              {/* Clock face — transparent PNG, no background, floating with shadow */}
-              <div
-                className="absolute inset-[13%] rounded-full"
-                style={{ filter: 'drop-shadow(0 12px 30px rgba(0,48,72,0.18)) drop-shadow(0 4px 12px rgba(0,48,72,0.10))' }}
-              >
-                <Image
-                  src="/images/clock-face.png"
-                  alt="Analog clock showing Taiwan time"
-                  fill
-                  className="object-contain"
-                  sizes="340px"
-                  priority
-                />
-              </div>
+              <svg className="w-full h-full" viewBox={`0 0 ${CLK} ${CLK}`}>
+                <defs>
+                  {/* Subtle shadow for clock hands */}
+                  <filter id="handShadow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feDropShadow dx="0" dy="1" stdDeviation="1.5" floodColor="rgba(0,0,0,0.18)" />
+                  </filter>
+                  {/* Red glow for second hand */}
+                  <filter id="secGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feDropShadow dx="0" dy="0" stdDeviation="2" floodColor="rgba(193,33,38,0.3)" />
+                  </filter>
+                  {/* Soft glow for arcs */}
+                  <filter id="arcGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
 
-              {/* SVG overlay — arcs + hands */}
-              <svg
-                className="absolute inset-0 w-full h-full"
-                viewBox={`0 0 ${CLK} ${CLK}`}
-              >
-                {/* ── Green arc (outer) — Mon-Fri 9 AM → 6 PM ── */}
+                {/* ── Subtle outer reference circle ── */}
+                <circle cx={CC} cy={CC} r={FACE_R + 3} fill="none" stroke="rgba(0,48,72,0.06)" strokeWidth={0.5} />
+
+                {/* ── Minute dots (every minute except on-the-hour) ── */}
+                {Array.from({ length: 60 }, (_, i) => {
+                  if (i % 5 === 0) return null;
+                  const a = i * 6 - 90;
+                  const p = pol(a, FACE_R - 1);
+                  return <circle key={`md${i}`} cx={p.x} cy={p.y} r={0.7} fill="rgba(0,48,72,0.1)" />;
+                })}
+
+                {/* ── Hour tick marks ── */}
+                {clockTicks.map((tk) => (
+                  <line
+                    key={`tk${tk.h}`}
+                    x1={tk.p1.x} y1={tk.p1.y}
+                    x2={tk.p2.x} y2={tk.p2.y}
+                    stroke={tk.isMajor ? 'rgba(0,48,72,0.75)' : 'rgba(0,48,72,0.28)'}
+                    strokeWidth={tk.isMajor ? 3 : 1.5}
+                    strokeLinecap="round"
+                  />
+                ))}
+
+                {/* ── Hour numbers: 12, 3, 6, 9 ── */}
+                {clockNums.map((n) => (
+                  <text
+                    key={`n${n.h}`}
+                    x={n.x}
+                    y={n.y}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fontSize="22"
+                    fontWeight="800"
+                    fill="rgba(0,48,72,0.82)"
+                    style={{ fontFamily: 'system-ui, -apple-system, sans-serif', letterSpacing: '-0.02em' }}
+                  >
+                    {n.h}
+                  </text>
+                ))}
+
+                {/* ── Green arc (Mon-Fri 9 AM → 6 PM) ── */}
                 <path
                   ref={greenArcRef}
                   d={GREEN_D}
                   fill="none"
-                  stroke="rgba(134,239,172,0.7)"
-                  strokeWidth={20}
+                  stroke="rgba(134,239,172,0.72)"
+                  strokeWidth={GREEN_SW}
                   strokeLinecap="round"
                   pathLength={1}
                   strokeDasharray={1}
                   strokeDashoffset={1}
+                  filter="url(#arcGlow)"
                 />
 
-                {/* ── Yellow arc (inner) — Saturday 9 AM → 1 PM ── */}
+                {/* ── Yellow arc (Saturday 9 AM → 1 PM) ── */}
                 <path
                   ref={yellowArcRef}
                   d={YELLOW_D}
                   fill="none"
-                  stroke="rgba(250,204,21,0.7)"
-                  strokeWidth={18}
+                  stroke="rgba(250,204,21,0.72)"
+                  strokeWidth={YELLOW_SW}
                   strokeLinecap="round"
                   pathLength={1}
                   strokeDasharray={1}
                   strokeDashoffset={1}
+                  filter="url(#arcGlow)"
                 />
 
                 {/* ── Green arc label ── */}
                 <g ref={greenLabelRef} style={{ opacity: 0 }}>
                   <rect
-                    x={greenMid.x - 38}
-                    y={greenMid.y - 11}
-                    width={76}
-                    height={22}
-                    rx={11}
+                    x={greenMid.x - 40} y={greenMid.y - 12}
+                    width={80} height={24} rx={12}
                     fill="rgba(134,239,172,0.92)"
                   />
                   <text
-                    x={greenMid.x}
-                    y={greenMid.y + 1}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fontSize="10.5"
-                    fontWeight="700"
-                    fill="#14532d"
+                    x={greenMid.x} y={greenMid.y}
+                    textAnchor="middle" dominantBaseline="central"
+                    fontSize="11" fontWeight="700" fill="#14532d"
                     letterSpacing="0.3"
                   >
                     Mon – Fri
@@ -623,65 +696,49 @@ export default function ContactPage() {
                 {/* ── Yellow arc label ── */}
                 <g ref={yellowLabelRef} style={{ opacity: 0 }}>
                   <rect
-                    x={yellowMid.x - 34}
-                    y={yellowMid.y - 10}
-                    width={68}
-                    height={20}
-                    rx={10}
+                    x={yellowMid.x - 36} y={yellowMid.y - 11}
+                    width={72} height={22} rx={11}
                     fill="rgba(250,204,21,0.92)"
                   />
                   <text
-                    x={yellowMid.x}
-                    y={yellowMid.y + 1}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fontSize="10"
-                    fontWeight="700"
-                    fill="#713f12"
+                    x={yellowMid.x} y={yellowMid.y}
+                    textAnchor="middle" dominantBaseline="central"
+                    fontSize="10.5" fontWeight="700" fill="#713f12"
                     letterSpacing="0.3"
                   >
                     Saturday
                   </text>
                 </g>
 
-                {/* ── Hour hand ── */}
-                <line
-                  x1={CC}
-                  y1={CC}
-                  x2={CC}
-                  y2={CC - 70}
-                  stroke="#1a1a1a"
-                  strokeWidth={5.5}
-                  strokeLinecap="round"
-                  transform={`rotate(${hourAngle}, ${CC}, ${CC})`}
-                />
+                {/* ── Hour hand — tapered elegant with rounded tip ── */}
+                <g transform={`rotate(${hourAngle}, ${CC}, ${CC})`} filter="url(#handShadow)">
+                  <path
+                    d={`M ${CC - 4.5} ${CC + 15} Q ${CC - 5} ${CC + 8} ${CC - 3.5} ${CC} L ${CC - 1.5} ${CC - 60} Q ${CC} ${CC - 67} ${CC + 1.5} ${CC - 60} L ${CC + 3.5} ${CC} Q ${CC + 5} ${CC + 8} ${CC + 4.5} ${CC + 15} Z`}
+                    fill="#1a1a1a"
+                  />
+                </g>
 
-                {/* ── Minute hand ── */}
-                <line
-                  x1={CC}
-                  y1={CC}
-                  x2={CC}
-                  y2={CC - 100}
-                  stroke="#1a1a1a"
-                  strokeWidth={3.5}
-                  strokeLinecap="round"
-                  transform={`rotate(${minuteAngle}, ${CC}, ${CC})`}
-                />
+                {/* ── Minute hand — tapered slim ── */}
+                <g transform={`rotate(${minuteAngle}, ${CC}, ${CC})`} filter="url(#handShadow)">
+                  <path
+                    d={`M ${CC - 3} ${CC + 15} Q ${CC - 3.5} ${CC + 8} ${CC - 2.5} ${CC} L ${CC - 1} ${CC - 88} Q ${CC} ${CC - 95} ${CC + 1} ${CC - 88} L ${CC + 2.5} ${CC} Q ${CC + 3.5} ${CC + 8} ${CC + 3} ${CC + 15} Z`}
+                    fill="#2a2a2a"
+                  />
+                </g>
 
-                {/* ── Second hand ── */}
-                <line
-                  x1={CC}
-                  y1={CC + 18}
-                  x2={CC}
-                  y2={CC - 110}
-                  stroke="#C12126"
-                  strokeWidth={1.5}
-                  strokeLinecap="round"
-                  transform={`rotate(${secondAngle}, ${CC}, ${CC})`}
-                />
+                {/* ── Second hand — thin red with counterweight dot & glow ── */}
+                <g transform={`rotate(${secondAngle}, ${CC}, ${CC})`} filter="url(#secGlow)">
+                  <line
+                    x1={CC} y1={CC + 24}
+                    x2={CC} y2={CC - 110}
+                    stroke="#C12126" strokeWidth={1.3} strokeLinecap="round"
+                  />
+                  <circle cx={CC} cy={CC + 20} r={3.5} fill="#C12126" opacity={0.5} />
+                </g>
 
-                {/* ── Center pivot ── */}
-                <circle cx={CC} cy={CC} r={5} fill="#C12126" />
+                {/* ── Center pivot — layered concentric circles ── */}
+                <circle cx={CC} cy={CC} r={7.5} fill="#1a1a1a" />
+                <circle cx={CC} cy={CC} r={4.5} fill="#C12126" />
                 <circle cx={CC} cy={CC} r={2} fill="#fff" />
               </svg>
             </div>
