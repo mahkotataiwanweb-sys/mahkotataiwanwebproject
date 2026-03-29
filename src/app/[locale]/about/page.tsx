@@ -67,6 +67,7 @@ const milestones = [
 
 function TiltCard({ children, className }: { children: React.ReactNode; className?: string }) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [style, setStyle] = useState<React.CSSProperties>({
     transform: 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1)',
     transition: 'transform 0.6s cubic-bezier(0.03, 0.98, 0.52, 0.99), box-shadow 0.6s ease',
@@ -74,8 +75,12 @@ function TiltCard({ children, className }: { children: React.ReactNode; classNam
   const [glare, setGlare] = useState({ x: 50, y: 50, opacity: 0 });
   const [edgeGlare, setEdgeGlare] = useState({ angle: 0, opacity: 0 });
 
+  useEffect(() => {
+    setIsMobileDevice(window.innerWidth < 768);
+  }, []);
+
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || isMobileDevice) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
@@ -90,9 +95,10 @@ function TiltCard({ children, className }: { children: React.ReactNode; classNam
     });
     setGlare({ x: x * 100, y: y * 100, opacity: 0.12 });
     setEdgeGlare({ angle, opacity: 0.2 });
-  }, []);
+  }, [isMobileDevice]);
 
   const handleMouseLeave = useCallback(() => {
+    if (isMobileDevice) return;
     setStyle({
       transform: 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1) translateZ(0px)',
       transition: 'transform 0.8s cubic-bezier(0.03, 0.98, 0.52, 0.99), box-shadow 0.8s ease',
@@ -100,7 +106,12 @@ function TiltCard({ children, className }: { children: React.ReactNode; classNam
     });
     setGlare({ x: 50, y: 50, opacity: 0 });
     setEdgeGlare({ angle: 0, opacity: 0 });
-  }, []);
+  }, [isMobileDevice]);
+
+  // Mobile: flat card, no 3D transforms
+  const mobileStyle: React.CSSProperties = {
+    boxShadow: '0 8px 24px -8px rgba(0,48,72,0.18), 0 4px 8px -4px rgba(0,0,0,0.06)',
+  };
 
   return (
     <div
@@ -108,37 +119,39 @@ function TiltCard({ children, className }: { children: React.ReactNode; classNam
       className={className}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{
+      style={isMobileDevice ? mobileStyle : {
         ...style,
         transformStyle: 'preserve-3d',
         boxShadow: style.boxShadow || '0 16px 32px -10px rgba(0,48,72,0.2), 0 8px 16px -6px rgba(0,0,0,0.08)',
       }}
     >
       {children}
-      {/* Mouse-following radial glare */}
-      <div
-        className="absolute inset-0 rounded-3xl pointer-events-none z-20"
-        style={{
-          background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,${glare.opacity}) 0%, transparent 60%)`,
-          transition: 'background 0.15s ease-out',
-        }}
-      />
-      {/* Edge shine reflection */}
-      <div
-        className="absolute inset-0 rounded-3xl pointer-events-none z-20 overflow-hidden"
-        style={{
-          background: `linear-gradient(${edgeGlare.angle + 90}deg, transparent 35%, rgba(255,255,255,${edgeGlare.opacity * 0.06}) 50%, transparent 65%)`,
-          transition: 'background 0.15s ease-out',
-        }}
-      />
-      {/* Subtle border shimmer */}
-      <div
-        className="absolute inset-0 rounded-3xl pointer-events-none z-20"
-        style={{
-          border: `1px solid rgba(255,255,255,${glare.opacity > 0 ? 0.1 : 0.04})`,
-          transition: 'border-color 0.3s ease',
-        }}
-      />
+      {/* Mouse-following radial glare — desktop only */}
+      {!isMobileDevice && (
+        <>
+          <div
+            className="absolute inset-0 rounded-3xl pointer-events-none z-20"
+            style={{
+              background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,${glare.opacity}) 0%, transparent 60%)`,
+              transition: 'background 0.15s ease-out',
+            }}
+          />
+          <div
+            className="absolute inset-0 rounded-3xl pointer-events-none z-20 overflow-hidden"
+            style={{
+              background: `linear-gradient(${edgeGlare.angle + 90}deg, transparent 35%, rgba(255,255,255,${edgeGlare.opacity * 0.06}) 50%, transparent 65%)`,
+              transition: 'background 0.15s ease-out',
+            }}
+          />
+          <div
+            className="absolute inset-0 rounded-3xl pointer-events-none z-20"
+            style={{
+              border: `1px solid rgba(255,255,255,${glare.opacity > 0 ? 0.1 : 0.04})`,
+              transition: 'border-color 0.3s ease',
+            }}
+          />
+        </>
+      )}
     </div>
   );
 }
@@ -349,91 +362,89 @@ export default function AboutPage() {
         );
       }
 
-      // Stats — dramatic cinematic bubble entrance
+      // Stats — bubble entrance + animation (mobile-aware)
+      const isMobile = window.innerWidth < 768;
+
       if (statsRef.current) {
         const bubbleItems = statsRef.current.querySelectorAll('.stat-bubble-item');
         
-        // Entrance: bubbles fly in from below with dramatic spring
-        gsap.fromTo(
-          bubbleItems,
-          { opacity: 0, scale: 0.3, y: 100, rotation: -15, filter: 'blur(16px)' },
-          {
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            rotation: 0,
-            filter: 'blur(0px)',
-            duration: 1.4,
-            stagger: 0.2,
-            ease: 'elastic.out(1, 0.45)',
-            scrollTrigger: {
-              trigger: statsRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
+        if (isMobile) {
+          // ── MOBILE: clean simple fade-up entrance, gentle float only ──
+          gsap.fromTo(
+            bubbleItems,
+            { opacity: 0, y: 40, scale: 0.9 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.8,
+              stagger: 0.12,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: statsRef.current,
+                start: 'top 88%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          );
 
-        // Advanced floating with bounce — each bubble has unique organic movement
-        const floatConfigs = [
-          { y: -20, x: 8, rotate: 4, dur: 3.0, bounceDelay: 4.5 },
-          { y: -26, x: -10, rotate: -3, dur: 3.6, bounceDelay: 5.8 },
-          { y: -18, x: 9, rotate: 3.5, dur: 3.3, bounceDelay: 6.5 },
-          { y: -24, x: -7, rotate: -4, dur: 3.9, bounceDelay: 5.0 },
-        ];
-        
-        bubbleItems.forEach((item, i) => {
-          const cfg = floatConfigs[i % floatConfigs.length];
-          const baseDelay = 1.5 + (i * 0.3);
-          
-          // Primary float — Y axis bob (larger range)
-          gsap.to(item, {
-            y: cfg.y,
-            duration: cfg.dur,
-            ease: 'sine.inOut',
-            repeat: -1,
-            yoyo: true,
-            delay: baseDelay,
+          // Gentle subtle float — no bounce, no rotation, no X drift
+          bubbleItems.forEach((item, i) => {
+            gsap.to(item, {
+              y: -6,
+              duration: 2.8 + i * 0.4,
+              ease: 'sine.inOut',
+              repeat: -1,
+              yoyo: true,
+              delay: 1 + i * 0.2,
+            });
           });
+        } else {
+          // ── DESKTOP: full dramatic cinematic entrance + advanced floating ──
+          gsap.fromTo(
+            bubbleItems,
+            { opacity: 0, scale: 0.3, y: 100, rotation: -15, filter: 'blur(16px)' },
+            {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              rotation: 0,
+              filter: 'blur(0px)',
+              duration: 1.4,
+              stagger: 0.2,
+              ease: 'elastic.out(1, 0.45)',
+              scrollTrigger: {
+                trigger: statsRef.current,
+                start: 'top 85%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          );
+
+          const floatConfigs = [
+            { y: -20, x: 8, rotate: 4, dur: 3.0, bounceDelay: 4.5 },
+            { y: -26, x: -10, rotate: -3, dur: 3.6, bounceDelay: 5.8 },
+            { y: -18, x: 9, rotate: 3.5, dur: 3.3, bounceDelay: 6.5 },
+            { y: -24, x: -7, rotate: -4, dur: 3.9, bounceDelay: 5.0 },
+          ];
           
-          // Secondary drift — X sway (wider)
-          gsap.to(item, {
-            x: cfg.x,
-            duration: cfg.dur * 1.2,
-            ease: 'sine.inOut',
-            repeat: -1,
-            yoyo: true,
-            delay: baseDelay + 0.3,
+          bubbleItems.forEach((item, i) => {
+            const cfg = floatConfigs[i % floatConfigs.length];
+            const baseDelay = 1.5 + (i * 0.3);
+            
+            gsap.to(item, { y: cfg.y, duration: cfg.dur, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: baseDelay });
+            gsap.to(item, { x: cfg.x, duration: cfg.dur * 1.2, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: baseDelay + 0.3 });
+            gsap.to(item, { rotation: cfg.rotate, duration: cfg.dur * 0.85, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: baseDelay + 0.5 });
+            gsap.to(item, { scale: 1.06, duration: cfg.dur * 1.1, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: baseDelay + 0.2 });
+            
+            const bounceTl = gsap.timeline({ repeat: -1, repeatDelay: cfg.bounceDelay, delay: cfg.bounceDelay });
+            bounceTl
+              .to(item, { scaleY: 0.88, scaleX: 1.12, duration: 0.15, ease: 'power2.in' })
+              .to(item, { scaleY: 1.18, scaleX: 0.88, y: '-=16', duration: 0.25, ease: 'power2.out' })
+              .to(item, { scaleY: 0.92, scaleX: 1.08, y: '+=16', duration: 0.2, ease: 'bounce.out' })
+              .to(item, { scaleY: 1, scaleX: 1, duration: 0.35, ease: 'elastic.out(1, 0.4)' });
           });
-          
-          // Rotation wobble (more dramatic)
-          gsap.to(item, {
-            rotation: cfg.rotate,
-            duration: cfg.dur * 0.85,
-            ease: 'sine.inOut',
-            repeat: -1,
-            yoyo: true,
-            delay: baseDelay + 0.5,
-          });
-          
-          // Scale breathing
-          gsap.to(item, {
-            scale: 1.06,
-            duration: cfg.dur * 1.1,
-            ease: 'sine.inOut',
-            repeat: -1,
-            yoyo: true,
-            delay: baseDelay + 0.2,
-          });
-          
-          // ★ BOUNCE — periodic elastic bounce that repeats with pause between
-          const bounceTl = gsap.timeline({ repeat: -1, repeatDelay: cfg.bounceDelay, delay: cfg.bounceDelay });
-          bounceTl
-            .to(item, { scaleY: 0.88, scaleX: 1.12, duration: 0.15, ease: 'power2.in' })
-            .to(item, { scaleY: 1.18, scaleX: 0.88, y: '-=16', duration: 0.25, ease: 'power2.out' })
-            .to(item, { scaleY: 0.92, scaleX: 1.08, y: '+=16', duration: 0.2, ease: 'bounce.out' })
-            .to(item, { scaleY: 1, scaleX: 1, duration: 0.35, ease: 'elastic.out(1, 0.4)' });
-        });
+        }
       }
 
       // Counter animation with dramatic counting
@@ -457,54 +468,67 @@ export default function AboutPage() {
         });
       });
 
-      // Values section — ultra premium cinematic reveal
+      // Values section — mobile-aware reveal
       if (valuesRef.current) {
         const cards = valuesRef.current.querySelectorAll('.value-card');
 
-        // Set initial state
-        gsap.set(cards, {
-          opacity: 0,
-          y: 120,
-          scale: 0.7,
-          rotationX: 25,
-          rotationY: -8,
-          filter: 'blur(16px) brightness(0.4)',
-          transformPerspective: 1200,
-          transformOrigin: 'center bottom',
-        });
-
-        // Staggered cinematic entrance
-        gsap.to(cards, {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          rotationX: 0,
-          rotationY: 0,
-          filter: 'blur(0px) brightness(1)',
-          duration: 1.2,
-          stagger: {
-            each: 0.18,
-            from: 'start',
-          },
-          ease: 'expo.out',
-          scrollTrigger: {
-            trigger: valuesRef.current,
-            start: 'top 82%',
-            toggleActions: 'play none none reverse',
-          },
-        });
-
-        // Subtle floating animation after entrance (continuous)
-        cards.forEach((card, i) => {
-          gsap.to(card, {
-            y: -6,
-            duration: 2.5 + i * 0.3,
-            ease: 'sine.inOut',
-            repeat: -1,
-            yoyo: true,
-            delay: 1.5 + i * 0.18,
+        if (isMobile) {
+          // ── MOBILE: simple clean fade-up, no 3D transforms ──
+          gsap.set(cards, { opacity: 0, y: 30 });
+          gsap.to(cards, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: valuesRef.current,
+              start: 'top 88%',
+              toggleActions: 'play none none reverse',
+            },
           });
-        });
+        } else {
+          // ── DESKTOP: full cinematic 3D entrance ──
+          gsap.set(cards, {
+            opacity: 0,
+            y: 120,
+            scale: 0.7,
+            rotationX: 25,
+            rotationY: -8,
+            filter: 'blur(16px) brightness(0.4)',
+            transformPerspective: 1200,
+            transformOrigin: 'center bottom',
+          });
+
+          gsap.to(cards, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotationX: 0,
+            rotationY: 0,
+            filter: 'blur(0px) brightness(1)',
+            duration: 1.2,
+            stagger: { each: 0.18, from: 'start' },
+            ease: 'expo.out',
+            scrollTrigger: {
+              trigger: valuesRef.current,
+              start: 'top 82%',
+              toggleActions: 'play none none reverse',
+            },
+          });
+
+          // Subtle floating animation after entrance (continuous)
+          cards.forEach((card, i) => {
+            gsap.to(card, {
+              y: -6,
+              duration: 2.5 + i * 0.3,
+              ease: 'sine.inOut',
+              repeat: -1,
+              yoyo: true,
+              delay: 1.5 + i * 0.18,
+            });
+          });
+        }
       }
 
       // Partners section fade-in
