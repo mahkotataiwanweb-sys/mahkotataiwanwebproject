@@ -70,14 +70,15 @@ const mkArc = (h1: number, h2: number, r: number) => {
   return `M ${p1.x.toFixed(1)},${p1.y.toFixed(1)} A ${r},${r} 0 ${span > 180 ? 1 : 0},1 ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
 };
 
-/* ── Clock image radius in SVG coords ── */
-const CLOCK_IMG_R = 140;       // approx visual edge of clock face in SVG
+/* ── Clock face image sizing ── */
+const FACE_SIZE = 310;          // clock face image size in SVG units
+const FACE_OFFSET = (CLK - FACE_SIZE) / 2;  // center the image
 
-/* ── Arc rings — sit concentrically outside the clock face ── */
-const GREEN_ARC_R = 175;     // Mon–Fri outer ring
-const YELLOW_ARC_R = 153;    // Saturday inner ring
-const GREEN_SW = 14;         // green stroke width
-const YELLOW_SW = 12;        // yellow stroke width
+/* ── Arc rings — sit just outside the visible clock face ── */
+const GREEN_ARC_R = 168;      // Mon–Fri outer ring
+const YELLOW_ARC_R = 156;     // Saturday inner ring
+const GREEN_SW = 9;           // green stroke width
+const YELLOW_SW = 7;          // yellow stroke width
 
 // Mon–Fri: 9 AM → 6 PM (270° arc, outer ring)
 const GREEN_D = mkArc(9, 6, GREEN_ARC_R);
@@ -87,7 +88,6 @@ const YELLOW_D = mkArc(9, 1, YELLOW_ARC_R);
 const greenMid = pol(hToA(1.5), GREEN_ARC_R);
 const yellowMid = pol(hToA(11), YELLOW_ARC_R);
 
-/* Clock image used instead of SVG-drawn ticks/numbers */
 
 const faqs = [
   {
@@ -323,29 +323,29 @@ export default function ContactPage() {
         gsap.set([gArc, yArc], { strokeDashoffset: 1, opacity: 1 });
         gsap.set([gLabel, yLabel], { opacity: 0, scale: 0.7 });
 
-        const arcTl = gsap.timeline({ repeat: -1, repeatDelay: 2, paused: true });
+        const arcTl = gsap.timeline({ repeat: -1, repeatDelay: 2.5, paused: true });
 
         // ── Reset at start of each cycle ──
         arcTl.set([gArc, yArc], { opacity: 1, strokeDashoffset: 1 });
         arcTl.set([gLabel, yLabel], { opacity: 0, scale: 0.7 });
 
-        // ── 1. Green arc draws in very slowly (dramatic) ──
-        arcTl.to(gArc, { strokeDashoffset: 0, duration: 8, ease: 'none' });
-        // Green label appears near end of draw
-        arcTl.to(gLabel, { opacity: 1, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }, '-=2.5');
+        // ── Green starts drawing first — constant speed, 10s to cover 270° ──
+        arcTl.to(gArc, { strokeDashoffset: 0, duration: 10, ease: 'none' }, 0);
 
-        // ── 2. Yellow arc draws in slowly (after green) ──
-        arcTl.to(yArc, { strokeDashoffset: 0, duration: 6, ease: 'none' }, '+=0.8');
-        // Yellow label appears
-        arcTl.to(yLabel, { opacity: 1, scale: 1, duration: 1.2, ease: 'back.out(1.7)' }, '-=2.5');
+        // ── Yellow starts 0.8s later, 9.2s duration — BOTH FINISH at t=10 ──
+        arcTl.to(yArc, { strokeDashoffset: 0, duration: 9.2, ease: 'none' }, 0.8);
 
-        // ── 3. Hold both visible ──
-        arcTl.to({}, { duration: 3 });
+        // ── Labels pop in near the end (t=9) ──
+        arcTl.to(gLabel, { opacity: 1, scale: 1, duration: 1, ease: 'back.out(1.7)' }, 9);
+        arcTl.to(yLabel, { opacity: 1, scale: 1, duration: 1, ease: 'back.out(1.7)' }, 9.2);
 
-        // ── 4. Both fade out together — dramatic ──
+        // ── Hold both visible for 3s after arcs complete ──
+        arcTl.to({}, { duration: 3 }, 10);
+
+        // ── Both fade out together — dramatic ──
         arcTl.to([gArc, yArc, gLabel, yLabel], {
           opacity: 0,
-          duration: 2.5,
+          duration: 2,
           ease: 'power2.inOut',
         });
 
@@ -599,8 +599,8 @@ export default function ContactPage() {
                 {/* ── Moon clock face image (no background) ── */}
                 <image
                   href="/images/clock-face.png"
-                  x="0" y="0"
-                  width={CLK} height={CLK}
+                  x={FACE_OFFSET} y={FACE_OFFSET}
+                  width={FACE_SIZE} height={FACE_SIZE}
                   preserveAspectRatio="xMidYMid meet"
                 />
 
@@ -674,10 +674,10 @@ export default function ContactPage() {
                   </text>
                 </g>
 
-                {/* ── Hour hand — tapered elegant with rounded tip ── */}
+                {/* ── Hour hand — tapered elegant ── */}
                 <g transform={`rotate(${hourAngle}, ${CC}, ${CC})`} filter="url(#handShadow)">
                   <path
-                    d={`M ${CC - 4.5} ${CC + 15} Q ${CC - 5} ${CC + 8} ${CC - 3.5} ${CC} L ${CC - 1.5} ${CC - 60} Q ${CC} ${CC - 67} ${CC + 1.5} ${CC - 60} L ${CC + 3.5} ${CC} Q ${CC + 5} ${CC + 8} ${CC + 4.5} ${CC + 15} Z`}
+                    d={`M ${CC - 3.8} ${CC + 12} Q ${CC - 4.2} ${CC + 6} ${CC - 3} ${CC} L ${CC - 1.2} ${CC - 72} Q ${CC} ${CC - 78} ${CC + 1.2} ${CC - 72} L ${CC + 3} ${CC} Q ${CC + 4.2} ${CC + 6} ${CC + 3.8} ${CC + 12} Z`}
                     fill="#1a1a1a"
                   />
                 </g>
@@ -685,7 +685,7 @@ export default function ContactPage() {
                 {/* ── Minute hand — tapered slim ── */}
                 <g transform={`rotate(${minuteAngle}, ${CC}, ${CC})`} filter="url(#handShadow)">
                   <path
-                    d={`M ${CC - 3} ${CC + 15} Q ${CC - 3.5} ${CC + 8} ${CC - 2.5} ${CC} L ${CC - 1} ${CC - 88} Q ${CC} ${CC - 95} ${CC + 1} ${CC - 88} L ${CC + 2.5} ${CC} Q ${CC + 3.5} ${CC + 8} ${CC + 3} ${CC + 15} Z`}
+                    d={`M ${CC - 2.5} ${CC + 12} Q ${CC - 3} ${CC + 6} ${CC - 2} ${CC} L ${CC - 0.8} ${CC - 102} Q ${CC} ${CC - 108} ${CC + 0.8} ${CC - 102} L ${CC + 2} ${CC} Q ${CC + 3} ${CC + 6} ${CC + 2.5} ${CC + 12} Z`}
                     fill="#2a2a2a"
                   />
                 </g>
@@ -693,11 +693,11 @@ export default function ContactPage() {
                 {/* ── Second hand — thin red with counterweight dot & glow ── */}
                 <g transform={`rotate(${secondAngle}, ${CC}, ${CC})`} filter="url(#secGlow)">
                   <line
-                    x1={CC} y1={CC + 24}
-                    x2={CC} y2={CC - 110}
-                    stroke="#C12126" strokeWidth={1.3} strokeLinecap="round"
+                    x1={CC} y1={CC + 20}
+                    x2={CC} y2={CC - 118}
+                    stroke="#C12126" strokeWidth={1.2} strokeLinecap="round"
                   />
-                  <circle cx={CC} cy={CC + 20} r={3.5} fill="#C12126" opacity={0.5} />
+                  <circle cx={CC} cy={CC + 16} r={3} fill="#C12126" opacity={0.5} />
                 </g>
 
                 {/* ── Center pivot — layered concentric circles ── */}
