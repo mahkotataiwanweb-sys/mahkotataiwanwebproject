@@ -349,7 +349,7 @@ export default function HomePage() {
           </div>
 
           {/* Two Stacked Card Sliders — 30% smaller on desktop, centered */}
-          <div ref={sliderWrapRef} className="space-y-20 lg:max-w-[70%] lg:mx-auto">
+          <div ref={sliderWrapRef} className="space-y-20 lg:max-w-[55%] lg:mx-auto">
             <StackedCardSlider
               slides={eventSlides}
               locale={locale}
