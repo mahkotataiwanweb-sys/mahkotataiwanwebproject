@@ -76,7 +76,7 @@ const FACE_OFFSET = (CLK - FACE_SIZE) / 2;  // center the image
 
 /* ── Arc rings — sit just outside the visible clock face ── */
 const GREEN_ARC_R = 168;      // Mon–Fri outer ring
-const YELLOW_ARC_R = 156;     // Saturday inner ring
+const YELLOW_ARC_R = 160;     // Saturday inner ring (tiny gap from clock face)
 const GREEN_SW = 9;           // green stroke width
 const YELLOW_SW = 7;          // yellow stroke width
 
