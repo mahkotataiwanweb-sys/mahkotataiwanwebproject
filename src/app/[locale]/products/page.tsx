@@ -7,13 +7,30 @@ import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Package, ArrowLeft, X, ChevronLeft, ChevronRight, Shield, Award, Sparkles } from 'lucide-react';
+import { Package, ArrowLeft, X, ChevronLeft, ChevronRight, Shield, Award, Sparkles, ChevronDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Product, Category } from '@/types/database';
 
 gsap.registerPlugin(ScrollTrigger);
+
+/* ------------------------------------------------------------------ */
+/*  ShowcaseProduct interface (same as ProductCatalogSection)           */
+/* ------------------------------------------------------------------ */
+interface ShowcaseProduct {
+  id: string;
+  category: string;
+  name: string;
+  name_zh: string;
+  name_id: string;
+  description_en: string | null;
+  description_id: string | null;
+  description_zh: string | null;
+  image_url: string | null;
+  sort_order: number;
+  is_active: boolean;
+}
 
 /* ------------------------------------------------------------------ */
 /*  Product Detail Modal                                               */
@@ -225,13 +242,16 @@ function BezelCard({
   locale,
   isSelected,
   onClick,
+  showcaseImageUrl,
 }: {
   product: Product;
   locale: string;
   isSelected: boolean;
   onClick: () => void;
+  showcaseImageUrl?: string | null;
 }) {
   const name = getLocalizedField(product, 'name', locale);
+  const imageUrl = showcaseImageUrl || product.image_url;
 
   return (
     <motion.div
@@ -257,9 +277,9 @@ function BezelCard({
         <div className="relative rounded-xl overflow-hidden bg-cream shadow-inner">
           {/* Image */}
           <div className="relative aspect-square bg-gradient-to-br from-cream-dark/30 to-cream overflow-hidden">
-            {product.image_url ? (
+            {imageUrl ? (
               <Image
-                src={product.image_url}
+                src={imageUrl}
                 alt={name}
                 fill
                 className={`object-cover transition-all duration-700 ${
@@ -325,22 +345,22 @@ function ProductDetailSection({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-      className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center"
+      className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8 lg:gap-12 items-center"
     >
       {/* Left: Product Image in premium frame */}
       <div className="relative">
         {/* Decorative glow behind frame */}
-        <div className="absolute -inset-4 bg-gradient-to-br from-red/5 via-transparent to-navy/5 rounded-3xl blur-2xl" />
+        <div className="absolute -inset-2 bg-gradient-to-br from-red/5 via-transparent to-navy/5 rounded-3xl blur-2xl" />
 
-        <div className="relative rounded-3xl p-3 sm:p-4 bg-gradient-to-br from-navy/10 via-navy/5 to-transparent shadow-2xl">
-          <div className="relative aspect-square rounded-2xl overflow-hidden bg-cream shadow-inner">
+        <div className="relative rounded-3xl p-2 sm:p-3 bg-gradient-to-br from-navy/10 via-navy/5 to-transparent shadow-2xl">
+          <div className="relative aspect-square max-w-[280px] mx-auto lg:mx-0 rounded-2xl overflow-hidden bg-cream shadow-inner">
             {product.image_url ? (
               <Image
                 src={product.image_url}
                 alt={name}
                 fill
                 className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                sizes="(max-width: 1024px) 100vw, 320px"
                 unoptimized
               />
             ) : (
@@ -422,10 +442,12 @@ function CategoryProductView({
   products,
   locale,
   categoryName,
+  getShowcaseImage,
 }: {
   products: Product[];
   locale: string;
   categoryName: string;
+  getShowcaseImage?: (product: Product) => string | null;
 }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -507,6 +529,7 @@ function CategoryProductView({
               locale={locale}
               isSelected={i === selectedIndex}
               onClick={() => setSelectedIndex(i)}
+              showcaseImageUrl={getShowcaseImage ? getShowcaseImage(product) : undefined}
             />
           ))}
         </div>
@@ -537,16 +560,30 @@ function ProductsContent() {
   const categoryParam = searchParams.get('category');
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [showcaseProducts, setShowcaseProducts] = useState<ShowcaseProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>('all');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Fetch data
   useEffect(() => {
     async function fetchData() {
       try {
-        const [catRes, prodRes] = await Promise.all([
+        const [catRes, prodRes, showcaseRes] = await Promise.all([
           supabase
             .from('categories')
             .select('*')
@@ -554,6 +591,11 @@ function ProductsContent() {
             .order('sort_order', { ascending: true }),
           supabase
             .from('products')
+            .select('*')
+            .eq('is_active', true)
+            .order('sort_order', { ascending: true }),
+          supabase
+            .from('showcase_products')
             .select('*')
             .eq('is_active', true)
             .order('sort_order', { ascending: true }),
@@ -567,6 +609,7 @@ function ProductsContent() {
           }
         }
         if (prodRes.data) setProducts(prodRes.data as Product[]);
+        if (showcaseRes.data) setShowcaseProducts(showcaseRes.data as ShowcaseProduct[]);
       } catch {
         // Silent fail
       } finally {
@@ -606,6 +649,19 @@ function ProductsContent() {
     [categories, locale]
   );
 
+  /* Helper: find matching showcase image for a product */
+  const getShowcaseImage = useCallback((product: Product) => {
+    const nameEn = product.name_en;
+    const nameId = product.name_id;
+    const nameZh = product.name_zh;
+    const match = showcaseProducts.find(sp =>
+      (nameEn && sp.name?.toLowerCase().trim() === nameEn.toLowerCase().trim()) ||
+      (nameId && sp.name_id?.toLowerCase().trim() === nameId.toLowerCase().trim()) ||
+      (nameZh && sp.name_zh?.toLowerCase().trim() === nameZh.toLowerCase().trim())
+    );
+    return match?.image_url || product.image_url;
+  }, [showcaseProducts]);
+
   /* Count products per category */
   const productCountByCategory = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -622,6 +678,10 @@ function ProductsContent() {
       : products.filter((p) => p.category_id === activeFilter);
 
   const totalProducts = products.length;
+
+  /* Get the active category object for dropdown display */
+  const activeCategory = categories.find((c) => c.id === activeFilter);
+  const dropdownLabel = activeCategory ? getLocalizedField(activeCategory, 'name', locale) : 'Select Category';
 
   return (
     <div className="min-h-screen bg-cream">
@@ -705,7 +765,7 @@ function ProductsContent() {
           {/* Row 1: All Products — floating luxury pill */}
           <div className="flex justify-center mb-4">
             <button
-              onClick={() => setActiveFilter('all')}
+              onClick={() => { setActiveFilter('all'); setDropdownOpen(false); }}
               className="group relative"
             >
               {/* Glow aura behind button */}
@@ -733,49 +793,70 @@ function ProductsContent() {
             </button>
           </div>
 
-          {/* Row 2: Category buttons — floating luxury chips */}
-          <div
-            className="flex gap-3 sm:gap-4 overflow-x-auto justify-center -mx-2 px-2 pb-2 scrollbar-hide"
-          >
+          {/* Row 2: Category Dropdown — premium select */}
+          <div className="flex justify-center" ref={dropdownRef}>
+            <div className="relative">
+              {/* Dropdown Trigger Button */}
+              <button
+                onClick={() => setDropdownOpen((prev) => !prev)}
+                className={`relative flex items-center gap-3 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                  dropdownOpen
+                    ? 'bg-white/90 border border-navy/20 shadow-xl text-navy'
+                    : activeFilter !== 'all'
+                      ? 'bg-white/80 border border-navy/15 shadow-lg text-navy'
+                      : 'bg-white/70 border border-navy/10 text-navy/60 hover:border-navy/20 hover:shadow-lg hover:text-navy'
+                }`}
+              >
+                {activeCategory?.icon && (
+                  <span className="text-lg leading-none">{activeCategory.icon}</span>
+                )}
+                <span>{activeFilter === 'all' ? 'Select Category' : dropdownLabel}</span>
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-300 ${
+                    dropdownOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
 
-
-            {categories.map((cat) => {
-              const isActive = activeFilter === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveFilter(cat.id)}
-                  className="group relative shrink-0"
-                >
-                  {/* Floating glow aura */}
-                  <div className={`absolute -inset-1 rounded-xl blur-lg transition-all duration-700 ${
-                    isActive
-                      ? 'bg-gradient-to-r from-navy/25 to-red/20 scale-105'
-                      : 'bg-navy/0 group-hover:bg-navy/8'
-                  }`} />
-                  <div className={`relative flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-500 overflow-hidden ${
-                    isActive
-                      ? 'bg-gradient-to-r from-navy via-navy/95 to-navy/85 text-white shadow-[0_6px_28px_rgba(0,45,90,0.3),0_2px_6px_rgba(0,45,90,0.15)] -translate-y-0.5'
-                      : 'bg-white/60 text-navy/45 hover:text-navy border border-navy/[0.06] hover:border-navy/12 shadow-[0_2px_10px_rgba(0,45,90,0.04)] hover:shadow-[0_6px_22px_rgba(0,45,90,0.1)] hover:-translate-y-0.5'
-                  }`}>
-                    {/* Glossy top highlight */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/[0.15] via-transparent to-transparent pointer-events-none rounded-xl" />
-                    {/* Shimmer on active */}
-                    {isActive && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/8 to-transparent animate-[shimmer_3s_ease-in-out_infinite] pointer-events-none" />
-                    )}
-                    {/* Bottom edge light — subtle glow line */}
-                    <div className={`absolute bottom-0 left-2 right-2 h-[1px] transition-all duration-500 ${
-                      isActive
-                        ? 'bg-gradient-to-r from-transparent via-white/30 to-transparent'
-                        : 'bg-gradient-to-r from-transparent via-navy/0 to-transparent group-hover:via-navy/10'
-                    }`} />
-                    {cat.icon && <span className="relative text-lg leading-none drop-shadow-sm">{cat.icon}</span>}
-                    <span className="relative tracking-wide">{getLocalizedField(cat, 'name', locale)}</span>
-                  </div>
-                </button>
-              );
-            })}
+              {/* Dropdown Menu */}
+              <AnimatePresence>
+                {dropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 rounded-xl bg-white/95 backdrop-blur-xl shadow-2xl border border-navy/10 overflow-hidden z-50"
+                  >
+                    <div className="py-2">
+                      {categories.map((cat) => {
+                        const isActive = activeFilter === cat.id;
+                        const catName = getLocalizedField(cat, 'name', locale);
+                        return (
+                          <button
+                            key={cat.id}
+                            onClick={() => {
+                              setActiveFilter(cat.id);
+                              setDropdownOpen(false);
+                            }}
+                            className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-medium transition-all duration-200 ${
+                              isActive
+                                ? 'bg-red/10 text-red font-semibold'
+                                : 'text-navy/70 hover:bg-navy/5 hover:text-navy'
+                            }`}
+                          >
+                            {cat.icon && (
+                              <span className="text-lg leading-none shrink-0">{cat.icon}</span>
+                            )}
+                            <span className="truncate">{catName}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </div>
@@ -863,6 +944,7 @@ function ProductsContent() {
             products={displayedProducts}
             locale={locale}
             categoryName={getCategoryName(activeFilter)}
+            getShowcaseImage={getShowcaseImage}
           />
         )}
       </div>

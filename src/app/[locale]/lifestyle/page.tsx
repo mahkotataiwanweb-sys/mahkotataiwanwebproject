@@ -1,30 +1,28 @@
 'use client';
-
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Sparkles, ArrowLeft, X, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
 
-/* ------------------------------------------------------------------ */
-/*  Helper: extract YYYY-MM-DD from an ISO date string                */
-/* ------------------------------------------------------------------ */
-function extractDateKey(isoStr: string): string {
-  try {
-    return new Date(isoStr).toISOString().slice(0, 10);
-  } catch {
-    return '';
-  }
+gsap.registerPlugin(ScrollTrigger);
+
+/* ───────────── helpers ───────────── */
+
+function extractDateKey(dateStr: string): string {
+  const d = new Date(dateStr);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Helper: group articles by published_at date                       */
-/* ------------------------------------------------------------------ */
 interface DateGroup {
   key: string;
   date: string;
@@ -44,70 +42,71 @@ function groupByDate(articles: Article[]): DateGroup[] {
   return Array.from(map.values()).sort((a, b) => b.date.localeCompare(a.date));
 }
 
-/* ------------------------------------------------------------------ */
-/*  Helper: format a YYYY-MM-DD string for display                    */
-/* ------------------------------------------------------------------ */
-function formatDateDisplay(dateStr: string, locale: string) {
-  try {
-    const d = new Date(dateStr + 'T00:00:00');
-    return d.toLocaleDateString(
-      locale === 'id' ? 'id-ID' : locale === 'zh' ? 'zh-TW' : 'en-US',
-      { year: 'numeric', month: 'long', day: 'numeric' }
-    );
-  } catch {
-    return dateStr;
-  }
+function formatDateDisplay(dateKey: string, locale: string): string {
+  const d = new Date(dateKey + 'T00:00:00');
+  return d.toLocaleDateString(
+    locale === 'id' ? 'id-ID' : locale === 'zh' ? 'zh-TW' : 'en-US',
+    { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' },
+  );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Calendar helpers                                                   */
-/* ------------------------------------------------------------------ */
-function getDaysInMonth(year: number, month: number) {
+function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month + 1, 0).getDate();
 }
 
-function getFirstDayOfMonth(year: number, month: number) {
-  return new Date(year, month, 1).getDay(); // 0=Sun
+function getFirstDayOfMonth(year: number, month: number): number {
+  return new Date(year, month, 1).getDay();
 }
 
-const MONTH_NAMES = [
+const monthNames = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
-const DAY_LABELS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const dayLabels = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
-/* ------------------------------------------------------------------ */
-/*  Page Component                                                     */
-/* ------------------------------------------------------------------ */
+/* ───────────── masonry size pattern ───────────── */
+// Returns CSS classes for a given item index within a group
+// Pattern creates visual variety: first = large (col-span-2 row-span-2), then alternating medium/small
+function getMasonryClasses(index: number, total: number): { span: string; aspect: string; isLarge: boolean } {
+  if (total === 1) {
+    return { span: 'sm:col-span-2 lg:col-span-3', aspect: 'aspect-[21/9]', isLarge: true };
+  }
+  if (index === 0) {
+    return { span: 'col-span-2 row-span-2', aspect: 'aspect-square md:aspect-auto', isLarge: true };
+  }
+  // Alternate medium / small
+  const pos = (index - 1) % 4;
+  if (pos === 0 || pos === 3) {
+    return { span: '', aspect: 'aspect-[4/5]', isLarge: false };
+  }
+  return { span: '', aspect: 'aspect-square', isLarge: false };
+}
+
+/* ───────────── page ───────────── */
+
 export default function LifestylePage() {
   const locale = useLocale();
 
-  /* ---------- state ---------- */
+  /* state */
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const [nameFilter, setNameFilter] = useState<string | null>(null);
+  const [dateFilter, setDateFilter] = useState<string | null>(null);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calMonth, setCalMonth] = useState(new Date().getMonth());
+  const [calYear, setCalYear] = useState(new Date().getFullYear());
 
-  // Calendar state
-  const today = new Date();
-  const [calYear, setCalYear] = useState(today.getFullYear());
-  const [calMonth, setCalMonth] = useState(today.getMonth());
-  const [calOpen, setCalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-
-  // Activity name filter
-  const [selectedActivityName, setSelectedActivityName] = useState<string | null>(null);
-
-  // Calendar transition direction
-  const [calDirection, setCalDirection] = useState(0);
-
-  // Refs
-  const headerRef = useRef<HTMLDivElement>(null);
+  /* refs */
+  const heroRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const calBtnRef = useRef<HTMLButtonElement>(null);
 
-  /* ---------- fetch ---------- */
+  /* fetch */
   useEffect(() => {
-    async function fetchLifestyle() {
+    (async () => {
+      setLoading(true);
       try {
         const { data, error } = await supabase
           .from('articles')
@@ -115,531 +114,723 @@ export default function LifestylePage() {
           .eq('type', 'lifestyle')
           .eq('is_active', true)
           .order('sort_order', { ascending: true });
-
-        if (!error && data) {
-          setArticles(data as Article[]);
-        }
+        if (!error && data) setArticles(data as Article[]);
       } catch {
         // Silent fail
       } finally {
         setLoading(false);
       }
-    }
-    fetchLifestyle();
+    })();
   }, []);
 
-  // GSAP header animation
+  /* GSAP hero entrance */
   useEffect(() => {
-    if (!headerRef.current) return;
+    if (!heroRef.current) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headerRef.current!.children,
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.12,
-          ease: 'power3.out',
-        }
-      );
-    });
+      gsap.from('[data-hero-anim]', {
+        opacity: 0,
+        y: 50,
+        clipPath: 'inset(100% 0 0 0)',
+        duration: 1,
+        ease: 'power3.out',
+        stagger: 0.14,
+      });
+    }, heroRef);
     return () => ctx.revert();
   }, []);
 
-  /* ---------- GSAP grid animation ---------- */
+  /* derived data */
+  const filteredArticles = useCallback(() => {
+    let list = [...articles];
+    if (nameFilter) {
+      list = list.filter((a) => getLocalizedField(a, 'title', locale) === nameFilter);
+    }
+    if (dateFilter) {
+      list = list.filter((a) => extractDateKey(a.published_at) === dateFilter);
+    }
+    return list;
+  }, [articles, nameFilter, dateFilter, locale]);
+
+  const filtered = filteredArticles();
+  const groups = groupByDate(filtered);
+
+  // Flat list for featured extraction
+  const flatFiltered = groups.flatMap((g) => g.articles);
+  const featuredArticle = flatFiltered[0] || null;
+
+  // Unique names for pills
+  const uniqueNames = Array.from(new Set(articles.map((a) => getLocalizedField(a, 'title', locale))));
+
+  // Dates that have articles
+  const articleDateKeys = new Set(articles.map((a) => extractDateKey(a.published_at)));
+
+  /* GSAP grid reveal on filter change */
   useEffect(() => {
-    if (!loading && gridRef.current) {
-      const cards = gridRef.current.querySelectorAll('.lifestyle-card');
+    if (!gridRef.current || loading) return;
+    const ctx = gsap.context(() => {
+      const cards = gridRef.current?.querySelectorAll('[data-card]');
+      if (!cards || cards.length === 0) return;
       gsap.fromTo(
         cards,
-        { opacity: 0, y: 40, scale: 0.95 },
+        { opacity: 0, y: 50, scale: 0.96 },
         {
           opacity: 1,
           y: 0,
           scale: 1,
-          duration: 0.5,
-          stagger: 0.07,
-          ease: 'power3.out',
-        }
+          duration: 0.55,
+          ease: 'power2.out',
+          stagger: 0.06,
+          scrollTrigger: {
+            trigger: gridRef.current,
+            start: 'top 88%',
+          },
+        },
       );
+    }, gridRef);
+    return () => ctx.revert();
+  }, [filtered.length, nameFilter, dateFilter, loading]);
+
+  /* close calendar on outside click */
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (
+        calendarOpen &&
+        calBtnRef.current &&
+        !calBtnRef.current.contains(e.target as Node) &&
+        !(e.target as HTMLElement).closest('[data-cal-dropdown]')
+      ) {
+        setCalendarOpen(false);
+      }
     }
-  }, [loading, selectedDate, selectedActivityName]);
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [calendarOpen]);
 
-  /* ---------- derived data ---------- */
-  // Dates that have articles (YYYY-MM-DD strings)
-  const datesWithContent = new Set(articles.map((a) => extractDateKey(a.published_at)));
+  /* lock scroll when modal open */
+  useEffect(() => {
+    if (selectedArticle) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [selectedArticle]);
 
-  // Unique activity titles for pills
-  const activityTitles = Array.from(
-    new Set(articles.map((a) => getLocalizedField(a, 'title', locale)))
-  );
+  /* calendar helpers */
+  const daysInMonth = getDaysInMonth(calYear, calMonth);
+  const firstDay = getFirstDayOfMonth(calYear, calMonth);
 
-  // Filtered articles
-  const filtered = articles.filter((a) => {
-    if (selectedDate && extractDateKey(a.published_at) !== selectedDate) return false;
-    if (selectedActivityName && getLocalizedField(a, 'title', locale) !== selectedActivityName)
-      return false;
-    return true;
-  });
-
-  const groups = groupByDate(filtered);
-
-  /* ---------- calendar navigation ---------- */
   function prevMonth() {
-    setCalDirection(-1);
     if (calMonth === 0) {
       setCalMonth(11);
-      setCalYear((y) => y - 1);
+      setCalYear(calYear - 1);
     } else {
-      setCalMonth((m) => m - 1);
+      setCalMonth(calMonth - 1);
     }
   }
   function nextMonth() {
-    setCalDirection(1);
     if (calMonth === 11) {
       setCalMonth(0);
-      setCalYear((y) => y + 1);
+      setCalYear(calYear + 1);
     } else {
-      setCalMonth((m) => m + 1);
+      setCalMonth(calMonth + 1);
     }
   }
-
   function handleDayClick(day: number) {
-    const mm = String(calMonth + 1).padStart(2, '0');
-    const dd = String(day).padStart(2, '0');
-    const dateStr = `${calYear}-${mm}-${dd}`;
-    if (datesWithContent.has(dateStr)) {
-      setSelectedDate(dateStr === selectedDate ? null : dateStr);
-      setSelectedActivityName(null);
-    }
+    const m = String(calMonth + 1).padStart(2, '0');
+    const d = String(day).padStart(2, '0');
+    const key = `${calYear}-${m}-${d}`;
+    setDateFilter(key === dateFilter ? null : key);
+    setCalendarOpen(false);
   }
 
   function clearFilters() {
-    setSelectedDate(null);
-    setSelectedActivityName(null);
+    setNameFilter(null);
+    setDateFilter(null);
   }
 
-  /* ---------- calendar grid ---------- */
-  const daysInMonth = getDaysInMonth(calYear, calMonth);
-  const firstDay = getFirstDayOfMonth(calYear, calMonth);
-  const calendarCells: (number | null)[] = [];
-  for (let i = 0; i < firstDay; i++) calendarCells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) calendarCells.push(d);
-
-  const isToday = (day: number) =>
-    day === today.getDate() &&
-    calMonth === today.getMonth() &&
-    calYear === today.getFullYear();
-
-  const dayHasContent = (day: number) => {
-    const mm = String(calMonth + 1).padStart(2, '0');
-    const dd = String(day).padStart(2, '0');
-    return datesWithContent.has(`${calYear}-${mm}-${dd}`);
-  };
-
-  const dayIsSelected = (day: number) => {
-    const mm = String(calMonth + 1).padStart(2, '0');
-    const dd = String(day).padStart(2, '0');
-    return selectedDate === `${calYear}-${mm}-${dd}`;
-  };
-
-  /* Calendar month slide variants */
-  const calSlideVariants = {
-    enter: (dir: number) => ({ x: dir > 0 ? 80 : -80, opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (dir: number) => ({ x: dir > 0 ? -80 : 80, opacity: 0 }),
-  };
-
-  /* ================================================================ */
-  /*  RENDER                                                           */
-  /* ================================================================ */
+  /* ─── render ─── */
   return (
-    <div className="min-h-screen bg-cream">
-      {/* ===================== HERO BANNER ===================== */}
-      <div className="relative bg-gradient-to-br from-navy via-navy/90 to-red-dark pt-32 pb-20 overflow-hidden">
-        {/* Decorative */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-10 w-72 h-72 rounded-full bg-red/10 blur-3xl" />
-          <div className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-cream/5 blur-3xl" />
-        </div>
+    <main className="min-h-screen bg-[#FFF8EE]">
+      {/* ═══════════════════════════════════════════════
+          HERO SECTION
+      ═══════════════════════════════════════════════ */}
+      <section
+        ref={heroRef}
+        className="relative overflow-hidden bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] pt-28 pb-24 md:pt-36 md:pb-32"
+      >
+        {/* Grid overlay */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        />
 
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <Link
-            href={`/${locale}`}
-            className="inline-flex items-center gap-2 text-cream/60 hover:text-cream text-sm mb-8 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
+        {/* Decorative blurred circles */}
+        <div className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[#C12126]/15 blur-[120px]" />
+        <div className="pointer-events-none absolute bottom-0 left-0 h-80 w-80 rounded-full bg-[#FAEDD3]/10 blur-[100px]" />
+        <div className="pointer-events-none absolute top-1/2 left-1/3 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#C12126]/8 blur-[80px]" />
 
-          <div ref={headerRef}>
-            <p className="text-red/80 text-sm tracking-[0.3em] uppercase font-semibold mb-3">
-              Showcase
-            </p>
-            <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
-              Activity
-            </h1>
-            <div className="w-20 h-[3px] bg-white/50 mb-6" />
-            <p className="text-cream/60 max-w-lg text-lg">
-              See how our community enjoys Mahkota Taiwan products in their everyday life.
-            </p>
+        {/* Floating sparkle elements */}
+        <motion.div
+          className="pointer-events-none absolute top-20 right-[15%] text-[#FAEDD3]/10"
+          animate={{ y: [0, -15, 0], rotate: [0, 180, 360] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <Sparkles className="h-8 w-8" />
+        </motion.div>
+        <motion.div
+          className="pointer-events-none absolute bottom-16 left-[20%] text-[#FAEDD3]/8"
+          animate={{ y: [0, 12, 0], rotate: [0, -90, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+        >
+          <Sparkles className="h-6 w-6" />
+        </motion.div>
+        <motion.div
+          className="pointer-events-none absolute top-1/2 right-[8%] text-[#C12126]/15"
+          animate={{ y: [0, -10, 0], scale: [1, 1.2, 1] }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+        >
+          <Sparkles className="h-5 w-5" />
+        </motion.div>
+
+        {/* Animated vertical accent line */}
+        <motion.div
+          className="absolute right-12 top-16 bottom-16 hidden w-px bg-gradient-to-b from-transparent via-[#FAEDD3]/15 to-transparent lg:block"
+          initial={{ scaleY: 0 }}
+          animate={{ scaleY: 1 }}
+          transition={{ duration: 1.4, ease: 'easeOut', delay: 0.5 }}
+          style={{ transformOrigin: 'top' }}
+        />
+
+        <div className="relative mx-auto max-w-7xl px-6">
+          {/* Back link */}
+          <div data-hero-anim>
+            <Link
+              href={`/${locale}`}
+              className="group mb-10 inline-flex items-center gap-2 text-sm text-[#FAEDD3]/60 transition hover:text-[#FAEDD3]"
+            >
+              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+              Back to Home
+            </Link>
           </div>
-        </div>
-      </div>
 
-      {/* ===================== CONTENT ===================== */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        {/* ---------- Calendar Toggle (mobile) ---------- */}
-        <div className="mb-6 lg:hidden">
-          <button
-            onClick={() => setCalOpen(!calOpen)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#003048] text-white text-sm font-medium shadow hover:bg-[#003048]/90 transition-colors"
+          {/* Subtitle tag */}
+          <p
+            data-hero-anim
+            className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em]"
           >
-            <CalendarIcon className="w-4 h-4" />
-            {calOpen ? 'Hide Calendar' : 'Show Calendar'}
-          </button>
+            <span className="text-[#C12126]">Showcase</span>
+            <span className="inline-block h-px w-8 bg-[#FAEDD3]/30" />
+            <span className="text-[#FAEDD3]/40">Lifestyle</span>
+          </p>
+
+          {/* Heading */}
+          <h1
+            data-hero-anim
+            className="font-heading text-5xl font-bold text-white md:text-7xl lg:text-8xl"
+          >
+            Activity
+          </h1>
+
+          {/* Accent line — white/50 to differentiate from Events */}
+          <div data-hero-anim className="mt-6 h-[3px] w-20 rounded-full bg-white/50" />
+
+          {/* Description */}
+          <p
+            data-hero-anim
+            className="mt-6 max-w-lg text-base leading-relaxed text-[#FAEDD3]/60 md:text-lg"
+          >
+            See how our community enjoys Mahkota Taiwan products in their everyday life.
+          </p>
         </div>
+      </section>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* ---------- PREMIUM CALENDAR SIDEBAR ---------- */}
-          <AnimatePresence>
-            {(calOpen || typeof window !== 'undefined') && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className={`${calOpen ? 'block' : 'hidden'} lg:block lg:w-80 flex-shrink-0`}
+      {/* ═══════════════════════════════════════════════
+          STICKY FILTER BAR
+      ═══════════════════════════════════════════════ */}
+      <div className="sticky top-0 z-30 border-b border-[#003048]/5 bg-[#FFF8EE]/90 backdrop-blur-lg">
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-6 py-3">
+          {/* Scrollable pills */}
+          <div className="flex flex-1 items-center gap-2 overflow-x-auto scrollbar-hide">
+            <button
+              onClick={() => { setNameFilter(null); setDateFilter(null); }}
+              className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition ${
+                !nameFilter
+                  ? 'bg-[#003048] text-white shadow-md'
+                  : 'border border-[#003048]/10 bg-white text-[#003048]/70 hover:border-[#003048]/30'
+              }`}
+            >
+              All Activities
+            </button>
+            {uniqueNames.map((name) => (
+              <button
+                key={name}
+                onClick={() => {
+                  setNameFilter(name === nameFilter ? null : name);
+                  setDateFilter(null);
+                }}
+                className={`shrink-0 truncate rounded-full px-4 py-2 text-sm font-medium transition ${
+                  nameFilter === name
+                    ? 'bg-[#003048] text-white shadow-md'
+                    : 'border border-[#003048]/10 bg-white text-[#003048]/70 hover:border-[#003048]/30'
+                }`}
               >
-                <div className="sticky top-24 bg-gradient-to-br from-[#003048] to-[#00425e] rounded-2xl shadow-2xl ring-1 ring-white/10 p-6 relative overflow-hidden">
-                  {/* Decorative glassmorphism reflections */}
-                  <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-white/5 blur-2xl pointer-events-none" />
-                  <div className="absolute -bottom-16 -left-16 w-36 h-36 rounded-full bg-[#C12126]/10 blur-2xl pointer-events-none" />
-                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                {name}
+              </button>
+            ))}
+          </div>
 
-                  {/* Month header */}
-                  <div className="relative flex items-center justify-between mb-5">
+          {/* Calendar dropdown toggle */}
+          <div className="relative">
+            <button
+              ref={calBtnRef}
+              onClick={() => setCalendarOpen(!calendarOpen)}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition ${
+                calendarOpen || dateFilter
+                  ? 'bg-[#003048] text-white'
+                  : 'border border-[#003048]/10 bg-white text-[#003048]/60 hover:border-[#003048]/30'
+              }`}
+              aria-label="Toggle calendar"
+            >
+              <CalendarIcon className="h-4 w-4" />
+            </button>
+
+            {/* Calendar dropdown */}
+            <AnimatePresence>
+              {calendarOpen && (
+                <motion.div
+                  data-cal-dropdown
+                  initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 top-14 z-40 w-72 overflow-hidden rounded-2xl bg-[#003048] p-4 shadow-2xl ring-1 ring-white/10"
+                >
+                  {/* Month navigation */}
+                  <div className="mb-3 flex items-center justify-between">
                     <button
                       onClick={prevMonth}
-                      className="p-2 rounded-xl hover:bg-white/10 transition-all duration-200 active:scale-95"
-                      aria-label="Previous month"
+                      className="rounded-full p-1 text-[#FAEDD3]/70 hover:text-[#FAEDD3] transition"
                     >
-                      <ChevronLeft className="w-5 h-5 text-white/80" />
+                      <ChevronLeft className="h-4 w-4" />
                     </button>
-                    <h3 className="font-bold text-white text-lg tracking-wide">
-                      {MONTH_NAMES[calMonth]} {calYear}
-                    </h3>
+                    <span className="text-sm font-semibold text-[#FAEDD3]">
+                      {monthNames[calMonth]} {calYear}
+                    </span>
                     <button
                       onClick={nextMonth}
-                      className="p-2 rounded-xl hover:bg-white/10 transition-all duration-200 active:scale-95"
-                      aria-label="Next month"
+                      className="rounded-full p-1 text-[#FAEDD3]/70 hover:text-[#FAEDD3] transition"
                     >
-                      <ChevronRight className="w-5 h-5 text-white/80" />
+                      <ChevronRight className="h-4 w-4" />
                     </button>
                   </div>
 
                   {/* Day labels */}
-                  <div className="relative grid grid-cols-7 mb-2 pb-2 border-b border-white/10">
-                    {DAY_LABELS.map((d) => (
-                      <div
-                        key={d}
-                        className="text-center text-[10px] font-semibold text-white/40 uppercase tracking-wider py-1"
-                      >
+                  <div className="mb-1 grid grid-cols-7 gap-1">
+                    {dayLabels.map((d) => (
+                      <div key={d} className="text-center text-[10px] font-medium uppercase text-[#FAEDD3]/40">
                         {d}
                       </div>
                     ))}
                   </div>
 
-                  {/* Day cells with month transition */}
-                  <div className="relative overflow-hidden min-h-[240px]">
-                    <AnimatePresence mode="wait" custom={calDirection}>
-                      <motion.div
-                        key={`${calYear}-${calMonth}`}
-                        custom={calDirection}
-                        variants={calSlideVariants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{ duration: 0.25, ease: 'easeInOut' }}
-                        className="grid grid-cols-7 gap-y-1 will-change-transform"
-                      >
-                        {calendarCells.map((day, i) => {
-                          if (day === null) {
-                            return <div key={`empty-${i}`} className="h-10" />;
-                          }
-                          const hasContent = dayHasContent(day);
-                          const isSel = dayIsSelected(day);
-                          const isTdy = isToday(day);
-                          return (
-                            <button
-                              key={day}
-                              onClick={() => handleDayClick(day)}
-                              disabled={!hasContent}
-                              className={`
-                                relative flex flex-col items-center justify-center h-10 rounded-xl text-sm transition-all duration-200
-                                ${hasContent
-                                  ? 'cursor-pointer hover:bg-white/10 font-medium text-white'
-                                  : 'text-white/20 cursor-default'
-                                }
-                                ${isSel
-                                  ? 'bg-[#C12126] !text-white shadow-lg shadow-[#C12126]/30 scale-110 hover:bg-[#C12126]/90 font-bold'
-                                  : ''
-                                }
-                                ${isTdy && !isSel
-                                  ? 'ring-2 ring-white/30 rounded-xl'
-                                  : ''
-                                }
-                              `}
-                            >
-                              {day}
-                              {/* Glowing red indicator for days with content */}
-                              {hasContent && !isSel && (
-                                <span className="absolute bottom-0.5 flex items-center justify-center">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-[#C12126] shadow-[0_0_6px_rgba(193,33,38,0.8)]" />
-                                  <span className="absolute w-1.5 h-1.5 rounded-full bg-[#C12126] animate-ping opacity-40" />
-                                </span>
-                              )}
-                            </button>
-                          );
-                        })}
-                      </motion.div>
-                    </AnimatePresence>
+                  {/* Days grid */}
+                  <div className="grid grid-cols-7 gap-1">
+                    {Array.from({ length: firstDay }).map((_, i) => (
+                      <div key={`empty-${i}`} />
+                    ))}
+                    {Array.from({ length: daysInMonth }).map((_, i) => {
+                      const day = i + 1;
+                      const m = String(calMonth + 1).padStart(2, '0');
+                      const d = String(day).padStart(2, '0');
+                      const key = `${calYear}-${m}-${d}`;
+                      const hasArticle = articleDateKeys.has(key);
+                      const isActive = dateFilter === key;
+                      const td = new Date();
+                      const isTdy =
+                        day === td.getDate() &&
+                        calMonth === td.getMonth() &&
+                        calYear === td.getFullYear();
+                      return (
+                        <button
+                          key={day}
+                          onClick={() => hasArticle && handleDayClick(day)}
+                          disabled={!hasArticle}
+                          className={`relative flex h-8 w-full items-center justify-center rounded-lg text-xs transition ${
+                            isActive
+                              ? 'bg-[#C12126] text-white font-bold shadow-lg shadow-[#C12126]/30'
+                              : hasArticle
+                              ? 'text-[#FAEDD3] hover:bg-[#FAEDD3]/10 font-medium cursor-pointer'
+                              : 'text-[#FAEDD3]/20 cursor-default'
+                          } ${isTdy && !isActive ? 'ring-1 ring-[#FAEDD3]/30' : ''}`}
+                        >
+                          {day}
+                          {hasArticle && !isActive && (
+                            <span className="absolute bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-[#C12126] shadow-[0_0_4px_rgba(193,33,38,0.7)]" />
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
 
-                  {/* Legend */}
-                  <div className="relative mt-4 pt-3 border-t border-white/10 flex items-center gap-2">
-                    <span className="relative flex items-center justify-center w-3 h-3">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#C12126] shadow-[0_0_6px_rgba(193,33,38,0.8)]" />
-                    </span>
-                    <span className="text-white/40 text-xs">= has activities</span>
-                  </div>
-
-                  {/* Clear filter button */}
-                  {(selectedDate || selectedActivityName) && (
+                  {/* Clear date */}
+                  {dateFilter && (
                     <button
-                      onClick={clearFilters}
-                      className="relative mt-4 w-full py-2.5 rounded-xl bg-gradient-to-r from-[#C12126] to-[#a51c21] text-white text-sm font-semibold shadow-lg shadow-[#C12126]/20 hover:shadow-[#C12126]/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                      onClick={() => {
+                        setDateFilter(null);
+                        setCalendarOpen(false);
+                      }}
+                      className="mt-3 w-full rounded-lg bg-[#FAEDD3]/10 py-1.5 text-xs font-medium text-[#FAEDD3] transition hover:bg-[#FAEDD3]/20"
                     >
-                      Clear Filter
+                      Clear date filter
                     </button>
                   )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Active filter badges */}
+        {(nameFilter || dateFilter) && (
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-6 pb-3">
+            {nameFilter && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#003048]/10 px-3 py-1 text-xs font-medium text-[#003048]">
+                {nameFilter}
+                <button
+                  onClick={() => setNameFilter(null)}
+                  className="text-[#003048]/50 hover:text-[#003048] transition"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {dateFilter && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#C12126]/10 px-3 py-1 text-xs font-medium text-[#C12126]">
+                <CalendarIcon className="h-3 w-3" />
+                {formatDateDisplay(dateFilter, locale)}
+                <button
+                  onClick={() => setDateFilter(null)}
+                  className="text-[#C12126]/50 hover:text-[#C12126] transition"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ═══════════════════════════════════════════════
+          CONTENT SECTION
+      ═══════════════════════════════════════════════ */}
+      <section className="mx-auto max-w-7xl px-6 py-12 md:py-16">
+        {loading ? (
+          /* ── Skeleton Loader ── */
+          <div className="space-y-8">
+            {/* Featured skeleton */}
+            <div className="h-72 w-full animate-pulse rounded-2xl bg-[#003048]/5 md:h-96" />
+            {/* Grid skeletons */}
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <div
+                  key={n}
+                  className={`animate-pulse rounded-2xl bg-[#003048]/5 ${
+                    n === 1 ? 'col-span-2 row-span-2 aspect-square' : 'aspect-[4/5]'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        ) : flatFiltered.length === 0 ? (
+          /* ── Empty State ── */
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center py-24 text-center"
+          >
+            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#003048]/5">
+              <Sparkles className="h-8 w-8 text-[#003048]/30" />
+            </div>
+            <h3 className="font-heading text-2xl font-bold text-[#003048]">
+              No activities found
+            </h3>
+            <p className="mt-2 max-w-sm text-[#003048]/50">
+              Try adjusting your filters or check back later for new activities.
+            </p>
+            {(nameFilter || dateFilter) && (
+              <button
+                onClick={clearFilters}
+                className="mt-6 rounded-full bg-[#003048] px-6 py-2.5 text-sm font-medium text-white transition hover:bg-[#003048]/90"
+              >
+                Clear all filters
+              </button>
+            )}
+          </motion.div>
+        ) : (
+          /* ── Main Content ── */
+          <div ref={gridRef}>
+            {/* ────── FEATURED ARTICLE — Editorial Horizontal Split ────── */}
+            {featuredArticle && (
+              <motion.div
+                data-card
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
+                className="group relative mb-12 cursor-pointer overflow-hidden rounded-2xl premium-shadow"
+                onClick={() => setSelectedArticle(featuredArticle)}
+              >
+                <div className="flex flex-col md:flex-row">
+                  {/* Image — 60% width on desktop */}
+                  <div className="relative w-full md:w-[60%] overflow-hidden">
+                    <div className="relative aspect-[4/3] md:aspect-auto md:h-full md:min-h-[420px]">
+                      {featuredArticle.image_url ? (
+                        <Image
+                          src={featuredArticle.image_url}
+                          alt={getLocalizedField(featuredArticle, 'title', locale)}
+                          fill
+                          className="object-cover transition-transform duration-700 group-hover:scale-110"
+                          sizes="(max-width: 768px) 100vw, 60vw"
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-gradient-to-br from-[#003048] to-[#003048]/80" />
+                      )}
+                      {/* Gradient overlay on image */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/20 md:bg-gradient-to-r md:from-transparent md:to-black/30" />
+                    </div>
+                  </div>
+
+                  {/* Content — 40% on desktop */}
+                  <div className="relative flex w-full flex-col justify-center bg-gradient-to-br from-[#003048] to-[#002236] p-8 md:w-[40%] md:p-10 lg:p-14">
+                    {/* Decorative accent */}
+                    <div className="pointer-events-none absolute -bottom-10 -right-10 h-40 w-40 rounded-full bg-[#C12126]/10 blur-[60px]" />
+                    <div className="pointer-events-none absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent md:hidden" />
+
+                    <span className="mb-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-[#FAEDD3]/80 backdrop-blur-sm">
+                      <Sparkles className="h-3 w-3" />
+                      Featured
+                    </span>
+
+                    <h2 className="font-heading text-2xl font-bold leading-tight text-white md:text-3xl lg:text-4xl">
+                      {getLocalizedField(featuredArticle, 'title', locale)}
+                    </h2>
+
+                    <div className="mt-4 h-[2px] w-12 rounded-full bg-white/40" />
+
+                    <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-[#FAEDD3]/60 md:text-base">
+                      {getLocalizedField(featuredArticle, 'excerpt', locale)}
+                    </p>
+
+                    <p className="mt-3 text-xs text-[#FAEDD3]/40">
+                      {formatDateDisplay(extractDateKey(featuredArticle.published_at), locale)}
+                    </p>
+
+                    <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[#FAEDD3]/80 transition-all group-hover:gap-3 group-hover:text-white">
+                      Read More <span aria-hidden>→</span>
+                    </span>
+                  </div>
                 </div>
               </motion.div>
             )}
-          </AnimatePresence>
 
-          {/* ---------- MAIN CONTENT ---------- */}
-          <div className="flex-1 min-w-0">
-            {/* Activity name pills */}
-            <div className="flex gap-2 overflow-x-auto pb-3 mb-8 scrollbar-hide">
-              <button
-                onClick={() => {
-                  setSelectedActivityName(null);
-                  setSelectedDate(null);
-                }}
-                className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap ${
-                  !selectedActivityName
-                    ? 'bg-[#003048] text-white shadow-lg'
-                    : 'bg-white text-[#003048] border border-[#003048]/20 hover:border-[#003048]/50'
-                }`}
-              >
-                All Activities
-              </button>
-              {activityTitles.map((name) => (
-                <button
-                  key={name}
-                  onClick={() => {
-                    setSelectedActivityName(name === selectedActivityName ? null : name);
-                    setSelectedDate(null);
-                  }}
-                  className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap ${
-                    selectedActivityName === name
-                      ? 'bg-[#003048] text-white shadow-lg'
-                      : 'bg-white text-[#003048] border border-[#003048]/20 hover:border-[#003048]/50'
-                  }`}
-                >
-                  {name}
-                </button>
-              ))}
-            </div>
+            {/* ────── DATE-GROUPED MASONRY CARDS ────── */}
+            {groups.map((group) => {
+              const groupArticles = group.articles.filter(
+                (a) => a.id !== featuredArticle?.id,
+              );
+              if (groupArticles.length === 0) return null;
 
-            {/* Active filter indicator */}
-            {selectedDate && (
-              <div className="mb-6 flex items-center gap-2">
-                <span className="text-sm text-[#003048]/70">Showing activities from:</span>
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#003048] text-white text-sm rounded-full font-medium">
-                  <CalendarIcon className="w-3.5 h-3.5" />
-                  {formatDateDisplay(selectedDate, locale)}
-                  <button
-                    onClick={() => setSelectedDate(null)}
-                    className="ml-1 hover:text-white/70 transition-colors"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </span>
-              </div>
-            )}
-
-            {/* Loading */}
-            {loading && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div
-                    key={`skeleton-${i}`}
-                    className={`rounded-2xl overflow-hidden animate-pulse ${
-                      i === 0 ? 'col-span-2 row-span-2 aspect-square md:aspect-auto' : 'aspect-square'
-                    }`}
-                  >
-                    <div className="w-full h-full bg-cream-dark min-h-[200px]" />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Empty */}
-            {!loading && groups.length === 0 && (
-              <div className="text-center py-24">
-                <Sparkles className="w-16 h-16 text-[#003048]/20 mx-auto mb-4" />
-                <p className="text-[#003048]/50 text-lg font-medium">No activities found</p>
-                {(selectedDate || selectedActivityName) && (
-                  <button
-                    onClick={clearFilters}
-                    className="mt-4 text-[#C12126] font-semibold text-sm hover:underline"
-                  >
-                    Clear all filters
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Articles grouped by date */}
-            <div ref={gridRef} className="space-y-12">
-              {groups.map((group) => (
-                <div key={group.key}>
-                  {/* Section header */}
-                  <div className="mb-5">
-                    <p className="text-[#003048]/50 text-sm">
+              return (
+                <div key={group.key} className="mb-14">
+                  {/* Date section header */}
+                  <div className="mb-6 flex items-center gap-3">
+                    <CalendarIcon className="h-4 w-4 text-[#003048]/40" />
+                    <h3 className="font-heading text-lg font-semibold text-[#003048]">
                       {formatDateDisplay(group.date, locale)}
-                    </p>
+                    </h3>
+                    <div className="h-px flex-1 bg-[#003048]/10" />
                   </div>
 
-                  {/* Masonry-style grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                    {group.articles.map((article, index) => {
-                      const isLarge = index === 0 && group.articles.length > 1;
+                  {/* Pinterest-style masonry grid */}
+                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
+                    {groupArticles.map((article, index) => {
+                      const { span, aspect, isLarge } = getMasonryClasses(
+                        index,
+                        groupArticles.length,
+                      );
+
                       return (
-                        <motion.div
+                        <motion.article
+                          data-card
                           key={article.id}
-                          initial={{ opacity: 0, y: 30 }}
+                          initial={{ opacity: 0, y: 40 }}
                           whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: index * 0.08, duration: 0.5 }}
-                          className={`lifestyle-card group cursor-pointer ${isLarge ? 'col-span-2 row-span-2' : ''}`}
+                          viewport={{ once: true, margin: '-40px' }}
+                          transition={{
+                            duration: 0.5,
+                            delay: index * 0.06,
+                            ease: 'easeOut',
+                          }}
+                          className={`lifestyle-card group cursor-pointer overflow-hidden rounded-2xl ${span}`}
                           onClick={() => setSelectedArticle(article)}
                         >
-                          <div className="relative w-full h-full overflow-hidden rounded-2xl bg-gradient-to-br from-cream to-cream-dark">
-                            <div className={`relative ${isLarge ? 'aspect-square md:aspect-[4/3]' : 'aspect-square'}`}>
+                          <div className={`relative w-full h-full overflow-hidden rounded-2xl bg-[#003048]/5 ${isLarge && groupArticles.length > 1 ? 'min-h-[300px] md:min-h-[400px]' : ''}`}>
+                            <div className={`relative ${aspect} ${isLarge && groupArticles.length > 1 ? 'md:aspect-auto md:h-full' : ''}`}>
                               {article.image_url ? (
                                 <Image
                                   src={article.image_url}
                                   alt={getLocalizedField(article, 'title', locale)}
                                   fill
-                                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                                  sizes={isLarge ? '(max-width: 768px) 100vw, 66vw' : '(max-width: 768px) 50vw, 33vw'}
+                                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                  sizes={
+                                    isLarge
+                                      ? '(max-width: 768px) 100vw, 66vw'
+                                      : '(max-width: 768px) 50vw, 33vw'
+                                  }
                                 />
                               ) : (
-                                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-navy/80 to-red/60">
-                                  <Sparkles className="w-12 h-12 text-white/30" />
+                                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#003048]/80 to-[#C12126]/40">
+                                  <Sparkles className="h-12 w-12 text-white/30" />
                                 </div>
                               )}
 
-                              {/* Overlay */}
-                              <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+                              {/* Dark gradient overlay */}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-60 transition-opacity duration-500 group-hover:opacity-85" />
 
-                              {/* Text overlay */}
-                              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
-                                <h3
-                                  className={`font-heading font-bold text-white drop-shadow-lg line-clamp-2 ${
-                                    isLarge ? 'text-xl md:text-2xl' : 'text-sm md:text-base'
+                              {/* Date tag */}
+                              <div className="absolute top-3 left-3">
+                                <span className="inline-block rounded-full bg-black/30 px-2.5 py-1 text-[10px] font-medium text-white/80 backdrop-blur-sm">
+                                  {formatDateDisplay(extractDateKey(article.published_at), locale)}
+                                </span>
+                              </div>
+
+                              {/* Text overlay at bottom — slides up on hover */}
+                              <div className="absolute bottom-0 left-0 right-0 translate-y-2 p-4 transition-transform duration-500 group-hover:translate-y-0 md:p-5">
+                                <h4
+                                  className={`font-heading font-bold leading-snug text-white drop-shadow-lg ${
+                                    isLarge
+                                      ? 'text-lg md:text-2xl line-clamp-3'
+                                      : 'text-sm md:text-base line-clamp-2'
                                   }`}
                                 >
                                   {getLocalizedField(article, 'title', locale)}
-                                </h3>
+                                </h4>
+
+                                {/* Excerpt only on large cards */}
                                 {isLarge && (
-                                  <p className="text-white/70 text-sm mt-2 line-clamp-2 hidden md:block">
+                                  <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-white/60 md:text-sm">
                                     {getLocalizedField(article, 'excerpt', locale)}
                                   </p>
                                 )}
+
+                                {/* Read more hint on hover */}
+                                <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-white/0 transition-colors duration-500 group-hover:text-white/70">
+                                  View Details <span aria-hidden>→</span>
+                                </span>
                               </div>
                             </div>
                           </div>
-                        </motion.div>
+                        </motion.article>
                       );
                     })}
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
-        </div>
-      </div>
+        )}
+      </section>
 
-      {/* ===================== ARTICLE DETAIL MODAL ===================== */}
+      {/* ═══════════════════════════════════════════════
+          ARTICLE DETAIL MODAL
+      ═══════════════════════════════════════════════ */}
       <AnimatePresence>
         {selectedArticle && (
           <motion.div
+            key="modal-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-md"
             onClick={() => setSelectedArticle(null)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              key="modal-content"
+              initial={{ opacity: 0, scale: 0.9, y: 40 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 340 }}
               onClick={(e) => e.stopPropagation()}
+              className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden overflow-y-auto rounded-2xl bg-white shadow-2xl"
             >
-              {/* Modal Header */}
-              <div className="relative">
+              {/* Image header */}
+              <div className="relative aspect-[16/9] w-full">
                 {selectedArticle.image_url ? (
-                  <div className="aspect-[16/9] relative">
-                    <Image
-                      src={selectedArticle.image_url}
-                      alt={getLocalizedField(selectedArticle, 'title', locale)}
-                      fill
-                      className="object-cover rounded-t-2xl"
-                      sizes="(max-width: 768px) 100vw, 768px"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-navy/60 to-transparent rounded-t-2xl" />
-                  </div>
+                  <Image
+                    src={selectedArticle.image_url}
+                    alt={getLocalizedField(selectedArticle, 'title', locale)}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 768px"
+                  />
                 ) : (
-                  <div className="aspect-[16/9] bg-gradient-to-br from-navy to-red-dark rounded-t-2xl flex items-center justify-center">
-                    <Sparkles className="w-20 h-20 text-white/30" />
+                  <div className="h-full w-full bg-gradient-to-br from-[#003048] to-[#002236] flex items-center justify-center">
+                    <Sparkles className="h-20 w-20 text-white/20" />
                   </div>
                 )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
+                {/* Close button with rotation */}
                 <button
                   onClick={() => setSelectedArticle(null)}
-                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-colors"
+                  className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/30 hover:rotate-90"
+                  aria-label="Close"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="h-5 w-5" />
                 </button>
               </div>
 
-              {/* Modal Content */}
-              <div className="p-8">
-                <span className="text-xs font-semibold text-red uppercase tracking-wider bg-red/10 px-3 py-1 rounded-full">
-                  Lifestyle
+              {/* Body */}
+              <div className="p-6 md:p-8">
+                {/* Badge */}
+                <span className="inline-block rounded-full bg-[#C12126]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[#C12126]">
+                  Activity
                 </span>
-                <h2 className="font-heading text-2xl sm:text-3xl font-bold text-navy mt-4 mb-4">
+
+                {/* Title */}
+                <h2 className="mt-4 font-heading text-2xl font-bold text-[#003048] md:text-3xl">
                   {getLocalizedField(selectedArticle, 'title', locale)}
                 </h2>
-                <div className="w-16 h-[2px] bg-red mb-6" />
+
+                {/* Red divider */}
+                <div className="mt-4 h-[3px] w-16 rounded-full bg-[#C12126]" />
+
+                {/* Date */}
+                <p className="mt-4 text-xs text-[#003048]/40">
+                  {formatDateDisplay(
+                    extractDateKey(selectedArticle.published_at),
+                    locale,
+                  )}
+                </p>
+
+                {/* Excerpt */}
+                {getLocalizedField(selectedArticle, 'excerpt', locale) && (
+                  <p className="mt-3 text-sm leading-relaxed text-[#003048]/60">
+                    {getLocalizedField(selectedArticle, 'excerpt', locale)}
+                  </p>
+                )}
+
+                {/* HTML content */}
                 <div
-                  className="prose prose-navy max-w-none text-navy/70 leading-relaxed"
+                  className="prose prose-sm mt-6 max-w-none text-[#003048]/80 prose-headings:font-heading prose-headings:text-[#003048] prose-a:text-[#C12126]"
                   dangerouslySetInnerHTML={{
                     __html: getLocalizedField(selectedArticle, 'content', locale),
                   }}
@@ -649,6 +840,6 @@ export default function LifestylePage() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </main>
   );
 }
