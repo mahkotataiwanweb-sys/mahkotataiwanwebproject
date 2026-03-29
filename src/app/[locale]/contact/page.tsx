@@ -324,29 +324,33 @@ export default function ContactPage() {
         const yLen = yArc.getTotalLength();
 
         // Set up stroke-dasharray = full length, offset = full length (hidden)
-        gsap.set(gArc, { strokeDasharray: gLen, strokeDashoffset: gLen, opacity: 1 });
-        gsap.set(yArc, { strokeDasharray: yLen, strokeDashoffset: yLen, opacity: 1 });
+        gsap.set(gArc, { strokeDasharray: gLen, strokeDashoffset: gLen, opacity: 0 });
+        gsap.set(yArc, { strokeDasharray: yLen, strokeDashoffset: yLen, opacity: 0 });
         gsap.set([gLabel, yLabel], { opacity: 0, scale: 0.7 });
 
         const arcTl = gsap.timeline({ repeat: -1, repeatDelay: 1, paused: true });
 
-        // ── Reset at start of each cycle ──
-        arcTl.set(gArc, { strokeDashoffset: gLen, opacity: 1 });
-        arcTl.set(yArc, { strokeDashoffset: yLen, opacity: 1 });
+        // ── Reset: hide arcs fully (opacity 0) to prevent dot glitch ──
+        arcTl.set(gArc, { strokeDashoffset: gLen, opacity: 0 });
+        arcTl.set(yArc, { strokeDashoffset: yLen, opacity: 0 });
         arcTl.set([gLabel, yLabel], { opacity: 0, scale: 0.7 });
 
-        // ── Navy blue draws — 16s constant speed to crawl from 9→6 ──
-        arcTl.to(gArc, { strokeDashoffset: 0, duration: 16, ease: 'none' }, 0);
+        // ── Show blue arc the instant it starts drawing ──
+        arcTl.set(gArc, { opacity: 1 }, 0);
+        // ── Navy blue draws — 14s constant speed ──
+        arcTl.to(gArc, { strokeDashoffset: 0, duration: 14, ease: 'none' }, 0);
 
-        // ── Red starts 1.5s after blue, 14.5s duration — BOTH FINISH at t=16 ──
-        arcTl.to(yArc, { strokeDashoffset: 0, duration: 14.5, ease: 'none' }, 1.5);
+        // ── Show red arc the instant it starts drawing ──
+        arcTl.set(yArc, { opacity: 1 }, 1.5);
+        // ── Red starts 1.5s after blue, 12.5s duration — BOTH FINISH at t=14 ──
+        arcTl.to(yArc, { strokeDashoffset: 0, duration: 12.5, ease: 'none' }, 1.5);
 
-        // ── Labels appear at START together with their liner (not at end) ──
+        // ── Labels appear at START together with their liner ──
         arcTl.to(gLabel, { opacity: 1, scale: 1, duration: 1, ease: 'back.out(1.7)' }, 0.3);
         arcTl.to(yLabel, { opacity: 1, scale: 1, duration: 1, ease: 'back.out(1.7)' }, 1.8);
 
         // ── Hold both visible for 5s after arcs complete ──
-        arcTl.to({}, { duration: 5 }, 16);
+        arcTl.to({}, { duration: 5 }, 14);
 
         // ── Both fade out together ──
         arcTl.to([gArc, yArc, gLabel, yLabel], {
