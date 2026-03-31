@@ -189,45 +189,28 @@
   100% { transform: translate3d(0, 0, 0); }
 }
 
-/* ===== Product Catalog: Center Wobble Animation ===== */
-@keyframes productWobble {
-  0% {
-    transform: translateY(0) rotate(0deg) scale(1);
+/* ===== Product Catalog: Smooth Dramatic Float Animation ===== */
+@keyframes productFloat {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.4));
   }
-  10% {
-    transform: translateY(-6px) rotate(2.5deg) scale(1.025);
-  }
-  20% {
-    transform: translateY(-1.5px) rotate(-2deg) scale(0.983);
-  }
-  30% {
-    transform: translateY(-8.5px) rotate(2deg) scale(1.035);
-  }
-  40% {
-    transform: translateY(-1px) rotate(-3deg) scale(0.975);
+  25% {
+    transform: translateY(-14px) scale(1.02);
+    filter: drop-shadow(0 32px 50px rgba(0,0,0,0.35));
   }
   50% {
-    transform: translateY(-7px) rotate(2.5deg) scale(1.017);
+    transform: translateY(-8px) scale(1.01);
+    filter: drop-shadow(0 26px 45px rgba(0,0,0,0.38));
   }
-  60% {
-    transform: translateY(-2.5px) rotate(-1.7deg) scale(1.025);
-  }
-  70% {
-    transform: translateY(-7.5px) rotate(2deg) scale(0.983);
-  }
-  80% {
-    transform: translateY(-3.5px) rotate(-1.7deg) scale(1.017);
-  }
-  90% {
-    transform: translateY(-5px) rotate(1.3deg) scale(1.008);
-  }
-  100% {
-    transform: translateY(0) rotate(0deg) scale(1);
+  75% {
+    transform: translateY(-16px) scale(1.025);
+    filter: drop-shadow(0 36px 55px rgba(0,0,0,0.32));
   }
 }
 
-.product-wobble-active {
-  animation: productWobble 2.4s ease-in-out infinite !important;
+.product-float-active {
+  animation: productFloat 4s cubic-bezier(0.37, 0, 0.63, 1) infinite !important;
 }
 
 /* ===== Letter-by-Letter Reveal ===== */
