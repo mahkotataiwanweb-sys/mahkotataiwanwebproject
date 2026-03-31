@@ -25,6 +25,7 @@ import {
   Package,
 } from 'lucide-react';
 import SandTexture from '@/components/effects/SandTexture';
+import HeroBackground from '@/components/effects/HeroBackground';
 
 function LineIcon({ className }: { className?: string }) {
   return (
@@ -468,7 +469,8 @@ export default function ContactPage() {
       {/* ╔═══════════════════════════════════════════╗
           ║  1. HERO                                   ║
           ╚═══════════════════════════════════════════╝ */}
-      <section ref={heroRef} className="py-24 sm:py-32 bg-navy relative overflow-hidden">
+      <section ref={heroRef} className="py-24 sm:py-32 bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] relative overflow-hidden">
+        <HeroBackground />
         <div className="max-w-7xl mx-auto px-6">
           <Link
             href={`/${locale}`}

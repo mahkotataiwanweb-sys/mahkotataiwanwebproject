@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Award, Store, Package, Users, Shield, Heart, Sparkles, ChevronRight, Star, Globe } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import SandTexture from '@/components/effects/SandTexture';
+import HeroBackground from '@/components/effects/HeroBackground';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -468,48 +469,65 @@ export default function AboutPage() {
         });
       });
 
-      // Values section — mobile-aware reveal
+      // Values section — sequential flip-forward animation + smooth float
       if (valuesRef.current) {
         const cards = valuesRef.current.querySelectorAll('.value-card');
 
         if (isMobile) {
-          // ── MOBILE: simple clean fade-up, no 3D transforms ──
-          gsap.set(cards, { opacity: 0, y: 30 });
-          gsap.to(cards, {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            stagger: 0.1,
-            ease: 'power2.out',
+          // ── MOBILE: clean flip-forward, lighter transforms ──
+          gsap.set(cards, {
+            opacity: 0,
+            rotationX: -70,
+            transformPerspective: 1000,
+            transformOrigin: 'center center',
+            scale: 0.85,
+          });
+
+          const flipTl = gsap.timeline({
             scrollTrigger: {
               trigger: valuesRef.current,
               start: 'top 88%',
               toggleActions: 'play none none reverse',
             },
           });
-        } else {
-          // ── DESKTOP: full cinematic 3D entrance ──
-          gsap.set(cards, {
-            opacity: 0,
-            y: 120,
-            scale: 0.7,
-            rotationX: 25,
-            rotationY: -8,
-            filter: 'blur(16px) brightness(0.4)',
-            transformPerspective: 1200,
-            transformOrigin: 'center bottom',
+
+          cards.forEach((card, i) => {
+            flipTl.to(card, {
+              opacity: 1,
+              rotationX: 0,
+              scale: 1,
+              duration: 0.7,
+              ease: 'power3.out',
+            }, i * 0.2);
           });
 
-          gsap.to(cards, {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            rotationX: 0,
-            rotationY: 0,
-            filter: 'blur(0px) brightness(1)',
-            duration: 1.2,
-            stagger: { each: 0.18, from: 'start' },
-            ease: 'expo.out',
+          // Gentle float after flip completes
+          flipTl.call(() => {
+            cards.forEach((card, i) => {
+              gsap.to(card, {
+                y: -5,
+                duration: 2.6 + i * 0.3,
+                ease: 'sine.inOut',
+                repeat: -1,
+                yoyo: true,
+                delay: 0.15 * i,
+              });
+            });
+          });
+
+        } else {
+          // ── DESKTOP: dramatic sequential flip-forward toward screen ──
+          gsap.set(cards, {
+            opacity: 0,
+            rotationX: -90,
+            transformPerspective: 1200,
+            transformOrigin: 'center center',
+            scale: 0.8,
+            filter: 'blur(8px) brightness(0.5)',
+            y: 30,
+          });
+
+          const flipTl = gsap.timeline({
             scrollTrigger: {
               trigger: valuesRef.current,
               start: 'top 82%',
@@ -517,17 +535,32 @@ export default function AboutPage() {
             },
           });
 
-          // Subtle floating animation after entrance (continuous)
+          // Flip each card forward one after another
           cards.forEach((card, i) => {
-            gsap.to(card, {
-              y: -6,
-              duration: 2.5 + i * 0.3,
-              ease: 'sine.inOut',
-              repeat: -1,
-              yoyo: true,
-              delay: 1.5 + i * 0.18,
-            });
+            flipTl.to(card, {
+              opacity: 1,
+              rotationX: 0,
+              scale: 1,
+              filter: 'blur(0px) brightness(1)',
+              y: 0,
+              duration: 0.9,
+              ease: 'back.out(1.2)',
+            }, i * 0.25);
           });
+
+          // After all cards have flipped, add smooth floating effect
+          flipTl.call(() => {
+            cards.forEach((card, i) => {
+              gsap.to(card, {
+                y: -8,
+                duration: 2.8 + i * 0.35,
+                ease: 'sine.inOut',
+                repeat: -1,
+                yoyo: true,
+                delay: 0.2 * i,
+              });
+            });
+          }, [], '+=0.2');
         }
       }
 
@@ -639,7 +672,8 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Hero Section
       ═══════════════════════════════════════════════════════════════ */}
-      <section ref={heroRef} className="py-24 sm:py-32 bg-navy relative overflow-hidden">
+      <section ref={heroRef} className="py-24 sm:py-32 bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] relative overflow-hidden">
+        <HeroBackground />
         <div className="max-w-7xl mx-auto px-6">
           <Link
             href={`/${locale}`}

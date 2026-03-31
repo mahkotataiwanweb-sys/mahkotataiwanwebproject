@@ -1,13 +1,26 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Sparkles, Calendar, ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Sparkles,
+  Calendar,
+  ArrowRight,
+  ShoppingBag,
+  ChefHat,
+  MapPin,
+  Camera,
+  Heart,
+  TrendingUp,
+  Store,
+  Package,
+  Users,
+} from 'lucide-react';
 import HeroSlider from '@/components/sections/HeroSlider';
 import MarqueeSection from '@/components/sections/MarqueeSection';
 import ProductCatalogSection from '@/components/sections/ProductCatalogSection';
@@ -20,18 +33,6 @@ import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
 
 gsap.registerPlugin(ScrollTrigger);
-
-/* ──────────────────────────────────────────
-   Types
-────────────────────────────────────────── */
-interface DiscoverSlide {
-  title: string;
-  description: string;
-  imageUrl: string | null;
-  slug: string;
-  date: string;
-  type: string;
-}
 
 /* ──────────────────────────────────────────
    WavyTextureBackground — same as ProductCatalog
@@ -57,195 +58,97 @@ function DiscoverWavyTexture() {
 }
 
 /* ──────────────────────────────────────────
-   CinematicScrollShowcase — Horizontal scroll cards
+   Animated Counter
 ────────────────────────────────────────── */
-function CinematicScrollShowcase({
-  slides,
-  locale,
-}: {
-  slides: DiscoverSlide[];
-  locale: string;
-}) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
-  const cardsContainerRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const hasAnimated = useRef(false);
 
-  /* Update scroll navigation state + progress bar */
-  const updateScrollState = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 10);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
-    if (progressRef.current) {
-      const max = el.scrollWidth - el.clientWidth;
-      const progress = max > 0 ? el.scrollLeft / max : 0;
-      progressRef.current.style.width = `${Math.max(10, progress * 100)}%`;
-    }
-  }, []);
-
-  /* Arrow click handler */
-  const scroll = useCallback((dir: 'left' | 'right') => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.scrollBy({ left: dir === 'left' ? -440 : 440, behavior: 'smooth' });
-  }, []);
-
-  /* GSAP card entrance — stagger from below with blur-deblur */
   useEffect(() => {
-    if (!cardsContainerRef.current) return;
-    const cards = cardsContainerRef.current.querySelectorAll('.discover-card');
-    if (cards.length === 0) return;
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        cards,
-        { opacity: 0, y: 70, filter: 'blur(14px)' },
-        {
-          opacity: 1,
-          y: 0,
-          filter: 'blur(0px)',
-          duration: 0.9,
-          stagger: 0.1,
-          ease: 'power3.out',
-          delay: 0.1,
-        },
-      );
-    });
-    return () => ctx.revert();
-  }, [slides]);
+    if (!ref.current || hasAnimated.current) return;
+    const el = ref.current;
 
-  /* Scroll listener */
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.addEventListener('scroll', updateScrollState, { passive: true });
-    updateScrollState();
-    return () => el.removeEventListener('scroll', updateScrollState);
-  }, [updateScrollState, slides]);
-
-  if (slides.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-16 h-16 rounded-full bg-navy/5 flex items-center justify-center mb-4">
-          <Sparkles className="w-7 h-7 text-navy/25" />
-        </div>
-        <p className="text-navy/40 text-sm">No articles yet — check back soon!</p>
-      </div>
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated.current) {
+          hasAnimated.current = true;
+          const obj = { val: 0 };
+          gsap.to(obj, {
+            val: value,
+            duration: 2,
+            ease: 'power3.out',
+            onUpdate: () => {
+              el.textContent = Math.round(obj.val).toLocaleString() + suffix;
+            },
+          });
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.5 },
     );
-  }
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [value, suffix]);
 
+  return <span ref={ref}>0{suffix}</span>;
+}
+
+/* ──────────────────────────────────────────
+   Interactive Bento Tile
+────────────────────────────────────────── */
+function BentoTile({
+  href,
+  icon: Icon,
+  title,
+  description,
+  className = '',
+  accentColor = 'bg-red/10',
+  iconColor = 'text-red',
+  children,
+}: {
+  href: string;
+  icon: React.ElementType;
+  title: string;
+  description: string;
+  className?: string;
+  accentColor?: string;
+  iconColor?: string;
+  children?: React.ReactNode;
+}) {
   return (
-    <div className="relative">
-      {/* Hide scrollbar across browsers */}
-      <style dangerouslySetInnerHTML={{ __html: `.discover-scroll::-webkit-scrollbar{display:none}` }} />
+    <Link
+      href={href}
+      className={`bento-tile group relative rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_20px_60px_-15px_rgba(0,48,72,0.2)] ${className}`}
+    >
+      {/* Hover glow */}
+      <div className="absolute inset-0 bg-gradient-to-br from-red/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
+      <div className="relative z-10 h-full flex flex-col p-6 sm:p-7">
+        {/* Icon */}
+        <div className={`w-12 h-12 rounded-2xl ${accentColor} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500`}>
+          <Icon className={`w-5 h-5 ${iconColor} group-hover:scale-110 transition-transform duration-300`} />
+        </div>
 
+        {/* Content */}
+        <h3 className="font-heading text-lg sm:text-xl font-bold text-navy mb-1.5 group-hover:text-navy/90 transition-colors">
+          {title}
+        </h3>
+        <p className="text-navy/45 text-sm leading-relaxed flex-1">
+          {description}
+        </p>
 
-      {/* Navigation arrows */}
-      <button
-        onClick={() => scroll('left')}
-        aria-label="Scroll left"
-        className={`absolute left-2 sm:left-4 top-[calc(50%-12px)] -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-navy/10 backdrop-blur-lg border border-navy/15 flex items-center justify-center transition-all duration-300 hover:bg-navy/20 hover:scale-110 hover:shadow-lg hover:shadow-navy/10 ${!canScrollLeft ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-      >
-        <ChevronLeft className="w-5 h-5 text-navy" />
-      </button>
-      <button
-        onClick={() => scroll('right')}
-        aria-label="Scroll right"
-        className={`absolute right-2 sm:right-4 top-[calc(50%-12px)] -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-navy/10 backdrop-blur-lg border border-navy/15 flex items-center justify-center transition-all duration-300 hover:bg-navy/20 hover:scale-110 hover:shadow-lg hover:shadow-navy/10 ${!canScrollRight ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-      >
-        <ChevronRight className="w-5 h-5 text-navy" />
-      </button>
+        {children}
 
-      {/* Horizontal scroll-snap container */}
-      <div
-        ref={scrollRef}
-        className="discover-scroll flex gap-5 sm:gap-7 overflow-x-auto snap-x snap-mandatory pb-4 px-4 sm:px-10"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
-        <div ref={cardsContainerRef} className="flex gap-5 sm:gap-7">
-          {slides.map((slide, i) => (
-            <Link
-              key={`${slide.slug}-${i}`}
-              href={`/${locale}/articles/${slide.slug}`}
-              className="discover-card snap-center flex-shrink-0 group relative rounded-2xl sm:rounded-3xl overflow-hidden min-w-[320px] sm:min-w-[420px] aspect-[3/4] ring-1 ring-white/[0.08] shadow-2xl shadow-black/40 hover:shadow-[0_25px_60px_-10px_rgba(193,33,38,0.3)] transition-shadow duration-700"
-            >
-              {/* Full image background */}
-              {slide.imageUrl ? (
-                <Image
-                  src={slide.imageUrl}
-                  alt={slide.title}
-                  fill
-                  className="object-cover transition-transform duration-[2s] ease-out group-hover:scale-110"
-                  sizes="(max-width: 640px) 320px, 420px"
-                  unoptimized
-                />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#004A6E] to-[#001a2c]" />
-              )}
-
-              {/* Multi-layer gradient overlays */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-black/5" />
-              <div className="absolute inset-0 bg-gradient-to-br from-[#003048]/30 via-transparent to-transparent" />
-
-              {/* Hover warm glow */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#C12126]/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-              {/* Glassmorphism content panel */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
-                <div className="relative backdrop-blur-xl bg-white/[0.07] rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-white/[0.1] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-                  {/* Category badge + Date row */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="px-2.5 py-0.5 rounded-full bg-[#C12126] text-white text-[10px] font-bold uppercase tracking-[0.12em] shadow-lg shadow-[#C12126]/40">
-                      {slide.type === 'event' ? 'Event' : 'Activity'}
-                    </span>
-                    {slide.date && (
-                      <span className="text-white/40 text-[11px] flex items-center gap-1.5">
-                        <Calendar className="w-3 h-3" />
-                        {slide.date}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="font-heading text-base sm:text-lg font-bold text-white leading-snug mb-1.5 line-clamp-2 drop-shadow-md">
-                    {slide.title}
-                  </h3>
-
-                  {/* Excerpt */}
-                  <p className="text-white/40 text-xs sm:text-sm line-clamp-2 leading-relaxed mb-3">
-                    {slide.description}
-                  </p>
-
-                  {/* Read link with hover arrow */}
-                  <div className="flex items-center gap-2 text-[#C12126] text-xs sm:text-sm font-semibold">
-                    Read Article
-                    <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Top-right hover arrow */}
-              <div className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 border border-white/15">
-                <ArrowUpRight className="w-4 h-4 text-white" />
-              </div>
-            </Link>
-          ))}
+        {/* Arrow */}
+        <div className="flex items-center gap-2 mt-4 text-red text-sm font-semibold">
+          <span className="group-hover:translate-x-1 transition-transform duration-300">Explore</span>
+          <ArrowRight className="w-4 h-4 opacity-0 -translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-400" />
         </div>
       </div>
 
-      {/* Scroll progress bar */}
-      <div className="mt-6 flex justify-center">
-        <div className="w-40 sm:w-56 h-[3px] rounded-full bg-navy/[0.1] overflow-hidden">
-          <div
-            ref={progressRef}
-            className="h-full rounded-full bg-gradient-to-r from-[#C12126] to-[#C12126]/50 transition-[width] duration-150 ease-out"
-            style={{ width: '10%' }}
-          />
-        </div>
-      </div>
-    </div>
+      {/* Bottom accent line */}
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-red/60 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center" />
+    </Link>
   );
 }
 
@@ -259,13 +162,12 @@ export default function HomePage() {
   const gridRef = useRef<HTMLDivElement>(null);
 
   /* state */
-  const [eventSlides, setEventSlides] = useState<DiscoverSlide[]>([]);
-  const [activitySlides, setActivitySlides] = useState<DiscoverSlide[]>([]);
-  const [activeTab, setActiveTab] = useState<'events' | 'activities'>('events');
+  const [featuredArticle, setFeaturedArticle] = useState<Article | null>(null);
+  const [latestActivity, setLatestActivity] = useState<Article | null>(null);
 
-  /* ── fetch articles ── */
+  /* ── fetch featured content ── */
   useEffect(() => {
-    async function fetchAll() {
+    async function fetchFeatured() {
       const [evRes, lifeRes] = await Promise.all([
         supabase
           .from('articles')
@@ -273,39 +175,21 @@ export default function HomePage() {
           .eq('type', 'event')
           .eq('is_active', true)
           .order('published_at', { ascending: false })
-          .limit(4),
+          .limit(1),
         supabase
           .from('articles')
           .select('*')
           .eq('type', 'lifestyle')
           .eq('is_active', true)
           .order('published_at', { ascending: false })
-          .limit(4),
+          .limit(1),
       ]);
 
-      const toSlides = (items: Article[] | null): DiscoverSlide[] =>
-        (items || [])
-          .filter((a) => getLocalizedField(a, 'title', locale))
-          .map((a) => ({
-            title: getLocalizedField(a, 'title', locale) || '',
-            description: getLocalizedField(a, 'excerpt', locale) || '',
-            imageUrl: a.image_url || null,
-            slug: a.slug,
-            date: a.published_at
-              ? new Date(a.published_at).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })
-              : '',
-            type: a.type,
-          }));
-
-      setEventSlides(toSlides(evRes.data as Article[] | null));
-      setActivitySlides(toSlides(lifeRes.data as Article[] | null));
+      if (evRes.data?.[0]) setFeaturedArticle(evRes.data[0] as Article);
+      if (lifeRes.data?.[0]) setLatestActivity(lifeRes.data[0] as Article);
     }
-    fetchAll();
-  }, [locale]);
+    fetchFeatured();
+  }, []);
 
   /* ── GSAP scroll entrance ── */
   useEffect(() => {
@@ -326,14 +210,16 @@ export default function HomePage() {
       }
 
       if (gridRef.current) {
+        const tiles = gridRef.current.querySelectorAll('.bento-tile');
         gsap.fromTo(
-          gridRef.current,
-          { opacity: 0, y: 50, scale: 0.97 },
+          tiles,
+          { opacity: 0, y: 60, scale: 0.95 },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 1,
+            duration: 0.8,
+            stagger: 0.08,
             ease: 'power3.out',
             scrollTrigger: { trigger: gridRef.current, start: 'top 85%', toggleActions: 'play none none reverse' },
           },
@@ -342,6 +228,11 @@ export default function HomePage() {
     }, sectionRef);
     return () => ctx.revert();
   }, []);
+
+  const featuredTitle = featuredArticle ? getLocalizedField(featuredArticle, 'title', locale) : '';
+  const featuredExcerpt = featuredArticle ? getLocalizedField(featuredArticle, 'excerpt', locale) : '';
+  const activityTitle = latestActivity ? getLocalizedField(latestActivity, 'title', locale) : '';
+  const activityExcerpt = latestActivity ? getLocalizedField(latestActivity, 'excerpt', locale) : '';
 
   return (
     <>
@@ -352,10 +243,9 @@ export default function HomePage() {
       <RecipeShowcaseSection />
 
       {/* ═══════════════════════════════════════════════
-          DISCOVER SECTION — Cinematic Horizontal Scroll
+          DISCOVER SECTION — Interactive Bento Grid
       ═══════════════════════════════════════════════ */}
       <section ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
-
 
         {/* Wavy texture background */}
         <DiscoverWavyTexture />
@@ -369,65 +259,193 @@ export default function HomePage() {
             </h2>
             <div className="w-16 h-[2px] bg-[#C12126] mx-auto mb-4 rounded-full" />
             <p className="text-navy/40 max-w-lg mx-auto text-sm tracking-wide">
-              Stay up to date with our latest events and community activities
+              Your gateway to authentic Indonesian products, recipes, events, and community
             </p>
           </div>
 
-          {/* ── Tab Switcher ── */}
-          <div className="flex justify-center gap-2 mb-10">
-            <button
-              onClick={() => setActiveTab('events')}
-              className={`px-7 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
-                activeTab === 'events'
-                  ? 'bg-[#C12126] text-white shadow-xl shadow-[#C12126]/30 scale-[1.02]'
-                  : 'bg-navy/[0.06] text-navy/50 hover:bg-navy/10 hover:text-navy/70 border border-navy/[0.08]'
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" /> Events
-              </span>
-            </button>
-            <button
-              onClick={() => setActiveTab('activities')}
-              className={`px-7 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
-                activeTab === 'activities'
-                  ? 'bg-navy text-cream shadow-xl shadow-navy/15 scale-[1.02]'
-                  : 'bg-navy/[0.06] text-navy/50 hover:bg-navy/10 hover:text-navy/70 border border-navy/[0.08]'
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4" /> Activities
-              </span>
-            </button>
-          </div>
+          {/* ── Bento Grid ── */}
+          <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 auto-rows-auto">
 
-          {/* ── Cinematic Scroll Showcase ── */}
-          <div ref={gridRef}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 25, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -20, scale: 0.98 }}
-                transition={{ duration: 0.5, ease: [0.22, 0.68, 0, 1] }}
-              >
-                <CinematicScrollShowcase
-                  slides={activeTab === 'events' ? eventSlides : activitySlides}
-                  locale={locale}
-                />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* ── View All link ── */}
-          <div className="text-center mt-10">
+            {/* ── Featured Event (large card, spans 2 cols) ── */}
             <Link
-              href={`/${locale}/${activeTab === 'events' ? 'events' : 'lifestyle'}`}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-navy/[0.06] text-navy text-sm font-semibold hover:bg-navy hover:text-cream transition-all duration-300 group border border-navy/[0.1] hover:border-navy"
+              href={featuredArticle ? `/${locale}/articles/${featuredArticle.slug}` : `/${locale}/events`}
+              className="bento-tile group relative sm:col-span-2 lg:row-span-2 rounded-3xl overflow-hidden min-h-[320px] lg:min-h-[420px] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_25px_60px_-15px_rgba(0,48,72,0.25)]"
             >
-              View All {activeTab === 'events' ? 'Events' : 'Activities'}
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              {/* Background Image */}
+              {featuredArticle?.image_url ? (
+                <Image
+                  src={featuredArticle.image_url}
+                  alt={featuredTitle || 'Featured'}
+                  fill
+                  className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  unoptimized
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-[#003048] to-[#001a2c]" />
+              )}
+
+              {/* Gradient overlays */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/5" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#003048]/20 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#C12126]/15 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              {/* Content */}
+              <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="px-3 py-1 rounded-full bg-[#C12126] text-white text-[10px] font-bold uppercase tracking-[0.15em] shadow-lg">
+                    <Calendar className="w-3 h-3 inline-block mr-1.5 -mt-0.5" />
+                    Latest Event
+                  </span>
+                </div>
+                <h3 className="font-heading text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-tight mb-2 drop-shadow-lg">
+                  {featuredTitle || 'Upcoming Events'}
+                </h3>
+                <p className="text-white/60 text-sm line-clamp-2 mb-4 max-w-md">
+                  {featuredExcerpt || 'Discover our latest community events and celebrations'}
+                </p>
+                <div className="flex items-center gap-2 text-white text-sm font-semibold">
+                  <span>View Event</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                </div>
+              </div>
             </Link>
+
+            {/* ── Our Products Tile ── */}
+            <BentoTile
+              href={`/${locale}/products`}
+              icon={ShoppingBag}
+              title="Our Products"
+              description="Explore 26+ authentic Indonesian products carefully curated for you"
+              className="bg-white/80 backdrop-blur-sm border border-navy/[0.06] shadow-sm"
+              accentColor="bg-navy/10"
+              iconColor="text-navy"
+            >
+              <div className="flex items-center gap-4 mt-3">
+                <div className="flex -space-x-2">
+                  {[Package, Heart, TrendingUp].map((Ic, i) => (
+                    <div key={i} className="w-7 h-7 rounded-full bg-cream border-2 border-white flex items-center justify-center">
+                      <Ic className="w-3 h-3 text-navy/50" />
+                    </div>
+                  ))}
+                </div>
+                <span className="text-navy/30 text-xs font-medium">26+ items</span>
+              </div>
+            </BentoTile>
+
+            {/* ── Recipes Tile ── */}
+            <BentoTile
+              href={`/${locale}/recipes`}
+              icon={ChefHat}
+              title="Recipes"
+              description="Cooking inspiration with authentic Indonesian flavors"
+              className="bg-white/80 backdrop-blur-sm border border-navy/[0.06] shadow-sm"
+              accentColor="bg-red/10"
+              iconColor="text-red"
+            />
+
+            {/* ── Stats Bar (spans 2 cols) ── */}
+            <div className="bento-tile sm:col-span-2 rounded-3xl bg-navy overflow-hidden relative">
+              {/* Subtle grid pattern */}
+              <div
+                className="absolute inset-0 pointer-events-none opacity-[0.04]"
+                style={{
+                  backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)',
+                  backgroundSize: '40px 40px',
+                }}
+              />
+              {/* Glow orbs */}
+              <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-red/20 blur-[60px]" />
+              <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-cream/10 blur-[50px]" />
+
+              <div className="relative z-10 p-6 sm:p-7">
+                <div className="flex items-center gap-2 mb-5">
+                  <Sparkles className="w-4 h-4 text-red/70" />
+                  <span className="text-cream/40 text-xs tracking-[0.2em] uppercase font-semibold">Our Impact</span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                  {[
+                    { value: 300, suffix: '+', label: 'Partner Stores', icon: Store },
+                    { value: 26, suffix: '+', label: 'Products', icon: Package },
+                    { value: 1, suffix: 'M+', label: 'Customers', icon: Users },
+                    { value: 4, suffix: '+', label: 'Years Trusted', icon: Heart },
+                  ].map((stat) => {
+                    const StatIcon = stat.icon;
+                    return (
+                      <div key={stat.label} className="text-center sm:text-left">
+                        <div className="flex items-center gap-2 justify-center sm:justify-start mb-1">
+                          <StatIcon className="w-3.5 h-3.5 text-red/60" />
+                          <span className="font-heading text-2xl sm:text-3xl font-bold text-white">
+                            <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                          </span>
+                        </div>
+                        <p className="text-cream/35 text-xs font-medium">{stat.label}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* ── Latest Activity (medium card, spans 2 cols) ── */}
+            <Link
+              href={latestActivity ? `/${locale}/articles/${latestActivity.slug}` : `/${locale}/lifestyle`}
+              className="bento-tile group relative sm:col-span-2 rounded-3xl overflow-hidden min-h-[220px] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_-15px_rgba(0,48,72,0.2)]"
+            >
+              {latestActivity?.image_url ? (
+                <Image
+                  src={latestActivity.image_url}
+                  alt={activityTitle || 'Activity'}
+                  fill
+                  className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  unoptimized
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-[#004A6E] to-[#002236]" />
+              )}
+
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/5" />
+              <div className="absolute inset-0 bg-gradient-to-t from-red/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-[0.15em] border border-white/10">
+                    <Sparkles className="w-3 h-3 inline-block mr-1.5 -mt-0.5" />
+                    Activity
+                  </span>
+                </div>
+                <h3 className="font-heading text-lg sm:text-xl font-bold text-white leading-snug mb-1 drop-shadow-md">
+                  {activityTitle || 'Community Activities'}
+                </h3>
+                <p className="text-white/50 text-sm line-clamp-2 max-w-lg">
+                  {activityExcerpt || 'See how our community enjoys Mahkota Taiwan products'}
+                </p>
+              </div>
+            </Link>
+
+            {/* ── Find a Store Tile ── */}
+            <BentoTile
+              href={`/${locale}/where-to-buy`}
+              icon={MapPin}
+              title="Find a Store"
+              description="300+ partner stores across Taiwan — find one near you"
+              className="bg-white/80 backdrop-blur-sm border border-navy/[0.06] shadow-sm"
+              accentColor="bg-red/10"
+              iconColor="text-red"
+            />
+
+            {/* ── Gallery Tile ── */}
+            <BentoTile
+              href={`/${locale}/gallery`}
+              icon={Camera}
+              title="Gallery"
+              description="Browse photos from our events and community moments"
+              className="bg-white/80 backdrop-blur-sm border border-navy/[0.06] shadow-sm"
+              accentColor="bg-navy/10"
+              iconColor="text-navy"
+            />
           </div>
         </div>
       </section>

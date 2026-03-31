@@ -11,6 +11,7 @@ import { Clock, ChefHat, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
+import HeroBackground from '@/components/effects/HeroBackground';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -175,12 +176,8 @@ export default function RecipesPage() {
   return (
     <main className="min-h-screen bg-cream">
       {/* Hero Header */}
-      <section className="relative pt-32 sm:pt-40 pb-16 sm:pb-20 bg-navy overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-red/30 blur-3xl" />
-          <div className="absolute bottom-10 right-20 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
-        </div>
+      <section className="relative pt-32 sm:pt-40 pb-16 sm:pb-20 bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] overflow-hidden">
+        <HeroBackground />
 
         <div ref={headerRef} className="relative z-10 max-w-7xl mx-auto px-6">
           <Link
