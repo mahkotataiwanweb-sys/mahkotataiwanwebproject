@@ -1014,8 +1014,9 @@ function ProductsContent() {
   return (
     <div className="min-h-screen bg-cream">
       {/* ============ HERO ============ */}
-      <div className="relative bg-navy overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
+      <div className="relative bg-navy">
+        {/* Decorative elements — clipped within their own container */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-red/8 blur-[120px]" />
           <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-cream/5 blur-[100px]" />
           <div
@@ -1086,16 +1087,13 @@ function ProductsContent() {
           </div>
         </div>
 
-        {/* Wave divider */}
-        <div className="absolute -bottom-px left-0 right-0">
-          <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="block w-full">
-            <path d="M0 60V30C240 10 480 0 720 10C960 20 1200 40 1440 30V60H0Z" fill="var(--color-cream)" />
+        {/* Wave divider — extends below hero, no overflow-hidden to clip it */}
+        <div className="absolute -bottom-[3px] left-0 right-0 z-20">
+          <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" className="block w-full h-[60px] sm:h-[80px]">
+            <path d="M0 80V30C240 10 480 0 720 10C960 20 1200 40 1440 30V80H0Z" fill="var(--color-cream)" />
           </svg>
         </div>
       </div>
-
-      {/* Seamless hero-to-content bridge — eliminates sub-pixel gap */}
-      <div className="h-2 bg-cream -mt-2 relative z-10" />
 
       {/* ============ CONTENT ============ */}
       <div ref={contentRef} className="max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20 scroll-mt-8">
