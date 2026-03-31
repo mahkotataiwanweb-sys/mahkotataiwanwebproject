@@ -355,13 +355,13 @@ function ProductDetailSection({
         <div className="absolute -inset-2 bg-gradient-to-br from-red/5 via-transparent to-navy/5 rounded-3xl blur-2xl" />
 
         <div className="relative rounded-3xl p-2 sm:p-3 bg-gradient-to-br from-navy/10 via-navy/5 to-transparent shadow-2xl">
-          <div className="relative aspect-square max-w-[280px] mx-auto lg:mx-0 rounded-2xl overflow-hidden bg-cream shadow-inner">
-            {product.image_url ? (
+          <div className={`relative aspect-square max-w-[280px] mx-auto lg:mx-0 rounded-2xl overflow-hidden shadow-inner ${product.detail_image_url ? 'bg-navy/90' : 'bg-cream'}`}>
+            {(product.detail_image_url || product.image_url) ? (
               <Image
-                src={product.image_url}
+                src={product.detail_image_url || product.image_url || ''}
                 alt={name}
                 fill
-                className="object-contain p-3"
+                className={product.detail_image_url ? "object-contain p-4" : "object-contain p-3"}
                 sizes="(max-width: 1024px) 100vw, 320px"
                 unoptimized
               />
