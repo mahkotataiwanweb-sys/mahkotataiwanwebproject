@@ -86,7 +86,7 @@ export default function HomePage() {
     fetchFeatured();
   }, []);
 
-  /* ── GSAP flip-right scroll animation (alphornsound.ch style) ── */
+  /* ── GSAP AOS-style flip-right animation ── */
   useEffect(() => {
     const ctx = gsap.context(() => {
       /* Header fade-up */
@@ -105,17 +105,19 @@ export default function HomePage() {
         );
       }
 
-      /* Flip-right animation for each card column — exact alphornsound.ch behavior */
+      /* flip-right for each card — exact AOS flip-right behavior:
+         rotateY(-100deg) → rotateY(0) with perspective(2500px)
+         duration: 1500ms, once: true, second card delay: 300ms */
       if (cardsContainerRef.current) {
-        const cards = cardsContainerRef.current.querySelectorAll('.discover-flip-card');
+        const cards = cardsContainerRef.current.querySelectorAll('.discover-card');
         cards.forEach((card, i) => {
           gsap.fromTo(
             card,
             {
               opacity: 0,
-              rotateY: -90,
-              transformOrigin: 'right center',
-              transformPerspective: 1200,
+              rotateY: -100,
+              transformPerspective: 2500,
+              transformOrigin: 'center center',
             },
             {
               opacity: 1,
@@ -124,8 +126,8 @@ export default function HomePage() {
               delay: i * 0.3,
               ease: 'power2.out',
               scrollTrigger: {
-                trigger: cardsContainerRef.current,
-                start: 'top 80%',
+                trigger: card,
+                start: 'top 85%',
                 once: true,
               },
             },
@@ -141,6 +143,30 @@ export default function HomePage() {
   const activityTitle = latestActivity ? getLocalizedField(latestActivity, 'title', locale) : '';
   const activityExcerpt = latestActivity ? getLocalizedField(latestActivity, 'excerpt', locale) : '';
 
+  /* Card data */
+  const cards = [
+    {
+      article: featuredArticle,
+      title: featuredTitle || 'Upcoming Events',
+      excerpt: featuredExcerpt || 'Discover our latest community events, celebrations, and gatherings across Taiwan',
+      badge: 'Events',
+      BadgeIcon: Calendar,
+      href: featuredArticle ? `/${locale}/articles/${featuredArticle.slug}` : `/${locale}/events`,
+      btnLabel: 'View Events',
+      badgeColor: 'bg-[#C12126]/10 text-[#C12126]',
+    },
+    {
+      article: latestActivity,
+      title: activityTitle || 'Community Activities',
+      excerpt: activityExcerpt || 'See how our community enjoys Mahkota Taiwan products in their daily life',
+      badge: 'Activity',
+      BadgeIcon: Sparkles,
+      href: latestActivity ? `/${locale}/articles/${latestActivity.slug}` : `/${locale}/lifestyle`,
+      btnLabel: 'View Activity',
+      badgeColor: 'bg-navy/10 text-navy',
+    },
+  ];
+
   return (
     <>
       <SandTexture fixed />
@@ -150,14 +176,13 @@ export default function HomePage() {
       <RecipeShowcaseSection />
 
       {/* ═══════════════════════════════════════════════
-          DISCOVER SECTION — Alphornsound-style Flip Cards
+          DISCOVER SECTION — Alphornsound.ch-style flip-right
       ═══════════════════════════════════════════════ */}
       <section ref={sectionRef} className="py-20 sm:py-28 bg-cream relative overflow-hidden">
-
         {/* Wavy texture background */}
         <DiscoverWavyTexture />
 
-        <div className="max-w-6xl mx-auto px-6 sm:px-10 relative z-10">
+        <div className="max-w-3xl mx-auto px-6 sm:px-10 relative z-10">
           {/* ── Header ── */}
           <div ref={headerRef} className="text-center mb-16">
             <p className="text-[#C12126] text-xs tracking-[0.35em] uppercase font-bold mb-3">Discover</p>
@@ -170,129 +195,66 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* ── Alphornsound-style Cards Grid ── */}
-          <div ref={cardsContainerRef} className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14">
-
-            {/* ════════ CARD 1: EVENTS ════════ */}
-            <div className="discover-flip-card" style={{ perspective: '1200px' }}>
-              <Link
-                href={featuredArticle ? `/${locale}/articles/${featuredArticle.slug}` : `/${locale}/events`}
-                className="group block"
-              >
-                {/* ── Image Section ── */}
-                <div className="relative mx-[-20px] sm:mx-[-40px]">
-                  <div className="relative aspect-[4/3] rounded-none overflow-hidden">
-                    {featuredArticle?.image_url ? (
-                      <Image
-                        src={featuredArticle.image_url}
-                        alt={featuredTitle || 'Events'}
-                        fill
-                        className="object-cover transition-transform duration-[1.8s] ease-out group-hover:scale-110"
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#003048] to-[#001a2c]" />
-                    )}
-                    {/* Image overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-                    {/* Hover glow */}
-                    <div className="absolute inset-0 bg-[#C12126]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  </div>
-                </div>
-
-                {/* ── White Content Card (overlapping image) ── */}
-                <div className="relative -mt-16 mx-auto bg-white px-8 sm:px-10 py-8 sm:py-10 shadow-[0_15px_50px_-15px_rgba(0,48,72,0.12)] group-hover:shadow-[0_25px_60px_-15px_rgba(0,48,72,0.2)] transition-shadow duration-500">
-                  {/* Red accent line at top */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-[3px] bg-[#C12126] rounded-full" />
-
-                  <div className="text-center">
-                    {/* Badge */}
-                    <div className="flex justify-center mb-4">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C12126]/10 text-[#C12126] text-[10px] font-bold uppercase tracking-[0.15em]">
-                        <Calendar className="w-3 h-3" />
-                        Events
-                      </span>
-                    </div>
-
-                    <h3 className="font-heading text-xl sm:text-2xl font-bold text-navy mb-3 leading-tight group-hover:text-[#C12126] transition-colors duration-300">
-                      {featuredTitle || 'Upcoming Events'}
-                    </h3>
-
-                    <p className="text-navy/50 text-sm leading-relaxed mb-6 line-clamp-3 max-w-sm mx-auto">
-                      {featuredExcerpt || 'Discover our latest community events, celebrations, and gatherings across Taiwan'}
-                    </p>
-
-                    {/* Button — alphornsound.ch style */}
-                    <div className="inline-flex items-center gap-2 px-6 py-3 bg-navy text-white text-sm font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300 rounded-sm">
-                      <span>View Events</span>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+          {/* ── Cards — STACKED VERTICALLY ── */}
+          <div ref={cardsContainerRef} className="flex flex-col gap-16 sm:gap-20">
+            {cards.map((card, i) => (
+              <div key={i} className="discover-card" style={{ perspective: '2500px' }}>
+                <Link
+                  href={card.href}
+                  className="group block"
+                >
+                  {/* ── Image Section (4:3 ratio, exactly like reference) ── */}
+                  <div className="relative rounded-2xl overflow-hidden shadow-lg">
+                    <div className="relative aspect-[4/3]">
+                      {card.article?.image_url ? (
+                        <Image
+                          src={card.article.image_url}
+                          alt={card.title}
+                          fill
+                          className="object-cover transition-transform duration-[1.8s] ease-out group-hover:scale-105"
+                          sizes="(max-width: 768px) 100vw, 720px"
+                          unoptimized
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#003048] to-[#001a2c]" />
+                      )}
+                      {/* Subtle overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent" />
                     </div>
                   </div>
-                </div>
-              </Link>
-            </div>
 
-            {/* ════════ CARD 2: ACTIVITY ════════ */}
-            <div className="discover-flip-card" style={{ perspective: '1200px' }}>
-              <Link
-                href={latestActivity ? `/${locale}/articles/${latestActivity.slug}` : `/${locale}/lifestyle`}
-                className="group block"
-              >
-                {/* ── Image Section ── */}
-                <div className="relative mx-[-20px] sm:mx-[-40px]">
-                  <div className="relative aspect-[4/3] rounded-none overflow-hidden">
-                    {latestActivity?.image_url ? (
-                      <Image
-                        src={latestActivity.image_url}
-                        alt={activityTitle || 'Activity'}
-                        fill
-                        className="object-cover transition-transform duration-[1.8s] ease-out group-hover:scale-110"
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#004A6E] to-[#002236]" />
-                    )}
-                    {/* Image overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-                    {/* Hover glow */}
-                    <div className="absolute inset-0 bg-[#C12126]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  </div>
-                </div>
+                  {/* ── White Content Card below image (alphornsound.ch style) ── */}
+                  <div className="relative bg-white rounded-2xl px-8 sm:px-10 py-8 sm:py-10 mt-6 shadow-[0_10px_40px_-10px_rgba(0,48,72,0.1)] group-hover:shadow-[0_20px_50px_-10px_rgba(0,48,72,0.18)] transition-shadow duration-500">
+                    {/* Red accent line at top */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-[3px] bg-[#C12126] rounded-full" />
 
-                {/* ── White Content Card (overlapping image) ── */}
-                <div className="relative -mt-16 mx-auto bg-white px-8 sm:px-10 py-8 sm:py-10 shadow-[0_15px_50px_-15px_rgba(0,48,72,0.12)] group-hover:shadow-[0_25px_60px_-15px_rgba(0,48,72,0.2)] transition-shadow duration-500">
-                  {/* Red accent line at top */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-[3px] bg-[#C12126] rounded-full" />
+                    <div className="text-center">
+                      {/* Badge */}
+                      <div className="flex justify-center mb-4">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.15em] ${card.badgeColor}`}>
+                          <card.BadgeIcon className="w-3 h-3" />
+                          {card.badge}
+                        </span>
+                      </div>
 
-                  <div className="text-center">
-                    {/* Badge */}
-                    <div className="flex justify-center mb-4">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-navy/10 text-navy text-[10px] font-bold uppercase tracking-[0.15em]">
-                        <Sparkles className="w-3 h-3" />
-                        Activity
-                      </span>
-                    </div>
+                      <h3 className="font-heading text-xl sm:text-2xl font-bold text-navy mb-3 leading-tight group-hover:text-[#C12126] transition-colors duration-300">
+                        {card.title}
+                      </h3>
 
-                    <h3 className="font-heading text-xl sm:text-2xl font-bold text-navy mb-3 leading-tight group-hover:text-[#C12126] transition-colors duration-300">
-                      {activityTitle || 'Community Activities'}
-                    </h3>
+                      <p className="text-navy/50 text-sm leading-relaxed mb-6 line-clamp-3 max-w-sm mx-auto">
+                        {card.excerpt}
+                      </p>
 
-                    <p className="text-navy/50 text-sm leading-relaxed mb-6 line-clamp-3 max-w-sm mx-auto">
-                      {activityExcerpt || 'See how our community enjoys Mahkota Taiwan products in their daily life'}
-                    </p>
-
-                    {/* Button — alphornsound.ch style */}
-                    <div className="inline-flex items-center gap-2 px-6 py-3 bg-navy text-white text-sm font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300 rounded-sm">
-                      <span>View Activity</span>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                      {/* Button — alphornsound.ch style */}
+                      <div className="inline-flex items-center gap-2 px-6 py-3 bg-navy text-white text-sm font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300 rounded-sm">
+                        <span>{card.btnLabel}</span>
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            </div>
-
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </section>
