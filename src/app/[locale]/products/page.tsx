@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, Suspense, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocale, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
@@ -54,7 +55,18 @@ function highlightText(text: string, query: string) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Smart Search Component — premium fuzzy + keyboard nav              */
+/*  Normalize text for search (remove diacritics, lowercase)           */
+/* ------------------------------------------------------------------ */
+function normalizeText(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
+
+/* ------------------------------------------------------------------ */
+/*  Smart Search Component — portal-based dropdown, no clip            */
 /* ------------------------------------------------------------------ */
 function SmartSearch({
   products,
@@ -70,12 +82,46 @@ function SmartSearch({
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const [portalReady, setPortalReady] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Enable portal after mount (SSR safety)
+  useEffect(() => { setPortalReady(true); }, []);
+
+  // Update dropdown position whenever focused/query changes or on scroll/resize
+  const updatePosition = useCallback(() => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setDropdownPos({
+      top: rect.bottom + 8,
+      left: rect.left,
+      width: rect.width,
+    });
+  }, []);
 
   useEffect(() => {
+    if (!focused) return;
+    updatePosition();
+    const onScrollOrResize = () => updatePosition();
+    window.addEventListener('scroll', onScrollOrResize, true);
+    window.addEventListener('resize', onScrollOrResize);
+    return () => {
+      window.removeEventListener('scroll', onScrollOrResize, true);
+      window.removeEventListener('resize', onScrollOrResize);
+    };
+  }, [focused, query, updatePosition]);
+
+  // Close on click outside
+  useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (
+        containerRef.current && !containerRef.current.contains(target) &&
+        dropdownRef.current && !dropdownRef.current.contains(target)
+      ) {
         setFocused(false);
       }
     }
@@ -83,36 +129,94 @@ function SmartSearch({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Build a category name map for search
+  const categoryNameMap = useMemo(() => {
+    const map: Record<string, { en: string; id: string; zh: string }> = {};
+    categories.forEach(c => {
+      map[c.id] = {
+        en: normalizeText(c.name_en || ''),
+        id: normalizeText(c.name_id || ''),
+        zh: normalizeText(c.name_zh || ''),
+      };
+    });
+    return map;
+  }, [categories]);
+
   // Fuzzy tokenized search with scoring
   const results = useMemo(() => {
     if (!query.trim()) return [];
-    const tokens = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    const normalizedQuery = normalizeText(query);
+    const tokens = normalizedQuery.split(/\s+/).filter(Boolean);
 
     const scored = products.map((p) => {
-      const fields = [
-        getLocalizedField(p, 'name', locale),
-        p.name_en || '',
-        p.name_id || '',
-        p.name_zh || '',
-        p.description_en || '',
-        p.description_id || '',
-        p.description_zh || '',
-      ].map(f => f.toLowerCase());
+      // Build all searchable fields for this product
+      const productFields = [
+        normalizeText(getLocalizedField(p, 'name', locale)),
+        normalizeText(p.name_en || ''),
+        normalizeText(p.name_id || ''),
+        normalizeText(p.name_zh || ''),
+        normalizeText(p.description_en || ''),
+        normalizeText(p.description_id || ''),
+        normalizeText(p.description_zh || ''),
+        normalizeText(p.slug || ''),
+      ];
+
+      // Also include category name fields
+      const catNames = categoryNameMap[p.category_id];
+      if (catNames) {
+        productFields.push(catNames.en, catNames.id, catNames.zh);
+      }
 
       let score = 0;
       let allTokensMatched = true;
 
       for (const token of tokens) {
-        let tokenScore = 0;
-        for (const text of fields) {
-          if (text === token) tokenScore = Math.max(tokenScore, 100);
-          else if (text.startsWith(token)) tokenScore = Math.max(tokenScore, 60);
-          else if (text.includes(token)) tokenScore = Math.max(tokenScore, 30);
-          // word-boundary match
-          else if (text.split(/\s+/).some(w => w.startsWith(token))) tokenScore = Math.max(tokenScore, 45);
+        let tokenBestScore = 0;
+
+        for (const text of productFields) {
+          if (!text) continue;
+
+          // Exact full match
+          if (text === token) {
+            tokenBestScore = Math.max(tokenBestScore, 100);
+            continue;
+          }
+          // Full text starts with token
+          if (text.startsWith(token)) {
+            tokenBestScore = Math.max(tokenBestScore, 70);
+            continue;
+          }
+          // Any word in text starts with token
+          const words = text.split(/[\s\-_]+/);
+          if (words.some(w => w === token)) {
+            tokenBestScore = Math.max(tokenBestScore, 80);
+            continue;
+          }
+          if (words.some(w => w.startsWith(token))) {
+            tokenBestScore = Math.max(tokenBestScore, 55);
+            continue;
+          }
+          // Contains anywhere
+          if (text.includes(token)) {
+            tokenBestScore = Math.max(tokenBestScore, 30);
+            continue;
+          }
+          // Partial character match for CJK (Chinese/Japanese)
+          if (token.length >= 1 && /[\u4e00-\u9fff]/.test(token) && text.includes(token)) {
+            tokenBestScore = Math.max(tokenBestScore, 40);
+          }
         }
-        if (tokenScore === 0) { allTokensMatched = false; break; }
-        score += tokenScore;
+
+        if (tokenBestScore === 0) {
+          allTokensMatched = false;
+          break;
+        }
+        score += tokenBestScore;
+      }
+
+      // Bonus: more tokens matched = higher score multiplier
+      if (allTokensMatched && tokens.length > 1) {
+        score *= (1 + tokens.length * 0.1);
       }
 
       return { product: p, score, matched: allTokensMatched };
@@ -121,9 +225,9 @@ function SmartSearch({
     return scored
       .filter(s => s.matched && s.score > 0)
       .sort((a, b) => b.score - a.score)
-      .slice(0, 10)
+      .slice(0, 12)
       .map(s => s.product);
-  }, [query, products, locale]);
+  }, [query, products, locale, categoryNameMap]);
 
   // Group results by category
   const grouped = useMemo(() => {
@@ -176,12 +280,152 @@ function SmartSearch({
     : 'Search products across all categories...';
 
   const searchHint = locale === 'id'
-    ? 'Ketik nama atau deskripsi produk'
+    ? 'Ketik nama, deskripsi, atau kategori produk'
     : locale === 'zh-TW'
-    ? '輸入產品名稱或描述'
-    : 'Type product name or description';
+    ? '輸入產品名稱、描述或類別'
+    : 'Type product name, description, or category';
 
+  const showDropdown = focused && query.trim().length > 0;
+
+  // Build flat index for keyboard navigation
   let globalResultIndex = -1;
+
+  // Dropdown content
+  const dropdownContent = showDropdown && portalReady ? createPortal(
+    <div
+      ref={dropdownRef}
+      className="fixed z-[9999]"
+      style={{
+        top: `${dropdownPos.top}px`,
+        left: `${dropdownPos.left}px`,
+        width: `${dropdownPos.width}px`,
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: -8, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -8, scale: 0.98 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+        className="rounded-2xl bg-white/[0.99] backdrop-blur-2xl shadow-2xl shadow-navy/20 border border-navy/8 overflow-hidden max-h-[min(440px,60vh)] overflow-y-auto"
+        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(0,48,72,0.12) transparent' }}
+      >
+        {results.length === 0 ? (
+          <div className="p-10 text-center">
+            <motion.div
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+            >
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-navy/5 flex items-center justify-center">
+                <Package className="w-8 h-8 text-navy/15" />
+              </div>
+            </motion.div>
+            <p className="text-navy/50 text-sm font-medium mb-1">
+              {locale === 'id' ? 'Produk tidak ditemukan' : locale === 'zh-TW' ? '找不到產品' : 'No products found'}
+            </p>
+            <p className="text-navy/30 text-xs">
+              {locale === 'id' ? 'Coba kata kunci lain' : locale === 'zh-TW' ? '嘗試其他關鍵字' : 'Try different keywords'}
+            </p>
+          </div>
+        ) : (
+          <div className="py-2">
+            {/* Results count */}
+            <div className="px-5 py-2 flex items-center justify-between">
+              <span className="text-[10px] font-semibold text-navy/30 uppercase tracking-[0.15em]">
+                {results.length} {locale === 'id' ? 'hasil' : locale === 'zh-TW' ? '個結果' : 'results'}
+              </span>
+              <div className="hidden sm:flex items-center gap-1">
+                <kbd className="text-[9px] text-navy/25 bg-navy/5 px-1 py-0.5 rounded font-mono">↵</kbd>
+                <span className="text-[9px] text-navy/20">select</span>
+              </div>
+            </div>
+
+            {Object.entries(grouped).map(([catId, prods]) => {
+              const catName = getCategoryName(catId);
+              const cat = categories.find((c) => c.id === catId);
+              return (
+                <div key={catId}>
+                  {/* Category header */}
+                  <div className="px-5 py-2 text-[10px] font-bold text-navy/30 uppercase tracking-[0.2em] bg-gradient-to-r from-cream/60 to-transparent flex items-center gap-2 sticky top-0 backdrop-blur-sm z-10">
+                    {cat && <CategoryIcon slug={cat.slug} size={12} className="opacity-40" />}
+                    {catName}
+                    <span className="text-navy/20">({prods.length})</span>
+                  </div>
+                  {/* Products */}
+                  {prods.map((product) => {
+                    globalResultIndex++;
+                    const thisIndex = globalResultIndex;
+                    const name = getLocalizedField(product, 'name', locale);
+                    const desc = getLocalizedField(product, 'description', locale);
+                    const isActive = thisIndex === activeIndex;
+
+                    return (
+                      <motion.button
+                        key={product.id}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: thisIndex * 0.02 }}
+                        onClick={() => {
+                          onSelectProduct(product, catId);
+                          setQuery('');
+                          setFocused(false);
+                        }}
+                        onMouseEnter={() => setActiveIndex(thisIndex)}
+                        className={`w-full flex items-center gap-4 px-5 py-3.5 transition-all duration-200 group text-left ${
+                          isActive ? 'bg-red/5' : 'hover:bg-cream/60'
+                        }`}
+                      >
+                        {/* Product thumbnail */}
+                        <div className={`w-13 h-13 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center transition-all duration-300 ${
+                          isActive ? 'bg-red/10 shadow-md shadow-red/10' : 'bg-cream/80'
+                        }`}>
+                          {product.image_url ? (
+                            <Image
+                              src={product.image_url}
+                              alt={name}
+                              width={52}
+                              height={52}
+                              className="w-full h-full object-contain p-1"
+                              unoptimized
+                            />
+                          ) : (
+                            <Package className="w-5 h-5 text-navy/20" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={`font-semibold text-sm truncate transition-colors duration-200 ${
+                            isActive ? 'text-red' : 'text-navy group-hover:text-red'
+                          }`}>
+                            {highlightText(name, query)}
+                          </p>
+                          {desc && (
+                            <p className="text-navy/35 text-xs mt-0.5 truncate">
+                              {highlightText(desc.slice(0, 60), query)}{desc.length > 60 ? '...' : ''}
+                            </p>
+                          )}
+                          <p className="text-navy/25 text-[10px] mt-0.5">{catName}</p>
+                        </div>
+                        <ArrowRight className={`w-4 h-4 shrink-0 transition-all duration-300 ${
+                          isActive ? 'text-red translate-x-1' : 'text-navy/15 group-hover:text-red group-hover:translate-x-1'
+                        }`} />
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              );
+            })}
+
+            {/* Search tip */}
+            <div className="px-5 py-3 border-t border-navy/5 flex items-center gap-2">
+              <Sparkles className="w-3 h-3 text-red/30" />
+              <span className="text-[10px] text-navy/25">{searchHint}</span>
+            </div>
+          </div>
+        )}
+      </motion.div>
+    </div>,
+    document.body
+  ) : null;
 
   return (
     <div ref={containerRef} className="relative w-full max-w-xl mx-auto">
@@ -238,133 +482,8 @@ function SmartSearch({
         </div>
       </div>
 
-      {/* Results Dropdown */}
-      <AnimatePresence>
-        {focused && query.trim() && (
-          <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.97 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="absolute top-full left-0 right-0 mt-3 rounded-2xl bg-white/[0.98] backdrop-blur-2xl shadow-2xl shadow-navy/15 border border-navy/8 overflow-hidden z-50 max-h-[440px] overflow-y-auto"
-            style={{ scrollbarWidth: 'thin' }}
-          >
-            {results.length === 0 ? (
-              <div className="p-10 text-center">
-                <motion.div
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 300 }}
-                >
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-navy/5 flex items-center justify-center">
-                    <Package className="w-8 h-8 text-navy/15" />
-                  </div>
-                </motion.div>
-                <p className="text-navy/50 text-sm font-medium mb-1">
-                  {locale === 'id' ? 'Produk tidak ditemukan' : locale === 'zh-TW' ? '找不到產品' : 'No products found'}
-                </p>
-                <p className="text-navy/30 text-xs">
-                  {locale === 'id' ? 'Coba kata kunci lain' : locale === 'zh-TW' ? '嘗試其他關鍵字' : 'Try different keywords'}
-                </p>
-              </div>
-            ) : (
-              <div className="py-2">
-                {/* Results count */}
-                <div className="px-5 py-2 flex items-center justify-between">
-                  <span className="text-[10px] font-semibold text-navy/30 uppercase tracking-[0.15em]">
-                    {results.length} {locale === 'id' ? 'hasil' : locale === 'zh-TW' ? '個結果' : 'results'}
-                  </span>
-                  <div className="hidden sm:flex items-center gap-1">
-                    <kbd className="text-[9px] text-navy/25 bg-navy/5 px-1 py-0.5 rounded font-mono">↵</kbd>
-                    <span className="text-[9px] text-navy/20">select</span>
-                  </div>
-                </div>
-
-                {Object.entries(grouped).map(([catId, prods]) => {
-                  const catName = getCategoryName(catId);
-                  const cat = categories.find((c) => c.id === catId);
-                  return (
-                    <div key={catId}>
-                      {/* Category header */}
-                      <div className="px-5 py-2 text-[10px] font-bold text-navy/30 uppercase tracking-[0.2em] bg-gradient-to-r from-cream/60 to-transparent flex items-center gap-2 sticky top-0 backdrop-blur-sm">
-                        {cat && <CategoryIcon slug={cat.slug} size={12} className="opacity-40" />}
-                        {catName}
-                        <span className="text-navy/20">({prods.length})</span>
-                      </div>
-                      {/* Products */}
-                      {prods.map((product) => {
-                        globalResultIndex++;
-                        const thisIndex = globalResultIndex;
-                        const name = getLocalizedField(product, 'name', locale);
-                        const desc = getLocalizedField(product, 'description', locale);
-                        const isActive = thisIndex === activeIndex;
-
-                        return (
-                          <motion.button
-                            key={product.id}
-                            initial={{ opacity: 0, x: -8 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: thisIndex * 0.02 }}
-                            onClick={() => {
-                              onSelectProduct(product, catId);
-                              setQuery('');
-                              setFocused(false);
-                            }}
-                            onMouseEnter={() => setActiveIndex(thisIndex)}
-                            className={`w-full flex items-center gap-4 px-5 py-3.5 transition-all duration-200 group text-left ${
-                              isActive ? 'bg-red/5' : 'hover:bg-cream/60'
-                            }`}
-                          >
-                            {/* Product thumbnail */}
-                            <div className={`w-13 h-13 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center transition-all duration-300 ${
-                              isActive ? 'bg-red/10 shadow-md shadow-red/10' : 'bg-cream/80'
-                            }`}>
-                              {product.image_url ? (
-                                <Image
-                                  src={product.image_url}
-                                  alt={name}
-                                  width={52}
-                                  height={52}
-                                  className="w-full h-full object-contain p-1"
-                                  unoptimized
-                                />
-                              ) : (
-                                <Package className="w-5 h-5 text-navy/20" />
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className={`font-semibold text-sm truncate transition-colors duration-200 ${
-                                isActive ? 'text-red' : 'text-navy group-hover:text-red'
-                              }`}>
-                                {highlightText(name, query)}
-                              </p>
-                              {desc && (
-                                <p className="text-navy/35 text-xs mt-0.5 truncate">
-                                  {highlightText(desc.slice(0, 60), query)}{desc.length > 60 ? '...' : ''}
-                                </p>
-                              )}
-                              <p className="text-navy/25 text-[10px] mt-0.5">{catName}</p>
-                            </div>
-                            <ArrowRight className={`w-4 h-4 shrink-0 transition-all duration-300 ${
-                              isActive ? 'text-red translate-x-1' : 'text-navy/15 group-hover:text-red group-hover:translate-x-1'
-                            }`} />
-                          </motion.button>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
-
-                {/* Search tip */}
-                <div className="px-5 py-3 border-t border-navy/5 flex items-center gap-2">
-                  <Sparkles className="w-3 h-3 text-red/30" />
-                  <span className="text-[10px] text-navy/25">{searchHint}</span>
-                </div>
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Portal-based dropdown — renders at body level, escapes overflow-hidden */}
+      {dropdownContent}
     </div>
   );
 }
@@ -955,7 +1074,7 @@ function ProductsContent() {
               </div>
             </div>
 
-            {/* Smart Search */}
+            {/* Smart Search — dropdown uses portal, immune to overflow-hidden */}
             <div className="hero-reveal mt-10">
               <SmartSearch
                 products={products}
