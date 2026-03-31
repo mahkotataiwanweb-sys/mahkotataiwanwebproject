@@ -34,6 +34,29 @@ interface DiscoverSlide {
 }
 
 /* ──────────────────────────────────────────
+   WavyTextureBackground — same as ProductCatalog
+────────────────────────────────────────── */
+function DiscoverWavyTexture() {
+  const rowHeight = 30;
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="wavy-discover" x="0" y="0" width="180" height={rowHeight} patternUnits="userSpaceOnUse">
+            <path d={`M0,${rowHeight/2} Q30,${rowHeight/2-8} 45,${rowHeight/2} T90,${rowHeight/2} Q120,${rowHeight/2+8} 135,${rowHeight/2} T180,${rowHeight/2}`} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="1.5" />
+          </pattern>
+          <pattern id="wavy-discover-2" x="40" y="7" width="220" height={rowHeight+5} patternUnits="userSpaceOnUse">
+            <path d={`M0,${(rowHeight+5)/2} Q40,${(rowHeight+5)/2-6} 55,${(rowHeight+5)/2} T110,${(rowHeight+5)/2} Q150,${(rowHeight+5)/2+6} 165,${(rowHeight+5)/2} T220,${(rowHeight+5)/2}`} fill="none" stroke="rgba(0,0,0,0.05)" strokeWidth="1.2" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#wavy-discover)" />
+        <rect width="100%" height="100%" fill="url(#wavy-discover-2)" />
+      </svg>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────
    CinematicScrollShowcase — Horizontal scroll cards
 ────────────────────────────────────────── */
 function CinematicScrollShowcase({
@@ -117,9 +140,7 @@ function CinematicScrollShowcase({
       {/* Hide scrollbar across browsers */}
       <style dangerouslySetInnerHTML={{ __html: `.discover-scroll::-webkit-scrollbar{display:none}` }} />
 
-      {/* Edge fade overlays */}
-      <div className="absolute left-0 top-0 bottom-6 w-8 sm:w-20 bg-gradient-to-r from-[#FAEDD3] to-transparent z-20 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-6 w-8 sm:w-20 bg-gradient-to-l from-[#FAEDD3] to-transparent z-20 pointer-events-none" />
+
 
       {/* Navigation arrows */}
       <button
@@ -334,16 +355,10 @@ export default function HomePage() {
           DISCOVER SECTION — Cinematic Horizontal Scroll
       ═══════════════════════════════════════════════ */}
       <section ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
-        {/* Ambient blur orbs */}
-        <div className="pointer-events-none absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-[#C12126]/[0.06] blur-[150px]" />
-        <div className="pointer-events-none absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-navy/[0.03] blur-[120px]" />
-        <div className="pointer-events-none absolute top-1/2 left-1/3 w-[300px] h-[300px] rounded-full bg-[#C12126]/[0.03] blur-[100px]" />
 
-        {/* Subtle dot grid pattern */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.025]"
-          style={{ backgroundImage: 'radial-gradient(circle, rgba(0,48,72,0.15) 1px, transparent 1px)', backgroundSize: '40px 40px' }}
-        />
+
+        {/* Wavy texture background */}
+        <DiscoverWavyTexture />
 
         <div className="max-w-7xl mx-auto px-6">
           {/* ── Header ── */}
