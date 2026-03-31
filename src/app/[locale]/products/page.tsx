@@ -963,8 +963,23 @@ function ProductsContent() {
 
       {/* ============ CONTENT ============ */}
       <div className="relative overflow-hidden">
-        {/* SandTexture overlays content as subtle grain — z-20 + pointer-events-none */}
-        <div className="absolute inset-0 z-20 pointer-events-none"><SandTexture /></div>
+        {/* Wavy SVG texture — visible background pattern behind products */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="wavy-products" x="0" y="0" width="180" height="30" patternUnits="userSpaceOnUse">
+                <path d="M0,15 Q30,7 45,15 T90,15 Q120,23 135,15 T180,15" fill="none" stroke="rgba(0,0,0,0.07)" strokeWidth="1.5" />
+              </pattern>
+              <pattern id="wavy-products-2" x="40" y="7" width="220" height="35" patternUnits="userSpaceOnUse">
+                <path d="M0,17.5 Q40,11.5 55,17.5 T110,17.5 Q150,23.5 165,17.5 T220,17.5" fill="none" stroke="rgba(0,0,0,0.04)" strokeWidth="1.2" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#wavy-products)" />
+            <rect width="100%" height="100%" fill="url(#wavy-products-2)" />
+          </svg>
+        </div>
+        {/* Subtle grain overlay */}
+        <div className="absolute inset-0 z-[1] pointer-events-none opacity-30"><SandTexture /></div>
       <div ref={contentRef} className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20 scroll-mt-8">
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
