@@ -75,7 +75,6 @@ export interface Category {
   description_id: string | null;
   description_zh: string | null;
   image_url: string | null;
-  detail_image_url: string | null;
   sort_order: number;
   is_active: boolean;
   created_at: string;
@@ -127,7 +126,7 @@ export interface Product {
   description_id: string | null;
   description_zh: string | null;
   image_url: string | null;
-  detail_image_url: string | null;
+  detail_image_url?: string | null;
   is_featured: boolean;
   is_active: boolean;
   sort_order: number;
@@ -146,6 +145,7 @@ export interface ProductInsert {
   description_id?: string | null;
   description_zh?: string | null;
   image_url?: string | null;
+  detail_image_url?: string | null;
   is_featured?: boolean;
   is_active?: boolean;
   sort_order?: number;
@@ -164,6 +164,7 @@ export interface ProductUpdate {
   description_id?: string | null;
   description_zh?: string | null;
   image_url?: string | null;
+  detail_image_url?: string | null;
   is_featured?: boolean;
   is_active?: boolean;
   sort_order?: number;
@@ -270,7 +271,6 @@ export interface HeroSlide {
   subtitle_id: string;
   subtitle_zh: string;
   image_url: string | null;
-  detail_image_url: string | null;
   media_type: 'image' | 'video' | 'gif';
   link_url: string | null;
   sort_order: number;
@@ -330,7 +330,6 @@ export interface Article {
   description_id: string | null;
   description_zh: string | null;
   image_url: string | null;
-  detail_image_url: string | null;
   slider_section: string | null;
   gallery_images: string[] | null;
   published_at: string;
