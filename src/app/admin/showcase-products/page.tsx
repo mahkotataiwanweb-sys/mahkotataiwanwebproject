@@ -14,6 +14,7 @@ interface ShowcaseProduct {
   description_id: string;
   description_zh: string;
   image_url: string | null;
+  detail_image_url: string | null;
   sort_order: number;
   is_active: boolean;
 }
@@ -35,6 +36,7 @@ const EMPTY_PRODUCT: Omit<ShowcaseProduct, 'id'> = {
   description_id: '',
   description_zh: '',
   image_url: null,
+  detail_image_url: null,
   sort_order: 0,
   is_active: true,
 };
@@ -46,6 +48,7 @@ export default function ShowcaseProductsAdmin() {
   const [isNew, setIsNew] = useState(false);
   const [filterCategory, setFilterCategory] = useState('all');
   const [uploading, setUploading] = useState(false);
+  const [uploadingDetail, setUploadingDetail] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const fetchProducts = useCallback(async () => {
@@ -130,6 +133,28 @@ export default function ShowcaseProductsAdmin() {
       alert('Failed to upload image');
     } finally {
       setUploading(false);
+    }
+  };
+
+
+  const handleDetailImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editing) return;
+    setUploadingDetail(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folder', 'showcase-products/detail');
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.url) {
+        setEditing({ ...editing, detail_image_url: data.url });
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      alert('Failed to upload detail image');
+    } finally {
+      setUploadingDetail(false);
     }
   };
 
@@ -356,6 +381,50 @@ export default function ShowcaseProductsAdmin() {
                 </div>
               </div>
 
+
+              {/* Detail Image (Big Card) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Detail Image <span className="text-xs text-gray-400 font-normal">(Big Card)</span>
+                </label>
+                <p className="text-xs text-gray-400 mb-2">Shown in the large product detail card only. Does NOT affect the small card image.</p>
+                <div className="flex items-center gap-4">
+                  <div className="w-24 h-24 rounded-lg bg-[#0c1929] flex items-center justify-center overflow-hidden">
+                    {editing.detail_image_url ? (
+                      <Image
+                        src={editing.detail_image_url}
+                        alt="Detail Preview"
+                        width={96}
+                        height={96}
+                        className="object-contain"
+                        unoptimized
+                      />
+                    ) : (
+                      <span className="text-xs text-gray-500 text-center leading-tight">No detail<br/>image</span>
+                    )}
+                  </div>
+                  <div>
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleDetailImageUpload}
+                      />
+                      {uploadingDetail ? 'Uploading...' : 'Upload Detail Image'}
+                    </label>
+                    <p className="text-xs text-gray-400 mt-1">Professional product photo recommended</p>
+                    {editing.detail_image_url && (
+                      <button
+                        onClick={() => setEditing({ ...editing, detail_image_url: null })}
+                        className="text-xs text-red-500 hover:text-red-700 mt-1"
+                      >
+                        Remove detail image
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
               {/* Names */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>

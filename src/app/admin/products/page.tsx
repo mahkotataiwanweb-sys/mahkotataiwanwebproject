@@ -24,6 +24,7 @@ interface ProductForm {
   is_active: boolean;
   sort_order: number;
   image_url: string;
+  detail_image_url: string;
 }
 
 const defaultForm: ProductForm = {
@@ -31,6 +32,7 @@ const defaultForm: ProductForm = {
   description_en: '', description_id: '', description_zh: '',
   category_id: '', slug: '', is_featured: false, is_active: true, sort_order: 0,
   image_url: '',
+  detail_image_url: '',
 };
 
 export default function ProductsPage() {
@@ -41,6 +43,7 @@ export default function ProductsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadingDetail, setUploadingDetail] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<ProductForm>({ ...defaultForm });
 
@@ -86,6 +89,7 @@ export default function ProductsPage() {
       is_active: product.is_active,
       sort_order: product.sort_order,
       image_url: product.image_url || '',
+      detail_image_url: product.detail_image_url || '',
     });
     setShowModal(true);
   };
@@ -106,6 +110,7 @@ export default function ProductsPage() {
         ...form,
         category_id: form.category_id || null,
         image_url: form.image_url || null,
+        detail_image_url: form.detail_image_url || null,
       };
 
       if (editingProduct) {
@@ -151,6 +156,28 @@ export default function ProductsPage() {
       toast.error('Upload failed');
     } finally {
       setUploading(false);
+    }
+  };
+
+
+
+  const handleDetailImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingDetail(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folder', 'products/detail');
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setForm(prev => ({ ...prev, detail_image_url: data.url }));
+      toast.success('Detail image uploaded!');
+    } catch {
+      toast.error('Detail image upload failed');
+    } finally {
+      setUploadingDetail(false);
     }
   };
 
@@ -333,6 +360,36 @@ export default function ProductsPage() {
                     <Upload className="w-4 h-4" />
                     {uploading ? 'Uploading...' : 'Upload Image'}
                     <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={uploading} />
+                  </label>
+                </div>
+              </div>
+
+              {/* Detail Image Upload (Big Card) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Detail Image <span className="text-xs text-gray-400 font-normal">(Big Card / Product Detail)</span></label>
+                <p className="text-xs text-gray-400 mb-2">This image appears in the large product detail card. Changing this does NOT affect the small product card image above.</p>
+                <div className="flex items-start gap-4">
+                  {form.detail_image_url ? (
+                    <div className="relative group">
+                      <div className="w-20 h-20 rounded-lg overflow-hidden bg-[#0c1929]">
+                        <Image src={form.detail_image_url} alt="" width={80} height={80} className="rounded-lg object-contain w-20 h-20" unoptimized />
+                      </div>
+                      <button
+                        onClick={() => setForm(prev => ({ ...prev, detail_image_url: '' }))}
+                        className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-20 h-20 rounded-lg bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-200">
+                      <span className="text-gray-300 text-xs text-center leading-tight">No detail<br/>image</span>
+                    </div>
+                  )}
+                  <label className={`flex items-center gap-2 px-4 py-2.5 border border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 text-sm text-gray-500 transition-colors ${uploadingDetail ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <Upload className="w-4 h-4" />
+                    {uploadingDetail ? 'Uploading...' : 'Upload Detail Image'}
+                    <input type="file" accept="image/*" onChange={handleDetailImageUpload} className="hidden" disabled={uploadingDetail} />
                   </label>
                 </div>
               </div>
