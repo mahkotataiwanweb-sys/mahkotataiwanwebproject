@@ -11,6 +11,7 @@ import { Sparkles, Calendar, ArrowRight } from 'lucide-react';
 import HeroSlider from '@/components/sections/HeroSlider';
 import MarqueeSection from '@/components/sections/MarqueeSection';
 import ProductCatalogSection from '@/components/sections/ProductCatalogSection';
+import RecipeShowcaseSection from '@/components/sections/RecipeShowcaseSection';
 import VideoShowcaseSection from '@/components/sections/VideoShowcaseSection';
 import WhereToBuySection from '@/components/sections/WhereToBuySection';
 import SandTexture from '@/components/effects/SandTexture';
@@ -329,6 +330,9 @@ export default function HomePage() {
 
       {/* Product Catalog Showcase — flush with marquee, no card-reveal gap */}
       <ProductCatalogSection />
+
+      {/* Recipe Showcase — Premium 3D Rotating Carousel */}
+      <RecipeShowcaseSection />
 
       {/* Discover Section — Dual Stacked Card Sliders */}
       <section ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
