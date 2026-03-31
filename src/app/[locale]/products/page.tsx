@@ -16,6 +16,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import CategoryIcon from '@/components/ui/CategoryIcon';
 import HeroBackground from '@/components/effects/HeroBackground';
+import SandTexture from '@/components/effects/SandTexture';
 import { getLocalizedField } from '@/lib/utils';
 import type { Product, Category } from '@/types/database';
 
@@ -703,9 +704,25 @@ function FloatingProductCard({
 
           <div className={`relative rounded-2xl overflow-hidden transition-all duration-500 ${
             isHighlighted
-              ? 'drop-shadow-[0_8px_24px_rgba(193,33,38,0.2)] ring-2 ring-red/30'
-              : 'drop-shadow-[0_4px_12px_rgba(0,48,72,0.06)] group-hover:drop-shadow-[0_12px_32px_rgba(0,48,72,0.12)]'
-          }`}>
+              ? 'ring-2 ring-red/30'
+              : ''
+          }`}
+          style={{
+            filter: isHighlighted
+              ? 'drop-shadow(0 12px 30px rgba(193,33,38,0.25)) drop-shadow(0 4px 10px rgba(193,33,38,0.15))'
+              : 'drop-shadow(0 8px 24px rgba(0,48,72,0.12)) drop-shadow(0 20px 40px rgba(0,48,72,0.08))',
+          }}
+          onMouseEnter={(e) => {
+            if (!isHighlighted) {
+              e.currentTarget.style.filter = 'drop-shadow(0 16px 40px rgba(0,48,72,0.18)) drop-shadow(0 30px 60px rgba(0,48,72,0.12))';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isHighlighted) {
+              e.currentTarget.style.filter = 'drop-shadow(0 8px 24px rgba(0,48,72,0.12)) drop-shadow(0 20px 40px rgba(0,48,72,0.08))';
+            }
+          }}
+          >
             <div className="relative aspect-square overflow-hidden">
               {imageUrl ? (
                 <Image
@@ -874,7 +891,7 @@ function ProductsContent() {
   return (
     <div className="min-h-screen bg-cream">
       {/* ============ HERO ============ */}
-      <div className="relative bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236]">
+      <div className="relative bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] overflow-hidden">
         <HeroBackground />
 
         <div className="max-w-7xl mx-auto px-6 sm:px-10 relative z-10 pt-32 sm:pt-36 pb-20 sm:pb-28">
@@ -945,7 +962,9 @@ function ProductsContent() {
       </div>
 
       {/* ============ CONTENT ============ */}
-      <div ref={contentRef} className="max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20 scroll-mt-8">
+      <div className="relative overflow-hidden">
+        <SandTexture />
+      <div ref={contentRef} className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20 scroll-mt-8">
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -1031,6 +1050,8 @@ function ProductsContent() {
           </>
         )}
       </div>
+
+      </div>{/* end SandTexture wrapper */}
 
       {/* Product Modal */}
       <AnimatePresence>
