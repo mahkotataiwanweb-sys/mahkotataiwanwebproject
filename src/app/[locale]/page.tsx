@@ -105,33 +105,27 @@ export default function HomePage() {
         );
       }
 
-      /* flip-right for each card — exact AOS flip-right behavior:
+      /* flip-right for each card — AOS flip-right style:
          rotateY(-100deg) → rotateY(0) with perspective(2500px)
-         duration: 1500ms, once: true, second card delay: 300ms */
+         Triggered when card is fully in view (top 60%), 1s duration */
       if (cardsContainerRef.current) {
         const cards = cardsContainerRef.current.querySelectorAll('.discover-card');
         cards.forEach((card, i) => {
-          gsap.fromTo(
-            card,
-            {
-              opacity: 0,
-              rotateY: -100,
-              transformPerspective: 2500,
-              transformOrigin: 'center center',
+          gsap.set(card, { opacity: 0, rotateY: -100, transformPerspective: 2500, transformOrigin: 'center center' });
+          ScrollTrigger.create({
+            trigger: card,
+            start: 'top 60%',
+            once: true,
+            onEnter: () => {
+              gsap.to(card, {
+                opacity: 1,
+                rotateY: 0,
+                duration: 1,
+                delay: i * 0.35,
+                ease: 'power2.out',
+              });
             },
-            {
-              opacity: 1,
-              rotateY: 0,
-              duration: 1.5,
-              delay: i * 0.3,
-              ease: 'power2.out',
-              scrollTrigger: {
-                trigger: card,
-                start: 'top 85%',
-                once: true,
-              },
-            },
-          );
+          });
         });
       }
     }, sectionRef);
