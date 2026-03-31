@@ -7,9 +7,7 @@ import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
-  Calendar,
   ArrowRight,
-  Sparkles,
 } from 'lucide-react';
 import HeroSlider from '@/components/sections/HeroSlider';
 import MarqueeSection from '@/components/sections/MarqueeSection';
@@ -107,21 +105,21 @@ export default function HomePage() {
 
       /* flip-right for each card — AOS flip-right style:
          rotateY(-100deg) → rotateY(0) with perspective(2500px)
-         Triggered when card is fully in view (top 60%), 1s duration */
+         Triggered when card is well into view (top 40%), 2s slow flip */
       if (cardsContainerRef.current) {
         const cards = cardsContainerRef.current.querySelectorAll('.discover-card');
         cards.forEach((card, i) => {
           gsap.set(card, { opacity: 0, rotateY: -100, transformPerspective: 2500, transformOrigin: 'center center' });
           ScrollTrigger.create({
             trigger: card,
-            start: 'top 60%',
+            start: 'top 40%',
             once: true,
             onEnter: () => {
               gsap.to(card, {
                 opacity: 1,
                 rotateY: 0,
-                duration: 1,
-                delay: i * 0.35,
+                duration: 2,
+                delay: i * 0.5,
                 ease: 'power2.out',
               });
             },
@@ -143,21 +141,15 @@ export default function HomePage() {
       article: featuredArticle,
       title: featuredTitle || 'Upcoming Events',
       excerpt: featuredExcerpt || 'Discover our latest community events, celebrations, and gatherings across Taiwan',
-      badge: 'Events',
-      BadgeIcon: Calendar,
       href: featuredArticle ? `/${locale}/articles/${featuredArticle.slug}` : `/${locale}/events`,
-      btnLabel: 'View Events',
-      badgeColor: 'bg-[#C12126]/10 text-[#C12126]',
+      btnLabel: locale === 'id' ? 'Lihat Acara' : '查看活動',
     },
     {
       article: latestActivity,
       title: activityTitle || 'Community Activities',
       excerpt: activityExcerpt || 'See how our community enjoys Mahkota Taiwan products in their daily life',
-      badge: 'Activity',
-      BadgeIcon: Sparkles,
       href: latestActivity ? `/${locale}/articles/${latestActivity.slug}` : `/${locale}/lifestyle`,
-      btnLabel: 'View Activity',
-      badgeColor: 'bg-navy/10 text-navy',
+      btnLabel: locale === 'id' ? 'Lihat Aktivitas' : '查看活動',
     },
   ];
 
@@ -189,60 +181,46 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* ── Cards — STACKED VERTICALLY ── */}
-          <div ref={cardsContainerRef} className="flex flex-col gap-16 sm:gap-20">
+          {/* ── Cards — STACKED VERTICALLY (alphornsound.ch exact match) ── */}
+          <div ref={cardsContainerRef} className="flex flex-col gap-20 sm:gap-28">
             {cards.map((card, i) => (
               <div key={i} className="discover-card" style={{ perspective: '2500px' }}>
                 <Link
                   href={card.href}
                   className="group block"
                 >
-                  {/* ── Image Section (4:3 ratio, exactly like reference) ── */}
-                  <div className="relative rounded-2xl overflow-hidden shadow-lg">
+                  {/* ── Image — full width, NO rounded corners, edge-to-edge ── */}
+                  <div className="relative overflow-hidden">
                     <div className="relative aspect-[4/3]">
                       {card.article?.image_url ? (
                         <Image
                           src={card.article.image_url}
                           alt={card.title}
                           fill
-                          className="object-cover transition-transform duration-[1.8s] ease-out group-hover:scale-105"
+                          className="object-cover transition-transform duration-[2s] ease-out group-hover:scale-105"
                           sizes="(max-width: 768px) 100vw, 720px"
                           unoptimized
                         />
                       ) : (
                         <div className="absolute inset-0 bg-gradient-to-br from-[#003048] to-[#001a2c]" />
                       )}
-                      {/* Subtle overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent" />
                     </div>
                   </div>
 
-                  {/* ── White Content Card below image (alphornsound.ch style) ── */}
-                  <div className="relative bg-white rounded-2xl px-8 sm:px-10 py-8 sm:py-10 mt-6 shadow-[0_10px_40px_-10px_rgba(0,48,72,0.1)] group-hover:shadow-[0_20px_50px_-10px_rgba(0,48,72,0.18)] transition-shadow duration-500">
-                    {/* Red accent line at top */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-[3px] bg-[#C12126] rounded-full" />
-
+                  {/* ── White content box — overlaps onto image bottom (exact reference style) ── */}
+                  <div className="relative bg-white mx-6 sm:mx-10 -mt-10 sm:-mt-14 px-8 sm:px-10 py-8 sm:py-10 shadow-[0_4px_30px_rgba(0,0,0,0.08)]">
                     <div className="text-center">
-                      {/* Badge */}
-                      <div className="flex justify-center mb-4">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.15em] ${card.badgeColor}`}>
-                          <card.BadgeIcon className="w-3 h-3" />
-                          {card.badge}
-                        </span>
-                      </div>
-
-                      <h3 className="font-heading text-xl sm:text-2xl font-bold text-navy mb-3 leading-tight group-hover:text-[#C12126] transition-colors duration-300">
+                      <h3 className="font-heading text-xl sm:text-2xl font-bold text-navy mb-3 leading-tight">
                         {card.title}
                       </h3>
 
-                      <p className="text-navy/50 text-sm leading-relaxed mb-6 line-clamp-3 max-w-sm mx-auto">
+                      <p className="text-navy/50 text-sm leading-relaxed mb-6 max-w-md mx-auto">
                         {card.excerpt}
                       </p>
 
-                      {/* Button — alphornsound.ch style */}
-                      <div className="inline-flex items-center gap-2 px-6 py-3 bg-navy text-white text-sm font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300 rounded-sm">
+                      {/* Solid rectangle button — exact reference style */}
+                      <div className="inline-flex items-center gap-2 px-7 py-3 bg-[#003048] text-white text-sm font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300">
                         <span>{card.btnLabel}</span>
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                       </div>
                     </div>
                   </div>
