@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
 import { getLocalizedField } from '@/lib/utils';
 import type { HeroSlide } from '@/types/database';
 
-const AUTOPLAY_INTERVAL = 6000;
+const AUTOPLAY_INTERVAL = 7200;
 
 // Fallback static slides when no data is loaded
 const fallbackSlides: HeroSlide[] = [

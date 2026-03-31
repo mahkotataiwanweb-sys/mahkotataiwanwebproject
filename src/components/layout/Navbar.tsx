@@ -72,7 +72,7 @@ export default function Navbar() {
   const isDarkHeaderPage = darkHeaderPages.some(
     (p) => pathname === `/${locale}${p}` || pathname.startsWith(`/${locale}${p}/`)
   );
-  const useLightText = !isScrolled && (isHomePage ? heroBrightness === 'dark' : isDarkHeaderPage);
+  const useLightText = !isScrolled && (isHomePage || isDarkHeaderPage);
 
   // Observe hero brightness
   useEffect(() => {
@@ -520,7 +520,7 @@ export default function Navbar() {
                 />
                 <Image src="/images/logo.png" alt="Mahkota Taiwan" width={80} height={80} priority
                   className={cn('relative w-16 h-16 sm:w-20 sm:h-20 transition-all duration-300 drop-shadow-lg',
-                    useLightText && 'brightness-0 invert')} />
+                    false && 'brightness-0 invert')} />
               </motion.div>
             </Link>
           </motion.div>
