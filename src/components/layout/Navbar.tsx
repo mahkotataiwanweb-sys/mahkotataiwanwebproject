@@ -1,19 +1,21 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, ChevronDown, Search, Package, ArrowRight } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import LanguageSwitcher from './LanguageSwitcher';
-import { cn, getLocalizedField } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
-import type { NavMenuItem, Product, Category } from '@/types/database';
+import type { NavMenuItem } from '@/types/database';
 
-// Fallback hardcoded nav items
+/* ------------------------------------------------------------------ */
+/*  Fallback nav structure                                             */
+/* ------------------------------------------------------------------ */
 interface FallbackNavLink { key: string; href: string; }
 interface FallbackNavItemSimple { type: 'link'; key: string; href: string; }
 interface FallbackNavItemDropdown { type: 'dropdown'; key: string; href: string; children: FallbackNavLink[]; }
@@ -44,128 +46,8 @@ const fallbackNavItems: FallbackNavItem[] = [
   { type: 'link', key: 'whereToBuy', href: '/where-to-buy' },
 ];
 
-const darkHeaderPages = ['/products', '/lifestyle', '/events', '/about', '/gallery', '/where-to-buy', '/contact'];
-
-/* ------------------------------------------------------------------ */
-/*  Navbar Search Dropdown                                             */
-/* ------------------------------------------------------------------ */
-function NavbarSearchDropdown({
-  products,
-  categories,
-  locale,
-  onClose,
-}: {
-  products: Product[];
-  categories: Category[];
-  locale: string;
-  onClose: () => void;
-}) {
-  const [query, setQuery] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
-
-  useEffect(() => {
-    // Focus search on mount
-    setTimeout(() => inputRef.current?.focus(), 100);
-  }, []);
-
-  const results = useMemo(() => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase().trim();
-    return products
-      .filter((p) => {
-        const name = getLocalizedField(p, 'name', locale).toLowerCase();
-        const nameEn = (p.name_en || '').toLowerCase();
-        const nameId = (p.name_id || '').toLowerCase();
-        const nameZh = (p.name_zh || '').toLowerCase();
-        return name.includes(q) || nameEn.includes(q) || nameId.includes(q) || nameZh.includes(q);
-      })
-      .slice(0, 6);
-  }, [query, products, locale]);
-
-  const getCategorySlug = useCallback((categoryId: string) => {
-    const cat = categories.find(c => c.id === categoryId);
-    return cat?.slug || '';
-  }, [categories]);
-
-  const getCategoryName = useCallback((categoryId: string) => {
-    const cat = categories.find(c => c.id === categoryId);
-    return cat ? getLocalizedField(cat, 'name', locale) : '';
-  }, [categories, locale]);
-
-  return (
-    <div className="py-3">
-      {/* Search Input */}
-      <div className="px-4 pb-3">
-        <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-cream/80 border border-navy/8">
-          <Search className="w-4 h-4 text-navy/30 shrink-0" />
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search products..."
-            className="flex-1 bg-transparent text-sm text-navy placeholder:text-navy/30 focus:outline-none"
-          />
-          {query && (
-            <button onClick={() => setQuery('')} className="p-0.5 rounded-full hover:bg-navy/5">
-              <X className="w-3 h-3 text-navy/30" />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Search Results */}
-      {query.trim() && (
-        <div className="border-t border-navy/5">
-          {results.length === 0 ? (
-            <div className="px-5 py-4 text-center">
-              <p className="text-navy/30 text-xs">No products found</p>
-            </div>
-          ) : (
-            <div className="py-1 max-h-[240px] overflow-y-auto">
-              {results.map((product) => {
-                const name = getLocalizedField(product, 'name', locale);
-                const catSlug = getCategorySlug(product.category_id);
-                const catName = getCategoryName(product.category_id);
-                return (
-                  <button
-                    key={product.id}
-                    onClick={() => {
-                      router.push(`/${locale}/products?category=${catSlug}`);
-                      onClose();
-                    }}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-cream/60 transition-colors text-left group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-cream/80 shrink-0 overflow-hidden flex items-center justify-center">
-                      {product.image_url ? (
-                        <Image src={product.image_url} alt={name} width={32} height={32} className="w-full h-full object-contain p-0.5" unoptimized />
-                      ) : (
-                        <Package className="w-3.5 h-3.5 text-navy/15" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-navy text-xs font-semibold truncate group-hover:text-red transition-colors">{name}</p>
-                      <p className="text-navy/35 text-[10px] mt-0.5">{catName}</p>
-                    </div>
-                    <ArrowRight className="w-3 h-3 text-navy/15 group-hover:text-red transition-all shrink-0" />
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Divider before categories */}
-      {!query.trim() && (
-        <div className="border-t border-navy/5 pt-1">
-          <p className="px-5 py-2 text-[10px] font-bold tracking-[0.15em] uppercase text-navy/25">Categories</p>
-        </div>
-      )}
-    </div>
-  );
-}
+// Pages with dark backgrounds where navbar needs light text
+const darkHeaderPages = ['/products', '/lifestyle', '/events', '/about', '/gallery', '/where-to-buy', '/contact', '/recipes'];
 
 /* ------------------------------------------------------------------ */
 /*  Main Navbar                                                        */
@@ -174,7 +56,6 @@ export default function Navbar() {
   const t = useTranslations('nav');
   const locale = useLocale();
   const pathname = usePathname();
-  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
@@ -186,10 +67,6 @@ export default function Navbar() {
   const [dbMenuItems, setDbMenuItems] = useState<NavMenuItem[]>([]);
   const [menuLoaded, setMenuLoaded] = useState(false);
   const [heroBrightness, setHeroBrightness] = useState<string>('dark');
-
-  // Products & categories for navbar search
-  const [navProducts, setNavProducts] = useState<Product[]>([]);
-  const [navCategories, setNavCategories] = useState<Category[]>([]);
 
   const isHomePage = pathname === `/${locale}` || pathname === `/${locale}/`;
   const isDarkHeaderPage = darkHeaderPages.some(
@@ -211,18 +88,12 @@ export default function Navbar() {
     return () => { observer.disconnect(); clearInterval(interval); };
   }, [isHomePage]);
 
-  // Fetch menus, products, categories
+  // Fetch menus
   useEffect(() => {
     async function fetchData() {
       try {
-        const [menusRes, prodsRes, catsRes] = await Promise.all([
-          supabase.from('navbar_menus').select('*').eq('is_active', true).order('sort_order'),
-          supabase.from('products').select('id,name_en,name_id,name_zh,slug,image_url,category_id').eq('is_active', true).order('sort_order', { ascending: true }),
-          supabase.from('categories').select('id,slug,name_en,name_id,name_zh').eq('is_active', true).order('sort_order', { ascending: true }),
-        ]);
+        const menusRes = await supabase.from('navbar_menus').select('*').eq('is_active', true).order('sort_order');
         if (menusRes.data && menusRes.data.length > 0) setDbMenuItems(menusRes.data as NavMenuItem[]);
-        if (prodsRes.data) setNavProducts(prodsRes.data as Product[]);
-        if (catsRes.data) setNavCategories(catsRes.data as Category[]);
       } catch {
         // keep fallback
       } finally {
@@ -265,8 +136,8 @@ export default function Navbar() {
   }, [lastScrollY]);
 
   useEffect(() => {
-    if (isMobileOpen) { document.body.style.overflow = 'hidden'; }
-    else { document.body.style.overflow = ''; }
+    if (isMobileOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
     return () => { document.body.style.overflow = ''; };
   }, [isMobileOpen]);
 
@@ -295,20 +166,51 @@ export default function Navbar() {
 
   const linkColor = (active: boolean) => {
     if (active) {
-      if (useLightText) return 'text-white font-bold border-b-2 border-white pb-0.5';
-      return 'text-navy font-bold border-b-2 border-red pb-0.5';
+      return useLightText
+        ? 'text-white font-bold border-b-2 border-white pb-0.5'
+        : 'text-navy font-bold border-b-2 border-red pb-0.5';
     }
-    if (useLightText) return 'text-white/90 hover:text-white';
-    return 'text-navy/80 hover:text-navy';
+    return useLightText ? 'text-white/90 hover:text-white' : 'text-navy/80 hover:text-navy';
   };
 
   const hamburgerColor = useLightText ? 'text-white' : 'text-navy';
   const useDbMenus = menuTree && menuTree.length > 0;
 
-  /* ===== Helper: Check if this is the "products" dropdown ===== */
-  const isProductsItem = (key: string, url?: string) => {
-    return key === 'products' || url === '/products';
-  };
+  /* ---- Products dropdown labels ---- */
+  const ourCollectionLabel = locale === 'id' ? 'Koleksi Kami' : locale === 'zh-TW' ? '我們的系列' : 'Our Collection';
+  const recipesLabel = locale === 'id' ? 'Resep' : locale === 'zh-TW' ? '食譜' : 'Recipes';
+
+  /* ===== RENDER PRODUCTS DROPDOWN (shared) ===== */
+  const renderProductsDropdownContent = (onLinkClick: () => void) => (
+    <div className="py-2">
+      <Link
+        href={buildHref('/products')}
+        onClick={onLinkClick}
+        className={cn(
+          'flex items-center gap-3 px-5 py-3 text-sm font-medium transition-all duration-200',
+          isLinkActive('/products') && !isLinkActive('/recipes')
+            ? 'text-red bg-red/5'
+            : 'text-navy/70 hover:text-navy hover:bg-cream/50'
+        )}
+      >
+        <span className="w-1.5 h-1.5 rounded-full bg-red/60" />
+        {ourCollectionLabel}
+      </Link>
+      <Link
+        href={buildHref('/recipes')}
+        onClick={onLinkClick}
+        className={cn(
+          'flex items-center gap-3 px-5 py-3 text-sm font-medium transition-all duration-200',
+          isLinkActive('/recipes')
+            ? 'text-red bg-red/5'
+            : 'text-navy/70 hover:text-navy hover:bg-cream/50'
+        )}
+      >
+        <span className="w-1.5 h-1.5 rounded-full bg-red/60" />
+        {recipesLabel}
+      </Link>
+    </div>
+  );
 
   /* ===== DB DESKTOP NAV ===== */
   const renderDbDesktopNav = () => {
@@ -339,7 +241,7 @@ export default function Navbar() {
         );
       }
 
-      // Products mega dropdown OR standard dropdown
+      // Products dropdown or standard dropdown
       return (
         <div key={item.id} className="relative"
           onMouseEnter={() => handleMouseEnter(item.id)}
@@ -359,60 +261,22 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.2 }}
-                className={cn(
-                  'absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden',
-                  isProducts ? 'min-w-[320px]' : 'min-w-[220px]'
-                )}
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden min-w-[220px]"
               >
-                {isProducts && (
-                  <NavbarSearchDropdown
-                    products={navProducts}
-                    categories={navCategories}
-                    locale={locale}
-                    onClose={() => setOpenDropdown(null)}
-                  />
-                )}
-
-                {/* Category links for products or regular children */}
-                <div className="py-1">
-                  {isProducts && navCategories.length > 0 ? (
-                    <>
-                      {navCategories.map((cat) => {
-                        const catName = getLocalizedField(cat, 'name', locale);
-                        return (
-                          <Link key={cat.id}
-                            href={`/${locale}/products?category=${cat.slug}`}
-                            onClick={() => setOpenDropdown(null)}
-                            className="block px-5 py-2.5 text-sm font-medium text-navy/70 hover:text-navy hover:bg-cream/50 transition-colors">
-                            {catName}
-                          </Link>
-                        );
-                      })}
-                      {/* Divider + child links (recipes etc) */}
-                      {item.children.length > 0 && (
-                        <div className="border-t border-navy/5 mt-1 pt-1">
-                          {item.children.map((child) => (
-                            <Link key={child.id} href={buildHref(child.url)}
-                              onClick={() => setOpenDropdown(null)}
-                              className={cn('block px-5 py-2.5 text-sm font-medium transition-colors',
-                                isLinkActive(child.url) ? 'text-red bg-red/5' : 'text-navy/70 hover:text-navy hover:bg-cream/50')}>
-                              {getLabel(child)}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    item.children.map((child) => (
+                {isProducts ? (
+                  renderProductsDropdownContent(() => setOpenDropdown(null))
+                ) : (
+                  <div className="py-1">
+                    {item.children.map((child) => (
                       <Link key={child.id} href={buildHref(child.url)}
                         onClick={() => setOpenDropdown(null)}
                         className={cn('block px-5 py-2.5 text-sm font-medium transition-colors',
                           isLinkActive(child.url) ? 'text-red bg-red/5' : 'text-navy/70 hover:text-navy hover:bg-cream/50')}>
                         {getLabel(child)}
                       </Link>
-                    ))
-                  )}
-                </div>
+                    ))}
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -458,35 +322,29 @@ export default function Navbar() {
                 exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }}
                 className="overflow-hidden flex flex-col items-center gap-3 mt-3">
 
-                {/* Mobile search for products */}
-                {isProducts && (
-                  <div className="w-72 mb-2">
-                    <MobileNavSearch products={navProducts} categories={navCategories} locale={locale}
-                      onNavigate={(href) => { router.push(href); setIsMobileOpen(false); }} />
-                  </div>
-                )}
-
-                {/* Category links for products */}
-                {isProducts && navCategories.map((cat) => {
-                  const catName = getLocalizedField(cat, 'name', locale);
-                  return (
-                    <Link key={cat.id} href={`/${locale}/products?category=${cat.slug}`}
-                      onClick={() => setIsMobileOpen(false)}
-                      className="text-xl font-medium text-navy/60 hover:text-red transition-colors">
-                      {catName}
+                {isProducts ? (
+                  <>
+                    <Link href={buildHref('/products')} onClick={() => setIsMobileOpen(false)}
+                      className={cn('text-xl font-medium transition-colors',
+                        isLinkActive('/products') && !isLinkActive('/recipes') ? 'text-red' : 'text-navy/60 hover:text-red')}>
+                      {ourCollectionLabel}
                     </Link>
-                  );
-                })}
-
-                {/* Regular children */}
-                {item.children.map((child) => (
-                  <Link key={child.id} href={buildHref(child.url)}
-                    onClick={() => setIsMobileOpen(false)}
-                    className={cn('text-xl font-medium transition-colors',
-                      isLinkActive(child.url) ? 'text-red' : 'text-navy/60 hover:text-red')}>
-                    {getLabel(child)}
-                  </Link>
-                ))}
+                    <Link href={buildHref('/recipes')} onClick={() => setIsMobileOpen(false)}
+                      className={cn('text-xl font-medium transition-colors',
+                        isLinkActive('/recipes') ? 'text-red' : 'text-navy/60 hover:text-red')}>
+                      {recipesLabel}
+                    </Link>
+                  </>
+                ) : (
+                  item.children.map((child) => (
+                    <Link key={child.id} href={buildHref(child.url)}
+                      onClick={() => setIsMobileOpen(false)}
+                      className={cn('text-xl font-medium transition-colors',
+                        isLinkActive(child.url) ? 'text-red' : 'text-navy/60 hover:text-red')}>
+                      {getLabel(child)}
+                    </Link>
+                  ))
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -536,51 +394,22 @@ export default function Navbar() {
             {openDropdown === item.key && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }} transition={{ duration: 0.2 }}
-                className={cn('absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden',
-                  isProducts ? 'min-w-[320px]' : 'min-w-[220px]')}>
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white rounded-xl shadow-lg border border-navy/5 overflow-hidden min-w-[220px]">
 
-                {isProducts && (
-                  <NavbarSearchDropdown products={navProducts} categories={navCategories} locale={locale}
-                    onClose={() => setOpenDropdown(null)} />
-                )}
-
-                <div className="py-1">
-                  {isProducts && navCategories.length > 0 ? (
-                    <>
-                      {navCategories.map((cat) => {
-                        const catName = getLocalizedField(cat, 'name', locale);
-                        return (
-                          <Link key={cat.id} href={`/${locale}/products?category=${cat.slug}`}
-                            onClick={() => setOpenDropdown(null)}
-                            className="block px-5 py-2.5 text-sm font-medium text-navy/70 hover:text-navy hover:bg-cream/50 transition-colors">
-                            {catName}
-                          </Link>
-                        );
-                      })}
-                      {item.children.length > 0 && (
-                        <div className="border-t border-navy/5 mt-1 pt-1">
-                          {item.children.map((child) => (
-                            <Link key={child.key} href={buildHref(child.href)}
-                              onClick={() => setOpenDropdown(null)}
-                              className={cn('block px-5 py-2.5 text-sm font-medium transition-colors',
-                                isLinkActive(child.href) ? 'text-red bg-red/5' : 'text-navy/70 hover:text-navy hover:bg-cream/50')}>
-                              {t(child.key)}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    item.children.map((child) => (
+                {isProducts ? (
+                  renderProductsDropdownContent(() => setOpenDropdown(null))
+                ) : (
+                  <div className="py-1">
+                    {item.children.map((child) => (
                       <Link key={child.key} href={buildHref(child.href)}
                         onClick={() => setOpenDropdown(null)}
                         className={cn('block px-5 py-2.5 text-sm font-medium transition-colors',
                           isLinkActive(child.href) ? 'text-red bg-red/5' : 'text-navy/70 hover:text-navy hover:bg-cream/50')}>
                         {t(child.key)}
                       </Link>
-                    ))
-                  )}
-                </div>
+                    ))}
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -623,32 +452,29 @@ export default function Navbar() {
                 exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }}
                 className="overflow-hidden flex flex-col items-center gap-3 mt-3">
 
-                {isProducts && (
-                  <div className="w-72 mb-2">
-                    <MobileNavSearch products={navProducts} categories={navCategories} locale={locale}
-                      onNavigate={(href) => { router.push(href); setIsMobileOpen(false); }} />
-                  </div>
-                )}
-
-                {isProducts && navCategories.map((cat) => {
-                  const catName = getLocalizedField(cat, 'name', locale);
-                  return (
-                    <Link key={cat.id} href={`/${locale}/products?category=${cat.slug}`}
-                      onClick={() => setIsMobileOpen(false)}
-                      className="text-xl font-medium text-navy/60 hover:text-red transition-colors">
-                      {catName}
+                {isProducts ? (
+                  <>
+                    <Link href={buildHref('/products')} onClick={() => setIsMobileOpen(false)}
+                      className={cn('text-xl font-medium transition-colors',
+                        isLinkActive('/products') && !isLinkActive('/recipes') ? 'text-red' : 'text-navy/60 hover:text-red')}>
+                      {ourCollectionLabel}
                     </Link>
-                  );
-                })}
-
-                {item.children.map((child) => (
-                  <Link key={child.key} href={buildHref(child.href)}
-                    onClick={() => setIsMobileOpen(false)}
-                    className={cn('text-xl font-medium transition-colors',
-                      isLinkActive(child.href) ? 'text-red' : 'text-navy/60 hover:text-red')}>
-                    {t(child.key)}
-                  </Link>
-                ))}
+                    <Link href={buildHref('/recipes')} onClick={() => setIsMobileOpen(false)}
+                      className={cn('text-xl font-medium transition-colors',
+                        isLinkActive('/recipes') ? 'text-red' : 'text-navy/60 hover:text-red')}>
+                      {recipesLabel}
+                    </Link>
+                  </>
+                ) : (
+                  item.children.map((child) => (
+                    <Link key={child.key} href={buildHref(child.href)}
+                      onClick={() => setIsMobileOpen(false)}
+                      className={cn('text-xl font-medium transition-colors',
+                        isLinkActive(child.href) ? 'text-red' : 'text-navy/60 hover:text-red')}>
+                      {t(child.key)}
+                    </Link>
+                  ))
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -724,67 +550,5 @@ export default function Navbar() {
         )}
       </AnimatePresence>
     </>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Mobile Nav Search (simple inline)                                  */
-/* ------------------------------------------------------------------ */
-function MobileNavSearch({
-  products,
-  categories,
-  locale,
-  onNavigate,
-}: {
-  products: Product[];
-  categories: Category[];
-  locale: string;
-  onNavigate: (href: string) => void;
-}) {
-  const [query, setQuery] = useState('');
-
-  const results = useMemo(() => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase().trim();
-    return products
-      .filter((p) => {
-        const name = getLocalizedField(p, 'name', locale).toLowerCase();
-        const nameEn = (p.name_en || '').toLowerCase();
-        const nameId = (p.name_id || '').toLowerCase();
-        const nameZh = (p.name_zh || '').toLowerCase();
-        return name.includes(q) || nameEn.includes(q) || nameId.includes(q) || nameZh.includes(q);
-      })
-      .slice(0, 5);
-  }, [query, products, locale]);
-
-  const getCategorySlug = useCallback((categoryId: string) => {
-    const cat = categories.find(c => c.id === categoryId);
-    return cat?.slug || '';
-  }, [categories]);
-
-  return (
-    <div>
-      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white border border-navy/10">
-        <Search className="w-4 h-4 text-navy/30" />
-        <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search products..."
-          className="flex-1 bg-transparent text-sm text-navy placeholder:text-navy/30 focus:outline-none" />
-      </div>
-      {query.trim() && results.length > 0 && (
-        <div className="mt-2 rounded-xl bg-white border border-navy/8 overflow-hidden">
-          {results.map((product) => {
-            const name = getLocalizedField(product, 'name', locale);
-            const catSlug = getCategorySlug(product.category_id);
-            return (
-              <button key={product.id}
-                onClick={() => onNavigate(`/${locale}/products?category=${catSlug}`)}
-                className="w-full px-4 py-2.5 text-left text-sm text-navy/70 hover:text-red hover:bg-cream/50 transition-colors truncate">
-                {name}
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </div>
   );
 }

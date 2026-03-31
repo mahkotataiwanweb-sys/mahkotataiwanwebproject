@@ -6,7 +6,7 @@ import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChevronDown, X, Search } from 'lucide-react';
+import { ChevronDown, X } from 'lucide-react';
 import CategoryIcon from '@/components/ui/CategoryIcon';
 import { supabase } from '@/lib/supabase';
 
@@ -81,153 +81,6 @@ function getProductName(p: ShowcaseProduct, locale: string): string {
   if (locale === 'zh-TW' && p.name_zh) return p.name_zh;
   if (locale === 'id' && p.name_id) return p.name_id;
   return p.name;
-}
-
-/* ------------------------------------------------------------------ */
-/*  Smart Product Search                                               */
-/* ------------------------------------------------------------------ */
-function SmartSearch({
-  allProducts,
-  categories,
-  locale,
-  onSelectProduct,
-  onSelectCategory,
-}: {
-  allProducts: ShowcaseProduct[];
-  categories: CategoryData[];
-  locale: string;
-  onSelectProduct: (p: ShowcaseProduct) => void;
-  onSelectCategory: (slug: string) => void;
-}) {
-  const [query, setQuery] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-
-  const results = useMemo(() => {
-    if (!query.trim() || query.length < 1) return [];
-    const q = query.toLowerCase();
-    return allProducts.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        (p.name_zh && p.name_zh.toLowerCase().includes(q)) ||
-        (p.name_id && p.name_id.toLowerCase().includes(q))
-    );
-  }, [query, allProducts]);
-
-  const grouped = useMemo(() => {
-    const groups: Record<string, ShowcaseProduct[]> = {};
-    results.forEach((p) => {
-      if (!groups[p.category]) groups[p.category] = [];
-      groups[p.category].push(p);
-    });
-    return groups;
-  }, [results]);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const placeholderText = locale === 'id'
-    ? 'Cari produk di semua kategori...'
-    : locale === 'zh-TW'
-    ? '搜尋所有類別的產品...'
-    : 'Search products across all categories...';
-
-  return (
-    <div ref={wrapperRef} className="relative w-full max-w-lg mx-auto mb-6 sm:mb-8 px-4">
-      <div className="relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-red/20 via-red/10 to-red/20 rounded-full blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
-        <div className="relative flex items-center">
-          <Search className="absolute left-5 w-4 h-4 text-navy/30 z-10 pointer-events-none" />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setIsOpen(e.target.value.length > 0);
-            }}
-            onFocus={() => query.length > 0 && setIsOpen(true)}
-            placeholder={placeholderText}
-            className="w-full pl-12 pr-5 py-3.5 rounded-full bg-cream/80 backdrop-blur-md text-navy text-sm font-medium shadow-[0_4px_30px_rgba(0,0,0,0.06)] border border-white/60 focus:outline-none focus:ring-2 focus:ring-red/20 focus:border-red/20 focus:shadow-[0_4px_40px_rgba(200,50,50,0.08)] transition-all duration-300 placeholder:text-navy/25"
-          />
-          {query && (
-            <button
-              onClick={() => { setQuery(''); setIsOpen(false); }}
-              className="absolute right-4 w-5 h-5 rounded-full bg-navy/10 hover:bg-navy/20 flex items-center justify-center transition-colors"
-            >
-              <X className="w-3 h-3 text-navy/50" />
-            </button>
-          )}
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {isOpen && results.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.97 }}
-            transition={{ duration: 0.2, ease: [0.25, 0.8, 0.25, 1] }}
-            className="absolute top-full mt-2 left-4 right-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.12)] overflow-hidden z-30 max-h-80 overflow-y-auto border border-white/80"
-          >
-            {Object.entries(grouped).map(([catSlug, prods]) => {
-              const cat = categories.find((c) => c.slug === catSlug);
-              const catName = cat ? getCategoryName(cat, locale) : catSlug;
-              return (
-                <div key={catSlug}>
-                  <div className="px-5 py-2 text-[10px] font-bold text-navy/30 uppercase tracking-[0.2em] bg-gradient-to-r from-cream/60 to-transparent flex items-center gap-2">
-                    {cat && <CategoryIcon slug={cat.slug} size={12} className="opacity-40" />}
-                    {catName}
-                  </div>
-                  {prods.map((p) => (
-                    <button
-                      key={p.id}
-                      onClick={() => {
-                        onSelectCategory(catSlug);
-                        setTimeout(() => onSelectProduct(p), 150);
-                        setIsOpen(false);
-                        setQuery('');
-                      }}
-                      className="w-full flex items-center gap-4 px-5 py-3 hover:bg-gradient-to-r hover:from-red/[0.04] hover:to-transparent transition-all duration-200 text-left group/item"
-                    >
-                      {p.image_url && (
-                        <div className="w-11 h-11 relative flex-shrink-0 rounded-xl overflow-hidden bg-cream/50">
-                          <Image src={p.image_url} alt="" fill className="object-contain p-1 group-hover/item:scale-110 transition-transform duration-300" sizes="44px" unoptimized />
-                        </div>
-                      )}
-                      <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-navy group-hover/item:text-red transition-colors duration-200">
-                          {getProductName(p, locale)}
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              );
-            })}
-          </motion.div>
-        )}
-        {isOpen && query.length > 0 && results.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            className="absolute top-full mt-2 left-4 right-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.12)] p-8 text-center z-30 border border-white/80"
-          >
-            <p className="text-navy/30 text-sm font-medium">
-              {locale === 'id' ? 'Produk tidak ditemukan' : locale === 'zh-TW' ? '找不到產品' : 'No products found'}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -745,15 +598,6 @@ export default function ProductCatalogSection() {
               {locale === 'id' ? 'Cita Rasa Indonesia, di Taiwan.' : locale === 'zh-TW' ? '印尼風味，在台灣。' : 'Indonesian Taste, in Taiwan.'}
             </p>
           </div>
-
-          {/* Smart Search */}
-          <SmartSearch
-            allProducts={allProducts}
-            categories={categories}
-            locale={locale}
-            onSelectProduct={setSelectedProduct}
-            onSelectCategory={setSelectedCategory}
-          />
 
           {/* Category Dropdown */}
           <div className="flex justify-center mb-6 sm:mb-10 px-4">
