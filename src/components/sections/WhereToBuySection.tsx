@@ -241,7 +241,23 @@ export default function WhereToBuySection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="bg-cream py-20 md:py-28 overflow-hidden">
+    <section ref={sectionRef} className="bg-cream py-20 md:py-28 overflow-hidden relative">
+      
+        {/* Wavy texture background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="wavy-wtb" x="0" y="0" width="180" height="30" patternUnits="userSpaceOnUse">
+                <path d="M0,15 Q30,7 45,15 T90,15 Q120,23 135,15 T180,15" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="1.5" />
+              </pattern>
+              <pattern id="wavy-wtb-2" x="40" y="7" width="220" height="35" patternUnits="userSpaceOnUse">
+                <path d="M0,17.5 Q40,11.5 55,17.5 T110,17.5 Q150,23.5 165,17.5 T220,17.5" fill="none" stroke="rgba(0,0,0,0.05)" strokeWidth="1.2" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#wavy-wtb)" />
+            <rect width="100%" height="100%" fill="url(#wavy-wtb-2)" />
+          </svg>
+        </div>
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-12">
