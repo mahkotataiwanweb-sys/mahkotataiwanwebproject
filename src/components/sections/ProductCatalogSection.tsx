@@ -1,12 +1,12 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChevronDown, X } from 'lucide-react';
+import { ChevronDown, X, Search } from 'lucide-react';
 import CategoryIcon from '@/components/ui/CategoryIcon';
 import { supabase } from '@/lib/supabase';
 
@@ -50,44 +50,15 @@ interface CategoryData {
 /* ------------------------------------------------------------------ */
 function WavyTextureBackground() {
   const rowHeight = 30;
-
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <svg
-        className="absolute inset-0 w-full h-full"
-        preserveAspectRatio="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <pattern
-            id="wavy-static"
-            x="0"
-            y="0"
-            width="180"
-            height={rowHeight}
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              d={`M0,${rowHeight / 2} Q30,${rowHeight / 2 - 8} 45,${rowHeight / 2} T90,${rowHeight / 2} Q120,${rowHeight / 2 + 8} 135,${rowHeight / 2} T180,${rowHeight / 2}`}
-              fill="none"
-              stroke="rgba(0,0,0,0.08)"
-              strokeWidth="1.5"
-            />
+          <pattern id="wavy-static" x="0" y="0" width="180" height={rowHeight} patternUnits="userSpaceOnUse">
+            <path d={`M0,${rowHeight/2} Q30,${rowHeight/2-8} 45,${rowHeight/2} T90,${rowHeight/2} Q120,${rowHeight/2+8} 135,${rowHeight/2} T180,${rowHeight/2}`} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="1.5" />
           </pattern>
-          <pattern
-            id="wavy-static-2"
-            x="40"
-            y="7"
-            width="220"
-            height={rowHeight + 5}
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              d={`M0,${(rowHeight + 5) / 2} Q40,${(rowHeight + 5) / 2 - 6} 55,${(rowHeight + 5) / 2} T110,${(rowHeight + 5) / 2} Q150,${(rowHeight + 5) / 2 + 6} 165,${(rowHeight + 5) / 2} T220,${(rowHeight + 5) / 2}`}
-              fill="none"
-              stroke="rgba(0,0,0,0.05)"
-              strokeWidth="1.2"
-            />
+          <pattern id="wavy-static-2" x="40" y="7" width="220" height={rowHeight+5} patternUnits="userSpaceOnUse">
+            <path d={`M0,${(rowHeight+5)/2} Q40,${(rowHeight+5)/2-6} 55,${(rowHeight+5)/2} T110,${(rowHeight+5)/2} Q150,${(rowHeight+5)/2+6} 165,${(rowHeight+5)/2} T220,${(rowHeight+5)/2}`} fill="none" stroke="rgba(0,0,0,0.05)" strokeWidth="1.2" />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#wavy-static)" />
@@ -98,7 +69,7 @@ function WavyTextureBackground() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Helper: Get localized category name                                */
+/*  Helper: Get localized name                                         */
 /* ------------------------------------------------------------------ */
 function getCategoryName(cat: CategoryData, locale: string): string {
   if (locale === 'zh-TW' && cat.name_zh) return cat.name_zh;
@@ -106,8 +77,161 @@ function getCategoryName(cat: CategoryData, locale: string): string {
   return cat.name_en;
 }
 
+function getProductName(p: ShowcaseProduct, locale: string): string {
+  if (locale === 'zh-TW' && p.name_zh) return p.name_zh;
+  if (locale === 'id' && p.name_id) return p.name_id;
+  return p.name;
+}
+
 /* ------------------------------------------------------------------ */
-/*  Product Popup                                                      */
+/*  Smart Product Search                                               */
+/* ------------------------------------------------------------------ */
+function SmartSearch({
+  allProducts,
+  categories,
+  locale,
+  onSelectProduct,
+  onSelectCategory,
+}: {
+  allProducts: ShowcaseProduct[];
+  categories: CategoryData[];
+  locale: string;
+  onSelectProduct: (p: ShowcaseProduct) => void;
+  onSelectCategory: (slug: string) => void;
+}) {
+  const [query, setQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const results = useMemo(() => {
+    if (!query.trim() || query.length < 1) return [];
+    const q = query.toLowerCase();
+    return allProducts.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        (p.name_zh && p.name_zh.toLowerCase().includes(q)) ||
+        (p.name_id && p.name_id.toLowerCase().includes(q))
+    );
+  }, [query, allProducts]);
+
+  const grouped = useMemo(() => {
+    const groups: Record<string, ShowcaseProduct[]> = {};
+    results.forEach((p) => {
+      if (!groups[p.category]) groups[p.category] = [];
+      groups[p.category].push(p);
+    });
+    return groups;
+  }, [results]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const placeholderText = locale === 'id'
+    ? 'Cari produk di semua kategori...'
+    : locale === 'zh-TW'
+    ? '搜尋所有類別的產品...'
+    : 'Search products across all categories...';
+
+  return (
+    <div ref={wrapperRef} className="relative w-full max-w-lg mx-auto mb-6 sm:mb-8 px-4">
+      <div className="relative group">
+        <div className="absolute -inset-1 bg-gradient-to-r from-red/20 via-red/10 to-red/20 rounded-full blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
+        <div className="relative flex items-center">
+          <Search className="absolute left-5 w-4 h-4 text-navy/30 z-10 pointer-events-none" />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setIsOpen(e.target.value.length > 0);
+            }}
+            onFocus={() => query.length > 0 && setIsOpen(true)}
+            placeholder={placeholderText}
+            className="w-full pl-12 pr-5 py-3.5 rounded-full bg-cream/80 backdrop-blur-md text-navy text-sm font-medium shadow-[0_4px_30px_rgba(0,0,0,0.06)] border border-white/60 focus:outline-none focus:ring-2 focus:ring-red/20 focus:border-red/20 focus:shadow-[0_4px_40px_rgba(200,50,50,0.08)] transition-all duration-300 placeholder:text-navy/25"
+          />
+          {query && (
+            <button
+              onClick={() => { setQuery(''); setIsOpen(false); }}
+              className="absolute right-4 w-5 h-5 rounded-full bg-navy/10 hover:bg-navy/20 flex items-center justify-center transition-colors"
+            >
+              <X className="w-3 h-3 text-navy/50" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {isOpen && results.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.97 }}
+            transition={{ duration: 0.2, ease: [0.25, 0.8, 0.25, 1] }}
+            className="absolute top-full mt-2 left-4 right-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.12)] overflow-hidden z-30 max-h-80 overflow-y-auto border border-white/80"
+          >
+            {Object.entries(grouped).map(([catSlug, prods]) => {
+              const cat = categories.find((c) => c.slug === catSlug);
+              const catName = cat ? getCategoryName(cat, locale) : catSlug;
+              return (
+                <div key={catSlug}>
+                  <div className="px-5 py-2 text-[10px] font-bold text-navy/30 uppercase tracking-[0.2em] bg-gradient-to-r from-cream/60 to-transparent flex items-center gap-2">
+                    {cat && <CategoryIcon slug={cat.slug} size={12} className="opacity-40" />}
+                    {catName}
+                  </div>
+                  {prods.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => {
+                        onSelectCategory(catSlug);
+                        setTimeout(() => onSelectProduct(p), 150);
+                        setIsOpen(false);
+                        setQuery('');
+                      }}
+                      className="w-full flex items-center gap-4 px-5 py-3 hover:bg-gradient-to-r hover:from-red/[0.04] hover:to-transparent transition-all duration-200 text-left group/item"
+                    >
+                      {p.image_url && (
+                        <div className="w-11 h-11 relative flex-shrink-0 rounded-xl overflow-hidden bg-cream/50">
+                          <Image src={p.image_url} alt="" fill className="object-contain p-1 group-hover/item:scale-110 transition-transform duration-300" sizes="44px" unoptimized />
+                        </div>
+                      )}
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold text-navy group-hover/item:text-red transition-colors duration-200">
+                          {getProductName(p, locale)}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              );
+            })}
+          </motion.div>
+        )}
+        {isOpen && query.length > 0 && results.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="absolute top-full mt-2 left-4 right-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.12)] p-8 text-center z-30 border border-white/80"
+          >
+            <p className="text-navy/30 text-sm font-medium">
+              {locale === 'id' ? 'Produk tidak ditemukan' : locale === 'zh-TW' ? '找不到產品' : 'No products found'}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Premium Product Popup — Pinterest-inspired                         */
 /* ------------------------------------------------------------------ */
 function ProductPopup({
   product,
@@ -120,12 +244,7 @@ function ProductPopup({
   categories: CategoryData[];
   onClose: () => void;
 }) {
-  const getName = () => {
-    if (locale === 'zh-TW' && product.name_zh) return product.name_zh;
-    if (locale === 'id' && product.name_id) return product.name_id;
-    return product.name;
-  };
-
+  const name = getProductName(product, locale);
   const getDesc = () => {
     if (locale === 'zh-TW' && product.description_zh) return product.description_zh;
     if (locale === 'id' && product.description_id) return product.description_id;
@@ -135,6 +254,11 @@ function ProductPopup({
   const categoryMatch = categories.find((c) => c.slug === product.category);
   const categoryLabel = categoryMatch ? getCategoryName(categoryMatch, locale) : product.category;
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -143,47 +267,94 @@ function ProductPopup({
       exit={{ opacity: 0 }}
       onClick={onClose}
     >
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-
+      {/* Backdrop with deep blur */}
       <motion.div
-        className="relative bg-cream rounded-3xl overflow-hidden max-w-md w-full shadow-2xl"
-        initial={{ scale: 0.85, y: 40, opacity: 0 }}
-        animate={{ scale: 1, y: 0, opacity: 1 }}
+        className="absolute inset-0 bg-navy/60 backdrop-blur-xl"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      />
+
+      {/* Card */}
+      <motion.div
+        className="relative bg-cream rounded-[2rem] overflow-hidden max-w-md w-full shadow-[0_40px_100px_rgba(0,0,0,0.3)]"
+        initial={{ scale: 0.8, y: 60, opacity: 0, rotateX: 12 }}
+        animate={{ scale: 1, y: 0, opacity: 1, rotateX: 0 }}
         exit={{ scale: 0.85, y: 40, opacity: 0 }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        transition={{ type: 'spring', damping: 28, stiffness: 280 }}
         onClick={(e) => e.stopPropagation()}
+        style={{ perspective: '1200px' }}
       >
+        {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-navy/10 hover:bg-navy/20 flex items-center justify-center transition-colors"
+          className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-white/15 backdrop-blur-md hover:bg-white/30 flex items-center justify-center transition-all duration-300 shadow-lg group"
         >
-          <X className="w-4 h-4 text-navy" />
+          <X className="w-4 h-4 text-white group-hover:rotate-90 transition-transform duration-300" />
         </button>
 
-        <div className={`relative w-full h-72 flex items-center justify-center overflow-hidden ${product.detail_image_url ? 'bg-[#0c1929]' : 'bg-gradient-to-br from-red/10 to-red/5'}`}>
+        {/* Image area — full bleed, dramatic */}
+        <div className={`relative aspect-square overflow-hidden ${product.detail_image_url ? 'bg-[#0a1628]' : 'bg-gradient-to-br from-cream-dark to-cream'}`}>
           {(product.detail_image_url || product.image_url) ? (
-            <Image
-              src={product.detail_image_url || product.image_url || ''}
-              alt={getName()}
-              fill
-              className={product.detail_image_url ? "object-contain p-4" : "object-contain p-6"}
-              sizes="(max-width: 448px) 100vw, 448px"
-              unoptimized
-            />
+            <>
+              <Image
+                src={product.detail_image_url || product.image_url || ''}
+                alt={name}
+                fill
+                className={`${product.detail_image_url ? 'object-contain p-6' : 'object-contain p-10'}`}
+                sizes="(max-width: 448px) 100vw, 448px"
+                unoptimized
+              />
+              {/* Subtle vignette */}
+              <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.2)] pointer-events-none" />
+            </>
           ) : (
-            <div className="w-32 h-32 rounded-full bg-red/10 flex items-center justify-center">
-              <span className="text-4xl">🍽️</span>
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="text-7xl opacity-20">🍽️</span>
             </div>
           )}
+
+          {/* Bottom gradient fade */}
+          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-cream via-cream/80 to-transparent" />
+
+          {/* Category pill on image */}
+          <motion.span
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="absolute top-5 left-5 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.15em] uppercase text-white/90 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10"
+          >
+            {categoryMatch && <CategoryIcon slug={categoryMatch.slug} size={12} className="opacity-80" />}
+            {categoryLabel}
+          </motion.span>
         </div>
 
-        <div className="p-6 pt-5">
-          <span className="inline-flex items-center gap-1.5 text-red/70 text-xs font-semibold tracking-wider uppercase mb-2">
-            {categoryMatch && <CategoryIcon slug={categoryMatch.slug} size={14} className="opacity-70" />}
-            {categoryLabel}
-          </span>
-          <h3 className="font-heading text-2xl font-bold text-navy mb-3">{getName()}</h3>
-          <p className="text-navy/60 text-sm leading-relaxed">{getDesc()}</p>
+        {/* Content */}
+        <div className="relative -mt-10 px-7 pb-8">
+          <motion.h3
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.5 }}
+            className="font-heading text-2xl sm:text-3xl font-bold text-navy mb-3 leading-tight"
+          >
+            {name}
+          </motion.h3>
+
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: 0.25, duration: 0.4 }}
+            className="w-12 h-[2px] bg-gradient-to-r from-red to-red/20 mb-4 origin-left rounded-full"
+          />
+
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="text-navy/55 text-sm leading-relaxed font-body"
+          >
+            {getDesc()}
+          </motion.p>
         </div>
       </motion.div>
     </motion.div>
@@ -191,7 +362,7 @@ function ProductPopup({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Infinite Carousel Slider — Fixed & Improved                        */
+/*  Infinite Carousel Slider                                           */
 /* ------------------------------------------------------------------ */
 function InfiniteSlider({
   products,
@@ -205,7 +376,7 @@ function InfiniteSlider({
   const trackRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);
   const velocityRef = useRef(0);
-  const baseDirectionRef = useRef(1); // 1 = right (default), -1 = left
+  const baseDirectionRef = useRef(1);
   const isDraggingRef = useRef(false);
   const isPausedRef = useRef(false);
   const lastPointerXRef = useRef(0);
@@ -220,8 +391,7 @@ function InfiniteSlider({
   const centerDwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const floatReadyRef = useRef(false);
 
-  // --- Tuning ---
-  const DEFAULT_SPEED = 0.8; // slower, more elegant
+  const DEFAULT_SPEED = 0.8;
   const FRICTION = 0.92;
   const RETURN_RATE = 0.02;
   const ITEM_WIDTH_MOBILE = 160;
@@ -235,20 +405,12 @@ function InfiniteSlider({
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  // Triple the items for seamless loop
   const items = [...products, ...products, ...products];
-
-  const getName = (p: ShowcaseProduct) => {
-    if (locale === 'zh-TW' && p.name_zh) return p.name_zh;
-    if (locale === 'id' && p.name_id) return p.name_id;
-    return p.name;
-  };
 
   const measureSetWidth = useCallback(() => {
     singleSetWidthRef.current = products.length * itemWidth;
   }, [products.length, itemWidth]);
 
-  // Apply scale + float based on exact center distance
   const applyItemTransforms = useCallback(() => {
     const container = containerRef.current;
     const track = trackRef.current;
@@ -271,59 +433,42 @@ function InfiniteSlider({
       const childCenter = rect.left + rect.width / 2;
       const dist = Math.abs(childCenter - centerX);
       const maxDist = containerRect.width * 0.5;
-
-      // Normalized 0 → 1 (1 = at center)
       const proximity = Math.max(0, 1 - dist / maxDist);
 
-      // Scale: far = 0.4, center = 1.5 (dramatic jump)
-      const scale = 0.4 + proximity * proximity * 1.1; // quadratic for dramatic center pop
+      const scale = 0.4 + proximity * proximity * 1.1;
       const opacity = 0.25 + proximity * 0.75;
 
       imgContainer.style.transform = `scale(${scale})`;
       imgContainer.style.opacity = `${opacity}`;
       imgContainer.style.transition = 'transform 0.35s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease';
 
-      // Name styling
       nameEl.style.opacity = `${0.2 + proximity * 0.8}`;
       nameEl.style.transform = `scale(${0.85 + proximity * 0.25})`;
       nameEl.style.color = `rgba(0,48,72,${0.3 + proximity * 0.7})`;
       nameEl.style.transition = 'all 0.35s ease';
 
-      // Track closest for float
       if (dist < closestDist) {
         closestDist = dist;
         closestIdx = i % products.length;
       }
 
-      // Center threshold: within half an item width
       const isCentered = dist < itemWidth * 0.35;
-
       if (isCentered) {
         imgContainer.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.5))';
-        // Only apply float if dwell time passed
         if (floatReadyRef.current && closestIdx === prevCenterIdxRef.current) {
           imgContainer.classList.add('product-float-active');
         }
       } else {
         imgContainer.classList.remove('product-float-active');
-        imgContainer.style.filter = 'none';
+        imgContainer.style.filter = 'drop-shadow(0 8px 16px rgba(0,0,0,0.15))';
       }
     }
 
-    // Detect center change → start dwell timer
     if (closestIdx !== prevCenterIdxRef.current) {
       prevCenterIdxRef.current = closestIdx;
       floatReadyRef.current = false;
-
-      // Clear previous timer
-      if (centerDwellTimerRef.current) {
-        clearTimeout(centerDwellTimerRef.current);
-      }
-
-      // Start new 0.5s dwell timer — float only after 500ms at center
-      centerDwellTimerRef.current = setTimeout(() => {
-        floatReadyRef.current = true;
-      }, 500);
+      if (centerDwellTimerRef.current) clearTimeout(centerDwellTimerRef.current);
+      centerDwellTimerRef.current = setTimeout(() => { floatReadyRef.current = true; }, 500);
     }
   }, [products.length, itemWidth]);
 
@@ -335,7 +480,6 @@ function InfiniteSlider({
     const targetSpeed = DEFAULT_SPEED * baseDirectionRef.current;
 
     if (!isDraggingRef.current && !isPausedRef.current) {
-      // Gradually return to base speed
       velocityRef.current += (targetSpeed - velocityRef.current) * RETURN_RATE;
       const excess = velocityRef.current - targetSpeed;
       if (Math.abs(excess) > 0.01) {
@@ -352,21 +496,18 @@ function InfiniteSlider({
       offsetRef.current += velocityRef.current;
     }
 
-    // Seamless wrapping
     if (setWidth > 0) {
       while (offsetRef.current < -setWidth) offsetRef.current += setWidth;
       while (offsetRef.current > 0) offsetRef.current -= setWidth;
     }
 
     track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
-
     applyItemTransforms();
     rafRef.current = requestAnimationFrame(animate);
   }, [applyItemTransforms]);
 
   useEffect(() => {
     measureSetWidth();
-    // Start with initial velocity
     velocityRef.current = DEFAULT_SPEED * baseDirectionRef.current;
     rafRef.current = requestAnimationFrame(animate);
     const handleResize = () => measureSetWidth();
@@ -378,9 +519,7 @@ function InfiniteSlider({
     };
   }, [animate, measureSetWidth]);
 
-  useEffect(() => {
-    setTimeout(measureSetWidth, 100);
-  }, [products, measureSetWidth]);
+  useEffect(() => { setTimeout(measureSetWidth, 100); }, [products, measureSetWidth]);
 
   const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     isDraggingRef.current = true;
@@ -399,7 +538,6 @@ function InfiniteSlider({
     const dx = e.clientX - lastPointerXRef.current;
     const dt = now - lastMoveTimeRef.current;
     if (dt > 0) dragVelocityRef.current = (dx / dt) * 16;
-
     dragDistRef.current += Math.abs(dx);
     offsetRef.current += dx;
     lastPointerXRef.current = e.clientX;
@@ -417,8 +555,6 @@ function InfiniteSlider({
   const handlePointerUp = useCallback(() => {
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
-
-    // Transfer drag velocity and change base direction based on swipe
     if (Math.abs(dragVelocityRef.current) > 0.5) {
       velocityRef.current = dragVelocityRef.current;
       baseDirectionRef.current = dragVelocityRef.current > 0 ? 1 : -1;
@@ -445,10 +581,8 @@ function InfiniteSlider({
       className="relative overflow-hidden py-8 sm:py-12"
       style={{ cursor: isDraggingRef.current ? 'grabbing' : 'grab' }}
     >
-      {/* Center line indicator (subtle) */}
       <div className="absolute top-0 left-1/2 -translate-x-px w-[2px] h-full bg-navy/8 pointer-events-none z-0" />
 
-      {/* Fade edges */}
       <div
         className="absolute top-0 left-0 w-20 sm:w-36 h-full z-10 pointer-events-none"
         style={{ background: 'linear-gradient(to right, var(--color-cream-deeper), transparent)' }}
@@ -478,7 +612,6 @@ function InfiniteSlider({
               onProductClick(product);
             }}
           >
-            {/* Product Image Container — bigger base size */}
             <div
               className="product-img-wrap relative cursor-pointer"
               style={{
@@ -490,10 +623,10 @@ function InfiniteSlider({
               {product.image_url ? (
                 <Image
                   src={product.image_url}
-                  alt={getName(product)}
+                  alt={getProductName(product, locale)}
                   fill
-                  className="object-contain drop-shadow-lg pointer-events-none"
-                  sizes="200px"
+                  className="object-contain pointer-events-none"
+                  sizes="220px"
                   unoptimized
                 />
               ) : (
@@ -503,7 +636,6 @@ function InfiniteSlider({
               )}
             </div>
 
-            {/* Product Name */}
             <p
               className="product-name mt-4 text-center font-heading font-semibold text-sm sm:text-base sm:whitespace-nowrap"
               style={{
@@ -513,7 +645,7 @@ function InfiniteSlider({
                 overflowWrap: 'break-word',
               }}
             >
-              {getName(product)}
+              {getProductName(product, locale)}
             </p>
           </div>
         ))}
@@ -537,7 +669,6 @@ export default function ProductCatalogSection() {
   const [selectedProduct, setSelectedProduct] = useState<ShowcaseProduct | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  /* Fetch categories from database */
   useEffect(() => {
     async function fetchCategories() {
       const { data, error } = await supabase
@@ -545,7 +676,6 @@ export default function ProductCatalogSection() {
         .select('*')
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
-
       if (!error && data && data.length > 0) {
         setCategories(data as CategoryData[]);
         setSelectedCategory(data[0].slug);
@@ -554,7 +684,6 @@ export default function ProductCatalogSection() {
     fetchCategories();
   }, []);
 
-  /* Fetch all showcase products on mount */
   useEffect(() => {
     async function fetchProducts() {
       const { data, error } = await supabase
@@ -562,22 +691,16 @@ export default function ProductCatalogSection() {
         .select('*')
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
-
-      if (!error && data) {
-        setAllProducts(data);
-      }
+      if (!error && data) setAllProducts(data);
     }
     fetchProducts();
   }, []);
 
-  /* Filter by selected category */
   useEffect(() => {
     if (!selectedCategory) return;
-    const filtered = allProducts.filter((p) => p.category === selectedCategory);
-    setProducts(filtered);
+    setProducts(allProducts.filter((p) => p.category === selectedCategory));
   }, [selectedCategory, allProducts]);
 
-  /* Close dropdown on outside click */
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -588,59 +711,51 @@ export default function ProductCatalogSection() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  /* GSAP entrance */
   useEffect(() => {
     if (!sectionRef.current || !contentRef.current) return;
-
     const ctx = gsap.context(() => {
-      // Elegant fade + rise entrance
-      gsap.fromTo(
-        contentRef.current,
-        { y: 40, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 85%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
+      gsap.fromTo(contentRef.current, { y: 40, opacity: 0 }, {
+        y: 0, opacity: 1, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: sectionRef.current, start: 'top 85%', toggleActions: 'play none none reverse' },
+      });
     }, sectionRef);
-
     return () => ctx.revert();
   }, []);
 
   const selectedCat = categories.find((c) => c.slug === selectedCategory);
   const selectedLabel = selectedCat ? getCategoryName(selectedCat, locale) : '';
-  // Icon now rendered via CategoryIcon component
 
   return (
     <>
       <section
+        id="products-catalog"
         ref={sectionRef}
         className="relative overflow-hidden py-16 sm:py-24"
         style={{ backgroundColor: 'var(--color-cream-deeper)' }}
       >
-        {/* Static wavy texture background */}
         <WavyTextureBackground />
 
-        {/* Content */}
         <div ref={contentRef} className="relative z-10">
           {/* Section Heading */}
           <div className="text-center mb-6 sm:mb-8 px-4">
             <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-navy mb-2 drop-shadow-sm">
-              Our Products
+              {locale === 'id' ? 'Produk Kami' : locale === 'zh-TW' ? '我們的產品' : 'Our Products'}
             </h2>
             <p className="text-navy/60 text-base sm:text-lg md:text-xl font-body tracking-wide">
-              Indonesian Taste, in Taiwan.
+              {locale === 'id' ? 'Cita Rasa Indonesia, di Taiwan.' : locale === 'zh-TW' ? '印尼風味，在台灣。' : 'Indonesian Taste, in Taiwan.'}
             </p>
           </div>
 
-          {/* Category Dropdown — compact */}
+          {/* Smart Search */}
+          <SmartSearch
+            allProducts={allProducts}
+            categories={categories}
+            locale={locale}
+            onSelectProduct={setSelectedProduct}
+            onSelectCategory={setSelectedCategory}
+          />
+
+          {/* Category Dropdown */}
           <div className="flex justify-center mb-6 sm:mb-10 px-4">
             <div ref={dropdownRef} className="relative">
               <button
@@ -651,11 +766,7 @@ export default function ProductCatalogSection() {
                   {selectedCat && <CategoryIcon slug={selectedCat.slug} size={16} />}
                   {selectedLabel}
                 </span>
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform duration-300 ${
-                    dropdownOpen ? 'rotate-180' : ''
-                  }`}
-                />
+                <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               <AnimatePresence>
@@ -672,14 +783,9 @@ export default function ProductCatalogSection() {
                       return (
                         <button
                           key={cat.slug}
-                          onClick={() => {
-                            setSelectedCategory(cat.slug);
-                            setDropdownOpen(false);
-                          }}
+                          onClick={() => { setSelectedCategory(cat.slug); setDropdownOpen(false); }}
                           className={`w-full text-left px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
-                            selectedCategory === cat.slug
-                              ? 'bg-red/10 text-red'
-                              : 'text-navy hover:bg-navy/5'
+                            selectedCategory === cat.slug ? 'bg-red/10 text-red' : 'text-navy hover:bg-navy/5'
                           }`}
                         >
                           <span className="flex items-center gap-2">
