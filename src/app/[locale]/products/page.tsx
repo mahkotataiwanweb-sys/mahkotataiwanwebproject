@@ -84,7 +84,7 @@ function ProductModal({
               src={product.detail_image_url || product.image_url || ''}
               alt={name}
               fill
-              className={product.detail_image_url ? "object-cover" : "object-contain p-4"}
+              className={product.detail_image_url ? "object-contain p-6" : "object-contain p-4"}
               sizes="(max-width: 512px) 100vw, 512px"
               unoptimized
             />

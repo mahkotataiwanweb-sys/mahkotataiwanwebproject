@@ -160,13 +160,13 @@ function ProductPopup({
           <X className="w-4 h-4 text-navy" />
         </button>
 
-        <div className={`relative w-full h-56 flex items-center justify-center overflow-hidden ${product.detail_image_url ? 'bg-[#0c1929]' : 'bg-gradient-to-br from-red/10 to-red/5'}`}>
+        <div className={`relative w-full h-72 flex items-center justify-center overflow-hidden ${product.detail_image_url ? 'bg-[#0c1929]' : 'bg-gradient-to-br from-red/10 to-red/5'}`}>
           {(product.detail_image_url || product.image_url) ? (
             <Image
               src={product.detail_image_url || product.image_url || ''}
               alt={getName()}
               fill
-              className={product.detail_image_url ? "object-cover" : "object-contain p-6"}
+              className={product.detail_image_url ? "object-contain p-4" : "object-contain p-6"}
               sizes="(max-width: 448px) 100vw, 448px"
               unoptimized
             />
