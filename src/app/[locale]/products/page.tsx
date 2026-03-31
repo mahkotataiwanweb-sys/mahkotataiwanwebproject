@@ -9,7 +9,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   Package, ArrowLeft, X,
-  Shield, Award, Search, ArrowRight
+  Shield, Award, Search, ArrowRight, Sparkles
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
@@ -38,7 +38,23 @@ interface ShowcaseProduct {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Smart Search Component — with product-level click                  */
+/*  Highlight helper                                                   */
+/* ------------------------------------------------------------------ */
+function highlightText(text: string, query: string) {
+  if (!query.trim()) return text;
+  const tokens = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  const pattern = tokens.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const regex = new RegExp(`(${pattern})`, 'gi');
+  const parts = text.split(regex);
+  return parts.map((part, i) =>
+    regex.test(part)
+      ? <mark key={i} className="bg-red/15 text-red font-bold rounded-sm px-0.5">{part}</mark>
+      : part
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Smart Search Component — premium fuzzy + keyboard nav              */
 /* ------------------------------------------------------------------ */
 function SmartSearch({
   products,
@@ -53,6 +69,7 @@ function SmartSearch({
 }) {
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -66,18 +83,46 @@ function SmartSearch({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Fuzzy tokenized search with scoring
   const results = useMemo(() => {
     if (!query.trim()) return [];
-    const q = query.toLowerCase().trim();
-    return products
-      .filter((p) => {
-        const name = getLocalizedField(p, 'name', locale).toLowerCase();
-        const nameEn = (p.name_en || '').toLowerCase();
-        const nameId = (p.name_id || '').toLowerCase();
-        const nameZh = (p.name_zh || '').toLowerCase();
-        return name.includes(q) || nameEn.includes(q) || nameId.includes(q) || nameZh.includes(q);
-      })
-      .slice(0, 8);
+    const tokens = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
+
+    const scored = products.map((p) => {
+      const fields = [
+        getLocalizedField(p, 'name', locale),
+        p.name_en || '',
+        p.name_id || '',
+        p.name_zh || '',
+        p.description_en || '',
+        p.description_id || '',
+        p.description_zh || '',
+      ].map(f => f.toLowerCase());
+
+      let score = 0;
+      let allTokensMatched = true;
+
+      for (const token of tokens) {
+        let tokenScore = 0;
+        for (const text of fields) {
+          if (text === token) tokenScore = Math.max(tokenScore, 100);
+          else if (text.startsWith(token)) tokenScore = Math.max(tokenScore, 60);
+          else if (text.includes(token)) tokenScore = Math.max(tokenScore, 30);
+          // word-boundary match
+          else if (text.split(/\s+/).some(w => w.startsWith(token))) tokenScore = Math.max(tokenScore, 45);
+        }
+        if (tokenScore === 0) { allTokensMatched = false; break; }
+        score += tokenScore;
+      }
+
+      return { product: p, score, matched: allTokensMatched };
+    });
+
+    return scored
+      .filter(s => s.matched && s.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 10)
+      .map(s => s.product);
   }, [query, products, locale]);
 
   // Group results by category
@@ -91,6 +136,12 @@ function SmartSearch({
     return groups;
   }, [results]);
 
+  // Flat list for keyboard nav
+  const flatList = results;
+
+  // Reset index on query change
+  useEffect(() => { setActiveIndex(-1); }, [query]);
+
   const getCategoryName = useCallback(
     (categoryId: string) => {
       const cat = categories.find((c) => c.id === categoryId);
@@ -99,100 +150,181 @@ function SmartSearch({
     [categories, locale]
   );
 
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex(prev => Math.min(prev + 1, flatList.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex(prev => Math.max(prev - 1, -1));
+    } else if (e.key === 'Enter' && activeIndex >= 0 && flatList[activeIndex]) {
+      e.preventDefault();
+      const p = flatList[activeIndex];
+      onSelectProduct(p, p.category_id);
+      setQuery('');
+      setFocused(false);
+    } else if (e.key === 'Escape') {
+      setFocused(false);
+      inputRef.current?.blur();
+    }
+  }, [activeIndex, flatList, onSelectProduct]);
+
   const placeholderText = locale === 'id'
     ? 'Cari produk di semua kategori...'
     : locale === 'zh-TW'
     ? '搜尋所有類別的產品...'
     : 'Search products across all categories...';
 
+  const searchHint = locale === 'id'
+    ? 'Ketik nama atau deskripsi produk'
+    : locale === 'zh-TW'
+    ? '輸入產品名稱或描述'
+    : 'Type product name or description';
+
+  let globalResultIndex = -1;
+
   return (
     <div ref={containerRef} className="relative w-full max-w-xl mx-auto">
       {/* Search Input */}
       <div className={`relative transition-all duration-500 ${focused ? 'scale-[1.02]' : ''}`}>
-        <div className={`absolute -inset-1 rounded-2xl blur-xl transition-all duration-500 ${
-          focused ? 'bg-red/15 opacity-100' : 'opacity-0'
-        }`} />
+        {/* Animated glow ring */}
+        <div className={`absolute -inset-1.5 rounded-2xl transition-all duration-700 ${
+          focused ? 'opacity-100' : 'opacity-0'
+        }`}>
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-red/20 via-red/10 to-cream/30 blur-xl animate-pulse" />
+        </div>
+
         <div className={`relative flex items-center rounded-2xl transition-all duration-500 overflow-hidden ${
           focused
             ? 'bg-white shadow-2xl shadow-navy/15 ring-2 ring-red/20'
             : 'bg-white/80 shadow-lg shadow-navy/5 ring-1 ring-navy/10 hover:ring-navy/20 hover:shadow-xl'
         }`}>
-          <Search className={`ml-5 w-5 h-5 shrink-0 transition-colors duration-300 ${
-            focused ? 'text-red' : 'text-navy/30'
-          }`} />
+          <div className={`ml-5 transition-all duration-500 ${focused ? 'scale-110' : ''}`}>
+            <Search className={`w-5 h-5 shrink-0 transition-colors duration-300 ${
+              focused ? 'text-red' : 'text-navy/30'
+            }`} />
+          </div>
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setFocused(true)}
+            onKeyDown={handleKeyDown}
             placeholder={placeholderText}
-            className="flex-1 px-4 py-4 bg-transparent text-navy placeholder:text-navy/30 text-base focus:outline-none"
+            className="flex-1 px-4 py-4.5 bg-transparent text-navy placeholder:text-navy/30 text-base focus:outline-none"
           />
-          {query && (
-            <button
-              onClick={() => { setQuery(''); inputRef.current?.focus(); }}
-              className="mr-4 p-1.5 rounded-full hover:bg-navy/5 transition-colors"
-            >
-              <X className="w-4 h-4 text-navy/40" />
-            </button>
+          <AnimatePresence>
+            {query && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.5, rotate: -90 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 0.5, rotate: 90 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => { setQuery(''); inputRef.current?.focus(); }}
+                className="mr-4 p-1.5 rounded-full hover:bg-red/10 transition-colors"
+              >
+                <X className="w-4 h-4 text-navy/40 hover:text-red transition-colors" />
+              </motion.button>
+            )}
+          </AnimatePresence>
+          {/* Keyboard hint */}
+          {focused && !query && (
+            <div className="hidden sm:flex items-center mr-4 gap-1">
+              <kbd className="text-[10px] text-navy/25 bg-navy/5 px-1.5 py-0.5 rounded font-mono">↑↓</kbd>
+              <span className="text-[10px] text-navy/20">navigate</span>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Results Dropdown — grouped by category */}
+      {/* Results Dropdown */}
       <AnimatePresence>
         {focused && query.trim() && (
           <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            initial={{ opacity: 0, y: -10, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            exit={{ opacity: 0, y: -10, scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="absolute top-full left-0 right-0 mt-3 rounded-2xl bg-white/98 backdrop-blur-xl shadow-2xl border border-navy/8 overflow-hidden z-50 max-h-[420px] overflow-y-auto"
+            className="absolute top-full left-0 right-0 mt-3 rounded-2xl bg-white/[0.98] backdrop-blur-2xl shadow-2xl shadow-navy/15 border border-navy/8 overflow-hidden z-50 max-h-[440px] overflow-y-auto"
+            style={{ scrollbarWidth: 'thin' }}
           >
             {results.length === 0 ? (
-              <div className="p-8 text-center">
-                <Package className="w-10 h-10 text-navy/15 mx-auto mb-3" />
-                <p className="text-navy/40 text-sm">
+              <div className="p-10 text-center">
+                <motion.div
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 300 }}
+                >
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-navy/5 flex items-center justify-center">
+                    <Package className="w-8 h-8 text-navy/15" />
+                  </div>
+                </motion.div>
+                <p className="text-navy/50 text-sm font-medium mb-1">
                   {locale === 'id' ? 'Produk tidak ditemukan' : locale === 'zh-TW' ? '找不到產品' : 'No products found'}
+                </p>
+                <p className="text-navy/30 text-xs">
+                  {locale === 'id' ? 'Coba kata kunci lain' : locale === 'zh-TW' ? '嘗試其他關鍵字' : 'Try different keywords'}
                 </p>
               </div>
             ) : (
-              <div className="py-1">
+              <div className="py-2">
+                {/* Results count */}
+                <div className="px-5 py-2 flex items-center justify-between">
+                  <span className="text-[10px] font-semibold text-navy/30 uppercase tracking-[0.15em]">
+                    {results.length} {locale === 'id' ? 'hasil' : locale === 'zh-TW' ? '個結果' : 'results'}
+                  </span>
+                  <div className="hidden sm:flex items-center gap-1">
+                    <kbd className="text-[9px] text-navy/25 bg-navy/5 px-1 py-0.5 rounded font-mono">↵</kbd>
+                    <span className="text-[9px] text-navy/20">select</span>
+                  </div>
+                </div>
+
                 {Object.entries(grouped).map(([catId, prods]) => {
                   const catName = getCategoryName(catId);
                   const cat = categories.find((c) => c.id === catId);
                   return (
                     <div key={catId}>
                       {/* Category header */}
-                      <div className="px-5 py-2 text-[10px] font-bold text-navy/30 uppercase tracking-[0.2em] bg-gradient-to-r from-cream/60 to-transparent flex items-center gap-2">
+                      <div className="px-5 py-2 text-[10px] font-bold text-navy/30 uppercase tracking-[0.2em] bg-gradient-to-r from-cream/60 to-transparent flex items-center gap-2 sticky top-0 backdrop-blur-sm">
                         {cat && <CategoryIcon slug={cat.slug} size={12} className="opacity-40" />}
                         {catName}
+                        <span className="text-navy/20">({prods.length})</span>
                       </div>
-                      {/* Products in this category */}
-                      {prods.map((product, i) => {
+                      {/* Products */}
+                      {prods.map((product) => {
+                        globalResultIndex++;
+                        const thisIndex = globalResultIndex;
                         const name = getLocalizedField(product, 'name', locale);
+                        const desc = getLocalizedField(product, 'description', locale);
+                        const isActive = thisIndex === activeIndex;
+
                         return (
                           <motion.button
                             key={product.id}
-                            initial={{ opacity: 0, x: -10 }}
+                            initial={{ opacity: 0, x: -8 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.03 }}
+                            transition={{ delay: thisIndex * 0.02 }}
                             onClick={() => {
                               onSelectProduct(product, catId);
                               setQuery('');
                               setFocused(false);
                             }}
-                            className="w-full flex items-center gap-4 px-5 py-3.5 hover:bg-cream/60 transition-all duration-200 group text-left"
+                            onMouseEnter={() => setActiveIndex(thisIndex)}
+                            className={`w-full flex items-center gap-4 px-5 py-3.5 transition-all duration-200 group text-left ${
+                              isActive ? 'bg-red/5' : 'hover:bg-cream/60'
+                            }`}
                           >
                             {/* Product thumbnail */}
-                            <div className="w-12 h-12 rounded-xl bg-cream/80 flex-shrink-0 overflow-hidden flex items-center justify-center">
+                            <div className={`w-13 h-13 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center transition-all duration-300 ${
+                              isActive ? 'bg-red/10 shadow-md shadow-red/10' : 'bg-cream/80'
+                            }`}>
                               {product.image_url ? (
                                 <Image
                                   src={product.image_url}
                                   alt={name}
-                                  width={48}
-                                  height={48}
+                                  width={52}
+                                  height={52}
                                   className="w-full h-full object-contain p-1"
                                   unoptimized
                                 />
@@ -201,18 +333,33 @@ function SmartSearch({
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-navy font-semibold text-sm truncate group-hover:text-red transition-colors">
-                                {name}
+                              <p className={`font-semibold text-sm truncate transition-colors duration-200 ${
+                                isActive ? 'text-red' : 'text-navy group-hover:text-red'
+                              }`}>
+                                {highlightText(name, query)}
                               </p>
-                              <p className="text-navy/40 text-xs mt-0.5">{catName}</p>
+                              {desc && (
+                                <p className="text-navy/35 text-xs mt-0.5 truncate">
+                                  {highlightText(desc.slice(0, 60), query)}{desc.length > 60 ? '...' : ''}
+                                </p>
+                              )}
+                              <p className="text-navy/25 text-[10px] mt-0.5">{catName}</p>
                             </div>
-                            <ArrowRight className="w-4 h-4 text-navy/20 group-hover:text-red group-hover:translate-x-1 transition-all duration-300 shrink-0" />
+                            <ArrowRight className={`w-4 h-4 shrink-0 transition-all duration-300 ${
+                              isActive ? 'text-red translate-x-1' : 'text-navy/15 group-hover:text-red group-hover:translate-x-1'
+                            }`} />
                           </motion.button>
                         );
                       })}
                     </div>
                   );
                 })}
+
+                {/* Search tip */}
+                <div className="px-5 py-3 border-t border-navy/5 flex items-center gap-2">
+                  <Sparkles className="w-3 h-3 text-red/30" />
+                  <span className="text-[10px] text-navy/25">{searchHint}</span>
+                </div>
               </div>
             )}
           </motion.div>
@@ -223,7 +370,7 @@ function SmartSearch({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Product Modal                                                      */
+/*  Product Modal — scrollable                                         */
 /* ------------------------------------------------------------------ */
 function ProductModal({
   product,
@@ -254,12 +401,13 @@ function ProductModal({
     >
       <div className="absolute inset-0 bg-navy/70 backdrop-blur-md" />
       <motion.div
-        className="relative bg-cream rounded-3xl overflow-hidden max-w-lg w-full shadow-2xl"
+        className="relative bg-cream rounded-3xl overflow-hidden max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto overscroll-contain"
         initial={{ scale: 0.8, y: 60, opacity: 0, rotateX: 15 }}
         animate={{ scale: 1, y: 0, opacity: 1, rotateX: 0 }}
         exit={{ scale: 0.85, y: 40, opacity: 0 }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
         onClick={(e) => e.stopPropagation()}
+        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(0,48,72,0.15) transparent' }}
       >
         <button
           onClick={onClose}
@@ -291,7 +439,7 @@ function ProductModal({
             {name}
           </h3>
           <div className="w-12 h-0.5 bg-red/30 mb-4 rounded-full" />
-          <p className="text-navy/60 text-sm sm:text-base leading-relaxed">
+          <p className="text-navy/60 text-sm sm:text-base leading-relaxed whitespace-pre-line">
             {description || 'Premium quality Indonesian product, crafted with authentic recipes and the finest ingredients.'}
           </p>
         </div>
@@ -301,7 +449,7 @@ function ProductModal({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Category Card — Full-bleed cinematic style with images             */
+/*  Category Card — for masonry Pinterest layout                       */
 /* ------------------------------------------------------------------ */
 function CategoryCard({
   category,
@@ -336,29 +484,31 @@ function CategoryCard({
   const imgX = (mousePos.x - 0.5) * -15;
   const imgY = (mousePos.y - 0.5) * -15;
 
-  // Masonry-style heights
-  const isLarge = index % 3 === 0;
+  // Varied heights for masonry effect
+  const heightPattern = [380, 300, 340, 280, 360, 320, 400, 290, 350, 310];
+  const cardHeight = heightPattern[index % heightPattern.length];
   const imageUrl = category.image_url || fallbackImageUrl;
 
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 60, scale: 0.95 }}
+      initial={{ opacity: 0, y: 50, scale: 0.96 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: '-50px' }}
+      viewport={{ once: true, margin: '-40px' }}
       transition={{
         type: 'spring',
         stiffness: 150,
         damping: 22,
-        delay: index * 0.08,
+        delay: index * 0.06,
       }}
       onClick={onClick}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => { setIsHovered(false); setMousePos({ x: 0.5, y: 0.5 }); }}
-      className="cursor-pointer group relative rounded-3xl overflow-hidden"
+      className="cursor-pointer group relative rounded-3xl overflow-hidden break-inside-avoid mb-4"
+      style={{ height: `${cardHeight}px` }}
     >
-      <div className={`relative overflow-hidden ${isLarge ? 'aspect-[3/4]' : 'aspect-square'}`}>
+      <div className="relative overflow-hidden w-full h-full">
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -371,7 +521,7 @@ function CategoryCard({
                 : 'scale(1.05) translate(0px, 0px)',
               filter: isHovered ? 'brightness(0.65) saturate(1.2)' : 'brightness(0.5) saturate(1)',
             }}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
             unoptimized
           />
         ) : (
@@ -390,32 +540,32 @@ function CategoryCard({
         />
 
         {/* Top badge */}
-        <div className="absolute top-5 right-5 z-10">
-          <div className="px-4 py-2 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-bold tracking-wider border border-white/10 group-hover:bg-white/20 transition-all duration-500">
+        <div className="absolute top-4 right-4 z-10">
+          <div className="px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-bold tracking-wider border border-white/10 group-hover:bg-white/20 transition-all duration-500">
             {productCount} items
           </div>
         </div>
 
         {/* Category icon */}
-        <div className="absolute top-5 left-5 z-10 opacity-70 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110 text-white drop-shadow-lg">
-          <CategoryIcon slug={category.slug} size={32} />
+        <div className="absolute top-4 left-4 z-10 opacity-70 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110 text-white drop-shadow-lg">
+          <CategoryIcon slug={category.slug} size={28} />
         </div>
 
         {/* Bottom content */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 z-10">
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 z-10">
           <div className="transform transition-all duration-500 group-hover:-translate-y-2">
-            <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-[1.05] mb-2 drop-shadow-lg">
+            <h3 className="font-heading text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-[1.05] mb-1.5 drop-shadow-lg">
               {name}
             </h3>
-            <p className="text-white/40 text-sm leading-relaxed line-clamp-2 max-w-xs group-hover:text-white/65 transition-colors duration-500">
+            <p className="text-white/40 text-xs leading-relaxed line-clamp-2 max-w-xs group-hover:text-white/65 transition-colors duration-500">
               {description || 'Discover our premium selection'}
             </p>
           </div>
 
           {/* Explore reveal */}
-          <div className="mt-4 overflow-hidden h-0 group-hover:h-10 transition-all duration-500 ease-out">
-            <div className="flex items-center gap-2 text-white/80 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out">
-              <div className="w-8 h-px bg-red" />
+          <div className="mt-3 overflow-hidden h-0 group-hover:h-8 transition-all duration-500 ease-out">
+            <div className="flex items-center gap-2 text-white/80 transform translate-y-6 group-hover:translate-y-0 transition-transform duration-500 ease-out">
+              <div className="w-6 h-px bg-red" />
               <span className="text-xs font-bold tracking-[0.2em] uppercase">Explore</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" />
             </div>
@@ -430,7 +580,7 @@ function CategoryCard({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Floating Product Card (for category view)                          */
+/*  Floating Product Card — continuous float animation                 */
 /* ------------------------------------------------------------------ */
 function FloatingProductCard({
   product,
@@ -460,65 +610,77 @@ function FloatingProductCard({
     }
   }, [isHighlighted]);
 
+  // Staggered float animation params
+  const floatDuration = 3.5 + (index % 4) * 0.6;
+  const floatDelay = (index % 6) * 0.25;
+
   return (
-    <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 40, scale: 0.9 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: '-30px' }}
-      transition={{
-        type: 'spring',
-        stiffness: 200,
-        damping: 25,
-        delay: index * 0.06,
+    <div
+      className="product-card-float-wrapper"
+      style={{
+        animation: `cardFloat ${floatDuration}s ease-in-out infinite`,
+        animationDelay: `${floatDelay}s`,
       }}
-      whileHover={{ y: -12, scale: 1.03 }}
-      onClick={onClick}
-      className="cursor-pointer group"
     >
-      <div className="relative">
-        {/* Hover glow — or highlighted glow */}
-        <div className={`absolute -inset-3 rounded-3xl blur-2xl transition-all duration-700 ${
-          isHighlighted ? 'bg-red/15' : 'bg-red/0 group-hover:bg-red/8'
-        }`} />
+      <motion.div
+        ref={cardRef}
+        initial={{ opacity: 0, y: 40, scale: 0.9 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, margin: '-30px' }}
+        transition={{
+          type: 'spring',
+          stiffness: 200,
+          damping: 25,
+          delay: index * 0.06,
+        }}
+        whileHover={{ scale: 1.05 }}
+        onClick={onClick}
+        className="cursor-pointer group"
+      >
+        <div className="relative">
+          {/* Hover glow — or highlighted glow */}
+          <div className={`absolute -inset-3 rounded-3xl blur-2xl transition-all duration-700 ${
+            isHighlighted ? 'bg-red/15' : 'bg-red/0 group-hover:bg-red/8'
+          }`} />
 
-        <div className={`relative rounded-2xl overflow-hidden bg-gradient-to-br from-cream via-white to-cream/50 transition-all duration-500 ${
-          isHighlighted
-            ? 'shadow-2xl shadow-red/20 ring-2 ring-red/30'
-            : 'shadow-lg shadow-navy/5 group-hover:shadow-2xl group-hover:shadow-navy/12'
-        }`}>
-          {/* Image */}
-          <div className="relative aspect-square overflow-hidden">
-            {imageUrl ? (
-              <Image
-                src={imageUrl}
-                alt={name}
-                fill
-                className="object-contain p-4 transition-all duration-700 group-hover:scale-110"
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                unoptimized
-              />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center text-navy/10">
-                <Package className="w-16 h-16" />
-              </div>
-            )}
+          <div className={`relative rounded-2xl overflow-hidden bg-gradient-to-br from-cream via-white to-cream/50 transition-all duration-500 ${
+            isHighlighted
+              ? 'shadow-2xl shadow-red/20 ring-2 ring-red/30'
+              : 'shadow-lg shadow-navy/5 group-hover:shadow-2xl group-hover:shadow-navy/12'
+          }`}>
+            {/* Image */}
+            <div className="relative aspect-square overflow-hidden">
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt={name}
+                  fill
+                  className="object-contain p-4 transition-all duration-700 group-hover:scale-110"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  unoptimized
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-navy/10">
+                  <Package className="w-16 h-16" />
+                </div>
+              )}
 
-            {/* Shine effect */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-white/0 group-hover:via-white/20 group-hover:to-transparent transition-all duration-700 pointer-events-none" />
+              {/* Shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-white/0 group-hover:via-white/20 group-hover:to-transparent transition-all duration-700 pointer-events-none" />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Name floating below */}
-      <div className="mt-4 px-1 text-center">
-        <p className={`text-sm font-semibold transition-colors duration-300 line-clamp-2 leading-snug ${
-          isHighlighted ? 'text-red' : 'text-navy/70 group-hover:text-navy'
-        }`}>
-          {name}
-        </p>
-      </div>
-    </motion.div>
+        {/* Name floating below */}
+        <div className="mt-4 px-1 text-center">
+          <p className={`text-sm font-semibold transition-colors duration-300 line-clamp-2 leading-snug ${
+            isHighlighted ? 'text-red' : 'text-navy/70 group-hover:text-navy'
+          }`}>
+            {name}
+          </p>
+        </div>
+      </motion.div>
+    </div>
   );
 }
 
@@ -625,19 +787,16 @@ function ProductsContent() {
         if (catRes.data) {
           const cats = catRes.data as Category[];
           setCategories(cats);
-          // Handle URL params for category + product selection
           if (categoryParam) {
             const matched = cats.find((c) => c.slug === categoryParam);
             if (matched) {
               setActiveFilter(matched.id);
-              // If product param exists, highlight that product
               if (productParam && prodRes.data) {
                 const matchedProduct = (prodRes.data as Product[]).find(
                   (p) => p.slug === productParam || p.id === productParam
                 );
                 if (matchedProduct) {
                   setHighlightedProductId(matchedProduct.id);
-                  // Auto-open modal after a short delay
                   setTimeout(() => {
                     setSelectedProductForModal(matchedProduct);
                   }, 800);
@@ -689,7 +848,6 @@ function ProductsContent() {
     return match?.image_url || product.image_url;
   }, [showcaseProducts]);
 
-  // Get first product image per category for fallback category images
   const categoryFallbackImages = useMemo(() => {
     const map: Record<string, string> = {};
     products.forEach((p) => {
@@ -718,11 +876,9 @@ function ProductsContent() {
     }, 100);
   }, []);
 
-  // Handle search result click: navigate to category + highlight product
   const handleSearchSelectProduct = useCallback((product: Product, categoryId: string) => {
     setActiveFilter(categoryId);
     setHighlightedProductId(product.id);
-    // Open modal after scroll + animation
     setTimeout(() => {
       setSelectedProductForModal(product);
     }, 600);
@@ -799,7 +955,7 @@ function ProductsContent() {
               </div>
             </div>
 
-            {/* Smart Search — in hero */}
+            {/* Smart Search */}
             <div className="hero-reveal mt-10">
               <SmartSearch
                 products={products}
@@ -822,16 +978,15 @@ function ProductsContent() {
       {/* ============ CONTENT ============ */}
       <div ref={contentRef} className="max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20 scroll-mt-8">
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="columns-2 lg:columns-3 gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="aspect-[3/4] bg-navy/5 rounded-3xl" />
-                <div className="mt-4 h-5 bg-navy/5 rounded-lg w-3/4" />
+              <div key={i} className="animate-pulse break-inside-avoid mb-4">
+                <div className="bg-navy/5 rounded-3xl" style={{ height: `${280 + (i % 3) * 40}px` }} />
               </div>
             ))}
           </div>
         ) : !activeFilter ? (
-          /* ======== CATEGORY SHOWCASE ======== */
+          /* ======== CATEGORY SHOWCASE — Pinterest Masonry ======== */
           <>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -850,8 +1005,8 @@ function ProductsContent() {
               </p>
             </motion.div>
 
-            {/* Masonry-style Category Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+            {/* Pinterest Masonry Category Grid */}
+            <div className="columns-2 lg:columns-3 gap-4">
               {categories.map((cat, i) => (
                 <CategoryCard
                   key={cat.id}
