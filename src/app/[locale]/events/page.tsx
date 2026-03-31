@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowLeft, X, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Calendar as CalendarIcon, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
@@ -24,16 +24,6 @@ function formatElegantDate(dateStr: string): string {
   const d = new Date(dateStr);
   return `${monthNames[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 }
-
-function formatBadgeDate(dateStr: string) {
-  const d = new Date(dateStr);
-  return {
-    day: d.getDate(),
-    month: monthNames[d.getMonth()].slice(0, 3).toUpperCase(),
-    year: d.getFullYear(),
-  };
-}
-
 
 
 function getDaysInMonth(year: number, month: number) {
@@ -190,7 +180,6 @@ export default function EventsPage() {
   const [events, setEvents] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
-  const [selectedEvent, setSelectedEvent] = useState<Article | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   /* refs */
@@ -268,17 +257,7 @@ export default function EventsPage() {
     return () => ctx.revert();
   }, [sortedEvents.length, sortOrder, loading]);
 
-  /* lock scroll when modal open */
-  useEffect(() => {
-    if (selectedEvent) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [selectedEvent]);
+
 
   /* ─── render ─── */
   return (
@@ -446,11 +425,11 @@ export default function EventsPage() {
             {sortedEvents.map((event, index) => {
               const isEven = index % 2 === 1;
               return (
-                <article
+                <Link
+                  href={`/${locale}/articles/${event.slug}`}
                   key={event.id}
                   data-card={isEven ? 'even' : 'odd'}
-                  className="group cursor-pointer overflow-hidden rounded-2xl shadow-[0_4px_30px_rgba(0,48,72,0.08)] hover:shadow-[0_8px_40px_rgba(0,48,72,0.14)] transition-shadow duration-500"
-                  onClick={() => setSelectedEvent(event)}
+                  className="group block cursor-pointer overflow-hidden rounded-2xl shadow-[0_4px_30px_rgba(0,48,72,0.08)] hover:shadow-[0_8px_40px_rgba(0,48,72,0.14)] transition-shadow duration-500"
                 >
                   <div
                     className={`flex flex-col ${
@@ -510,98 +489,14 @@ export default function EventsPage() {
                       </span>
                     </div>
                   </div>
-                </article>
+                </Link>
               );
             })}
           </div>
         )}
       </section>
 
-      {/* ═══════ MODAL ═══════ */}
-      <AnimatePresence>
-        {selectedEvent && (
-          <motion.div
-            key="modal-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-md"
-            onClick={() => setSelectedEvent(null)}
-          >
-            <motion.div
-              key="modal-content"
-              initial={{ opacity: 0, scale: 0.9, y: 40 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ type: 'spring', damping: 28, stiffness: 340 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden overflow-y-auto rounded-2xl bg-white shadow-2xl"
-            >
-              {/* image header */}
-              <div className="relative aspect-[16/9] w-full">
-                {selectedEvent.image_url ? (
-                  <Image
-                    src={selectedEvent.image_url}
-                    alt={getLocalizedField(selectedEvent, 'title', locale)}
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="h-full w-full bg-gradient-to-br from-[#003048] to-[#003048]/70" />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-                {/* close button */}
-                <button
-                  onClick={() => setSelectedEvent(null)}
-                  className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/30 hover:rotate-90"
-                  aria-label="Close"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-
-                {/* date badge on image */}
-                {(() => {
-                  const bd = formatBadgeDate(selectedEvent.published_at);
-                  return (
-                    <div className="absolute bottom-4 left-4 flex flex-col items-center rounded-xl bg-[#C12126] px-4 py-2.5 text-white shadow-lg">
-                      <span className="text-2xl font-bold leading-none">{bd.day}</span>
-                      <span className="text-[10px] font-semibold uppercase tracking-wider">
-                        {bd.month}
-                      </span>
-                      <span className="text-[10px] text-white/70">{bd.year}</span>
-                    </div>
-                  );
-                })()}
-              </div>
-
-              {/* body */}
-              <div className="p-6 md:p-8">
-                <h2 className="font-heading text-2xl font-bold text-[#003048] md:text-3xl">
-                  {getLocalizedField(selectedEvent, 'title', locale)}
-                </h2>
-
-                {/* red divider */}
-                <div className="mt-4 h-[3px] w-16 rounded-full bg-[#C12126]" />
-
-                {/* excerpt */}
-                <p className="mt-4 text-sm leading-relaxed text-[#003048]/60">
-                  {getLocalizedField(selectedEvent, 'excerpt', locale)}
-                </p>
-
-                {/* HTML content */}
-                <div
-                  className="prose prose-sm mt-6 max-w-none text-[#003048]/80 prose-headings:font-heading prose-headings:text-[#003048] prose-a:text-[#C12126]"
-                  dangerouslySetInnerHTML={{
-                    __html: getLocalizedField(selectedEvent, 'content', locale),
-                  }}
-                />
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </main>
   );
 }

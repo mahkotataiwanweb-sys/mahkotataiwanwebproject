@@ -181,7 +181,6 @@ export default function LifestylePage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
-  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   /* refs */
@@ -265,17 +264,7 @@ export default function LifestylePage() {
     return () => ctx.revert();
   }, [sortedArticles.length, sortOrder, loading]);
 
-  /* lock scroll when modal open */
-  useEffect(() => {
-    if (selectedArticle) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [selectedArticle]);
+
 
   /* ─── render ─── */
   return (
@@ -460,11 +449,11 @@ export default function LifestylePage() {
             {sortedArticles.map((article, index) => {
               const isEven = index % 2 === 1;
               return (
-                <article
+                <Link
+                  href={`/${locale}/articles/${article.slug}`}
                   key={article.id}
                   data-card={isEven ? 'even' : 'odd'}
-                  className="group cursor-pointer overflow-hidden rounded-2xl shadow-[0_4px_30px_rgba(0,48,72,0.08)] hover:shadow-[0_8px_40px_rgba(0,48,72,0.14)] transition-shadow duration-500"
-                  onClick={() => setSelectedArticle(article)}
+                  className="group block cursor-pointer overflow-hidden rounded-2xl shadow-[0_4px_30px_rgba(0,48,72,0.08)] hover:shadow-[0_8px_40px_rgba(0,48,72,0.14)] transition-shadow duration-500"
                 >
                   <div
                     className={`flex flex-col ${
@@ -525,102 +514,14 @@ export default function LifestylePage() {
                       </span>
                     </div>
                   </div>
-                </article>
+                </Link>
               );
             })}
           </div>
         )}
       </section>
 
-      {/* ═══════════════════════════════════════════════
-          ARTICLE DETAIL MODAL
-      ═══════════════════════════════════════════════ */}
-      <AnimatePresence>
-        {selectedArticle && (
-          <motion.div
-            key="modal-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-md"
-            onClick={() => setSelectedArticle(null)}
-          >
-            <motion.div
-              key="modal-content"
-              initial={{ opacity: 0, scale: 0.9, y: 40 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ type: 'spring', damping: 28, stiffness: 340 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden overflow-y-auto rounded-2xl bg-white shadow-2xl"
-            >
-              {/* Image header */}
-              <div className="relative aspect-[16/9] w-full">
-                {selectedArticle.image_url ? (
-                  <Image
-                    src={selectedArticle.image_url}
-                    alt={getLocalizedField(selectedArticle, 'title', locale)}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 768px"
-                  />
-                ) : (
-                  <div className="h-full w-full bg-gradient-to-br from-[#003048] to-[#002236] flex items-center justify-center">
-                    <Sparkles className="h-20 w-20 text-white/20" />
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-                {/* Close button */}
-                <button
-                  onClick={() => setSelectedArticle(null)}
-                  className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/30 hover:rotate-90"
-                  aria-label="Close"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              {/* Body */}
-              <div className="p-6 md:p-8">
-                {/* Badge */}
-                <span className="inline-block rounded-full bg-[#C12126]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[#C12126]">
-                  Activity
-                </span>
-
-                {/* Title */}
-                <h2 className="mt-4 font-heading text-2xl font-bold text-[#003048] md:text-3xl">
-                  {getLocalizedField(selectedArticle, 'title', locale)}
-                </h2>
-
-                {/* Red divider */}
-                <div className="mt-4 h-[3px] w-16 rounded-full bg-[#C12126]" />
-
-                {/* Date */}
-                <p className="mt-4 text-xs text-[#003048]/40">
-                  {formatElegantDate(selectedArticle.published_at)}
-                </p>
-
-                {/* Excerpt */}
-                {getLocalizedField(selectedArticle, 'excerpt', locale) && (
-                  <p className="mt-3 text-sm leading-relaxed text-[#003048]/60">
-                    {getLocalizedField(selectedArticle, 'excerpt', locale)}
-                  </p>
-                )}
-
-                {/* HTML content */}
-                <div
-                  className="prose prose-sm mt-6 max-w-none text-[#003048]/80 prose-headings:font-heading prose-headings:text-[#003048] prose-a:text-[#C12126]"
-                  dangerouslySetInnerHTML={{
-                    __html: getLocalizedField(selectedArticle, 'content', locale),
-                  }}
-                />
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </main>
   );
 }
