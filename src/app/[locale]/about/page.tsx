@@ -707,30 +707,7 @@ export default function AboutPage() {
               ))}
             </div>
 
-            {/* Key Differentiators Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {[
-                { icon: Package, label: '26+ Product Lines', sublabel: 'Carefully Curated' },
-                { icon: Store, label: '300+ Partner Stores', sublabel: 'Island-Wide' },
-                { icon: Shield, label: 'Halal Certified', sublabel: 'Quality Assured' },
-                { icon: Globe, label: 'Island-Wide Distribution', sublabel: 'Reliable Supply Chain' },
-              ].map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div
-                    key={item.label}
-                    className="bg-white rounded-2xl p-5 sm:p-6 text-center border border-navy/[0.06] shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
-                  >
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-navy/[0.06] flex items-center justify-center mx-auto mb-3 group-hover:bg-red/10 transition-colors duration-300">
-                      <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-navy/60 group-hover:text-red transition-colors duration-300" />
-                    </div>
-                    <p className="font-heading font-bold text-navy text-sm sm:text-base mb-0.5">{item.label}</p>
-                    <p className="text-navy/40 text-xs sm:text-sm">{item.sublabel}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+</div>
         </div>
       </section>
 
