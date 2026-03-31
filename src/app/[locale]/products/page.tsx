@@ -10,6 +10,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Package, ArrowLeft, X, ChevronLeft, ChevronRight, Shield, Award, Sparkles, ChevronDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
+import CategoryIcon from '@/components/ui/CategoryIcon';
 import { getLocalizedField } from '@/lib/utils';
 import type { Product, Category } from '@/types/database';
 
@@ -198,8 +199,8 @@ function CategoryShowcaseCard({
 
         {/* Top: product count + icon */}
         <div className="absolute top-0 left-0 right-0 p-5 sm:p-6 flex items-start justify-between z-10">
-          <div className="text-3xl sm:text-4xl opacity-80 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110 drop-shadow-lg">
-            {category.icon || '📦'}
+          <div className="opacity-80 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110 drop-shadow-lg text-white">
+            <CategoryIcon slug={category.slug} size={36} />
           </div>
           <div className="px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-white text-xs font-semibold tracking-wide border border-white/10 group-hover:bg-white/25 transition-all duration-500">
             {productCount} items
@@ -807,8 +808,8 @@ function ProductsContent() {
                       : 'bg-white/70 border border-navy/10 text-navy/60 hover:border-navy/20 hover:shadow-lg hover:text-navy'
                 }`}
               >
-                {activeCategory?.icon && (
-                  <span className="text-lg leading-none">{activeCategory.icon}</span>
+                {activeCategory && (
+                  <CategoryIcon slug={activeCategory.slug} size={18} className="shrink-0" />
                 )}
                 <span>{activeFilter === 'all' ? 'Select Category' : dropdownLabel}</span>
                 <ChevronDown
@@ -845,9 +846,7 @@ function ProductsContent() {
                                 : 'text-navy/70 hover:bg-navy/5 hover:text-navy'
                             }`}
                           >
-                            {cat.icon && (
-                              <span className="text-lg leading-none shrink-0">{cat.icon}</span>
-                            )}
+                            <CategoryIcon slug={cat.slug} size={17} className="shrink-0" />
                             <span className="truncate">{catName}</span>
                           </button>
                         );
