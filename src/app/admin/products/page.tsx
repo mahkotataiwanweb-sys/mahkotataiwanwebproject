@@ -113,15 +113,20 @@ export default function ProductsPage() {
         detail_image_url: form.detail_image_url || null,
       };
 
-      if (editingProduct) {
-        const { error } = await supabase.from('products').update(payload).eq('id', editingProduct.id);
-        if (error) throw error;
-        toast.success('Product updated!');
-      } else {
-        const { error } = await supabase.from('products').insert(payload);
-        if (error) throw error;
-        toast.success('Product created!');
-      }
+      const body = editingProduct 
+        ? { id: editingProduct.id, ...payload }
+        : payload;
+
+      const res = await fetch('/api/products/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      
+      toast.success(editingProduct ? 'Product updated!' : 'Product created!');
       setShowModal(false);
       fetchProducts();
     } catch (err: unknown) {
