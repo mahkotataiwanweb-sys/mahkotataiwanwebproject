@@ -29,6 +29,7 @@ interface ShowcaseProduct {
   description_id: string | null;
   description_zh: string | null;
   image_url: string | null;
+  detail_image_url: string | null;
   sort_order: number;
   is_active: boolean;
 }
@@ -76,14 +77,14 @@ function ProductModal({
           <X className="w-4 h-4 text-navy group-hover:rotate-90 transition-transform duration-300" />
         </button>
 
-        {/* Image */}
-        <div className="relative w-full aspect-square bg-gradient-to-br from-cream-dark/50 to-cream flex items-center justify-center p-4">
-          {product.image_url ? (
+        {/* Image - use professional detail image for big card */}
+        <div className="relative w-full aspect-square bg-gradient-to-br from-cream-dark/50 to-cream flex items-center justify-center overflow-hidden">
+          {(product.detail_image_url || product.image_url) ? (
             <Image
-              src={product.image_url}
+              src={product.detail_image_url || product.image_url || ''}
               alt={name}
               fill
-              className="object-contain p-4"
+              className={product.detail_image_url ? "object-cover" : "object-contain p-4"}
               sizes="(max-width: 512px) 100vw, 512px"
               unoptimized
             />
