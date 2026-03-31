@@ -723,13 +723,13 @@ function FloatingProductCard({
             }
           }}
           >
-            <div className="relative aspect-square overflow-hidden">
+            <div className="relative w-full h-0 pb-[100%] overflow-hidden bg-white">
               {imageUrl ? (
                 <Image
                   src={imageUrl}
                   alt={name}
                   fill
-                  className="object-contain p-2 transition-all duration-700 group-hover:scale-110"
+                  className="object-contain p-4 transition-all duration-700 group-hover:scale-110"
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   unoptimized
                 />
