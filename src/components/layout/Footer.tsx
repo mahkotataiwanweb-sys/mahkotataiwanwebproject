@@ -43,7 +43,7 @@ const fallbackNavItems: FallbackNavItem[] = [
     key: 'products',
     href: '/products',
     children: [
-      { key: 'allProducts', href: '/products' },
+      
       { key: 'recipes', href: '/recipes' },
     ],
   },
