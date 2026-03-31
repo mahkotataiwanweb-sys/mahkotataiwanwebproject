@@ -51,6 +51,14 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  // Sync detail_image_url back to products table
+  if (data && updates.detail_image_url !== undefined) {
+    await admin
+      .from('products')
+      .update({ detail_image_url: updates.detail_image_url || null })
+      .eq('name_en', data.name);
+  }
+
   return NextResponse.json(data);
 }
 
