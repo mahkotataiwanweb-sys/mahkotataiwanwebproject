@@ -77,13 +77,13 @@ function ProductModal({
         </button>
 
         {/* Image */}
-        <div className="relative w-full aspect-square bg-gradient-to-br from-cream-dark/50 to-cream flex items-center justify-center">
+        <div className="relative w-full aspect-square bg-gradient-to-br from-cream-dark/50 to-cream flex items-center justify-center p-4">
           {product.image_url ? (
             <Image
               src={product.image_url}
               alt={name}
               fill
-              className="object-cover"
+              className="object-contain p-4"
               sizes="(max-width: 512px) 100vw, 512px"
               unoptimized
             />
@@ -283,7 +283,7 @@ function BezelCard({
                 src={imageUrl}
                 alt={name}
                 fill
-                className={`object-cover transition-all duration-700 ${
+                className={`object-contain transition-all duration-700 ${
                   isSelected ? 'scale-105' : 'group-hover:scale-110'
                 }`}
                 sizes="220px"
@@ -360,7 +360,7 @@ function ProductDetailSection({
                 src={product.image_url}
                 alt={name}
                 fill
-                className="object-cover"
+                className="object-contain p-3"
                 sizes="(max-width: 1024px) 100vw, 320px"
                 unoptimized
               />
