@@ -518,7 +518,7 @@ export default function Navbar() {
                       : 'radial-gradient(circle, rgba(26,82,118,0.25) 0%, transparent 70%)',
                   }}
                 />
-                <Image src="/images/logo.png" alt="Mahkota Taiwan" width={80} height={80} priority
+                <Image src={useLightText && !isHomePage ? "/images/logo-light.png" : "/images/logo.png"} alt="Mahkota Taiwan" width={80} height={80} priority
                   className={cn('relative w-16 h-16 sm:w-20 sm:h-20 transition-all duration-300 drop-shadow-lg',
                     false && 'brightness-0 invert')} />
               </motion.div>
