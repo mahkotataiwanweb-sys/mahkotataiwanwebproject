@@ -160,7 +160,6 @@ export default function RecipeDetailPage() {
                   {getLocalizedField(recipe, 'description', locale)}
                 </span>
               )}
-              )}
             </div>
 
             <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
