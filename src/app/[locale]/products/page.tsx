@@ -441,7 +441,7 @@ function SmartSearch({
         <div className={`relative flex items-center rounded-2xl transition-all duration-500 overflow-hidden ${
           focused
             ? 'bg-white shadow-2xl shadow-navy/15 ring-2 ring-red/20'
-            : 'bg-white/80 shadow-lg shadow-navy/5 ring-1 ring-navy/10 hover:ring-navy/20 hover:shadow-xl'
+            : 'bg-white/80 shadow-lg shadow-navy/5 hover:shadow-xl'
         }`}>
           <div className={`ml-5 transition-all duration-500 ${focused ? 'scale-110' : ''}`}>
             <Search className={`w-5 h-5 shrink-0 transition-colors duration-300 ${
@@ -1087,8 +1087,8 @@ function ProductsContent() {
         </div>
 
         {/* Wave divider */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+        <div className="absolute -bottom-px left-0 right-0">
+          <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="block w-full">
             <path d="M0 60V30C240 10 480 0 720 10C960 20 1200 40 1440 30V60H0Z" fill="var(--color-cream)" />
           </svg>
         </div>
