@@ -12,7 +12,7 @@ import { supabase } from '@/lib/supabase';
 gsap.registerPlugin(ScrollTrigger);
 
 /* ------------------------------------------------------------------ */
-/*  Types & Constants                                                  */
+/*  Types                                                              */
 /* ------------------------------------------------------------------ */
 interface ShowcaseProduct {
   id: string;
@@ -28,18 +28,20 @@ interface ShowcaseProduct {
   is_active: boolean;
 }
 
-interface CategoryOption {
-  value: string;
-  label: string;
+interface CategoryData {
+  id: string;
+  slug: string;
+  name_en: string;
+  name_id: string;
+  name_zh: string;
+  icon: string | null;
+  description_en: string | null;
+  description_id: string | null;
+  description_zh: string | null;
+  image_url: string | null;
+  sort_order: number;
+  is_active: boolean;
 }
-
-const CATEGORIES: CategoryOption[] = [
-  { value: 'abon-sapi', label: 'Abon Sapi' },
-  { value: 'bakso-pentol', label: 'Bakso & Pentol' },
-  { value: 'cita-rasa-indonesia', label: 'Cita Rasa Indonesia' },
-  { value: 'nasi-rempah-instan', label: 'Nasi Rempah Instan' },
-  { value: 'snack', label: 'Snack' },
-];
 
 /* ------------------------------------------------------------------ */
 /*  Static Wavy Texture Background                                     */
@@ -94,15 +96,26 @@ function WavyTextureBackground() {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Helper: Get localized category name                                */
+/* ------------------------------------------------------------------ */
+function getCategoryName(cat: CategoryData, locale: string): string {
+  if (locale === 'zh-TW' && cat.name_zh) return cat.name_zh;
+  if (locale === 'id' && cat.name_id) return cat.name_id;
+  return cat.name_en;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Product Popup                                                      */
 /* ------------------------------------------------------------------ */
 function ProductPopup({
   product,
   locale,
+  categories,
   onClose,
 }: {
   product: ShowcaseProduct;
   locale: string;
+  categories: CategoryData[];
   onClose: () => void;
 }) {
   const getName = () => {
@@ -116,6 +129,9 @@ function ProductPopup({
     if (locale === 'id' && product.description_id) return product.description_id;
     return product.description_en || '';
   };
+
+  const categoryMatch = categories.find((c) => c.slug === product.category);
+  const categoryLabel = categoryMatch ? getCategoryName(categoryMatch, locale) : product.category;
 
   return (
     <motion.div
@@ -161,7 +177,7 @@ function ProductPopup({
 
         <div className="p-6 pt-5">
           <span className="inline-block text-red/70 text-xs font-semibold tracking-wider uppercase mb-2">
-            {CATEGORIES.find((c) => c.value === product.category)?.label || product.category}
+            {categoryMatch?.icon ? `${categoryMatch.icon} ` : ''}{categoryLabel}
           </span>
           <h3 className="font-heading text-2xl font-bold text-navy mb-3">{getName()}</h3>
           <p className="text-navy/60 text-sm leading-relaxed">{getDesc()}</p>
@@ -510,12 +526,30 @@ export default function ProductCatalogSection() {
   const locale = useLocale();
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0].value);
+  const [categories, setCategories] = useState<CategoryData[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [products, setProducts] = useState<ShowcaseProduct[]>([]);
   const [allProducts, setAllProducts] = useState<ShowcaseProduct[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<ShowcaseProduct | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  /* Fetch categories from database */
+  useEffect(() => {
+    async function fetchCategories() {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        setCategories(data as CategoryData[]);
+        setSelectedCategory(data[0].slug);
+      }
+    }
+    fetchCategories();
+  }, []);
 
   /* Fetch all showcase products on mount */
   useEffect(() => {
@@ -535,6 +569,7 @@ export default function ProductCatalogSection() {
 
   /* Filter by selected category */
   useEffect(() => {
+    if (!selectedCategory) return;
     const filtered = allProducts.filter((p) => p.category === selectedCategory);
     setProducts(filtered);
   }, [selectedCategory, allProducts]);
@@ -576,7 +611,9 @@ export default function ProductCatalogSection() {
     return () => ctx.revert();
   }, []);
 
-  const selectedLabel = CATEGORIES.find((c) => c.value === selectedCategory)?.label || '';
+  const selectedCat = categories.find((c) => c.slug === selectedCategory);
+  const selectedLabel = selectedCat ? getCategoryName(selectedCat, locale) : '';
+  const selectedIcon = selectedCat?.icon || '';
 
   return (
     <>
@@ -607,7 +644,9 @@ export default function ProductCatalogSection() {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center gap-2 px-5 py-2 rounded-full bg-cream text-navy font-semibold text-sm shadow-md hover:shadow-lg transition-all duration-300 min-w-[200px] justify-between"
               >
-                <span className="font-heading text-sm">{selectedLabel}</span>
+                <span className="font-heading text-sm">
+                  {selectedIcon ? `${selectedIcon} ` : ''}{selectedLabel}
+                </span>
                 <ChevronDown
                   className={`w-4 h-4 transition-transform duration-300 ${
                     dropdownOpen ? 'rotate-180' : ''
@@ -624,22 +663,25 @@ export default function ProductCatalogSection() {
                     transition={{ duration: 0.2 }}
                     className="absolute top-full mt-1.5 left-0 right-0 bg-cream rounded-xl shadow-2xl overflow-hidden z-20"
                   >
-                    {CATEGORIES.map((cat) => (
-                      <button
-                        key={cat.value}
-                        onClick={() => {
-                          setSelectedCategory(cat.value);
-                          setDropdownOpen(false);
-                        }}
-                        className={`w-full text-left px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
-                          selectedCategory === cat.value
-                            ? 'bg-red/10 text-red'
-                            : 'text-navy hover:bg-navy/5'
-                        }`}
-                      >
-                        {cat.label}
-                      </button>
-                    ))}
+                    {categories.map((cat) => {
+                      const catName = getCategoryName(cat, locale);
+                      return (
+                        <button
+                          key={cat.slug}
+                          onClick={() => {
+                            setSelectedCategory(cat.slug);
+                            setDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                            selectedCategory === cat.slug
+                              ? 'bg-red/10 text-red'
+                              : 'text-navy hover:bg-navy/5'
+                          }`}
+                        >
+                          {cat.icon ? `${cat.icon} ` : ''}{catName}
+                        </button>
+                      );
+                    })}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -671,6 +713,7 @@ export default function ProductCatalogSection() {
           <ProductPopup
             product={selectedProduct}
             locale={locale}
+            categories={categories}
             onClose={() => setSelectedProduct(null)}
           />
         )}
