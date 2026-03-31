@@ -963,7 +963,8 @@ function ProductsContent() {
 
       {/* ============ CONTENT ============ */}
       <div className="relative overflow-hidden">
-        <SandTexture />
+        {/* SandTexture overlays content as subtle grain — z-20 + pointer-events-none */}
+        <div className="absolute inset-0 z-20 pointer-events-none"><SandTexture /></div>
       <div ref={contentRef} className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20 scroll-mt-8">
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
