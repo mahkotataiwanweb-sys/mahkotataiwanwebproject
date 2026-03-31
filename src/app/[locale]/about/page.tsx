@@ -7,7 +7,7 @@ import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Award, Store, Package, Users, Shield, Heart, Sparkles, ChevronRight, Star } from 'lucide-react';
+import { ArrowLeft, Award, Store, Package, Users, Shield, Heart, Sparkles, ChevronRight, Star, Globe } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import SandTexture from '@/components/effects/SandTexture';
 
@@ -670,10 +670,26 @@ export default function AboutPage() {
         <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
 
         <div className="max-w-7xl mx-auto px-6">
-          <div ref={textRef} className="text-center">
-            <p className="text-navy/60 leading-relaxed text-sm tracking-wide max-w-3xl mx-auto mb-8">
-              {t('description')}
-            </p>
+          <div ref={textRef}>
+            {/* 2-Column layout on desktop */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-12">
+              {/* Left column — Heading & tagline */}
+              <div>
+                <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-navy leading-tight mb-4">
+                  Bridging Indonesian Flavors to Taiwan
+                </h2>
+                <p className="text-red font-semibold text-sm sm:text-base tracking-wide">
+                  More than a distributor — a cultural ambassador bringing the taste of home.
+                </p>
+              </div>
+
+              {/* Right column — Description */}
+              <div>
+                <p className="text-navy/60 leading-relaxed text-base sm:text-lg tracking-wide mb-4">
+                  {t('description')}
+                </p>
+              </div>
+            </div>
 
             {/* Decorative red line that draws on scroll */}
             <div
@@ -681,13 +697,38 @@ export default function AboutPage() {
               className="w-16 h-[2px] bg-red mx-auto mb-10 origin-left"
             />
 
-            <div className="flex flex-wrap justify-center gap-x-10 gap-y-4">
+            {/* Highlights */}
+            <div className="flex flex-wrap justify-center gap-x-10 gap-y-4 mb-14">
               {['highlight1', 'highlight2', 'highlight3'].map((key) => (
                 <div key={key} className="flex items-center gap-3">
                   <div className="w-2.5 h-2.5 rounded-full bg-red shrink-0 shadow-[0_0_8px_rgba(193,33,38,0.3)]" />
-                  <p className="text-navy/60 text-sm">{t(key)}</p>
+                  <p className="text-navy/60 text-sm sm:text-base">{t(key)}</p>
                 </div>
               ))}
+            </div>
+
+            {/* Key Differentiators Grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {[
+                { icon: Package, label: '26+ Product Lines', sublabel: 'Carefully Curated' },
+                { icon: Store, label: '300+ Partner Stores', sublabel: 'Island-Wide' },
+                { icon: Shield, label: 'Halal Certified', sublabel: 'Quality Assured' },
+                { icon: Globe, label: 'Island-Wide Distribution', sublabel: 'Reliable Supply Chain' },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div
+                    key={item.label}
+                    className="bg-white rounded-2xl p-5 sm:p-6 text-center border border-navy/[0.06] shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
+                  >
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-navy/[0.06] flex items-center justify-center mx-auto mb-3 group-hover:bg-red/10 transition-colors duration-300">
+                      <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-navy/60 group-hover:text-red transition-colors duration-300" />
+                    </div>
+                    <p className="font-heading font-bold text-navy text-sm sm:text-base mb-0.5">{item.label}</p>
+                    <p className="text-navy/40 text-xs sm:text-sm">{item.sublabel}</p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -739,7 +780,7 @@ export default function AboutPage() {
                   </div>
 
                   {/* ── Number — dark text on cream ── */}
-                  <div className="text-3xl sm:text-4xl font-heading font-bold text-navy mb-1.5 relative">
+                  <div className="text-4xl sm:text-5xl font-heading font-bold text-navy mb-1.5 relative">
                     <span className="relative">
                       {stat.prefix}
                       <span ref={(el) => { counterRefs.current[i] = el; }}>0</span>
@@ -800,7 +841,7 @@ export default function AboutPage() {
                     </div>
                     <h3 className="font-heading text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">{val.title}</h3>
                     <div className="w-10 h-[2px] bg-red/50 mx-auto mb-4 sm:mb-5 group-hover:w-16 transition-all duration-500" />
-                    <p className="text-cream/60 text-xs sm:text-sm leading-relaxed">{val.description}</p>
+                    <p className="text-cream/60 text-sm sm:text-base leading-relaxed">{val.description}</p>
                   </div>
 
                   {/* Bottom accent glow bar */}
