@@ -762,19 +762,19 @@ function FloatingProductCard({
             isHighlighted ? 'bg-red/15' : 'bg-red/0 group-hover:bg-red/8'
           }`} />
 
-          <div className={`relative rounded-2xl overflow-hidden bg-gradient-to-br from-cream via-white to-cream/50 transition-all duration-500 ${
+          <div className={`relative rounded-2xl overflow-hidden transition-all duration-500 ${
             isHighlighted
-              ? 'shadow-2xl shadow-red/20 ring-2 ring-red/30'
-              : 'shadow-lg shadow-navy/5 group-hover:shadow-2xl group-hover:shadow-navy/12'
+              ? 'drop-shadow-[0_8px_24px_rgba(193,33,38,0.2)] ring-2 ring-red/30'
+              : 'drop-shadow-[0_4px_12px_rgba(0,48,72,0.06)] group-hover:drop-shadow-[0_12px_32px_rgba(0,48,72,0.12)]'
           }`}>
-            {/* Image */}
+            {/* Image — no background, floating freely */}
             <div className="relative aspect-square overflow-hidden">
               {imageUrl ? (
                 <Image
                   src={imageUrl}
                   alt={name}
                   fill
-                  className="object-contain p-4 transition-all duration-700 group-hover:scale-110"
+                  className="object-contain p-2 transition-all duration-700 group-hover:scale-110"
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   unoptimized
                 />
@@ -1093,6 +1093,9 @@ function ProductsContent() {
           </svg>
         </div>
       </div>
+
+      {/* Seamless hero-to-content bridge — eliminates sub-pixel gap */}
+      <div className="h-2 bg-cream -mt-2 relative z-10" />
 
       {/* ============ CONTENT ============ */}
       <div ref={contentRef} className="max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20 scroll-mt-8">
