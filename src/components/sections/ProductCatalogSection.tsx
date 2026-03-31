@@ -7,6 +7,7 @@ import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ChevronDown, X } from 'lucide-react';
+import CategoryIcon from '@/components/ui/CategoryIcon';
 import { supabase } from '@/lib/supabase';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -176,8 +177,9 @@ function ProductPopup({
         </div>
 
         <div className="p-6 pt-5">
-          <span className="inline-block text-red/70 text-xs font-semibold tracking-wider uppercase mb-2">
-            {categoryMatch?.icon ? `${categoryMatch.icon} ` : ''}{categoryLabel}
+          <span className="inline-flex items-center gap-1.5 text-red/70 text-xs font-semibold tracking-wider uppercase mb-2">
+            {categoryMatch && <CategoryIcon slug={categoryMatch.slug} size={14} className="opacity-70" />}
+            {categoryLabel}
           </span>
           <h3 className="font-heading text-2xl font-bold text-navy mb-3">{getName()}</h3>
           <p className="text-navy/60 text-sm leading-relaxed">{getDesc()}</p>
@@ -613,7 +615,7 @@ export default function ProductCatalogSection() {
 
   const selectedCat = categories.find((c) => c.slug === selectedCategory);
   const selectedLabel = selectedCat ? getCategoryName(selectedCat, locale) : '';
-  const selectedIcon = selectedCat?.icon || '';
+  // Icon now rendered via CategoryIcon component
 
   return (
     <>
@@ -644,8 +646,9 @@ export default function ProductCatalogSection() {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center gap-2 px-5 py-2 rounded-full bg-cream text-navy font-semibold text-sm shadow-md hover:shadow-lg transition-all duration-300 min-w-[200px] justify-between"
               >
-                <span className="font-heading text-sm">
-                  {selectedIcon ? `${selectedIcon} ` : ''}{selectedLabel}
+                <span className="font-heading text-sm flex items-center gap-2">
+                  {selectedCat && <CategoryIcon slug={selectedCat.slug} size={16} />}
+                  {selectedLabel}
                 </span>
                 <ChevronDown
                   className={`w-4 h-4 transition-transform duration-300 ${
@@ -678,7 +681,10 @@ export default function ProductCatalogSection() {
                               : 'text-navy hover:bg-navy/5'
                           }`}
                         >
-                          {cat.icon ? `${cat.icon} ` : ''}{catName}
+                          <span className="flex items-center gap-2">
+                            <CategoryIcon slug={cat.slug} size={15} />
+                            {catName}
+                          </span>
                         </button>
                       );
                     })}
