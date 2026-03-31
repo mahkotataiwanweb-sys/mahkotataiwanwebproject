@@ -1,13 +1,13 @@
 'use client';
 
-import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Sparkles, Calendar, ArrowRight } from 'lucide-react';
+import { Sparkles, Calendar, ArrowRight, ArrowUpRight } from 'lucide-react';
 import HeroSlider from '@/components/sections/HeroSlider';
 import MarqueeSection from '@/components/sections/MarqueeSection';
 import ProductCatalogSection from '@/components/sections/ProductCatalogSection';
@@ -21,299 +21,216 @@ import type { Article } from '@/types/database';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ------------------------------------------------------------------ */
-/*  Types & config                                                     */
-/* ------------------------------------------------------------------ */
-interface UnifiedSlide {
+/* ──────────────────────────────────────────
+   Types
+────────────────────────────────────────── */
+interface DiscoverSlide {
   title: string;
   description: string;
   imageUrl: string | null;
-  categoryLabel: string;
-  categoryHref: string;
-  categoryIcon: typeof Calendar;
+  slug: string;
+  date: string;
+  type: string;
 }
 
-const CATEGORY_META: Record<string, { label: string; href: string; icon: typeof Calendar }> = {
-  event: { label: 'Event', href: '/events', icon: Calendar },
-  activity: { label: 'Activity', href: '/lifestyle', icon: Sparkles },
-};
-
-/* ------------------------------------------------------------------ */
-/*  StackedCardSlider                                                  */
-/* ------------------------------------------------------------------ */
-function StackedCardSlider({ 
-  slides, 
-  locale, 
-  label,
-  accentColor = 'bg-red',
-  delayOffset = 0,
-}: { 
-  slides: UnifiedSlide[]; 
-  locale: string; 
-  label: string;
-  accentColor?: string;
-  delayOffset?: number;
+/* ──────────────────────────────────────────
+   BentoArticleGrid — Premium magazine layout
+────────────────────────────────────────── */
+function BentoArticleGrid({
+  slides,
+  locale,
+}: {
+  slides: DiscoverSlide[];
+  locale: string;
 }) {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const VISIBLE = Math.min(4, slides.length);
-
-  useEffect(() => {
-    if (slides.length <= 1 || isHovered) return;
-    const timer = setTimeout(() => {
-      const interval = setInterval(() => {
-        setIsAnimating(true);
-        setActiveIndex((prev) => (prev + 1) % slides.length);
-        setTimeout(() => setIsAnimating(false), 1600);
-      }, 5500);
-      return () => clearInterval(interval);
-    }, delayOffset);
-    return () => clearTimeout(timer);
-  }, [slides.length, isHovered, delayOffset]);
-
   if (slides.length === 0) {
     return (
-      <div className="relative w-full aspect-[16/9] rounded-3xl overflow-hidden bg-gradient-to-br from-navy to-navy/80 shadow-lg ring-1 ring-white/10">
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <Sparkles className="w-12 h-12 text-white/30 mb-3" />
-          <span className="text-white/50 text-sm font-medium">Coming Soon</span>
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-16 h-16 rounded-full bg-[#003048]/5 flex items-center justify-center mb-4">
+          <Sparkles className="w-7 h-7 text-[#003048]/25" />
         </div>
+        <p className="text-[#003048]/40 text-sm">No articles yet — check back soon!</p>
       </div>
     );
   }
 
+  const featured = slides[0];
+  const rest = slides.slice(1, 4);
+
   return (
-    <div
-      className="relative"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Section label — larger, bolder, more prominent */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className={`w-3 h-3 rounded-full ${accentColor} shadow-[0_0_12px_rgba(193,33,38,0.5)]`} />
-        <span className="text-navy font-heading font-bold text-base sm:text-lg uppercase tracking-[0.15em]">{label}</span>
-        <span className="ml-auto text-navy/40 text-sm font-mono font-semibold">
-          {String(activeIndex + 1).padStart(2, '0')}/{String(slides.length).padStart(2, '0')}
-        </span>
-      </div>
-
-      {/* Card stack container */}
-      <div className="relative w-full aspect-[16/9] sm:aspect-[2/1]" style={{ perspective: '1200px' }}>
-        {slides.map((slide, i) => {
-          let pos = i - activeIndex;
-          if (pos < 0) pos += slides.length;
-          const isVisible = pos < VISIBLE;
-          const isFront = pos === 0;
-
-          return (
-            <motion.div
-              key={`${label}-${i}`}
-              className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden will-change-transform"
-              animate={{
-                y: isVisible ? pos * 18 : -80,
-                x: isVisible ? pos * 5 : 0,
-                scale: isVisible ? 1 - pos * 0.035 : 0.85,
-                opacity: isVisible ? 1 - pos * 0.2 : 0,
-                rotateX: isVisible ? pos * -1.8 : -10,
-                zIndex: isVisible ? VISIBLE - pos + 1 : 0,
-                filter: isFront ? 'blur(0px) brightness(1)' : `blur(${pos * 0.6}px) brightness(${1 - pos * 0.05})`,
-              }}
-              transition={{
-                duration: 1.5,
-                ease: [0.22, 0.68, 0, 1.04],
-              }}
-              style={{ 
-                transformOrigin: 'center 85%',
-                transformStyle: 'preserve-3d',
-              }}
-            >
-              {/* Card background */}
-              <Link
-                href={`/${locale}${slide.categoryHref}`}
-                className="block absolute inset-0 group"
-              >
-                {slide.imageUrl ? (
-                  <Image
-                    src={slide.imageUrl}
-                    alt={slide.title || label}
-                    fill
-                    className="object-cover transition-transform duration-[8s] ease-linear group-hover:scale-105"
-                    sizes="(max-width: 640px) 100vw, 90vw"
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/90 to-navy-dark" />
-                )}
-
-                {/* Overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/5 group-hover:from-black/85 transition-all duration-500" />
-
-                {/* Glossy top reflection */}
-                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.07] via-transparent to-transparent pointer-events-none" />
-
-                {/* Subtle edge shadow for each stacked card */}
-                <div className="absolute inset-0 rounded-2xl sm:rounded-3xl shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] pointer-events-none" />
-
-                {/* Content overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
-                  <AnimatePresence mode="wait">
-                    {isFront && (
-                      <motion.div
-                        key={`content-${activeIndex}`}
-                        initial={{ opacity: 0, y: 24, filter: 'blur(6px)' }}
-                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                        exit={{ opacity: 0, y: -16, filter: 'blur(6px)' }}
-                        transition={{ duration: 0.9, delay: 0.4, ease: [0.22, 0.68, 0, 1] }}
-                      >
-                        <h3 className="text-white font-bold text-lg sm:text-xl lg:text-2xl mb-1.5 line-clamp-1 drop-shadow-lg">
-                          {slide.title}
-                        </h3>
-                        <p className="text-white/65 text-xs sm:text-sm line-clamp-2 max-w-xl">
-                          {slide.description}
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* Hover arrow indicator */}
-                {isFront && (
-                  <div className="absolute top-4 sm:top-5 right-4 sm:right-5 w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
-                    <ArrowRight className="w-4 h-4 text-white" />
-                  </div>
-                )}
-              </Link>
-
-              {/* Edge shadow for depth on stacked cards */}
-              {!isFront && isVisible && (
-                <div className="absolute inset-0 shadow-[inset_0_2px_6px_rgba(0,0,0,0.15)] rounded-2xl sm:rounded-3xl pointer-events-none" />
-              )}
-            </motion.div>
-          );
-        })}
-
-        {/* Progress bar at bottom — pushed further from card stack */}
-        {slides.length > 1 && (
-          <div className="absolute -bottom-12 left-0 right-0 flex gap-1.5 z-20">
-            {slides.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => { setActiveIndex(i); setIsAnimating(true); setTimeout(() => setIsAnimating(false), 1600); }}
-                className="relative h-1 flex-1 rounded-full overflow-hidden bg-navy/10"
-              >
-                {i === activeIndex && (
-                  <motion.div
-                    className={`absolute inset-0 rounded-full ${accentColor === 'bg-navy' ? 'bg-navy' : 'bg-red'}`}
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ duration: 5.5, ease: 'linear' }}
-                    style={{ transformOrigin: 'left' }}
-                    key={`progress-${activeIndex}`}
-                  />
-                )}
-                {i < activeIndex && (
-                  <div className={`absolute inset-0 rounded-full ${accentColor === 'bg-navy' ? 'bg-navy/40' : 'bg-red/40'}`} />
-                )}
-              </button>
-            ))}
-          </div>
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      {/* ── FEATURED CARD — 3 columns, 2 rows ── */}
+      <Link
+        href={`/${locale}/articles/${featured.slug}`}
+        className="lg:col-span-3 lg:row-span-2 group relative rounded-3xl overflow-hidden aspect-[4/3] lg:aspect-auto shadow-2xl shadow-[#003048]/15 ring-1 ring-white/10"
+      >
+        {featured.imageUrl ? (
+          <Image
+            src={featured.imageUrl}
+            alt={featured.title}
+            fill
+            className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105"
+            sizes="(max-width: 1024px) 100vw, 60vw"
+            unoptimized
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-[#003048] to-[#001a2c]" />
         )}
-      </div>
+        {/* overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/5" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
+        {/* glossy top */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] via-transparent to-transparent pointer-events-none" />
+
+        {/* content overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 lg:p-10">
+          <span className="inline-block px-3 py-1 mb-3 rounded-full bg-[#C12126] text-white text-[10px] font-bold uppercase tracking-[0.15em] shadow-lg shadow-[#C12126]/30">
+            Featured
+          </span>
+          <h3 className="font-heading text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-tight mb-2 line-clamp-2 drop-shadow-lg">
+            {featured.title}
+          </h3>
+          <p className="text-white/60 text-xs sm:text-sm line-clamp-2 max-w-lg mb-4">
+            {featured.description}
+          </p>
+          <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#C12126] group-hover:gap-3 transition-all duration-300">
+            Read Article <ArrowRight className="w-4 h-4" />
+          </span>
+        </div>
+
+        {/* hover arrow */}
+        <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300">
+          <ArrowUpRight className="w-5 h-5 text-white" />
+        </div>
+      </Link>
+
+      {/* ── SECONDARY CARDS — 2 columns each ── */}
+      {rest.map((slide, i) => (
+        <Link
+          key={i}
+          href={`/${locale}/articles/${slide.slug}`}
+          className="lg:col-span-2 group relative rounded-2xl overflow-hidden aspect-[16/9] shadow-xl shadow-[#003048]/10 ring-1 ring-white/10"
+        >
+          {slide.imageUrl ? (
+            <Image
+              src={slide.imageUrl}
+              alt={slide.title}
+              fill
+              className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105"
+              sizes="(max-width: 1024px) 100vw, 40vw"
+              unoptimized
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-[#003048] to-[#001a2c]" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/[0.04] via-transparent to-transparent pointer-events-none" />
+
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+            <p className="text-[#C12126] text-[10px] font-bold uppercase tracking-[0.15em] mb-1">{slide.date}</p>
+            <h3 className="font-heading text-sm lg:text-base font-bold text-white leading-snug mb-1 line-clamp-2">
+              {slide.title}
+            </h3>
+            <p className="text-white/45 text-xs line-clamp-1">{slide.description}</p>
+          </div>
+
+          <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/0 group-hover:bg-white/20 backdrop-blur-sm flex items-center justify-center scale-0 group-hover:scale-100 transition-all duration-300">
+            <ArrowUpRight className="w-4 h-4 text-white" />
+          </div>
+        </Link>
+      ))}
     </div>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  HomePage                                                           */
-/* ------------------------------------------------------------------ */
+/* ──────────────────────────────────────────
+   HomePage
+────────────────────────────────────────── */
 export default function HomePage() {
   const locale = useLocale();
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const sliderWrapRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
-  /* ---------- Dynamic content state ---------- */
-  const [eventSlides, setEventSlides] = useState<UnifiedSlide[]>([]);
-  const [activitySlides, setActivitySlides] = useState<UnifiedSlide[]>([]);
+  /* state */
+  const [eventSlides, setEventSlides] = useState<DiscoverSlide[]>([]);
+  const [activitySlides, setActivitySlides] = useState<DiscoverSlide[]>([]);
+  const [activeTab, setActiveTab] = useState<'events' | 'activities'>('events');
 
-  /* ---------- Fetch all content in parallel ---------- */
+  /* ── fetch articles ── */
   useEffect(() => {
     async function fetchAll() {
-      const [eventsRes, lifestyleRes] = await Promise.all([
+      const [evRes, lifeRes] = await Promise.all([
         supabase
           .from('articles')
           .select('*')
           .eq('type', 'event')
+          .eq('is_active', true)
           .order('published_at', { ascending: false })
           .limit(4),
         supabase
           .from('articles')
           .select('*')
           .eq('type', 'lifestyle')
+          .eq('is_active', true)
           .order('published_at', { ascending: false })
           .limit(4),
       ]);
 
-      const toSlides = (articles: Article[] | null, catKey: string): UnifiedSlide[] => {
-        const meta = CATEGORY_META[catKey];
-        return (articles || [])
-          .filter((item) => getLocalizedField(item, 'title', locale))
-          .map((item) => ({
-            title: getLocalizedField(item, 'title', locale) || '',
-            description: getLocalizedField(item, 'excerpt', locale) || '',
-            imageUrl: item.image_url || null,
-            categoryLabel: meta.label,
-            categoryHref: meta.href,
-            categoryIcon: meta.icon,
+      const toSlides = (items: Article[] | null): DiscoverSlide[] =>
+        (items || [])
+          .filter((a) => getLocalizedField(a, 'title', locale))
+          .map((a) => ({
+            title: getLocalizedField(a, 'title', locale) || '',
+            description: getLocalizedField(a, 'excerpt', locale) || '',
+            imageUrl: a.image_url || null,
+            slug: a.slug,
+            date: a.published_at
+              ? new Date(a.published_at).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })
+              : '',
+            type: a.type,
           }));
-      };
 
-      setEventSlides(toSlides(eventsRes.data as Article[] | null, 'event'));
-      setActivitySlides(toSlides(lifestyleRes.data as Article[] | null, 'activity'));
+      setEventSlides(toSlides(evRes.data as Article[] | null));
+      setActivitySlides(toSlides(lifeRes.data as Article[] | null));
     }
-
     fetchAll();
   }, [locale]);
 
-  /* ---------- ✨ GSAP scroll entrance for discover section ---------- */
+  /* ── GSAP scroll entrance ── */
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Header: staggered fade-in entrance
       if (headerRef.current) {
         gsap.fromTo(
           headerRef.current.children,
-          { opacity: 0, y: 40 },
+          { opacity: 0, y: 45 },
           {
             opacity: 1,
             y: 0,
             duration: 1,
             stagger: 0.12,
             ease: 'power3.out',
-            scrollTrigger: {
-              trigger: headerRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
+            scrollTrigger: { trigger: headerRef.current, start: 'top 85%', toggleActions: 'play none none reverse' },
+          },
         );
       }
 
-      // Slider: scale + fade entrance
-      if (sliderWrapRef.current) {
-        gsap.fromTo(sliderWrapRef.current,
-          { opacity: 0, y: 50, scale: 0.95 },
+      if (gridRef.current) {
+        gsap.fromTo(
+          gridRef.current,
+          { opacity: 0, y: 50, scale: 0.97 },
           {
             opacity: 1,
             y: 0,
             scale: 1,
             duration: 1,
             ease: 'power3.out',
-            scrollTrigger: {
-              trigger: sliderWrapRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
+            scrollTrigger: { trigger: gridRef.current, start: 'top 85%', toggleActions: 'play none none reverse' },
+          },
         );
       }
     }, sectionRef);
@@ -322,59 +239,94 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Global sand texture — visible through all cream-colored areas */}
       <SandTexture fixed />
-
       <HeroSlider />
       <MarqueeSection />
-
-      {/* Product Catalog Showcase — flush with marquee, no card-reveal gap */}
       <ProductCatalogSection />
-
-      {/* Recipe Showcase — Premium 3D Rotating Carousel */}
       <RecipeShowcaseSection />
 
-      {/* Discover Section — Dual Stacked Card Sliders */}
+      {/* ═══════════════════════════════════════════════
+          DISCOVER SECTION — Premium Bento Grid
+      ═══════════════════════════════════════════════ */}
       <section ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+        {/* decorative elements */}
+        <div className="pointer-events-none absolute -top-40 -right-40 w-96 h-96 rounded-full bg-[#C12126]/5 blur-[120px]" />
+        <div className="pointer-events-none absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-[#003048]/5 blur-[100px]" />
 
         <div className="max-w-7xl mx-auto px-6">
-          {/* Header */}
-          <div ref={headerRef} className="text-center mb-16">
-            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
-              Discover
-            </p>
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">
+          {/* ── Header ── */}
+          <div ref={headerRef} className="text-center mb-14">
+            <p className="text-[#C12126] text-xs tracking-[0.35em] uppercase font-bold mb-3">Discover</p>
+            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-[#003048] tracking-tight mb-3">
               Explore Mahkota Taiwan
             </h2>
-            <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
-            <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">
+            <div className="w-16 h-[2px] bg-[#C12126] mx-auto mb-4 rounded-full" />
+            <p className="text-[#003048]/45 max-w-lg mx-auto text-sm tracking-wide">
               Stay up to date with our latest events and community activities
             </p>
           </div>
 
-          {/* Two Stacked Card Sliders — 30% smaller on desktop, centered */}
-          <div ref={sliderWrapRef} className="space-y-20 lg:max-w-[55%] lg:mx-auto">
-            <StackedCardSlider
-              slides={eventSlides}
-              locale={locale}
-              label="Events"
-              accentColor="bg-red"
-              delayOffset={0}
-            />
-            <StackedCardSlider
-              slides={activitySlides}
-              locale={locale}
-              label="Activities"
-              accentColor="bg-navy"
-              delayOffset={4000}
-            />
+          {/* ── Tab Switcher ── */}
+          <div className="flex justify-center gap-2 mb-10">
+            <button
+              onClick={() => setActiveTab('events')}
+              className={`px-7 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
+                activeTab === 'events'
+                  ? 'bg-[#C12126] text-white shadow-xl shadow-[#C12126]/25 scale-[1.02]'
+                  : 'bg-[#003048]/5 text-[#003048]/50 hover:bg-[#003048]/10 hover:text-[#003048]/70'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" /> Events
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('activities')}
+              className={`px-7 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
+                activeTab === 'activities'
+                  ? 'bg-[#003048] text-white shadow-xl shadow-[#003048]/25 scale-[1.02]'
+                  : 'bg-[#003048]/5 text-[#003048]/50 hover:bg-[#003048]/10 hover:text-[#003048]/70'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4" /> Activities
+              </span>
+            </button>
+          </div>
+
+          {/* ── Bento Grid ── */}
+          <div ref={gridRef}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 25, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.98 }}
+                transition={{ duration: 0.5, ease: [0.22, 0.68, 0, 1] }}
+              >
+                <BentoArticleGrid
+                  slides={activeTab === 'events' ? eventSlides : activitySlides}
+                  locale={locale}
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* ── View All link ── */}
+          <div className="text-center mt-10">
+            <Link
+              href={`/${locale}/${activeTab === 'events' ? 'events' : 'lifestyle'}`}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#003048]/5 text-[#003048] text-sm font-semibold hover:bg-[#003048] hover:text-white transition-all duration-300 group"
+            >
+              View All {activeTab === 'events' ? 'Events' : 'Activities'}
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </Link>
           </div>
         </div>
       </section>
 
       <VideoShowcaseSection />
       <WhereToBuySection />
-
     </>
   );
 }
