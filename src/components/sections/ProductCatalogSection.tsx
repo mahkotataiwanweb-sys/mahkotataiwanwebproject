@@ -217,7 +217,7 @@ function InfiniteSlider({
   const containerRef = useRef<HTMLDivElement>(null);
   const prevCenterIdxRef = useRef(-1);
   const centerDwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const wobbleReadyRef = useRef(false);
+  const floatReadyRef = useRef(false);
 
   // --- Tuning ---
   const DEFAULT_SPEED = 0.8; // slower, more elegant
@@ -247,7 +247,7 @@ function InfiniteSlider({
     singleSetWidthRef.current = products.length * itemWidth;
   }, [products.length, itemWidth]);
 
-  // Apply scale + wobble based on exact center distance
+  // Apply scale + float based on exact center distance
   const applyItemTransforms = useCallback(() => {
     const container = containerRef.current;
     const track = trackRef.current;
@@ -288,7 +288,7 @@ function InfiniteSlider({
       nameEl.style.color = `rgba(0,48,72,${0.3 + proximity * 0.7})`;
       nameEl.style.transition = 'all 0.35s ease';
 
-      // Track closest for wobble
+      // Track closest for float
       if (dist < closestDist) {
         closestDist = dist;
         closestIdx = i % products.length;
@@ -299,12 +299,12 @@ function InfiniteSlider({
 
       if (isCentered) {
         imgContainer.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.5))';
-        // Only apply wobble if dwell time passed
-        if (wobbleReadyRef.current && closestIdx === prevCenterIdxRef.current) {
-          imgContainer.classList.add('product-wobble-active');
+        // Only apply float if dwell time passed
+        if (floatReadyRef.current && closestIdx === prevCenterIdxRef.current) {
+          imgContainer.classList.add('product-float-active');
         }
       } else {
-        imgContainer.classList.remove('product-wobble-active');
+        imgContainer.classList.remove('product-float-active');
         imgContainer.style.filter = 'none';
       }
     }
@@ -312,16 +312,16 @@ function InfiniteSlider({
     // Detect center change → start dwell timer
     if (closestIdx !== prevCenterIdxRef.current) {
       prevCenterIdxRef.current = closestIdx;
-      wobbleReadyRef.current = false;
+      floatReadyRef.current = false;
 
       // Clear previous timer
       if (centerDwellTimerRef.current) {
         clearTimeout(centerDwellTimerRef.current);
       }
 
-      // Start new 0.5s dwell timer — wobble only after 500ms at center
+      // Start new 0.5s dwell timer — float only after 500ms at center
       centerDwellTimerRef.current = setTimeout(() => {
-        wobbleReadyRef.current = true;
+        floatReadyRef.current = true;
       }, 500);
     }
   }, [products.length, itemWidth]);
