@@ -10,6 +10,7 @@ import { ArrowLeft, Calendar as CalendarIcon, ChevronLeft, ChevronRight, X } fro
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
+import HeroBackground from '@/components/effects/HeroBackground';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -265,31 +266,9 @@ export default function EventsPage() {
       {/* ═══════ HERO ═══════ */}
       <section
         ref={heroRef}
-        className="relative overflow-hidden bg-[#003048] pt-28 pb-20 md:pt-36 md:pb-28"
+        className="relative overflow-hidden bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] pt-28 pb-20 md:pt-36 md:pb-28"
       >
-        {/* grid overlay */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
-
-        {/* decorative blurred circles */}
-        <div className="pointer-events-none absolute -top-20 -left-20 h-72 w-72 rounded-full bg-[#C12126]/20 blur-[100px]" />
-        <div className="pointer-events-none absolute bottom-10 right-10 h-56 w-56 rounded-full bg-[#FAEDD3]/15 blur-[90px]" />
-        <div className="pointer-events-none absolute top-1/2 left-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#C12126]/10 blur-[80px]" />
-
-        {/* animated vertical line on right */}
-        <motion.div
-          className="absolute right-12 top-16 bottom-16 hidden w-px bg-gradient-to-b from-transparent via-[#FAEDD3]/20 to-transparent lg:block"
-          initial={{ scaleY: 0 }}
-          animate={{ scaleY: 1 }}
-          transition={{ duration: 1.2, ease: 'easeOut', delay: 0.6 }}
-          style={{ transformOrigin: 'top' }}
-        />
+        <HeroBackground />
 
         <div className="relative mx-auto max-w-7xl px-6">
           {/* back */}

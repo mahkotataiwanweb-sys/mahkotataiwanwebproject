@@ -15,6 +15,7 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import CategoryIcon from '@/components/ui/CategoryIcon';
+import HeroBackground from '@/components/effects/HeroBackground';
 import { getLocalizedField } from '@/lib/utils';
 import type { Product, Category } from '@/types/database';
 
@@ -1014,19 +1015,8 @@ function ProductsContent() {
   return (
     <div className="min-h-screen bg-cream">
       {/* ============ HERO ============ */}
-      <div className="relative bg-navy">
-        {/* Decorative elements — clipped within their own container */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-red/8 blur-[120px]" />
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-cream/5 blur-[100px]" />
-          <div
-            className="absolute inset-0 opacity-[0.02]"
-            style={{
-              backgroundImage: 'linear-gradient(rgba(250,237,211,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(250,237,211,0.3) 1px, transparent 1px)',
-              backgroundSize: '80px 80px',
-            }}
-          />
-        </div>
+      <div className="relative bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236]">
+        <HeroBackground />
 
         <div className="max-w-7xl mx-auto px-6 sm:px-10 relative z-10 pt-32 sm:pt-36 pb-20 sm:pb-28">
           <Link

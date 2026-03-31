@@ -18,6 +18,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { GalleryImage } from '@/types/database';
+import HeroBackground from '@/components/effects/HeroBackground';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -381,22 +382,9 @@ export default function GalleryPage() {
       {/* ═══════════════ HERO ═══════════════ */}
       <section
         ref={heroRef}
-        className="relative overflow-hidden bg-[#003048] py-28 md:py-36 lg:py-44"
+        className="relative overflow-hidden bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] py-28 md:py-36 lg:py-44"
       >
-        {/* Grid Overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(250,237,211,1) 1px, transparent 1px), linear-gradient(90deg, rgba(250,237,211,1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
-
-        {/* Decorative Orbs */}
-        <div className="hero-orb absolute -top-32 -right-32 w-96 h-96 rounded-full bg-gradient-to-br from-[#C12126]/30 to-transparent blur-3xl" />
-        <div className="hero-orb absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-[#FAEDD3]/10 to-transparent blur-3xl" />
-        <div className="hero-orb absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full bg-[#C12126]/5 blur-2xl" />
+        <HeroBackground />
 
         {/* Floating Camera Icon */}
         <motion.div
