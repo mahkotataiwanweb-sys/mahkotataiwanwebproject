@@ -10,7 +10,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   Package, ArrowLeft, X,
-  Shield, Award, Search, ArrowRight, Sparkles
+  Shield, Award, Search, ArrowRight, Sparkles, ChevronDown
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
@@ -89,10 +89,8 @@ function SmartSearch({
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Enable portal after mount (SSR safety)
   useEffect(() => { setPortalReady(true); }, []);
 
-  // Update dropdown position whenever focused/query changes or on scroll/resize
   const updatePosition = useCallback(() => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
@@ -115,7 +113,6 @@ function SmartSearch({
     };
   }, [focused, query, updatePosition]);
 
-  // Close on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
@@ -130,7 +127,6 @@ function SmartSearch({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Build a category name map for search
   const categoryNameMap = useMemo(() => {
     const map: Record<string, { en: string; id: string; zh: string }> = {};
     categories.forEach(c => {
@@ -143,14 +139,12 @@ function SmartSearch({
     return map;
   }, [categories]);
 
-  // Fuzzy tokenized search with scoring
   const results = useMemo(() => {
     if (!query.trim()) return [];
     const normalizedQuery = normalizeText(query);
     const tokens = normalizedQuery.split(/\s+/).filter(Boolean);
 
     const scored = products.map((p) => {
-      // Build all searchable fields for this product
       const productFields = [
         normalizeText(getLocalizedField(p, 'name', locale)),
         normalizeText(p.name_en || ''),
@@ -162,7 +156,6 @@ function SmartSearch({
         normalizeText(p.slug || ''),
       ];
 
-      // Also include category name fields
       const catNames = categoryNameMap[p.category_id];
       if (catNames) {
         productFields.push(catNames.en, catNames.id, catNames.zh);
@@ -176,46 +169,21 @@ function SmartSearch({
 
         for (const text of productFields) {
           if (!text) continue;
-
-          // Exact full match
-          if (text === token) {
-            tokenBestScore = Math.max(tokenBestScore, 100);
-            continue;
-          }
-          // Full text starts with token
-          if (text.startsWith(token)) {
-            tokenBestScore = Math.max(tokenBestScore, 70);
-            continue;
-          }
-          // Any word in text starts with token
+          if (text === token) { tokenBestScore = Math.max(tokenBestScore, 100); continue; }
+          if (text.startsWith(token)) { tokenBestScore = Math.max(tokenBestScore, 70); continue; }
           const words = text.split(/[\s\-_]+/);
-          if (words.some(w => w === token)) {
-            tokenBestScore = Math.max(tokenBestScore, 80);
-            continue;
-          }
-          if (words.some(w => w.startsWith(token))) {
-            tokenBestScore = Math.max(tokenBestScore, 55);
-            continue;
-          }
-          // Contains anywhere
-          if (text.includes(token)) {
-            tokenBestScore = Math.max(tokenBestScore, 30);
-            continue;
-          }
-          // Partial character match for CJK (Chinese/Japanese)
+          if (words.some(w => w === token)) { tokenBestScore = Math.max(tokenBestScore, 80); continue; }
+          if (words.some(w => w.startsWith(token))) { tokenBestScore = Math.max(tokenBestScore, 55); continue; }
+          if (text.includes(token)) { tokenBestScore = Math.max(tokenBestScore, 30); continue; }
           if (token.length >= 1 && /[\u4e00-\u9fff]/.test(token) && text.includes(token)) {
             tokenBestScore = Math.max(tokenBestScore, 40);
           }
         }
 
-        if (tokenBestScore === 0) {
-          allTokensMatched = false;
-          break;
-        }
+        if (tokenBestScore === 0) { allTokensMatched = false; break; }
         score += tokenBestScore;
       }
 
-      // Bonus: more tokens matched = higher score multiplier
       if (allTokensMatched && tokens.length > 1) {
         score *= (1 + tokens.length * 0.1);
       }
@@ -230,7 +198,6 @@ function SmartSearch({
       .map(s => s.product);
   }, [query, products, locale, categoryNameMap]);
 
-  // Group results by category
   const grouped = useMemo(() => {
     const groups: Record<string, Product[]> = {};
     results.forEach((p) => {
@@ -241,10 +208,8 @@ function SmartSearch({
     return groups;
   }, [results]);
 
-  // Flat list for keyboard nav
   const flatList = results;
 
-  // Reset index on query change
   useEffect(() => { setActiveIndex(-1); }, [query]);
 
   const getCategoryName = useCallback(
@@ -288,10 +253,8 @@ function SmartSearch({
 
   const showDropdown = focused && query.trim().length > 0;
 
-  // Build flat index for keyboard navigation
   let globalResultIndex = -1;
 
-  // Dropdown content
   const dropdownContent = showDropdown && portalReady ? createPortal(
     <div
       ref={dropdownRef}
@@ -312,11 +275,7 @@ function SmartSearch({
       >
         {results.length === 0 ? (
           <div className="p-10 text-center">
-            <motion.div
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
+            <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 300 }}>
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-navy/5 flex items-center justify-center">
                 <Package className="w-8 h-8 text-navy/15" />
               </div>
@@ -330,7 +289,6 @@ function SmartSearch({
           </div>
         ) : (
           <div className="py-2">
-            {/* Results count */}
             <div className="px-5 py-2 flex items-center justify-between">
               <span className="text-[10px] font-semibold text-navy/30 uppercase tracking-[0.15em]">
                 {results.length} {locale === 'id' ? 'hasil' : locale === 'zh-TW' ? '個結果' : 'results'}
@@ -346,13 +304,11 @@ function SmartSearch({
               const cat = categories.find((c) => c.id === catId);
               return (
                 <div key={catId}>
-                  {/* Category header */}
                   <div className="px-5 py-2 text-[10px] font-bold text-navy/30 uppercase tracking-[0.2em] bg-gradient-to-r from-cream/60 to-transparent flex items-center gap-2 sticky top-0 backdrop-blur-sm z-10">
                     {cat && <CategoryIcon slug={cat.slug} size={12} className="opacity-40" />}
                     {catName}
                     <span className="text-navy/20">({prods.length})</span>
                   </div>
-                  {/* Products */}
                   {prods.map((product) => {
                     globalResultIndex++;
                     const thisIndex = globalResultIndex;
@@ -376,7 +332,6 @@ function SmartSearch({
                           isActive ? 'bg-red/5' : 'hover:bg-cream/60'
                         }`}
                       >
-                        {/* Product thumbnail */}
                         <div className={`w-13 h-13 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center transition-all duration-300 ${
                           isActive ? 'bg-red/10 shadow-md shadow-red/10' : 'bg-cream/80'
                         }`}>
@@ -416,7 +371,6 @@ function SmartSearch({
               );
             })}
 
-            {/* Search tip */}
             <div className="px-5 py-3 border-t border-navy/5 flex items-center gap-2">
               <Sparkles className="w-3 h-3 text-red/30" />
               <span className="text-[10px] text-navy/25">{searchHint}</span>
@@ -430,9 +384,7 @@ function SmartSearch({
 
   return (
     <div ref={containerRef} className="relative w-full max-w-xl mx-auto">
-      {/* Search Input */}
       <div className={`relative transition-all duration-500 ${focused ? 'scale-[1.02]' : ''}`}>
-        {/* Animated glow ring */}
         <div className={`absolute -inset-1.5 rounded-2xl transition-all duration-700 ${
           focused ? 'opacity-100' : 'opacity-0'
         }`}>
@@ -473,7 +425,6 @@ function SmartSearch({
               </motion.button>
             )}
           </AnimatePresence>
-          {/* Keyboard hint */}
           {focused && !query && (
             <div className="hidden sm:flex items-center mr-4 gap-1">
               <kbd className="text-[10px] text-navy/25 bg-navy/5 px-1.5 py-0.5 rounded font-mono">↑↓</kbd>
@@ -483,7 +434,6 @@ function SmartSearch({
         </div>
       </div>
 
-      {/* Portal-based dropdown — renders at body level, escapes overflow-hidden */}
       {dropdownContent}
     </div>
   );
@@ -569,133 +519,124 @@ function ProductModal({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Category Card — for masonry Pinterest layout                       */
+/*  Category Dropdown Selector                                         */
 /* ------------------------------------------------------------------ */
-function CategoryCard({
-  category,
+function CategoryDropdown({
+  categories,
+  activeCategory,
   locale,
-  productCount,
-  index,
-  onClick,
-  fallbackImageUrl,
+  productCounts,
+  onSelect,
 }: {
-  category: Category;
+  categories: Category[];
+  activeCategory: string;
   locale: string;
-  productCount: number;
-  index: number;
-  onClick: () => void;
-  fallbackImageUrl?: string | null;
+  productCounts: Record<string, number>;
+  onSelect: (categoryId: string) => void;
 }) {
-  const name = getLocalizedField(category, 'name', locale);
-  const description = getLocalizedField(category, 'description', locale);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
-  const [isHovered, setIsHovered] = useState(false);
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    setMousePos({
-      x: (e.clientX - rect.left) / rect.width,
-      y: (e.clientY - rect.top) / rect.height,
-    });
+  const activeCat = categories.find(c => c.id === activeCategory);
+  const activeName = activeCat ? getLocalizedField(activeCat, 'name', locale) : '';
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const imgX = (mousePos.x - 0.5) * -15;
-  const imgY = (mousePos.y - 0.5) * -15;
-
-  // Varied heights for masonry effect
-  const heightPattern = [380, 300, 340, 280, 360, 320, 400, 290, 350, 310];
-  const cardHeight = heightPattern[index % heightPattern.length];
-  const imageUrl = category.image_url || fallbackImageUrl;
+  const categoryLabel = locale === 'id' ? 'Kategori' : locale === 'zh-TW' ? '類別' : 'Category';
+  const itemsLabel = locale === 'id' ? 'produk' : locale === 'zh-TW' ? '項' : 'items';
 
   return (
-    <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 50, scale: 0.96 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{
-        type: 'spring',
-        stiffness: 150,
-        damping: 22,
-        delay: index * 0.06,
-      }}
-      onClick={onClick}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => { setIsHovered(false); setMousePos({ x: 0.5, y: 0.5 }); }}
-      className="cursor-pointer group relative rounded-3xl overflow-hidden break-inside-avoid mb-4"
-      style={{ height: `${cardHeight}px` }}
-    >
-      <div className="relative overflow-hidden w-full h-full">
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={name}
-            fill
-            className="object-cover transition-all duration-[800ms] ease-out will-change-transform"
-            style={{
-              transform: isHovered
-                ? `scale(1.15) translate(${imgX}px, ${imgY}px)`
-                : 'scale(1.05) translate(0px, 0px)',
-              filter: isHovered ? 'brightness(0.65) saturate(1.2)' : 'brightness(0.5) saturate(1)',
-            }}
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
-            unoptimized
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/95 to-red/20" />
+    <div ref={dropdownRef} className="relative inline-block">
+      {/* Trigger button */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="group flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-white/80 backdrop-blur-sm border border-navy/8 shadow-lg shadow-navy/5 hover:shadow-xl hover:bg-white transition-all duration-300"
+      >
+        {activeCat && (
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-red/10 to-red/5 flex items-center justify-center text-red">
+            <CategoryIcon slug={activeCat.slug} size={18} />
+          </div>
         )}
-
-        {/* Vignette */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/5" />
-
-        {/* Cursor spotlight */}
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
-          style={{
-            background: `radial-gradient(circle 300px at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(255,255,255,0.08), transparent)`,
-          }}
-        />
-
-        {/* Top badge */}
-        <div className="absolute top-4 right-4 z-10">
-          <div className="px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-bold tracking-wider border border-white/10 group-hover:bg-white/20 transition-all duration-500">
-            {productCount} items
-          </div>
+        <div className="text-left">
+          <span className="text-[10px] text-navy/35 font-semibold uppercase tracking-[0.15em] block leading-none mb-0.5">{categoryLabel}</span>
+          <span className="text-sm font-bold text-navy block leading-tight">{activeName}</span>
         </div>
+        <ChevronDown className={`w-4 h-4 text-navy/30 ml-2 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
+      </button>
 
-        {/* Category icon */}
-        <div className="absolute top-4 left-4 z-10 opacity-70 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110 text-white drop-shadow-lg">
-          <CategoryIcon slug={category.slug} size={28} />
-        </div>
+      {/* Dropdown menu */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+            className="absolute top-full left-0 mt-2 w-72 sm:w-80 bg-white/[0.99] backdrop-blur-2xl rounded-2xl shadow-2xl shadow-navy/15 border border-navy/8 overflow-hidden z-50"
+          >
+            <div className="p-2">
+              {categories.map((cat, i) => {
+                const name = getLocalizedField(cat, 'name', locale);
+                const desc = getLocalizedField(cat, 'description', locale);
+                const isActive = cat.id === activeCategory;
+                const count = productCounts[cat.id] || 0;
 
-        {/* Bottom content */}
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 z-10">
-          <div className="transform transition-all duration-500 group-hover:-translate-y-2">
-            <h3 className="font-heading text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-[1.05] mb-1.5 drop-shadow-lg">
-              {name}
-            </h3>
-            <p className="text-white/40 text-xs leading-relaxed line-clamp-2 max-w-xs group-hover:text-white/65 transition-colors duration-500">
-              {description || 'Discover our premium selection'}
-            </p>
-          </div>
-
-          {/* Explore reveal */}
-          <div className="mt-3 overflow-hidden h-0 group-hover:h-8 transition-all duration-500 ease-out">
-            <div className="flex items-center gap-2 text-white/80 transform translate-y-6 group-hover:translate-y-0 transition-transform duration-500 ease-out">
-              <div className="w-6 h-px bg-red" />
-              <span className="text-xs font-bold tracking-[0.2em] uppercase">Explore</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" />
+                return (
+                  <motion.button
+                    key={cat.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.03 }}
+                    onClick={() => {
+                      onSelect(cat.id);
+                      setOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl transition-all duration-200 group text-left ${
+                      isActive
+                        ? 'bg-red/8 ring-1 ring-red/15'
+                        : 'hover:bg-cream/70'
+                    }`}
+                  >
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 ${
+                      isActive
+                        ? 'bg-red/15 text-red shadow-sm shadow-red/10'
+                        : 'bg-navy/5 text-navy/40 group-hover:bg-red/10 group-hover:text-red'
+                    }`}>
+                      <CategoryIcon slug={cat.slug} size={20} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-semibold truncate transition-colors duration-200 ${
+                        isActive ? 'text-red' : 'text-navy group-hover:text-navy'
+                      }`}>
+                        {name}
+                      </p>
+                      {desc && (
+                        <p className="text-navy/30 text-[11px] mt-0.5 truncate">{desc}</p>
+                      )}
+                    </div>
+                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                      isActive
+                        ? 'bg-red/15 text-red'
+                        : 'bg-navy/5 text-navy/30 group-hover:bg-red/10 group-hover:text-red/60'
+                    }`}>
+                      {count} {itemsLabel}
+                    </span>
+                  </motion.button>
+                );
+              })}
             </div>
-          </div>
-        </div>
-
-        {/* Bottom line accent */}
-        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-red scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left z-20" />
-      </div>
-    </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -721,7 +662,6 @@ function FloatingProductCard({
   const imageUrl = showcaseImageUrl || product.image_url;
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll into view if highlighted
   useEffect(() => {
     if (isHighlighted && cardRef.current) {
       setTimeout(() => {
@@ -730,7 +670,6 @@ function FloatingProductCard({
     }
   }, [isHighlighted]);
 
-  // Staggered float animation params
   const floatDuration = 3.5 + (index % 4) * 0.6;
   const floatDelay = (index % 6) * 0.25;
 
@@ -758,7 +697,6 @@ function FloatingProductCard({
         className="cursor-pointer group"
       >
         <div className="relative">
-          {/* Hover glow — or highlighted glow */}
           <div className={`absolute -inset-3 rounded-3xl blur-2xl transition-all duration-700 ${
             isHighlighted ? 'bg-red/15' : 'bg-red/0 group-hover:bg-red/8'
           }`} />
@@ -768,7 +706,6 @@ function FloatingProductCard({
               ? 'drop-shadow-[0_8px_24px_rgba(193,33,38,0.2)] ring-2 ring-red/30'
               : 'drop-shadow-[0_4px_12px_rgba(0,48,72,0.06)] group-hover:drop-shadow-[0_12px_32px_rgba(0,48,72,0.12)]'
           }`}>
-            {/* Image — no background, floating freely */}
             <div className="relative aspect-square overflow-hidden">
               {imageUrl ? (
                 <Image
@@ -784,14 +721,11 @@ function FloatingProductCard({
                   <Package className="w-16 h-16" />
                 </div>
               )}
-
-              {/* Shine effect */}
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-white/0 group-hover:via-white/20 group-hover:to-transparent transition-all duration-700 pointer-events-none" />
             </div>
           </div>
         </div>
 
-        {/* Name floating below */}
         <div className="mt-4 px-1 text-center">
           <p className={`text-sm font-semibold transition-colors duration-300 line-clamp-2 leading-snug ${
             isHighlighted ? 'text-red' : 'text-navy/70 group-hover:text-navy'
@@ -800,78 +734,6 @@ function FloatingProductCard({
           </p>
         </div>
       </motion.div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Category Product View                                              */
-/* ------------------------------------------------------------------ */
-function CategoryProductView({
-  products,
-  locale,
-  categoryName,
-  onBack,
-  getShowcaseImage,
-  highlightedProductId,
-  onProductClick,
-}: {
-  products: Product[];
-  locale: string;
-  categoryName: string;
-  onBack: () => void;
-  getShowcaseImage: (product: Product) => string | null;
-  highlightedProductId: string | null;
-  onProductClick: (product: Product) => void;
-}) {
-  if (products.length === 0) return null;
-
-  const backLabel = locale === 'id' ? 'Kembali ke Koleksi' : locale === 'zh-TW' ? '返回系列' : 'Back to Collections';
-  const categoryLabel = locale === 'id' ? 'Kategori' : locale === 'zh-TW' ? '類別' : 'Category';
-  const productLabel = locale === 'id' ? 'produk' : locale === 'zh-TW' ? '產品' : 'product';
-  const tapLabel = locale === 'id' ? 'Ketuk produk untuk detail' : locale === 'zh-TW' ? '點擊任意產品查看詳情' : 'Tap any product for details';
-
-  return (
-    <div>
-      {/* Back + Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-10"
-      >
-        <button
-          onClick={onBack}
-          className="inline-flex items-center gap-2 text-navy/40 hover:text-navy text-sm mb-6 transition-colors duration-300 group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          {backLabel}
-        </button>
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-8 h-[2px] bg-red rounded-full" />
-          <span className="text-red text-xs font-bold tracking-[0.25em] uppercase">{categoryLabel}</span>
-        </div>
-        <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy">
-          {categoryName}
-        </h2>
-        <p className="text-navy/40 text-sm mt-2">
-          {products.length} {productLabel}{products.length !== 1 ? 's' : ''} — {tapLabel}
-        </p>
-      </motion.div>
-
-      {/* Floating Product Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
-        {products.map((product, i) => (
-          <FloatingProductCard
-            key={product.id}
-            product={product}
-            locale={locale}
-            index={i}
-            onClick={() => onProductClick(product)}
-            isHighlighted={highlightedProductId === product.id}
-            showcaseImageUrl={getShowcaseImage(product)}
-          />
-        ))}
-      </div>
     </div>
   );
 }
@@ -907,6 +769,7 @@ function ProductsContent() {
         if (catRes.data) {
           const cats = catRes.data as Category[];
           setCategories(cats);
+
           if (categoryParam) {
             const matched = cats.find((c) => c.slug === categoryParam);
             if (matched) {
@@ -922,7 +785,13 @@ function ProductsContent() {
                   }, 800);
                 }
               }
+            } else if (cats.length > 0) {
+              // Default to first category
+              setActiveFilter(cats[0].id);
             }
+          } else if (cats.length > 0) {
+            // Default to first category
+            setActiveFilter(cats[0].id);
           }
         }
         if (prodRes.data) setProducts(prodRes.data as Product[]);
@@ -968,16 +837,6 @@ function ProductsContent() {
     return match?.image_url || product.image_url;
   }, [showcaseProducts]);
 
-  const categoryFallbackImages = useMemo(() => {
-    const map: Record<string, string> = {};
-    products.forEach((p) => {
-      if (!map[p.category_id] && (p.detail_image_url || p.image_url)) {
-        map[p.category_id] = p.detail_image_url || p.image_url || '';
-      }
-    });
-    return map;
-  }, [products]);
-
   const productCountByCategory = useMemo(() => {
     const counts: Record<string, number> = {};
     products.forEach((p) => { counts[p.category_id] = (counts[p.category_id] || 0) + 1; });
@@ -991,9 +850,6 @@ function ProductsContent() {
   const handleSelectCategory = useCallback((categoryId: string) => {
     setActiveFilter(categoryId);
     setHighlightedProductId(null);
-    setTimeout(() => {
-      contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
   }, []);
 
   const handleSearchSelectProduct = useCallback((product: Product, categoryId: string) => {
@@ -1011,6 +867,9 @@ function ProductsContent() {
     setSelectedProductForModal(product);
     setHighlightedProductId(product.id);
   }, []);
+
+  const tapLabel = locale === 'id' ? 'Ketuk produk untuk detail' : locale === 'zh-TW' ? '點擊產品查看詳情' : 'Tap any product for details';
+  const productLabel = locale === 'id' ? 'produk' : locale === 'zh-TW' ? '產品' : 'products';
 
   return (
     <div className="min-h-screen bg-cream">
@@ -1065,7 +924,7 @@ function ProductsContent() {
               </div>
             </div>
 
-            {/* Smart Search — dropdown uses portal, immune to overflow-hidden */}
+            {/* Smart Search */}
             <div className="hero-reveal mt-10">
               <SmartSearch
                 products={products}
@@ -1077,7 +936,7 @@ function ProductsContent() {
           </div>
         </div>
 
-        {/* Wave divider — extends below hero, no overflow-hidden to clip it */}
+        {/* Wave divider */}
         <div className="absolute -bottom-[3px] left-0 right-0 z-20">
           <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" className="block w-full h-[60px] sm:h-[80px]">
             <path d="M0 80V30C240 10 480 0 720 10C960 20 1200 40 1440 30V80H0Z" fill="var(--color-cream)" />
@@ -1088,47 +947,75 @@ function ProductsContent() {
       {/* ============ CONTENT ============ */}
       <div ref={contentRef} className="max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20 scroll-mt-8">
         {loading ? (
-          <div className="columns-2 lg:columns-3 gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="animate-pulse break-inside-avoid mb-4">
-                <div className="bg-navy/5 rounded-3xl" style={{ height: `${280 + (i % 3) * 40}px` }} />
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="bg-navy/5 rounded-2xl aspect-square mb-3" />
+                <div className="bg-navy/5 rounded-lg h-4 w-3/4 mx-auto" />
               </div>
             ))}
           </div>
-        ) : !activeFilter ? (
-          /* ======== CATEGORY SHOWCASE — Pinterest Masonry ======== */
+        ) : (
           <>
+            {/* Category Dropdown + Info Bar */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-12 sm:mb-16"
+              className="mb-10 sm:mb-14"
             >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-[2px] bg-red rounded-full" />
-                <span className="text-red text-xs font-bold tracking-[0.3em] uppercase">Collections</span>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                {/* Dropdown */}
+                <CategoryDropdown
+                  categories={categories}
+                  activeCategory={activeFilter || ''}
+                  locale={locale}
+                  productCounts={productCountByCategory}
+                  onSelect={handleSelectCategory}
+                />
+
+                {/* Product count + hint */}
+                <div className="text-right">
+                  <p className="text-navy/50 text-sm">
+                    <span className="font-bold text-navy">{displayedProducts.length}</span> {productLabel}
+                  </p>
+                  <p className="text-navy/30 text-xs mt-0.5">{tapLabel}</p>
+                </div>
               </div>
-              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-3 leading-[1.05]">
-                {locale === 'id' ? 'Koleksi Kami' : locale === 'zh-TW' ? '我們的系列' : 'Our Collections'}
-              </h2>
-              <p className="text-navy/40 text-base max-w-lg leading-relaxed">
-                {locale === 'id' ? 'Ketuk kategori untuk menjelajahi produknya' : locale === 'zh-TW' ? '點擊類別探索其產品' : 'Tap a category to explore its products'}
-              </p>
             </motion.div>
 
-            {/* Pinterest Masonry Category Grid */}
-            <div className="columns-2 lg:columns-3 gap-4">
-              {categories.map((cat, i) => (
-                <CategoryCard
-                  key={cat.id}
-                  category={cat}
-                  locale={locale}
-                  productCount={productCountByCategory[cat.id] || 0}
-                  index={i}
-                  onClick={() => handleSelectCategory(cat.id)}
-                  fallbackImageUrl={categoryFallbackImages[cat.id]}
-                />
-              ))}
-            </div>
+            {/* Product Grid with AnimatePresence for smooth transitions */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeFilter}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+              >
+                {displayedProducts.length > 0 ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+                    {displayedProducts.map((product, i) => (
+                      <FloatingProductCard
+                        key={product.id}
+                        product={product}
+                        locale={locale}
+                        index={i}
+                        onClick={() => handleProductClick(product)}
+                        isHighlighted={highlightedProductId === product.id}
+                        showcaseImageUrl={getShowcaseImage(product)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-20">
+                    <Package className="w-16 h-16 text-navy/10 mx-auto mb-4" />
+                    <p className="text-navy/40 text-sm">
+                      {locale === 'id' ? 'Belum ada produk di kategori ini' : locale === 'zh-TW' ? '此類別尚無產品' : 'No products in this category yet'}
+                    </p>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
 
             {/* Bottom accent */}
             <motion.div
@@ -1142,17 +1029,6 @@ function ProductsContent() {
               <div className="w-16 h-px bg-navy/10" />
             </motion.div>
           </>
-        ) : (
-          /* ======== CATEGORY PRODUCTS VIEW ======== */
-          <CategoryProductView
-            products={displayedProducts}
-            locale={locale}
-            categoryName={getCategoryName(activeFilter)}
-            onBack={() => { setActiveFilter(null); setHighlightedProductId(null); }}
-            getShowcaseImage={getShowcaseImage}
-            highlightedProductId={highlightedProductId}
-            onProductClick={handleProductClick}
-          />
         )}
       </div>
 
