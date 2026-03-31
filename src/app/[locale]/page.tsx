@@ -104,10 +104,10 @@ function CinematicScrollShowcase({
   if (slides.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-          <Sparkles className="w-7 h-7 text-white/25" />
+        <div className="w-16 h-16 rounded-full bg-navy/5 flex items-center justify-center mb-4">
+          <Sparkles className="w-7 h-7 text-navy/25" />
         </div>
-        <p className="text-white/40 text-sm">No articles yet — check back soon!</p>
+        <p className="text-navy/40 text-sm">No articles yet — check back soon!</p>
       </div>
     );
   }
@@ -118,23 +118,23 @@ function CinematicScrollShowcase({
       <style dangerouslySetInnerHTML={{ __html: `.discover-scroll::-webkit-scrollbar{display:none}` }} />
 
       {/* Edge fade overlays */}
-      <div className="absolute left-0 top-0 bottom-6 w-8 sm:w-20 bg-gradient-to-r from-[#003048] to-transparent z-20 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-6 w-8 sm:w-20 bg-gradient-to-l from-[#003048] to-transparent z-20 pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-6 w-8 sm:w-20 bg-gradient-to-r from-[#FAEDD3] to-transparent z-20 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-6 w-8 sm:w-20 bg-gradient-to-l from-[#FAEDD3] to-transparent z-20 pointer-events-none" />
 
       {/* Navigation arrows */}
       <button
         onClick={() => scroll('left')}
         aria-label="Scroll left"
-        className={`absolute left-2 sm:left-4 top-[calc(50%-12px)] -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 flex items-center justify-center transition-all duration-300 hover:bg-white/25 hover:scale-110 hover:shadow-lg hover:shadow-white/10 ${!canScrollLeft ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        className={`absolute left-2 sm:left-4 top-[calc(50%-12px)] -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-navy/10 backdrop-blur-lg border border-navy/15 flex items-center justify-center transition-all duration-300 hover:bg-navy/20 hover:scale-110 hover:shadow-lg hover:shadow-navy/10 ${!canScrollLeft ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
-        <ChevronLeft className="w-5 h-5 text-white" />
+        <ChevronLeft className="w-5 h-5 text-navy" />
       </button>
       <button
         onClick={() => scroll('right')}
         aria-label="Scroll right"
-        className={`absolute right-2 sm:right-4 top-[calc(50%-12px)] -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 flex items-center justify-center transition-all duration-300 hover:bg-white/25 hover:scale-110 hover:shadow-lg hover:shadow-white/10 ${!canScrollRight ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        className={`absolute right-2 sm:right-4 top-[calc(50%-12px)] -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-navy/10 backdrop-blur-lg border border-navy/15 flex items-center justify-center transition-all duration-300 hover:bg-navy/20 hover:scale-110 hover:shadow-lg hover:shadow-navy/10 ${!canScrollRight ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
-        <ChevronRight className="w-5 h-5 text-white" />
+        <ChevronRight className="w-5 h-5 text-navy" />
       </button>
 
       {/* Horizontal scroll-snap container */}
@@ -216,7 +216,7 @@ function CinematicScrollShowcase({
 
       {/* Scroll progress bar */}
       <div className="mt-6 flex justify-center">
-        <div className="w-40 sm:w-56 h-[3px] rounded-full bg-white/[0.08] overflow-hidden">
+        <div className="w-40 sm:w-56 h-[3px] rounded-full bg-navy/[0.1] overflow-hidden">
           <div
             ref={progressRef}
             className="h-full rounded-full bg-gradient-to-r from-[#C12126] to-[#C12126]/50 transition-[width] duration-150 ease-out"
@@ -333,27 +333,27 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════
           DISCOVER SECTION — Cinematic Horizontal Scroll
       ═══════════════════════════════════════════════ */}
-      <section ref={sectionRef} className="py-24 sm:py-32 bg-[#003048] relative overflow-hidden">
+      <section ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
         {/* Ambient blur orbs */}
-        <div className="pointer-events-none absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-[#C12126]/[0.08] blur-[150px]" />
-        <div className="pointer-events-none absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-white/[0.03] blur-[120px]" />
-        <div className="pointer-events-none absolute top-1/2 left-1/3 w-[300px] h-[300px] rounded-full bg-[#C12126]/[0.04] blur-[100px]" />
+        <div className="pointer-events-none absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-[#C12126]/[0.06] blur-[150px]" />
+        <div className="pointer-events-none absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-navy/[0.03] blur-[120px]" />
+        <div className="pointer-events-none absolute top-1/2 left-1/3 w-[300px] h-[300px] rounded-full bg-[#C12126]/[0.03] blur-[100px]" />
 
         {/* Subtle dot grid pattern */}
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.025]"
-          style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '40px 40px' }}
+          style={{ backgroundImage: 'radial-gradient(circle, rgba(0,48,72,0.15) 1px, transparent 1px)', backgroundSize: '40px 40px' }}
         />
 
         <div className="max-w-7xl mx-auto px-6">
           {/* ── Header ── */}
           <div ref={headerRef} className="text-center mb-14">
             <p className="text-[#C12126] text-xs tracking-[0.35em] uppercase font-bold mb-3">Discover</p>
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-3">
+            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">
               Explore Mahkota Taiwan
             </h2>
             <div className="w-16 h-[2px] bg-[#C12126] mx-auto mb-4 rounded-full" />
-            <p className="text-[#FAF6F1]/40 max-w-lg mx-auto text-sm tracking-wide">
+            <p className="text-navy/40 max-w-lg mx-auto text-sm tracking-wide">
               Stay up to date with our latest events and community activities
             </p>
           </div>
@@ -365,7 +365,7 @@ export default function HomePage() {
               className={`px-7 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
                 activeTab === 'events'
                   ? 'bg-[#C12126] text-white shadow-xl shadow-[#C12126]/30 scale-[1.02]'
-                  : 'bg-white/[0.06] text-white/50 hover:bg-white/10 hover:text-white/70 border border-white/[0.08]'
+                  : 'bg-navy/[0.06] text-navy/50 hover:bg-navy/10 hover:text-navy/70 border border-navy/[0.08]'
               }`}
             >
               <span className="flex items-center gap-2">
@@ -376,8 +376,8 @@ export default function HomePage() {
               onClick={() => setActiveTab('activities')}
               className={`px-7 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
                 activeTab === 'activities'
-                  ? 'bg-white text-[#003048] shadow-xl shadow-white/15 scale-[1.02]'
-                  : 'bg-white/[0.06] text-white/50 hover:bg-white/10 hover:text-white/70 border border-white/[0.08]'
+                  ? 'bg-navy text-cream shadow-xl shadow-navy/15 scale-[1.02]'
+                  : 'bg-navy/[0.06] text-navy/50 hover:bg-navy/10 hover:text-navy/70 border border-navy/[0.08]'
               }`}
             >
               <span className="flex items-center gap-2">
@@ -408,7 +408,7 @@ export default function HomePage() {
           <div className="text-center mt-10">
             <Link
               href={`/${locale}/${activeTab === 'events' ? 'events' : 'lifestyle'}`}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/[0.06] text-white text-sm font-semibold hover:bg-white hover:text-[#003048] transition-all duration-300 group border border-white/[0.1] hover:border-white"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-navy/[0.06] text-navy text-sm font-semibold hover:bg-navy hover:text-cream transition-all duration-300 group border border-navy/[0.1] hover:border-navy"
             >
               View All {activeTab === 'events' ? 'Events' : 'Activities'}
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
