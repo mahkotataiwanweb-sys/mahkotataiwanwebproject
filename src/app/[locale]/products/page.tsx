@@ -697,24 +697,17 @@ function FloatingProductCard({
         onClick={onClick}
         className="cursor-pointer group"
       >
-        <div className="relative">
-          <div className={`absolute -inset-3 rounded-3xl blur-2xl transition-all duration-700 ${
-            isHighlighted ? 'bg-red/15' : 'bg-red/0 group-hover:bg-red/8'
-          }`} />
-
-          <div className={`relative rounded-2xl overflow-hidden transition-all duration-500 ${
-            isHighlighted
-              ? 'ring-2 ring-red/30'
-              : ''
-          }`}
+        <div
+          className="relative"
           style={{
             filter: isHighlighted
               ? 'drop-shadow(0 12px 30px rgba(193,33,38,0.25)) drop-shadow(0 4px 10px rgba(193,33,38,0.15))'
               : 'drop-shadow(0 8px 24px rgba(0,48,72,0.12)) drop-shadow(0 20px 40px rgba(0,48,72,0.08))',
+            transition: 'filter 0.5s ease',
           }}
           onMouseEnter={(e) => {
             if (!isHighlighted) {
-              e.currentTarget.style.filter = 'drop-shadow(0 16px 40px rgba(0,48,72,0.18)) drop-shadow(0 30px 60px rgba(0,48,72,0.12))';
+              e.currentTarget.style.filter = 'drop-shadow(0 16px 40px rgba(0,48,72,0.22)) drop-shadow(0 30px 60px rgba(0,48,72,0.15))';
             }
           }}
           onMouseLeave={(e) => {
@@ -722,24 +715,22 @@ function FloatingProductCard({
               e.currentTarget.style.filter = 'drop-shadow(0 8px 24px rgba(0,48,72,0.12)) drop-shadow(0 20px 40px rgba(0,48,72,0.08))';
             }
           }}
-          >
-            <div className="relative w-full h-0 pb-[100%] overflow-hidden bg-white">
-              {imageUrl ? (
-                <Image
-                  src={imageUrl}
-                  alt={name}
-                  fill
-                  className="object-contain p-4 transition-all duration-700 group-hover:scale-110"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  unoptimized
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-navy/10">
-                  <Package className="w-16 h-16" />
-                </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-white/0 group-hover:via-white/20 group-hover:to-transparent transition-all duration-700 pointer-events-none" />
-            </div>
+        >
+          <div className="relative w-full h-0 pb-[100%]">
+            {imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt={name}
+                fill
+                className="object-contain p-2 transition-all duration-700 group-hover:scale-110"
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                unoptimized
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center text-navy/10">
+                <Package className="w-16 h-16" />
+              </div>
+            )}
           </div>
         </div>
 
