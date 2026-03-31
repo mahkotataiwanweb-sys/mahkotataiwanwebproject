@@ -25,6 +25,7 @@ interface ShowcaseProduct {
   description_id: string | null;
   description_zh: string | null;
   image_url: string | null;
+  detail_image_url: string | null;
   sort_order: number;
   is_active: boolean;
 }
@@ -159,13 +160,13 @@ function ProductPopup({
           <X className="w-4 h-4 text-navy" />
         </button>
 
-        <div className="relative w-full h-56 bg-gradient-to-br from-red/10 to-red/5 flex items-center justify-center">
-          {product.image_url ? (
+        <div className={`relative w-full h-56 flex items-center justify-center overflow-hidden ${product.detail_image_url ? 'bg-[#0c1929]' : 'bg-gradient-to-br from-red/10 to-red/5'}`}>
+          {(product.detail_image_url || product.image_url) ? (
             <Image
-              src={product.image_url}
+              src={product.detail_image_url || product.image_url || ''}
               alt={getName()}
               fill
-              className="object-contain p-6"
+              className={product.detail_image_url ? "object-cover" : "object-contain p-6"}
               sizes="(max-width: 448px) 100vw, 448px"
               unoptimized
             />
