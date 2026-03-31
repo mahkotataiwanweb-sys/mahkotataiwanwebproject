@@ -15,33 +15,39 @@ import type { Article } from '@/types/database';
 gsap.registerPlugin(ScrollTrigger);
 
 /* ------------------------------------------------------------------ */
-/*  Pinterest-style Masonry Recipe Card                                */
+/*  Pinterest-style Masonry Recipe Card — premium scroll reveal        */
 /* ------------------------------------------------------------------ */
 function RecipeCard({ recipe, locale, index }: { recipe: Article; locale: string; index: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const title = getLocalizedField(recipe, 'title', locale);
   const excerpt = getLocalizedField(recipe, 'excerpt', locale);
 
-  // Alternating tall/short for masonry effect
-  const isTall = index % 3 === 0;
-  const aspectClass = isTall ? 'aspect-[3/4]' : 'aspect-[4/3]';
+  // Varied heights for true masonry look
+  const heightPattern = [320, 260, 350, 240, 300, 280, 370, 250, 310, 290];
+  const cardHeight = heightPattern[index % heightPattern.length];
 
   useEffect(() => {
     if (!cardRef.current) return;
     const ctx = gsap.context(() => {
       gsap.fromTo(
         cardRef.current,
-        { opacity: 0, y: 50, scale: 0.96 },
+        {
+          opacity: 0,
+          y: 60,
+          scale: 0.94,
+          rotateX: 8,
+        },
         {
           opacity: 1,
           y: 0,
           scale: 1,
-          duration: 0.8,
-          delay: index * 0.08,
+          rotateX: 0,
+          duration: 0.9,
+          delay: (index % 6) * 0.08,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: cardRef.current,
-            start: 'top 90%',
+            start: 'top 92%',
             toggleActions: 'play none none none',
           },
         }
@@ -53,19 +59,22 @@ function RecipeCard({ recipe, locale, index }: { recipe: Article; locale: string
   return (
     <motion.div
       ref={cardRef}
-      whileHover={{ y: -6 }}
+      whileHover={{ y: -8, scale: 1.02 }}
       transition={{ duration: 0.4, ease: [0.25, 0.8, 0.25, 1] }}
-      className="break-inside-avoid mb-5 sm:mb-6"
+      className="break-inside-avoid mb-3 sm:mb-4"
     >
       <Link href={`/${locale}/recipes/${recipe.slug}`} className="block group">
-        <div className={`relative ${aspectClass} rounded-2xl sm:rounded-3xl overflow-hidden bg-navy/5`}>
+        <div
+          className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-navy/5"
+          style={{ height: `${cardHeight}px` }}
+        >
           {recipe.image_url ? (
             <Image
               src={recipe.image_url}
               alt={title}
               fill
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-red/20 to-navy/10 flex items-center justify-center">
@@ -77,15 +86,15 @@ function RecipeCard({ recipe, locale, index }: { recipe: Article; locale: string
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
 
           {/* Content overlay */}
-          <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+          <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
             {/* Tags */}
-            <div className="flex items-center gap-2 mb-2.5">
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.15em] uppercase text-white/80 bg-white/10 backdrop-blur-sm px-2.5 py-1 rounded-full">
+            <div className="flex items-center gap-1.5 mb-2">
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.15em] uppercase text-white/80 bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-full">
                 <ChefHat className="w-2.5 h-2.5" />
                 {locale === 'id' ? 'Resep' : locale === 'zh-TW' ? '食譜' : 'Recipe'}
               </span>
               {getLocalizedField(recipe, 'description', locale) && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.15em] uppercase text-white/80 bg-white/10 backdrop-blur-sm px-2.5 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.15em] uppercase text-white/80 bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-full">
                   <Clock className="w-2.5 h-2.5" />
                   {getLocalizedField(recipe, 'description', locale)}
                 </span>
@@ -93,7 +102,7 @@ function RecipeCard({ recipe, locale, index }: { recipe: Article; locale: string
             </div>
 
             {/* Title */}
-            <h3 className="font-heading text-lg sm:text-xl lg:text-2xl font-bold text-white leading-tight mb-1.5 group-hover:text-white/90 transition-colors">
+            <h3 className="font-heading text-base sm:text-lg lg:text-xl font-bold text-white leading-tight mb-1 group-hover:text-white/90 transition-colors">
               {title}
             </h3>
 
@@ -102,6 +111,9 @@ function RecipeCard({ recipe, locale, index }: { recipe: Article; locale: string
               {excerpt}
             </p>
           </div>
+
+          {/* Bottom accent line */}
+          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-red scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
         </div>
       </Link>
     </motion.div>
@@ -192,16 +204,15 @@ export default function RecipesPage() {
         </div>
       </section>
 
-      {/* Masonry Grid */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-6 py-12 sm:py-16">
+      {/* Masonry Grid — 2 columns on mobile, 3 on desktop */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
         {loading ? (
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 sm:gap-6">
+          <div className="columns-2 lg:columns-3 gap-3 sm:gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className={`break-inside-avoid mb-5 sm:mb-6 rounded-2xl sm:rounded-3xl bg-navy/5 animate-pulse ${
-                  i % 3 === 0 ? 'aspect-[3/4]' : 'aspect-[4/3]'
-                }`}
+                className="break-inside-avoid mb-3 sm:mb-4 rounded-2xl sm:rounded-3xl bg-navy/5 animate-pulse"
+                style={{ height: `${260 + (i % 3) * 40}px` }}
               />
             ))}
           </div>
@@ -213,7 +224,7 @@ export default function RecipesPage() {
             </p>
           </div>
         ) : (
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 sm:gap-6">
+          <div className="columns-2 lg:columns-3 gap-3 sm:gap-4">
             {recipes.map((recipe, i) => (
               <RecipeCard key={recipe.id} recipe={recipe} locale={locale} index={i} />
             ))}

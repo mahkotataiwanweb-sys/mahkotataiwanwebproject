@@ -568,3 +568,17 @@
 /* Utility: hide scrollbar but keep scrolling */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
+
+/* ===== Product Card Floating Animation ===== */
+@keyframes cardFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.product-card-float-wrapper {
+  will-change: transform;
+}
