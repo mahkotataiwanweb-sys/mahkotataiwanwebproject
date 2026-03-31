@@ -20,7 +20,7 @@
   },
   "about": {
     "title": "About Mahkota Taiwan",
-    "description": "Mahkota Taiwan is a leading Indonesian food distributor based in Taiwan, dedicated to bringing authentic Indonesian flavors to the Taiwanese market. We supply a wide range of beloved Indonesian food products — from instant noodles and snacks to cooking spices and beverages — ensuring that Indonesian communities in Taiwan and local food enthusiasts can enjoy the genuine taste of Indonesia.",
+    "description": "Mahkota Taiwan is Taiwan's leading Indonesian food distributor, proudly bridging Indonesian culture and Taiwanese daily life since 2021. With 26+ carefully curated product lines spanning instant noodles, snacks, cooking spices, beverages, and household essentials, we serve over 1 million customers through 300+ partner stores island-wide. All our products are Halal certified, ensuring the highest standards of quality and trust. Backed by a reliable supply chain and comprehensive logistics network, we are more than just a distributor — we are a cultural ambassador, bringing the authentic taste of home to every Indonesian community in Taiwan and beyond.",
     "mission": "Our mission is to bridge cultures through food, providing high-quality Indonesian products with reliable distribution across Taiwan.",
     "stats": {
       "since": "Established",
@@ -49,7 +49,7 @@
   },
   "contact": {
     "title": "Contact Us",
-    "subtitle": "Have questions or want to place an order? Get in touch with us!",
+    "subtitle": "Interested in partnership or have questions about our products? Let's connect!",
     "form": {
       "name": "Full Name",
       "email": "Email Address",

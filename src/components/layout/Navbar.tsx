@@ -266,12 +266,13 @@ export default function Navbar() {
                 {isProducts ? (
                   renderProductsDropdownContent(() => setOpenDropdown(null))
                 ) : (
-                  <div className="py-1">
+                  <div className="py-2">
                     {item.children.map((child) => (
                       <Link key={child.id} href={buildHref(child.url)}
                         onClick={() => setOpenDropdown(null)}
-                        className={cn('block px-5 py-2.5 text-sm font-medium transition-colors',
+                        className={cn('flex items-center gap-3 px-5 py-3 text-sm font-medium transition-all duration-200',
                           isLinkActive(child.url) ? 'text-red bg-red/5' : 'text-navy/70 hover:text-navy hover:bg-cream/50')}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-red/60" />
                         {getLabel(child)}
                       </Link>
                     ))}
@@ -399,12 +400,13 @@ export default function Navbar() {
                 {isProducts ? (
                   renderProductsDropdownContent(() => setOpenDropdown(null))
                 ) : (
-                  <div className="py-1">
+                  <div className="py-2">
                     {item.children.map((child) => (
                       <Link key={child.key} href={buildHref(child.href)}
                         onClick={() => setOpenDropdown(null)}
-                        className={cn('block px-5 py-2.5 text-sm font-medium transition-colors',
+                        className={cn('flex items-center gap-3 px-5 py-3 text-sm font-medium transition-all duration-200',
                           isLinkActive(child.href) ? 'text-red bg-red/5' : 'text-navy/70 hover:text-navy hover:bg-cream/50')}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-red/60" />
                         {t(child.key)}
                       </Link>
                     ))}
