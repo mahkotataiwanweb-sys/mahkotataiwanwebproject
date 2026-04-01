@@ -15,9 +15,21 @@ function injectPinStyles() {
   const style = document.createElement('style');
   style.id = STYLE_ID;
   style.textContent = `
-    /* ── Force Leaflet ocean background ── */
+    /* ── Force Leaflet ocean background everywhere ── */
     .illustrated-map.leaflet-container {
       background: #A8D8EA !important;
+    }
+    .illustrated-map .leaflet-tile-pane {
+      background: #A8D8EA !important;
+    }
+    .illustrated-map .leaflet-pane {
+      background: transparent !important;
+    }
+    .illustrated-map .leaflet-tile {
+      background: transparent !important;
+    }
+    .illustrated-map .leaflet-overlay-pane {
+      background: transparent !important;
     }
 
     /* Smooth premium bounce for store pins */
@@ -157,18 +169,18 @@ const createCityPinIcon = () => {
   return L.divIcon({
     className: 'city-pin',
     html: `
-      <div style="position:relative;cursor:pointer;width:24px;height:32px;">
+      <div style="position:relative;cursor:pointer;width:20px;height:26px;">
         <div style="
-          position:absolute;left:50%;top:100%;width:14px;height:14px;border-radius:50%;
-          border:1.5px solid rgba(193,33,38,0.35);
+          position:absolute;left:50%;top:100%;width:12px;height:12px;border-radius:50%;
+          border:1.5px solid rgba(193,33,38,0.3);
           animation: cityPulseRing 2.5s ease-out infinite;pointer-events:none;
         "></div>
         <div style="
-          position:absolute;left:50%;top:100%;width:10px;height:10px;border-radius:50%;
-          border:1px solid rgba(193,33,38,0.2);
+          position:absolute;left:50%;top:100%;width:8px;height:8px;border-radius:50%;
+          border:1px solid rgba(193,33,38,0.18);
           animation: cityPulseRing2 3s ease-out infinite 0.5s;pointer-events:none;
         "></div>
-        <svg width="24" height="32" viewBox="0 0 40 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="20" height="26" viewBox="0 0 40 52" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <filter id="cityPinShadow">
               <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#C12126" flood-opacity="0.35"/>
@@ -181,9 +193,9 @@ const createCityPinIcon = () => {
         </svg>
       </div>
     `,
-    iconSize: [24, 32],
-    iconAnchor: [12, 32],
-    popupAnchor: [0, -34],
+    iconSize: [20, 26],
+    iconAnchor: [10, 26],
+    popupAnchor: [0, -28],
   });
 };
 
@@ -693,11 +705,12 @@ export default function StoreMap({ stores }: StoreMapProps) {
       </div>
 
       {/* ─── Map ─── */}
-      <div className="relative overflow-hidden rounded-2xl">
+      <div className="relative overflow-hidden rounded-2xl" style={{ background: '#A8D8EA' }}>
         <DecorativeElements />
         <div
           ref={mapContainerRef}
           className="illustrated-map w-full h-[500px] sm:h-[600px] lg:h-[700px] overflow-hidden"
+          style={{ background: '#A8D8EA' }}
         />
       </div>
 
