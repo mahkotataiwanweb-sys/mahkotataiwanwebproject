@@ -207,8 +207,8 @@ export default function HomePage() {
         /* Flip top card */
         await topCardRef.current?.triggerFlip();
         if (cancelled) break;
-        /* Pause between cards — 0.5s */
-        await new Promise(r => setTimeout(r, 500));
+        /* Pause between cards — 0.3s */
+        await new Promise(r => setTimeout(r, 300));
         if (cancelled) break;
         /* Flip bottom card */
         await bottomCardRef.current?.triggerFlip();
