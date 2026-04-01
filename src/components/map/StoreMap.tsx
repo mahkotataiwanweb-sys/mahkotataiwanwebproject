@@ -536,7 +536,7 @@ function DecorativeElements() {
             zIndex: 10,
           }}
         >
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="white" style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.25))' }}>
+          <svg className="w-[20px] h-[20px] sm:w-[28px] sm:h-[28px] lg:w-[32px] lg:h-[32px]" viewBox="0 0 24 24" fill="white" style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.25))' }}>
             <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
           </svg>
         </div>
@@ -877,11 +877,15 @@ export default function StoreMap({ stores }: StoreMapProps) {
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
+    const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
     const map = L.map(mapContainerRef.current, {
       center: [23.7, 120.96],
       zoom: 8,
       zoomControl: false,
-      scrollWheelZoom: true,
+      scrollWheelZoom: !isMobile,
+      dragging: !isMobile,
+      touchZoom: true,
       attributionControl: false,
       maxBounds: L.latLngBounds([21.5, 119.0], [26.0, 122.5]),
       maxBoundsViscosity: 0.9,
@@ -892,6 +896,59 @@ export default function StoreMap({ stores }: StoreMapProps) {
     L.control.attribution({ position: 'bottomleft', prefix: false }).addAttribution('© OpenStreetMap').addTo(map);
 
     mapRef.current = map;
+
+    /* ── Mobile: two-finger gesture handling (like Google Maps) ── */
+    if (isMobile && mapContainerRef.current) {
+      const container = mapContainerRef.current;
+
+      // Create overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'map-gesture-overlay';
+      overlay.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 10V6a2 2 0 0 1 4 0v1M14 6V5a2 2 0 0 1 4 0v5"/>
+            <path d="M10 5.5V4a2 2 0 0 1 4 0v2"/>
+            <path d="M6 10a2 2 0 0 0-2 2v1a8 8 0 0 0 8 8h.5a8 8 0 0 0 7.5-5.2L18.5 11"/>
+          </svg>
+          <span style="color:white;font-size:13px;font-weight:500;text-shadow:0 1px 4px rgba(0,0,0,0.4);">Use two fingers to move the map</span>
+        </div>
+      `;
+      overlay.style.cssText = `
+        position:absolute;inset:0;z-index:9999;display:none;
+        align-items:center;justify-content:center;
+        background:rgba(0,0,0,0.45);backdrop-filter:blur(2px);
+        pointer-events:none;border-radius:inherit;
+        transition:opacity 0.3s ease;
+      `;
+      container.style.position = 'relative';
+      container.appendChild(overlay);
+
+      let hideTimeout: ReturnType<typeof setTimeout>;
+
+      container.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          // Single finger → show overlay, keep page scrolling
+          overlay.style.display = 'flex';
+          overlay.style.opacity = '1';
+          clearTimeout(hideTimeout);
+          hideTimeout = setTimeout(() => {
+            overlay.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 300);
+          }, 1500);
+        } else if (e.touches.length >= 2) {
+          // Two fingers → enable map dragging
+          overlay.style.display = 'none';
+          map.dragging.enable();
+        }
+      }, { passive: true });
+
+      container.addEventListener('touchend', (e) => {
+        if (e.touches.length < 2) {
+          map.dragging.disable();
+        }
+      }, { passive: true });
+    }
 
     /* Start ambient music on first map interaction */
     map.on('click', () => startMusicOnInteraction());
