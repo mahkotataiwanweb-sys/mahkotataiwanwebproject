@@ -37,74 +37,100 @@ function LineIcon({ className }: { className?: string }) {
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ── CharReveal: per-letter rain animation (all lines simultaneous) ── */
-function CharReveal({ text, className }: { text: string; className?: string }) {
-  const ref = useRef<HTMLParagraphElement>(null);
+/* ── LineReveal: professional line-by-line cascade reveal ── */
+function LineReveal({ text, className }: { text: string; className?: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [lines, setLines] = useState<string[]>([]);
+  const measured = useRef(false);
 
   useEffect(() => {
-    if (!ref.current) return;
-    const chars = ref.current.querySelectorAll('.cr-char');
-    if (chars.length === 0) return;
+    if (!containerRef.current || measured.current) return;
+    const el = containerRef.current;
+    const words = text.split(' ');
 
-    /* Assign random per-char Y offset */
-    chars.forEach((char) => {
-      const el = char as HTMLElement;
-      el.style.setProperty('--rain-y', `${-(60 + Math.random() * 100)}px`);
-    });
+    const measurer = document.createElement('p');
+    measurer.className = className || '';
+    measurer.style.cssText = 'visibility:hidden;position:absolute;top:0;left:0;right:0;pointer-events:none;';
+    el.parentElement?.appendChild(measurer);
 
-    /* ONE ScrollTrigger → one timeline, random stagger */
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: ref.current,
-          start: 'top 82%',
-          toggleActions: 'play none none reverse',
-        },
+    const detectedLines: string[] = [];
+    let currentLine = '';
+    let lastTop = -1;
+
+    words.forEach((word) => {
+      measurer.innerHTML = '';
+      const testWords = currentLine ? (currentLine + ' ' + word).split(' ') : [word];
+      testWords.forEach((w, wi) => {
+        if (wi > 0) measurer.appendChild(document.createTextNode(' '));
+        const span = document.createElement('span');
+        span.textContent = w;
+        measurer.appendChild(span);
       });
+      const spans = measurer.querySelectorAll('span');
+      const lastSpan = spans[spans.length - 1];
+      const top = lastSpan.offsetTop;
 
-      tl.fromTo(
-        gsap.utils.shuffle([...chars]),
-        { opacity: 0, y: (i: number, el: HTMLElement) => el.style.getPropertyValue('--rain-y') },
+      if (lastTop === -1) {
+        lastTop = top;
+        currentLine = word;
+      } else if (top > lastTop) {
+        detectedLines.push(currentLine);
+        currentLine = word;
+        lastTop = top;
+      } else {
+        currentLine = currentLine + ' ' + word;
+      }
+    });
+    if (currentLine) detectedLines.push(currentLine);
+    measurer.remove();
+
+    measured.current = true;
+    setLines(detectedLines);
+  }, [text, className]);
+
+  useEffect(() => {
+    if (!containerRef.current || lines.length === 0) return;
+    const lineEls = containerRef.current.querySelectorAll('.lr-line');
+    if (lineEls.length === 0) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        lineEls,
+        { opacity: 0, y: 28, filter: 'blur(6px)' },
         {
           opacity: 1,
           y: 0,
-          duration: 0.9,
-          stagger: { each: 0.02, from: 'random' },
-          ease: 'power2.out',
+          filter: 'blur(0px)',
+          duration: 0.8,
+          stagger: 0.12,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: 'top 82%',
+            toggleActions: 'play none none reverse',
+          },
         },
-        0
       );
     });
     return () => ctx.revert();
-  }, [text]);
-
-  const words = text.split(' ');
-  let globalIdx = 0;
+  }, [lines]);
 
   return (
-    <p ref={ref} className={className}>
-      {words.map((word, wi) => {
-        const chars = word.split('').map((char) => {
-          const idx = globalIdx++;
-          return (
-            <span
-              key={idx}
-              className="cr-char"
-              style={{ opacity: 0, display: 'inline-block', willChange: 'transform, opacity' }}
-            >
-              {char}
-            </span>
-          );
-        });
-        if (wi < words.length - 1) globalIdx++;
-        return (
-          <span key={wi} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
-            {chars}
-            {wi < words.length - 1 && <span className="cr-char" style={{ opacity: 1, display: 'inline' }}>&nbsp;</span>}
+    <div ref={containerRef} className={className}>
+      {lines.length === 0 ? (
+        <p style={{ visibility: 'hidden' }}>{text}</p>
+      ) : (
+        lines.map((line, i) => (
+          <span
+            key={i}
+            className="lr-line"
+            style={{ display: 'block', opacity: 0, willChange: 'transform, opacity, filter' }}
+          >
+            {line}
           </span>
-        );
-      })}
-    </p>
+        ))
+      )}
+    </div>
   );
 }
 
@@ -599,7 +625,7 @@ export default function ContactPage() {
                 Get in Touch
               </h2>
               <div className="w-16 h-[2px] bg-red mb-4" />
-              <CharReveal
+              <LineReveal
                 text="Whether you have questions about our products, partnerships, or services — we'd love to hear from you. Reach out through any of these channels."
                 className="text-navy/60 text-base sm:text-lg tracking-wide leading-relaxed max-w-md mb-10"
               />
