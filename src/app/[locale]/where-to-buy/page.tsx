@@ -170,29 +170,27 @@ export default function WhereToBuyPage() {
         ease: 'power4.out',
       });
 
-      // Stats cards — cinematic cascade entrance
+      // Stats cards — dramatic slow reveal
       const statCards = gsap.utils.toArray('.stat-card') as HTMLElement[];
       statCards.forEach((card, i) => {
         gsap.fromTo(card,
           {
             opacity: 0,
-            y: 80,
-            scale: 0.8,
-            rotateY: 15,
-            filter: 'blur(12px)',
+            y: 140,
+            scale: 0.88,
+            filter: 'blur(25px)',
           },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            rotateY: 0,
             filter: 'blur(0px)',
-            duration: 1.2,
-            delay: i * 0.15,
-            ease: 'power4.out',
+            duration: 2.2,
+            delay: i * 0.3,
+            ease: 'power3.out',
             scrollTrigger: {
               trigger: '.stats-section',
-              start: 'top 82%',
+              start: 'top 85%',
               once: true,
             },
           }
@@ -433,98 +431,43 @@ export default function WhereToBuyPage() {
         <ShimmerLines />
 
         <div className="max-w-6xl mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-7">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {stats.map((stat, idx) => (
-              <motion.div
+              <div
                 key={idx}
-                className="stat-card group relative rounded-[1.75rem] p-[2px] cursor-default overflow-hidden"
-                whileHover={{ y: -8, scale: 1.03 }}
-                transition={{ type: 'spring', stiffness: 350, damping: 22 }}
+                className="stat-card group relative bg-white rounded-3xl p-7 md:p-10 text-center transition-all duration-[0.9s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1.5 hover:shadow-[0_20px_60px_-15px_rgba(0,48,72,0.08)]"
+                style={{ boxShadow: '0 1px 2px rgba(0,48,72,0.04), 0 0 0 1px rgba(0,48,72,0.03)' }}
               >
-                {/* ✦ Animated rotating conic-gradient border ✦ */}
-                <motion.div
-                  className="absolute"
-                  style={{
-                    inset: '-120%',
-                    background: `conic-gradient(from 0deg, ${stat.gradient})`,
-                    opacity: 0.7,
-                  }}
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 10 - idx * 0.8, repeat: Infinity, ease: 'linear' }}
-                />
-
-                {/* Inner glass card */}
-                <div className="relative bg-white/[0.97] backdrop-blur-xl rounded-[calc(1.75rem-2px)] p-6 md:p-8 text-center overflow-hidden transition-all duration-500 group-hover:bg-white/[0.93]">
-                  {/* Radial glow on hover */}
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                    style={{ background: `radial-gradient(circle at 50% 40%, ${stat.glowColor}, transparent 70%)` }}
-                  />
-
-                  {/* Shimmer sweep */}
-                  <div className="absolute inset-0 overflow-hidden">
-                    <div
-                      className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1.4s] ease-out"
-                      style={{ background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.6) 50%, transparent 60%)' }}
-                    />
-                  </div>
-
-                  {/* Floating sparkles on hover */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-                    {[...Array(4)].map((_, j) => (
-                      <motion.div
-                        key={j}
-                        className="absolute w-1 h-1 rounded-full"
-                        style={{
-                          background: stat.accentColor,
-                          left: `${20 + j * 20}%`,
-                          top: `${30 + (j % 2) * 40}%`,
-                          opacity: 0.3,
-                        }}
-                        animate={{ y: [0, -12, 0], opacity: [0.2, 0.5, 0.2] }}
-                        transition={{ duration: 2 + j * 0.5, repeat: Infinity, delay: j * 0.3, ease: 'easeInOut' }}
-                      />
-                    ))}
-                  </div>
-
-                  {/* Content */}
-                  <div className="relative z-10">
-                    {/* Icon with spring interaction */}
-                    <motion.div
-                      className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl ${stat.iconBg} border border-cream-dark/10 mb-5 shadow-sm`}
-                      whileHover={{ scale: 1.2, rotate: 8 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 12 }}
-                    >
-                      <stat.icon className={`w-6 h-6 ${stat.iconColor}`} />
-                    </motion.div>
-
-                    {/* Number with gradient text */}
-                    <div
-                      className="stat-number text-4xl md:text-[2.75rem] font-heading font-bold mb-2 tracking-tight leading-none"
-                      data-value={stat.number}
-                      style={{
-                        background: stat.numberGradient,
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text',
-                      }}
-                    >
-                      {stat.number.includes('/') ? stat.number : loading ? '—' : '0'}
-                    </div>
-
-                    {/* Label */}
-                    <div className="text-navy/40 text-[10.5px] font-bold uppercase tracking-[0.2em] mt-1">
-                      {stat.label}
-                    </div>
-
-                    {/* Bottom accent bar */}
-                    <div
-                      className="mx-auto mt-4 h-[2px] w-8 group-hover:w-12 rounded-full transition-all duration-500 opacity-40 group-hover:opacity-80"
-                      style={{ background: stat.numberGradient }}
-                    />
-                  </div>
+                {/* Subtle icon */}
+                <div className={`inline-flex items-center justify-center w-10 h-10 rounded-2xl ${stat.iconBg} mb-7`}>
+                  <stat.icon className={`w-[18px] h-[18px] ${stat.iconColor} opacity-40`} />
                 </div>
-              </motion.div>
+
+                {/* Large number with gradient */}
+                <div
+                  className="stat-number text-[2.5rem] md:text-[3.25rem] font-heading font-bold mb-2.5 tracking-[-0.03em] leading-none"
+                  data-value={stat.number}
+                  style={{
+                    background: stat.numberGradient,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
+                >
+                  {stat.number.includes('/') ? stat.number : loading ? '\u2014' : '0'}
+                </div>
+
+                {/* Label */}
+                <div className="text-navy/30 text-[10px] font-semibold uppercase tracking-[0.25em]">
+                  {stat.label}
+                </div>
+
+                {/* Hover accent line — grows in from center */}
+                <div
+                  className="mx-auto mt-6 h-px w-0 group-hover:w-8 rounded-full transition-all duration-[1.2s] ease-out opacity-0 group-hover:opacity-40"
+                  style={{ background: stat.accentColor }}
+                />
+              </div>
             ))}
           </div>
         </div>
