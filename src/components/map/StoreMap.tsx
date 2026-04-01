@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { MapPin, Phone, Navigation, X, Search, ChevronDown, Locate } from 'lucide-react';
+import { MapPin, Phone, Navigation, X, ChevronDown, Locate } from 'lucide-react';
 import gsap from 'gsap';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -15,100 +15,114 @@ function injectPinStyles() {
   const style = document.createElement('style');
   style.id = STYLE_ID;
   style.textContent = `
-    /* Smooth premium bounce for all pins */
+    /* Smooth premium bounce for store pins */
     @keyframes pinBounce {
       0%, 100% { transform: translateY(0); }
       40% { transform: translateY(-8px); }
       60% { transform: translateY(-3px); }
     }
+    /* Smooth premium bounce for city pins */
     @keyframes pinBounceCity {
       0%, 100% { transform: translateY(0) scale(1); }
-      40% { transform: translateY(-6px) scale(1.05); }
-      60% { transform: translateY(-2px) scale(1.02); }
+      40% { transform: translateY(-10px) scale(1.05); }
+      60% { transform: translateY(-4px) scale(1.02); }
     }
-    @keyframes pulseRing {
-      0% { transform: scale(1); opacity: 0.4; }
-      100% { transform: scale(2.2); opacity: 0; }
+    /* Pulsing ring for city pins */
+    @keyframes cityPulseRing {
+      0% { transform: translate(-50%, -50%) scale(0.6); opacity: 0.5; }
+      100% { transform: translate(-50%, -50%) scale(2.0); opacity: 0; }
     }
-    .custom-pin > div {
+    @keyframes cityPulseRing2 {
+      0% { transform: translate(-50%, -50%) scale(0.7); opacity: 0.35; }
+      100% { transform: translate(-50%, -50%) scale(1.7); opacity: 0; }
+    }
+    .store-pin > div {
       animation: pinBounce 2.8s cubic-bezier(0.36, 0, 0.66, 1) infinite;
     }
-    .city-cluster-pin > div {
+    .city-pin > div {
       animation: pinBounceCity 3s cubic-bezier(0.36, 0, 0.66, 1) infinite;
     }
-    /* Stagger animation delays per pin */
-    .custom-pin:nth-child(2n) > div { animation-delay: 0.3s; }
-    .custom-pin:nth-child(3n) > div { animation-delay: 0.6s; }
-    .custom-pin:nth-child(4n) > div { animation-delay: 0.9s; }
-    .custom-pin:nth-child(5n) > div { animation-delay: 1.2s; }
-    .city-cluster-pin:nth-child(2n) > div { animation-delay: 0.4s; }
-    .city-cluster-pin:nth-child(3n) > div { animation-delay: 0.8s; }
-    .city-cluster-pin:nth-child(4n) > div { animation-delay: 1.2s; }
-    .city-cluster-pin:nth-child(5n) > div { animation-delay: 1.6s; }
+    /* Stagger animation delays */
+    .store-pin:nth-child(2n) > div { animation-delay: 0.3s; }
+    .store-pin:nth-child(3n) > div { animation-delay: 0.6s; }
+    .store-pin:nth-child(4n) > div { animation-delay: 0.9s; }
+    .store-pin:nth-child(5n) > div { animation-delay: 1.2s; }
+    .city-pin:nth-child(2n) > div { animation-delay: 0.4s; }
+    .city-pin:nth-child(3n) > div { animation-delay: 0.8s; }
+    .city-pin:nth-child(4n) > div { animation-delay: 1.2s; }
+    .city-pin:nth-child(5n) > div { animation-delay: 1.6s; }
     /* Hover pause */
-    .city-cluster-pin:hover > div { animation-play-state: paused; transform: translateY(-6px) scale(1.1); }
-    .custom-pin:hover > div { animation-play-state: paused; transform: translateY(-4px); }
+    .city-pin:hover > div { animation-play-state: paused; transform: translateY(-8px) scale(1.08); }
+    .store-pin:hover > div { animation-play-state: paused; transform: translateY(-4px); }
   `;
   document.head.appendChild(style);
 }
 
-/* ─── Custom store pin SVG (navy blue, keeps existing size) ─── */
-const createPinIcon = (isActive = false) => {
+/* ─── City pin: teardrop SVG like homepage (red, no number, no label) ─── */
+const createCityPinIcon = () => {
+  return L.divIcon({
+    className: 'city-pin',
+    html: `
+      <div style="position:relative;cursor:pointer;width:40px;height:52px;">
+        <!-- Pulse ring 1 -->
+        <div style="
+          position:absolute;
+          left:50%;top:100%;
+          width:24px;height:24px;
+          border-radius:50%;
+          border:2px solid rgba(193,33,38,0.4);
+          animation: cityPulseRing 2.5s ease-out infinite;
+          pointer-events:none;
+        "></div>
+        <!-- Pulse ring 2 -->
+        <div style="
+          position:absolute;
+          left:50%;top:100%;
+          width:20px;height:20px;
+          border-radius:50%;
+          border:1.5px solid rgba(193,33,38,0.25);
+          animation: cityPulseRing2 3s ease-out infinite 0.5s;
+          pointer-events:none;
+        "></div>
+        <!-- Teardrop pin SVG -->
+        <svg width="40" height="52" viewBox="0 0 40 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="cityPinShadow">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#C12126" flood-opacity="0.35"/>
+            </filter>
+          </defs>
+          <path d="M20 2 C11 2 4 9 4 18 C4 30 20 50 20 50 C20 50 36 30 36 18 C36 9 29 2 20 2 Z"
+            fill="#C12126" stroke="#8B0000" stroke-width="0.8" filter="url(#cityPinShadow)"/>
+          <circle cx="20" cy="18" r="7" fill="white" opacity="0.95"/>
+          <circle cx="20" cy="18" r="3.5" fill="#C12126"/>
+        </svg>
+      </div>
+    `,
+    iconSize: [40, 52],
+    iconAnchor: [20, 52],
+    popupAnchor: [0, -54],
+  });
+};
+
+/* ─── Store pin SVG (navy blue, same size as before) ─── */
+const createStorePinIcon = (isActive = false) => {
   const color = isActive ? '#C12126' : '#003048';
-  const innerBg = '#FAEDD3';
   const innerDot = isActive ? '#C12126' : '#003048';
   const glow = isActive
     ? 'drop-shadow(0 0 12px rgba(193,33,38,0.6)) drop-shadow(0 3px 8px rgba(0,0,0,0.3))'
     : 'drop-shadow(0 2px 6px rgba(0,48,72,0.35))';
   return L.divIcon({
-    className: 'custom-pin',
+    className: 'store-pin',
     html: `<div style="filter:${glow};transition:filter 0.4s cubic-bezier(0.22,1,0.36,1);">
       <svg width="34" height="46" viewBox="0 0 32 44" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 28 16 28s16-16 16-28C32 7.16 24.84 0 16 0z" fill="${color}" opacity="${isActive ? '1' : '0.9'}"/>
-        <circle cx="16" cy="16" r="7" fill="${innerBg}" opacity="0.95"/>
+        <circle cx="16" cy="16" r="7" fill="#FAEDD3" opacity="0.95"/>
         <circle cx="16" cy="16" r="3.5" fill="${innerDot}"/>
       </svg>
     </div>`,
     iconSize: [34, 46],
     iconAnchor: [17, 46],
     popupAnchor: [0, -48],
-  });
-};
-
-/* ─── City cluster dot icon (small, elegant, red — no city name label) ─── */
-const createCityClusterIcon = (storeCount: number) => {
-  return L.divIcon({
-    className: 'city-cluster-pin',
-    html: `
-      <div style="
-        position:relative;
-        display:flex;align-items:center;justify-content:center;
-        cursor:pointer;
-      ">
-        <!-- Pulse ring -->
-        <div style="
-          position:absolute;
-          width:32px;height:32px;
-          border-radius:50%;
-          background:rgba(193,33,38,0.15);
-          animation: pulseRing 2.5s ease-out infinite;
-        "></div>
-        <!-- Main dot -->
-        <div style="
-          position:relative;
-          width:32px;height:32px;
-          background:linear-gradient(135deg,#C12126,#a01b1f);
-          border-radius:50%;
-          display:flex;align-items:center;justify-content:center;
-          border:2.5px solid rgba(250,237,211,0.9);
-          box-shadow:0 2px 10px rgba(193,33,38,0.35), 0 0 0 1px rgba(193,33,38,0.15);
-        ">
-          <span style="color:#FAEDD3;font-weight:700;font-size:12px;line-height:1;letter-spacing:-0.02em;">${storeCount}</span>
-        </div>
-      </div>
-    `,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
   });
 };
 
@@ -146,14 +160,13 @@ export default function StoreMap({ stores }: StoreMapProps) {
   const markersRef = useRef<L.Marker[]>([]);
   const [selectedStore, setSelectedStore] = useState<StoreLocation | null>(null);
   const [filterCity, setFilterCity] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
 
   /* Inject CSS once */
   useEffect(() => { injectPinStyles(); }, []);
 
-  /* ─── Compute city clusters (centroid + count) ─── */
+  /* ─── Compute city clusters ─── */
   const cityClusters = useMemo(() => {
     const cityMap: Record<string, { stores: StoreLocation[]; totalLat: number; totalLng: number }> = {};
     stores.forEach((s) => {
@@ -174,39 +187,17 @@ export default function StoreMap({ stores }: StoreMapProps) {
     }));
   }, [stores]);
 
-  /* ─── Filtered stores (only used when a city is selected) ─── */
+  /* ─── Filtered stores (city selected) ─── */
   const filteredStores = useMemo(() => {
     return stores.filter((s) => {
-      const matchCity =
-        filterCity === 'All' ||
-        s.city === filterCity ||
-        (filterCity === 'Other' && !CITIES.includes(s.city));
-      const matchSearch =
-        !searchQuery ||
-        s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.address.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchCity && matchSearch;
+      const matchCity = filterCity === 'All' || s.city === filterCity;
+      return matchCity;
     });
-  }, [stores, filterCity, searchQuery]);
-
-  /* ─── Filtered city clusters for search in All mode ─── */
-  const filteredClusters = useMemo(() => {
-    if (!searchQuery) return cityClusters;
-    return cityClusters.filter(
-      (c) =>
-        c.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.stores.some(
-          (s) =>
-            s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            s.address.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-    );
-  }, [cityClusters, searchQuery]);
+  }, [stores, filterCity]);
 
   /* ─── Display count ─── */
   const displayCount = filterCity === 'All' ? stores.length : filteredStores.length;
-  const cityCountNum = filterCity === 'All' ? filteredClusters.length : null;
+  const cityCountNum = filterCity === 'All' ? cityClusters.length : null;
 
   /* ─── Initialize map ─── */
   useEffect(() => {
@@ -255,10 +246,10 @@ export default function StoreMap({ stores }: StoreMapProps) {
     markersRef.current = [];
 
     if (filterCity === 'All') {
-      // ── CITY CLUSTER MODE: one small dot per city ──
-      filteredClusters.forEach((cluster) => {
+      // ── CITY MODE: one teardrop pin per city ──
+      cityClusters.forEach((cluster) => {
         const marker = L.marker([cluster.lat, cluster.lng], {
-          icon: createCityClusterIcon(cluster.count),
+          icon: createCityPinIcon(),
         });
 
         marker.on('click', () => {
@@ -271,7 +262,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
       });
 
       // Fit to all clusters
-      if (filteredClusters.length > 0) {
+      if (cityClusters.length > 0) {
         const group = L.featureGroup(markersRef.current);
         map.fitBounds(group.getBounds().pad(0.15), { maxZoom: 10 });
       }
@@ -279,7 +270,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
       // ── INDIVIDUAL STORE MODE ──
       filteredStores.forEach((store) => {
         const marker = L.marker([store.lat, store.lng], {
-          icon: createPinIcon(selectedStore?.id === store.id),
+          icon: createStorePinIcon(selectedStore?.id === store.id),
         });
 
         marker.on('click', () => {
@@ -297,7 +288,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
         map.fitBounds(group.getBounds().pad(0.3), { maxZoom: 14 });
       }
     }
-  }, [filteredStores, filteredClusters, filterCity, selectedStore]);
+  }, [filteredStores, cityClusters, filterCity, selectedStore]);
 
   useEffect(() => {
     updateMarkers();
@@ -309,7 +300,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
       markersRef.current.forEach((marker, idx) => {
         const store = filteredStores[idx];
         if (store) {
-          marker.setIcon(createPinIcon(selectedStore?.id === store.id));
+          marker.setIcon(createStorePinIcon(selectedStore?.id === store.id));
         }
       });
     }
@@ -347,11 +338,9 @@ export default function StoreMap({ stores }: StoreMapProps) {
     if (!map) return;
     setSelectedStore(null);
     setFilterCity('All');
-    setSearchQuery('');
     map.flyTo([23.7, 120.96], 8, { duration: 1 });
   };
 
-  /* ─── Back to All Cities button ─── */
   const handleBackToAll = () => {
     const map = mapRef.current;
     if (!map) return;
@@ -384,40 +373,29 @@ export default function StoreMap({ stores }: StoreMapProps) {
 
   return (
     <div className="relative w-full">
-      {/* ─── Search & Filter Bar ─── */}
-      <div className="absolute top-4 left-4 right-4 z-[1000] flex flex-col sm:flex-row gap-3">
-        {/* Search */}
-        <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-navy/40" />
-          <input
-            type="text"
-            placeholder="Search stores, cities..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-white/95 backdrop-blur-xl border border-cream-dark/30 rounded-2xl text-navy text-sm placeholder:text-navy/30 focus:outline-none focus:border-red/40 focus:ring-2 focus:ring-red/10 transition-all shadow-lg shadow-navy/5"
-          />
-        </div>
-
-        {/* City filter */}
+      {/* ─── Top bar: Dropdown (left) + Reset (right) ─── */}
+      <div className="absolute top-4 left-4 right-4 z-[1000] flex items-center gap-3">
+        {/* City dropdown — left side, wider */}
         <div className="relative">
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="flex items-center gap-2 px-5 py-3 bg-white/95 backdrop-blur-xl border border-cream-dark/30 rounded-2xl text-navy text-sm hover:border-navy/20 transition-all whitespace-nowrap shadow-lg shadow-navy/5"
+            className="flex items-center gap-2.5 px-5 py-3 min-w-[220px] sm:min-w-[260px] bg-white/95 backdrop-blur-xl border border-cream-dark/30 rounded-2xl text-navy text-sm hover:border-navy/20 transition-all shadow-lg shadow-navy/5"
           >
-            <MapPin className="w-4 h-4 text-red" />
-            {filterCity}
+            <MapPin className="w-4 h-4 text-red shrink-0" />
+            <span className="flex-1 text-left font-medium truncate">{filterCity}</span>
             <ChevronDown
-              className={`w-4 h-4 text-navy/40 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`}
+              className={`w-4 h-4 text-navy/40 transition-transform shrink-0 ${isFilterOpen ? 'rotate-180' : ''}`}
             />
           </button>
           {isFilterOpen && (
-            <div className="absolute top-full mt-2 right-0 w-52 max-h-80 overflow-y-auto bg-white/98 backdrop-blur-xl border border-cream-dark/30 rounded-2xl py-2 shadow-2xl z-[1001]">
+            <div className="absolute top-full mt-2 left-0 w-full min-w-[220px] sm:min-w-[260px] max-h-80 overflow-y-auto bg-white/98 backdrop-blur-xl border border-cream-dark/30 rounded-2xl py-2 shadow-2xl z-[1001]">
               {CITIES.map((city) => (
                 <button
                   key={city}
                   onClick={() => {
                     setFilterCity(city);
                     setIsFilterOpen(false);
+                    setSelectedStore(null);
                   }}
                   className={`block w-full text-left px-4 py-2.5 text-sm transition-colors ${
                     filterCity === city
@@ -432,6 +410,19 @@ export default function StoreMap({ stores }: StoreMapProps) {
           )}
         </div>
 
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Back to All Cities button (when viewing a specific city) */}
+        {filterCity !== 'All' && (
+          <button
+            onClick={handleBackToAll}
+            className="flex items-center gap-2 px-4 py-3 bg-navy/90 backdrop-blur-xl rounded-2xl text-white text-xs font-semibold hover:bg-navy transition-all shadow-lg whitespace-nowrap"
+          >
+            ← All Cities
+          </button>
+        )}
+
         {/* Reset view button */}
         <button
           onClick={handleResetView}
@@ -441,18 +432,6 @@ export default function StoreMap({ stores }: StoreMapProps) {
           <Locate className="w-4 h-4 text-navy/60" />
         </button>
       </div>
-
-      {/* ─── Back to All Cities button (shown when viewing a specific city) ─── */}
-      {filterCity !== 'All' && (
-        <div className="absolute top-20 sm:top-4 sm:left-auto sm:right-[calc(4rem+12rem+4rem+3.5rem+1.5rem)] left-4 z-[1000]">
-          <button
-            onClick={handleBackToAll}
-            className="flex items-center gap-2 px-4 py-2.5 bg-navy/90 backdrop-blur-xl rounded-2xl text-white text-xs font-semibold hover:bg-navy transition-all shadow-lg"
-          >
-            ← All Cities
-          </button>
-        </div>
-      )}
 
       {/* ─── Counter badge ─── */}
       <div className="absolute bottom-20 left-4 z-[1000]">
