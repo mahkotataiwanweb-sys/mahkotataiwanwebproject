@@ -265,7 +265,6 @@ export default function AboutPage() {
   const t = useTranslations('about');
   const locale = useLocale();
   const heroRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const redLineRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
@@ -405,23 +404,18 @@ export default function AboutPage() {
     velocityRef.current = -PARTNER_MARQUEE_SPEED;
   }, []);
 
-  // GSAP hero entrance animation
+  // GSAP hero entrance animation — Premium staggered blur reveal
   useEffect(() => {
-    if (!headerRef.current) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headerRef.current!.children,
-        { opacity: 0, y: 60, filter: 'blur(16px)', scale: 0.92 },
-        {
-          opacity: 1,
-          y: 0,
-          filter: 'blur(0px)',
-          scale: 1,
-          duration: 1.4,
-          stagger: 0.2,
-          ease: 'power3.out',
-        }
-      );
+      gsap.from('.hero-text', {
+        opacity: 0,
+        y: 60,
+        filter: 'blur(16px)',
+        scale: 0.9,
+        duration: 1.6,
+        stagger: 0.25,
+        ease: 'power4.out',
+      });
     });
     return () => ctx.revert();
   }, []);
@@ -735,27 +729,73 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Hero Section
       ═══════════════════════════════════════════════════════════════ */}
-      <section ref={heroRef} className="py-24 sm:py-32 bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] relative overflow-hidden">
+      <section ref={heroRef} className="relative bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] pt-32 pb-24 overflow-hidden">
         <HeroBackground />
-        <div className="max-w-7xl mx-auto px-6">
-          <Link
-            href={`/${locale}`}
-            className="inline-flex items-center gap-2 text-cream/70 hover:text-cream text-sm transition-colors mb-8"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Home
-          </Link>
 
-          <div ref={headerRef} className="text-center">
-            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
-              {t('label')}
-            </p>
-            <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-3 leading-[1.1]">
-              {t('title')}
-            </h1>
-            <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
-            <p className="text-cream/70 max-w-lg mx-auto text-sm tracking-wide">
-              {t('mission')}
-            </p>
+        {/* Extra hero decorations */}
+        <motion.div
+          className="absolute top-16 left-[10%] pointer-events-none"
+          animate={{ y: [0, -10, 0], opacity: [0.15, 0.3, 0.15] }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <Sparkles className="w-10 h-10 text-cream/20" />
+        </motion.div>
+        <motion.div
+          className="absolute bottom-10 right-[15%] pointer-events-none"
+          animate={{ y: [0, 8, 0], rotate: [0, 180, 360] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+        >
+          <div className="w-3 h-3 rounded-full bg-red/30" />
+        </motion.div>
+
+        <div className="relative max-w-7xl mx-auto px-6 text-center">
+          {/* Back link */}
+          <div className="hero-text mb-8">
+            <Link
+              href={`/${locale}`}
+              className="inline-flex items-center gap-2 text-cream/60 hover:text-cream transition-colors text-sm group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              Back to Home
+            </Link>
+          </div>
+
+          <motion.span
+            className="hero-text inline-block text-base sm:text-lg font-bold tracking-[0.35em] uppercase mb-5 px-6 py-2 rounded-full border border-cream/20"
+            style={{
+              background: 'linear-gradient(135deg, rgba(193,33,38,0.15), rgba(250,237,211,0.1))',
+              color: '#FAEDD3',
+              textShadow: '0 0 20px rgba(250,237,211,0.4), 0 0 40px rgba(193,33,38,0.2)',
+            }}
+            animate={{ opacity: [0.85, 1, 0.85], scale: [0.98, 1, 0.98] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            ✦ {t('label')} ✦
+          </motion.span>
+          <h1 className="hero-text text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-5">
+            {t('title')}
+          </h1>
+          <p className="hero-text text-cream/60 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+            {t('mission')}
+          </p>
+
+          {/* Animated separator */}
+          <div className="hero-text relative mt-8 flex items-center justify-center gap-3">
+            <motion.div
+              className="w-12 h-px bg-gradient-to-r from-transparent to-red/60"
+              animate={{ scaleX: [0, 1] }}
+              transition={{ duration: 1.5, delay: 1.2, ease: 'power4.out' }}
+            />
+            <motion.div
+              className="w-2 h-2 rounded-full bg-red"
+              animate={{ scale: [0, 1.2, 1] }}
+              transition={{ duration: 0.5, delay: 1.8 }}
+            />
+            <motion.div
+              className="w-12 h-px bg-gradient-to-l from-transparent to-red/60"
+              animate={{ scaleX: [0, 1] }}
+              transition={{ duration: 1.5, delay: 1.2, ease: 'power4.out' }}
+            />
           </div>
         </div>
       </section>
