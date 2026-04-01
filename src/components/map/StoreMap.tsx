@@ -413,17 +413,104 @@ function DecorativeElements() {
           <ellipse cx="26" cy="8" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.65" transform="rotate(-10 26 8)"/>
           <ellipse cx="26" cy="12" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.65" transform="rotate(10 26 12)"/>
         </svg>
+        {/* Dolphin — swimming right in left ocean */}
+        <div style={{ position: 'absolute', top: '35%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
+          <svg style={{ animation: 'dolphinSwimRight 20s ease-in-out infinite' }} viewBox="0 0 52 30" fill="none" width="52" height="30">
+            {/* Body */}
+            <path d="M10 18 Q14 6 26 5 Q38 4 44 12 Q46 15 42 17 Q38 19 30 20 Q20 22 10 18Z" fill="#5BAED6" opacity="0.85"/>
+            {/* Belly highlight */}
+            <path d="M18 18 Q26 22 36 17 Q30 20 22 20Z" fill="#B8E6F8" opacity="0.7"/>
+            {/* Eye */}
+            <circle cx="38" cy="11" r="1.3" fill="#1A3D4E"/>
+            {/* Dorsal fin */}
+            <path d="M24 8 L22 1 L28 7Z" fill="#4A9EC0" opacity="0.9"/>
+            {/* Tail */}
+            <path d="M10 16 Q4 10 6 6" stroke="#5BAED6" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.8"/>
+            <path d="M10 18 Q4 22 6 26" stroke="#5BAED6" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.8"/>
+            {/* Mouth line (smile) */}
+            <path d="M42 14 Q44 15 43 16" stroke="#3A8AB0" strokeWidth="0.8" fill="none"/>
+          </svg>
+        </div>
+        {/* Orca — bobbing in left ocean */}
+        <div style={{ position: 'absolute', top: '70%', left: '10%', animation: 'orcaBob 8s ease-in-out infinite' }}>
+          <svg viewBox="0 0 60 30" fill="none" width="60" height="30">
+            {/* Main body */}
+            <ellipse cx="30" cy="15" rx="22" ry="11" fill="#1A1A2E" opacity="0.9"/>
+            {/* White belly */}
+            <ellipse cx="32" cy="20" rx="15" ry="5" fill="white" opacity="0.85"/>
+            {/* White eye patch */}
+            <ellipse cx="42" cy="11" rx="4.5" ry="3" fill="white" opacity="0.9"/>
+            {/* Eye */}
+            <circle cx="43" cy="11" r="1.3" fill="#1A1A2E"/>
+            {/* Dorsal fin — tall */}
+            <path d="M26 4 L24 -4 L30 4Z" fill="#1A1A2E"/>
+            {/* Tail flukes */}
+            <path d="M8 12 Q2 6 4 2" stroke="#1A1A2E" strokeWidth="3" fill="none" strokeLinecap="round"/>
+            <path d="M8 18 Q2 24 4 28" stroke="#1A1A2E" strokeWidth="3" fill="none" strokeLinecap="round"/>
+            {/* White belly patch near tail */}
+            <ellipse cx="16" cy="18" rx="5" ry="2.5" fill="white" opacity="0.6"/>
+          </svg>
+        </div>
       </div>
 
       {/* ═══ RIGHT OCEAN — Pacific (65-100%) ═══ */}
       <div style={{ position: 'absolute', top: 0, left: '65%', width: '35%', height: '100%', overflow: 'hidden' }}>
-        {/* Dolphin in right ocean */}
-        <svg style={{ position: 'absolute', top: '30%', right: '-30px', animation: 'fishSwimLeft 40s linear infinite 3s' }} viewBox="0 0 40 22" fill="none" width="40" height="22">
-          <ellipse cx="20" cy="11" rx="8" ry="4.5" fill="#5BC0EB" opacity="0.65"/>
-          <path d="M28 11 L34 8 L33 14 Z" fill="#5BC0EB" opacity="0.6"/>
-          <circle cx="14" cy="10" r="1.2" fill="white" opacity="0.8"/>
-          <path d="M10 11 Q6 5 2 11" stroke="#5BC0EB" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.5"/>
-        </svg>
+        {/* Dolphin 1 — proper dolphin swimming left in right ocean */}
+        <div style={{ position: 'absolute', top: '25%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
+          <svg style={{ animation: 'dolphinSwimLeft 22s ease-in-out infinite' }} viewBox="0 0 52 30" fill="none" width="52" height="30">
+            {/* Body */}
+            <path d="M10 18 Q14 6 26 5 Q38 4 44 12 Q46 15 42 17 Q38 19 30 20 Q20 22 10 18Z" fill="#5BAED6" opacity="0.85"/>
+            {/* Belly highlight */}
+            <path d="M18 18 Q26 22 36 17 Q30 20 22 20Z" fill="#B8E6F8" opacity="0.7"/>
+            {/* Eye */}
+            <circle cx="38" cy="11" r="1.3" fill="#1A3D4E"/>
+            {/* Dorsal fin */}
+            <path d="M24 8 L22 1 L28 7Z" fill="#4A9EC0" opacity="0.9"/>
+            {/* Tail */}
+            <path d="M10 16 Q4 10 6 6" stroke="#5BAED6" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.8"/>
+            <path d="M10 18 Q4 22 6 26" stroke="#5BAED6" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.8"/>
+            {/* Mouth line (smile) */}
+            <path d="M42 14 Q44 15 43 16" stroke="#3A8AB0" strokeWidth="0.8" fill="none"/>
+          </svg>
+        </div>
+        {/* Dolphin 2 — second dolphin swimming left in right ocean */}
+        <div style={{ position: 'absolute', top: '45%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
+          <svg style={{ animation: 'dolphinSwimLeft 26s ease-in-out infinite 5s' }} viewBox="0 0 52 30" fill="none" width="52" height="30">
+            {/* Body */}
+            <path d="M10 18 Q14 6 26 5 Q38 4 44 12 Q46 15 42 17 Q38 19 30 20 Q20 22 10 18Z" fill="#5BAED6" opacity="0.85"/>
+            {/* Belly highlight */}
+            <path d="M18 18 Q26 22 36 17 Q30 20 22 20Z" fill="#B8E6F8" opacity="0.7"/>
+            {/* Eye */}
+            <circle cx="38" cy="11" r="1.3" fill="#1A3D4E"/>
+            {/* Dorsal fin */}
+            <path d="M24 8 L22 1 L28 7Z" fill="#4A9EC0" opacity="0.9"/>
+            {/* Tail */}
+            <path d="M10 16 Q4 10 6 6" stroke="#5BAED6" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.8"/>
+            <path d="M10 18 Q4 22 6 26" stroke="#5BAED6" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.8"/>
+            {/* Mouth line (smile) */}
+            <path d="M42 14 Q44 15 43 16" stroke="#3A8AB0" strokeWidth="0.8" fill="none"/>
+          </svg>
+        </div>
+        {/* Orca — bobbing in right ocean */}
+        <div style={{ position: 'absolute', top: '65%', left: '15%', animation: 'orcaBob 9s ease-in-out infinite 2s' }}>
+          <svg viewBox="0 0 60 30" fill="none" width="60" height="30" style={{ transform: 'scaleX(-1)' }}>
+            {/* Main body */}
+            <ellipse cx="30" cy="15" rx="22" ry="11" fill="#1A1A2E" opacity="0.9"/>
+            {/* White belly */}
+            <ellipse cx="32" cy="20" rx="15" ry="5" fill="white" opacity="0.85"/>
+            {/* White eye patch */}
+            <ellipse cx="42" cy="11" rx="4.5" ry="3" fill="white" opacity="0.9"/>
+            {/* Eye */}
+            <circle cx="43" cy="11" r="1.3" fill="#1A1A2E"/>
+            {/* Dorsal fin — tall */}
+            <path d="M26 4 L24 -4 L30 4Z" fill="#1A1A2E"/>
+            {/* Tail flukes */}
+            <path d="M8 12 Q2 6 4 2" stroke="#1A1A2E" strokeWidth="3" fill="none" strokeLinecap="round"/>
+            <path d="M8 18 Q2 24 4 28" stroke="#1A1A2E" strokeWidth="3" fill="none" strokeLinecap="round"/>
+            {/* White belly patch near tail */}
+            <ellipse cx="16" cy="18" rx="5" ry="2.5" fill="white" opacity="0.6"/>
+          </svg>
+        </div>
         {/* Yellow fish school */}
         <svg style={{ position: 'absolute', top: '55%', right: '-25px', animation: 'fishSwimLeft 28s linear infinite 6s' }} viewBox="0 0 40 16" fill="none" width="40" height="16">
           <ellipse cx="8" cy="5" rx="4" ry="2.2" fill="#FFB300" opacity="0.75"/>
@@ -524,7 +611,45 @@ function DecorativeElements() {
         <line x1="15" y1="14" x2="16" y2="18" stroke="#8B6914" strokeWidth="1"/>
       </svg>
 
-      {/* ═══ AIRPLANE — occasional slow rise from bottom to top ═══ */}
+      {/* ═══ CARS — driving across Taiwan land ═══ */}
+      <div style={{ position: 'absolute', top: '25%', left: '40%', width: '22%', height: '45%', overflow: 'hidden', pointerEvents: 'none' }}>
+        {/* Car 1 — red/orange driving left to right */}
+        <div style={{ position: 'absolute', top: '45%', left: 0, width: '100%', height: '18px' }}>
+          <svg style={{ animation: 'carDriveRight 28s linear infinite' }} viewBox="0 0 36 18" fill="none" width="28" height="14">
+            {/* Body */}
+            <rect x="3" y="7" width="30" height="8" rx="2.5" fill="#E85A3A"/>
+            {/* Roof */}
+            <path d="M9 7 L12 2 L24 2 L27 7Z" fill="#D04A2A"/>
+            {/* Windows */}
+            <path d="M13 7 L14.5 3 L18 3 L18 7Z" fill="#B3E5FC" opacity="0.9"/>
+            <path d="M20 7 L20 3 L23.5 3 L25 7Z" fill="#B3E5FC" opacity="0.9"/>
+            {/* Wheels */}
+            <circle cx="11" cy="15" r="2.8" fill="#333"/>
+            <circle cx="25" cy="15" r="2.8" fill="#333"/>
+            <circle cx="11" cy="15" r="1" fill="#999"/>
+            <circle cx="25" cy="15" r="1" fill="#999"/>
+          </svg>
+        </div>
+        {/* Car 2 — blue driving right to left */}
+        <div style={{ position: 'absolute', top: '55%', left: 0, width: '100%', height: '18px' }}>
+          <svg style={{ animation: 'carDriveLeft 32s linear infinite 10s' }} viewBox="0 0 36 18" fill="none" width="28" height="14">
+            {/* Body */}
+            <rect x="3" y="7" width="30" height="8" rx="2.5" fill="#4A90D9"/>
+            {/* Roof */}
+            <path d="M9 7 L12 2 L24 2 L27 7Z" fill="#3A7BC0"/>
+            {/* Windows */}
+            <path d="M13 7 L14.5 3 L18 3 L18 7Z" fill="#B3E5FC" opacity="0.9"/>
+            <path d="M20 7 L20 3 L23.5 3 L25 7Z" fill="#B3E5FC" opacity="0.9"/>
+            {/* Wheels */}
+            <circle cx="11" cy="15" r="2.8" fill="#333"/>
+            <circle cx="25" cy="15" r="2.8" fill="#333"/>
+            <circle cx="11" cy="15" r="1" fill="#999"/>
+            <circle cx="25" cy="15" r="1" fill="#999"/>
+          </svg>
+        </div>
+      </div>
+
+            {/* ═══ AIRPLANE — occasional slow rise from bottom to top ═══ */}
       {[
         { left: '18%', duration: '50s', delay: '0s' },
         { left: '48%', duration: '58s', delay: '18s' },
@@ -547,7 +672,59 @@ function DecorativeElements() {
         </div>
       ))}
 
-      {/* ═══ KEYFRAMES ═══ */}
+      {/* ═══ DESKTOP-ONLY EXTRAS ═══ */}
+      <div className="hidden lg:block" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+        {/* Extra bird 1 */}
+        <svg style={{ position: 'absolute', top: '7%', left: 0, width: '100%', height: '24px', animation: 'floatBird 15s ease-in-out infinite 2s' }} viewBox="0 0 30 16" fill="none" width="30" height="16">
+          <path d="M2 10 Q6 3 10 8 M10 8 Q14 3 18 10" stroke="#2A5060" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        </svg>
+        {/* Extra bird 2 */}
+        <svg style={{ position: 'absolute', top: '15%', left: 0, width: '100%', height: '28px', animation: 'floatBird2 20s ease-in-out infinite 6s' }} viewBox="0 0 36 18" fill="none" width="36" height="18">
+          <path d="M2 12 Q8 4 14 10 M14 10 Q20 4 26 12" stroke="#1A3D4E" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        </svg>
+        {/* Extra cloud */}
+        <svg style={{ position: 'absolute', top: '6%', left: 0, width: '100%', height: '38px', animation: 'floatCloud 45s linear infinite 12s', opacity: 0.55 }} viewBox="0 0 100 32" fill="none" width="100" height="32">
+          <ellipse cx="50" cy="20" rx="40" ry="11" fill="white"/><ellipse cx="35" cy="14" rx="20" ry="10" fill="white"/><ellipse cx="65" cy="16" rx="25" ry="9" fill="white"/>
+        </svg>
+        {/* Extra fish — left ocean */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '38%', height: '100%', overflow: 'hidden' }}>
+          <svg style={{ position: 'absolute', top: '25%', left: '-20px', animation: 'fishSwimRight 26s linear infinite 4s' }} viewBox="0 0 22 10" fill="none" width="22" height="10">
+            <ellipse cx="9" cy="5" rx="7" ry="3.5" fill="#FF9800" opacity="0.7"/><polygon points="16,5 22,2 22,8" fill="#FF9800" opacity="0.7"/><circle cx="5" cy="4" r="1" fill="white"/>
+          </svg>
+          <svg style={{ position: 'absolute', top: '75%', left: '-25px', animation: 'fishSwimRight 33s linear infinite 12s' }} viewBox="0 0 24 12" fill="none" width="24" height="12">
+            <ellipse cx="10" cy="6" rx="8" ry="4" fill="#4DB6AC" opacity="0.7"/><polygon points="18,6 24,2 24,10" fill="#4DB6AC" opacity="0.7"/><circle cx="6" cy="5" r="1.2" fill="white"/>
+          </svg>
+        </div>
+        {/* Extra fish — right ocean */}
+        <div style={{ position: 'absolute', top: 0, left: '65%', width: '35%', height: '100%', overflow: 'hidden' }}>
+          <svg style={{ position: 'absolute', top: '40%', right: '-20px', animation: 'fishSwimLeft 24s linear infinite 7s' }} viewBox="0 0 22 10" fill="none" width="22" height="10">
+            <ellipse cx="9" cy="5" rx="7" ry="3.5" fill="#AB47BC" opacity="0.7"/><polygon points="16,5 22,2 22,8" fill="#AB47BC" opacity="0.7"/><circle cx="5" cy="4" r="1" fill="white"/>
+          </svg>
+          <svg style={{ position: 'absolute', top: '85%', right: '-25px', animation: 'fishSwimLeft 30s linear infinite 15s' }} viewBox="0 0 24 12" fill="none" width="24" height="12">
+            <ellipse cx="10" cy="6" rx="8" ry="4" fill="#26A69A" opacity="0.7"/><polygon points="18,6 24,2 24,10" fill="#26A69A" opacity="0.7"/><circle cx="6" cy="5" r="1.2" fill="white"/>
+          </svg>
+        </div>
+        {/* Extra butterfly — near Taiwan */}
+        <svg style={{ position: 'absolute', top: '48%', left: '46%', width: '18px', height: '14px', opacity: 0.65, animation: 'butterflyFloat 7s ease-in-out infinite 3s' }} viewBox="0 0 24 18" fill="none">
+          <ellipse cx="12" cy="9" rx="1" ry="6" fill="#333"/>
+          <ellipse cx="7" cy="6" rx="5" ry="4" fill="#FFA726" opacity="0.8" transform="rotate(-15 7 6)">
+            <animate attributeName="rx" values="5;3.5;5" dur="0.9s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="17" cy="6" rx="5" ry="4" fill="#FFA726" opacity="0.8" transform="rotate(15 17 6)">
+            <animate attributeName="rx" values="5;3.5;5" dur="0.9s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="8" cy="12" rx="3.5" ry="3" fill="#FFCC80" opacity="0.7" transform="rotate(-10 8 12)">
+            <animate attributeName="rx" values="3.5;2.5;3.5" dur="0.9s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="16" cy="12" rx="3.5" ry="3" fill="#FFCC80" opacity="0.7" transform="rotate(10 16 12)">
+            <animate attributeName="rx" values="3.5;2.5;3.5" dur="0.9s" repeatCount="indefinite"/>
+          </ellipse>
+          <circle cx="7" cy="5.5" r="1" fill="#FF8F00" opacity="0.6"/>
+          <circle cx="17" cy="5.5" r="1" fill="#FF8F00" opacity="0.6"/>
+        </svg>
+      </div>
+
+            {/* ═══ KEYFRAMES ═══ */}
       <style>{`
         @keyframes floatBird {
           0% { transform: translateX(-60px); }
@@ -599,6 +776,38 @@ function DecorativeElements() {
           46%  { transform: translateY(-1100px) translateX(-30px) rotate(-8deg); opacity: 0; }
           47%  { transform: translateY(0) rotate(-8deg); opacity: 0; }
           100% { transform: translateY(0) rotate(-8deg); opacity: 0; }
+        }
+        @keyframes dolphinSwimRight {
+          0% { transform: translateX(-60px) translateY(0); }
+          15% { transform: translateX(15%) translateY(-12px); }
+          30% { transform: translateX(30%) translateY(0); }
+          45% { transform: translateX(45%) translateY(-8px); }
+          60% { transform: translateX(60%) translateY(0); }
+          75% { transform: translateX(75%) translateY(-10px); }
+          100% { transform: translateX(calc(100% + 60px)) translateY(0); }
+        }
+        @keyframes dolphinSwimLeft {
+          0% { transform: translateX(calc(100% + 60px)) scaleX(-1) translateY(0); }
+          15% { transform: translateX(75%) scaleX(-1) translateY(-12px); }
+          30% { transform: translateX(60%) scaleX(-1) translateY(0); }
+          45% { transform: translateX(45%) scaleX(-1) translateY(-8px); }
+          60% { transform: translateX(30%) scaleX(-1) translateY(0); }
+          75% { transform: translateX(15%) scaleX(-1) translateY(-10px); }
+          100% { transform: translateX(-60px) scaleX(-1) translateY(0); }
+        }
+        @keyframes orcaBob {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          25% { transform: translateY(-6px) rotate(-2deg); }
+          50% { transform: translateY(0) rotate(0deg); }
+          75% { transform: translateY(-4px) rotate(2deg); }
+        }
+        @keyframes carDriveRight {
+          0% { transform: translateX(-30px); }
+          100% { transform: translateX(calc(100% + 30px)); }
+        }
+        @keyframes carDriveLeft {
+          0% { transform: translateX(calc(100% + 30px)) scaleX(-1); }
+          100% { transform: translateX(-30px) scaleX(-1); }
         }
       `}</style>
     </div>
