@@ -478,6 +478,45 @@ function DecorativeElements() {
             <path d="M42 14 Q44 15 43 16" stroke="#3A8AB0" strokeWidth="0.8" fill="none"/>
           </svg>
         </div>
+        {/* ── Desktop-only: extra fish & jellyfish in left ocean ── */}
+        {/* Jellyfish 1 — drifting mid-left */}
+        <div className="hidden lg:block ocean-creature" style={{ position: 'absolute', top: '45%', left: '35%', animation: 'jellyDriftDown 14s ease-in-out infinite' }}>
+          <svg viewBox="0 0 22 32" fill="none" width="26" height="36" style={{ opacity: 0.55 }}>
+            <ellipse cx="11" cy="9" rx="9" ry="9" fill="#B388FF" />
+            <ellipse cx="11" cy="9" rx="6" ry="6" fill="#CE93D8" opacity="0.45" />
+            <path d="M4 18 Q6 26 5 32" stroke="#AB47BC" strokeWidth="1.2" fill="none" strokeLinecap="round"><animate attributeName="d" values="M4 18 Q6 26 5 32;M4 18 Q3 26 6 32;M4 18 Q6 26 5 32" dur="3s" repeatCount="indefinite"/></path>
+            <path d="M8 18 Q9 28 7 32" stroke="#AB47BC" strokeWidth="1.2" fill="none" strokeLinecap="round"><animate attributeName="d" values="M8 18 Q9 28 7 32;M8 18 Q7 28 9 32;M8 18 Q9 28 7 32" dur="3.5s" repeatCount="indefinite"/></path>
+            <path d="M14 18 Q13 28 15 32" stroke="#AB47BC" strokeWidth="1.2" fill="none" strokeLinecap="round"><animate attributeName="d" values="M14 18 Q13 28 15 32;M14 18 Q15 28 13 32;M14 18 Q13 28 15 32" dur="2.8s" repeatCount="indefinite"/></path>
+            <path d="M18 18 Q16 26 17 32" stroke="#AB47BC" strokeWidth="1.2" fill="none" strokeLinecap="round"><animate attributeName="d" values="M18 18 Q16 26 17 32;M18 18 Q19 26 16 32;M18 18 Q16 26 17 32" dur="3.2s" repeatCount="indefinite"/></path>
+          </svg>
+        </div>
+        {/* Jellyfish 2 — smaller, higher */}
+        <div className="hidden lg:block ocean-creature" style={{ position: 'absolute', top: '22%', left: '55%', animation: 'jellyDriftDown 18s ease-in-out infinite 4s' }}>
+          <svg viewBox="0 0 18 26" fill="none" width="20" height="28" style={{ opacity: 0.45 }}>
+            <ellipse cx="9" cy="7" rx="7" ry="7" fill="#80CBC4" />
+            <ellipse cx="9" cy="7" rx="4.5" ry="4.5" fill="#B2DFDB" opacity="0.5" />
+            <path d="M3 14 Q5 20 4 26" stroke="#4DB6AC" strokeWidth="1" fill="none" strokeLinecap="round"><animate attributeName="d" values="M3 14 Q5 20 4 26;M3 14 Q2 20 5 26;M3 14 Q5 20 4 26" dur="3s" repeatCount="indefinite"/></path>
+            <path d="M7 14 Q8 22 6 26" stroke="#4DB6AC" strokeWidth="1" fill="none" strokeLinecap="round"><animate attributeName="d" values="M7 14 Q8 22 6 26;M7 14 Q6 22 8 26;M7 14 Q8 22 6 26" dur="2.6s" repeatCount="indefinite"/></path>
+            <path d="M11 14 Q10 22 12 26" stroke="#4DB6AC" strokeWidth="1" fill="none" strokeLinecap="round"><animate attributeName="d" values="M11 14 Q10 22 12 26;M11 14 Q12 22 10 26;M11 14 Q10 22 12 26" dur="3.4s" repeatCount="indefinite"/></path>
+            <path d="M15 14 Q13 20 14 26" stroke="#4DB6AC" strokeWidth="1" fill="none" strokeLinecap="round"><animate attributeName="d" values="M15 14 Q13 20 14 26;M15 14 Q16 20 13 26;M15 14 Q13 20 14 26" dur="2.9s" repeatCount="indefinite"/></path>
+          </svg>
+        </div>
+        {/* Blue striped fish — swimming right */}
+        <svg className="hidden lg:block" style={{ position: 'absolute', top: '30%', left: '-25px', animation: 'fishSwimRight 25s linear infinite 4s' }} viewBox="0 0 26 12" fill="none" width="26" height="12">
+          <ellipse cx="11" cy="6" rx="9" ry="4.5" fill="#42A5F5" opacity="0.75"/>
+          <line x1="6" y1="3" x2="6" y2="9" stroke="#1E88E5" strokeWidth="0.8" opacity="0.5"/>
+          <line x1="10" y1="2" x2="10" y2="10" stroke="#1E88E5" strokeWidth="0.8" opacity="0.5"/>
+          <line x1="14" y1="3" x2="14" y2="9" stroke="#1E88E5" strokeWidth="0.8" opacity="0.5"/>
+          <polygon points="20,6 26,2 26,10" fill="#42A5F5" opacity="0.75"/>
+          <circle cx="5" cy="5" r="1.2" fill="white"/>
+          <circle cx="5" cy="5" r="0.6" fill="#333"/>
+        </svg>
+        {/* Small green fish school — swimming right */}
+        <svg className="hidden lg:block" style={{ position: 'absolute', top: '78%', left: '-30px', animation: 'fishSwimRight 22s linear infinite 12s' }} viewBox="0 0 50 20" fill="none" width="50" height="20">
+          <ellipse cx="8" cy="6" rx="5" ry="2.5" fill="#66BB6A" opacity="0.7"/><polygon points="13,6 17,3 17,9" fill="#66BB6A" opacity="0.7"/><circle cx="5" cy="5" r="0.8" fill="white"/>
+          <ellipse cx="22" cy="12" rx="5" ry="2.5" fill="#66BB6A" opacity="0.65"/><polygon points="27,12 31,9 31,15" fill="#66BB6A" opacity="0.65"/><circle cx="19" cy="11" r="0.8" fill="white"/>
+          <ellipse cx="36" cy="8" rx="4.5" ry="2.2" fill="#66BB6A" opacity="0.6"/><polygon points="40.5,8 44,5.5 44,10.5" fill="#66BB6A" opacity="0.6"/><circle cx="33" cy="7" r="0.7" fill="white"/>
+        </svg>
         {/* Orca — bobbing in left ocean (desktop only) */}
         <div className="hidden lg:block ocean-creature" style={{ position: 'absolute', top: '70%', left: '10%', animation: 'orcaBob 8s ease-in-out infinite' }}>
           <svg viewBox="0 0 60 30" fill="none" width="60" height="30">
@@ -569,6 +608,40 @@ function DecorativeElements() {
         {/* Coral fish */}
         <svg style={{ position: 'absolute', top: '75%', right: '-20px', animation: 'fishSwimLeft 32s linear infinite 10s' }} viewBox="0 0 22 10" fill="none" width="22" height="10">
           <ellipse cx="9" cy="5" rx="7" ry="3.5" fill="#E84855" opacity="0.7"/><polygon points="16,5 22,2 22,8" fill="#E84855" opacity="0.7"/><circle cx="5" cy="4" r="1" fill="white"/>
+        </svg>
+        {/* ── Desktop-only: extra fish & jellyfish in right ocean ── */}
+        {/* Jellyfish — drifting in right ocean */}
+        <div className="hidden lg:block ocean-creature" style={{ position: 'absolute', top: '35%', left: '40%', animation: 'jellyDriftDown 16s ease-in-out infinite 2s' }}>
+          <svg viewBox="0 0 22 32" fill="none" width="28" height="38" style={{ opacity: 0.5 }}>
+            <ellipse cx="11" cy="9" rx="9" ry="9" fill="#F48FB1" />
+            <ellipse cx="11" cy="9" rx="6" ry="6" fill="#F8BBD0" opacity="0.5" />
+            <path d="M4 18 Q6 26 5 32" stroke="#EC407A" strokeWidth="1.2" fill="none" strokeLinecap="round"><animate attributeName="d" values="M4 18 Q6 26 5 32;M4 18 Q3 26 6 32;M4 18 Q6 26 5 32" dur="3s" repeatCount="indefinite"/></path>
+            <path d="M8 18 Q9 28 7 32" stroke="#EC407A" strokeWidth="1.2" fill="none" strokeLinecap="round"><animate attributeName="d" values="M8 18 Q9 28 7 32;M8 18 Q7 28 9 32;M8 18 Q9 28 7 32" dur="3.5s" repeatCount="indefinite"/></path>
+            <path d="M14 18 Q13 28 15 32" stroke="#EC407A" strokeWidth="1.2" fill="none" strokeLinecap="round"><animate attributeName="d" values="M14 18 Q13 28 15 32;M14 18 Q15 28 13 32;M14 18 Q13 28 15 32" dur="2.8s" repeatCount="indefinite"/></path>
+            <path d="M18 18 Q16 26 17 32" stroke="#EC407A" strokeWidth="1.2" fill="none" strokeLinecap="round"><animate attributeName="d" values="M18 18 Q16 26 17 32;M18 18 Q19 26 16 32;M18 18 Q16 26 17 32" dur="3.2s" repeatCount="indefinite"/></path>
+          </svg>
+        </div>
+        {/* Small jellyfish — lower right */}
+        <div className="hidden lg:block ocean-creature" style={{ position: 'absolute', top: '80%', left: '60%', animation: 'jellyDriftDown 12s ease-in-out infinite 7s' }}>
+          <svg viewBox="0 0 16 24" fill="none" width="18" height="26" style={{ opacity: 0.4 }}>
+            <ellipse cx="8" cy="6" rx="6" ry="6" fill="#81D4FA" />
+            <ellipse cx="8" cy="6" rx="4" ry="4" fill="#B3E5FC" opacity="0.5" />
+            <path d="M3 12 Q5 18 4 24" stroke="#29B6F6" strokeWidth="1" fill="none" strokeLinecap="round"><animate attributeName="d" values="M3 12 Q5 18 4 24;M3 12 Q2 18 5 24;M3 12 Q5 18 4 24" dur="2.5s" repeatCount="indefinite"/></path>
+            <path d="M8 12 Q9 20 7 24" stroke="#29B6F6" strokeWidth="1" fill="none" strokeLinecap="round"><animate attributeName="d" values="M8 12 Q9 20 7 24;M8 12 Q7 20 9 24;M8 12 Q9 20 7 24" dur="3s" repeatCount="indefinite"/></path>
+            <path d="M13 12 Q11 18 12 24" stroke="#29B6F6" strokeWidth="1" fill="none" strokeLinecap="round"><animate attributeName="d" values="M13 12 Q11 18 12 24;M13 12 Q14 18 11 24;M13 12 Q11 18 12 24" dur="2.8s" repeatCount="indefinite"/></path>
+          </svg>
+        </div>
+        {/* Purple fish — swimming left */}
+        <svg className="hidden lg:block" style={{ position: 'absolute', top: '15%', right: '-20px', animation: 'fishSwimLeft 20s linear infinite 3s' }} viewBox="0 0 24 12" fill="none" width="24" height="12">
+          <ellipse cx="10" cy="6" rx="8" ry="4" fill="#7E57C2" opacity="0.7"/>
+          <polygon points="18,6 24,2 24,10" fill="#7E57C2" opacity="0.7"/>
+          <circle cx="5" cy="5" r="1.2" fill="white"/><circle cx="5" cy="5" r="0.5" fill="#333"/>
+          <path d="M10 3 L10 1.5" stroke="#9575CD" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
+        </svg>
+        {/* Teal fish pair — swimming left */}
+        <svg className="hidden lg:block" style={{ position: 'absolute', top: '90%', right: '-30px', animation: 'fishSwimLeft 26s linear infinite 15s' }} viewBox="0 0 44 16" fill="none" width="44" height="16">
+          <ellipse cx="10" cy="5" rx="7" ry="3" fill="#26A69A" opacity="0.65"/><polygon points="17,5 22,2 22,8" fill="#26A69A" opacity="0.65"/><circle cx="5" cy="4" r="0.9" fill="white"/>
+          <ellipse cx="28" cy="11" rx="6" ry="2.8" fill="#26A69A" opacity="0.6"/><polygon points="34,11 38,8.5 38,13.5" fill="#26A69A" opacity="0.6"/><circle cx="24" cy="10" r="0.8" fill="white"/>
         </svg>
       </div>
 
@@ -988,6 +1061,14 @@ function DecorativeElements() {
           25% { transform: translateY(-6px) rotate(-2deg); }
           50% { transform: translateY(0) rotate(0deg); }
           75% { transform: translateY(-4px) rotate(2deg); }
+        }
+        @keyframes jellyDriftDown {
+          0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+          15% { transform: translateY(-10px) translateX(5px) rotate(3deg); }
+          30% { transform: translateY(4px) translateX(-3px) rotate(-2deg); }
+          50% { transform: translateY(-14px) translateX(8px) rotate(4deg); }
+          70% { transform: translateY(-2px) translateX(-6px) rotate(-3deg); }
+          85% { transform: translateY(-18px) translateX(4px) rotate(2deg); }
         }
         @keyframes crabWalk {
           0%, 100% { transform: translateX(0); }
