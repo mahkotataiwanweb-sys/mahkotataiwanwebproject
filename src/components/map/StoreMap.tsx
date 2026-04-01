@@ -1430,7 +1430,31 @@ export default function StoreMap({ stores }: StoreMapProps) {
     map.on('zoomend', updateOceanCreatures);
     updateOceanCreatures(); // initial check
 
-    /* ── Mobile: enable normal touch dragging ── */
+    /* ── Mobile: two-finger gesture handling (like Google Maps) ── */
+    if (isMobile && mapContainerRef.current) {
+      const container = mapContainerRef.current;
+      container.style.position = 'relative';
+
+      let touchCount = 0;
+
+      container.addEventListener('touchstart', (e) => {
+        touchCount = e.touches.length;
+        if (e.touches.length >= 2) {
+          map.dragging.enable();
+        }
+      }, { passive: true });
+
+      container.addEventListener('touchmove', () => {
+        // one-finger scroll passes through to page
+      }, { passive: true });
+
+      container.addEventListener('touchend', (e) => {
+        touchCount = e.touches.length;
+        if (e.touches.length < 2) {
+          map.dragging.disable();
+        }
+      }, { passive: true });
+    }
 
     /* Start ambient music on first map interaction */
     map.on('click', () => startMusicOnInteraction());
