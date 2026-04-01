@@ -366,13 +366,13 @@ export default function ContactPage() {
         arcTl.to(gLabel, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)' }, 3);
         arcTl.to(yLabel, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)' }, 3);
 
-        // ── Hold both visible for 5s after arcs complete ──
-        arcTl.to({}, { duration: 5 }, 6);
+        // ── Hold both visible for 4.5s after arcs complete ──
+        arcTl.to({}, { duration: 4.5 }, 6);
 
         // ── Both fade out together ──
         arcTl.to([gArc, yArc, gLabel, yLabel], {
           opacity: 0,
-          duration: 2.5,
+          duration: 2.3,
           ease: 'power2.inOut',
         });
 
