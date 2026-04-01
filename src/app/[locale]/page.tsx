@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useImperativeHandle } from 'react';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -42,48 +42,29 @@ function DiscoverWavyTexture() {
   );
 }
 
-/* ──────────────────────────────────────────
-   AutoFlipCard — continuously flips to show
-   next article every few seconds
+/* ──────────────────────────────────────
+   AutoFlipCard — controlled via ref
 ────────────────────────────────────────── */
-function AutoFlipCard({
-  articles,
-  fallbackTitle,
-  fallbackExcerpt,
-  fallbackHref,
-  btnLabel,
-  locale,
-  flipInterval = 5000,
-  startDelay = 0,
-}: {
+interface AutoFlipCardHandle {
+  triggerFlip: () => Promise<void>;
+  enterView: () => Promise<void>;
+}
+
+const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
   articles: Article[];
   fallbackTitle: string;
   fallbackExcerpt: string;
   fallbackHref: string;
   btnLabel: string;
   locale: string;
-  flipInterval?: number;
-  startDelay?: number;
-}) {
+}>(function AutoFlipCardInner({ articles, fallbackTitle, fallbackExcerpt, fallbackHref, btnLabel, locale }, ref) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const indexRef = useRef(0);
   const [displayIndex, setDisplayIndex] = useState(0);
-  const isAnimating = useRef(false);
-  const hasEnteredView = useRef(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
   const count = articles.length;
 
-  /* Get article data for a given index */
   const getArticleData = useCallback((idx: number) => {
-    if (count === 0) {
-      return {
-        title: fallbackTitle,
-        excerpt: fallbackExcerpt,
-        href: fallbackHref,
-        imageUrl: '',
-      };
-    }
+    if (count === 0) return { title: fallbackTitle, excerpt: fallbackExcerpt, href: fallbackHref, imageUrl: '' };
     const a = articles[idx % count];
     return {
       title: getLocalizedField(a, 'title', locale) || fallbackTitle,
@@ -93,150 +74,58 @@ function AutoFlipCard({
     };
   }, [articles, count, locale, fallbackTitle, fallbackExcerpt, fallbackHref]);
 
-  /* Flip to next article */
-  const flipToNext = useCallback(() => {
-    if (isAnimating.current || count <= 1 || !cardRef.current) return;
-    isAnimating.current = true;
-
-    const nextIdx = (currentIndex + 1) % count;
-
-    /* Phase 1: flip OUT (rotate away from viewer) */
-    gsap.to(cardRef.current, {
-      rotateY: 90,
-      opacity: 0.3,
-      duration: 0.5,
-      ease: 'power2.in',
-      transformPerspective: 2500,
-      transformOrigin: 'center center',
-      onComplete: () => {
-        /* Swap content while hidden at 90° */
-        setDisplayIndex(nextIdx);
-        setCurrentIndex(nextIdx);
-
-        /* Phase 2: snap to -90° (other side) then flip IN */
-        gsap.set(cardRef.current, { rotateY: -90 });
-        gsap.to(cardRef.current, {
-          rotateY: 0,
-          opacity: 1,
-          duration: 1,
-          ease: 'power2.out',
-          transformPerspective: 2500,
-          onComplete: () => {
-            isAnimating.current = false;
-          },
-        });
-      },
-    });
-  }, [currentIndex, count]);
-
-  /* Initial entrance flip + start auto-cycling */
-  useEffect(() => {
-    if (!cardRef.current) return;
-
-    const ctx = gsap.context(() => {
-      /* Set initial hidden state */
-      gsap.set(cardRef.current, {
-        opacity: 0,
-        rotateY: -100,
-        transformPerspective: 2500,
-        transformOrigin: 'center center',
-      });
-
-      /* Scroll-triggered entrance */
-      ScrollTrigger.create({
-        trigger: cardRef.current,
-        start: 'top 50%',
-        once: true,
-        onEnter: () => {
-          hasEnteredView.current = true;
+  useImperativeHandle(ref, () => ({
+    triggerFlip: () => new Promise<void>((resolve) => {
+      if (count <= 1 || !cardRef.current) { resolve(); return; }
+      const nextIdx = (indexRef.current + 1) % count;
+      gsap.to(cardRef.current, {
+        rotateY: 90, opacity: 0.3, duration: 0.5,
+        ease: 'power2.in', transformPerspective: 2500, transformOrigin: 'center center',
+        onComplete: () => {
+          indexRef.current = nextIdx;
+          setDisplayIndex(nextIdx);
+          gsap.set(cardRef.current, { rotateY: -90 });
           gsap.to(cardRef.current, {
-            opacity: 1,
-            rotateY: 0,
-            duration: 2,
-            ease: 'power2.out',
-            onComplete: () => {
-              /* Start auto-flipping only AFTER entrance animation finishes */
-              if (count > 1) {
-                const startTimer = setTimeout(() => {
-                  flipToNext();
-                  intervalRef.current = setInterval(() => {
-                    flipToNext();
-                  }, flipInterval);
-                }, startDelay);
-                intervalRef.current = startTimer as unknown as ReturnType<typeof setInterval>;
-              }
-            },
+            rotateY: 0, opacity: 1, duration: 1,
+            ease: 'power2.out', transformPerspective: 2500,
+            onComplete: resolve,
           });
         },
       });
-    });
-
-    return () => {
-      ctx.revert();
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count, flipInterval, startDelay]);
-
-  /* Update flipToNext when currentIndex changes */
-  useEffect(() => {
-    if (!hasEnteredView.current || count <= 1) return;
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      flipToNext();
-    }, flipInterval);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [flipToNext, flipInterval, count]);
+    }),
+    enterView: () => new Promise<void>((resolve) => {
+      if (!cardRef.current) { resolve(); return; }
+      gsap.set(cardRef.current, { opacity: 0, rotateY: -100, transformPerspective: 2500, transformOrigin: 'center center' });
+      gsap.to(cardRef.current, { opacity: 1, rotateY: 0, duration: 2, ease: 'power2.out', onComplete: resolve });
+    }),
+  }), [count]);
 
   const data = getArticleData(displayIndex);
-
-  /* Dot indicators */
   const dots = count > 1 ? (
     <div className="flex justify-center gap-2 mt-5">
       {articles.map((_, i) => (
-        <div
-          key={i}
-          className={`w-2 h-2 rounded-full transition-all duration-300 ${
-            i === displayIndex ? 'bg-[#C12126] scale-125' : 'bg-navy/20'
-          }`}
-        />
+        <div key={i} className={`w-2 h-2 rounded-full transition-all duration-300 ${i === displayIndex ? 'bg-[#C12126] scale-125' : 'bg-navy/20'}`} />
       ))}
     </div>
   ) : null;
 
   return (
     <div>
-      <div ref={cardRef} style={{ perspective: '2500px' }}>
+      <div ref={cardRef} style={{ perspective: '2500px', opacity: 0 }}>
         <Link href={data.href} className="group block">
-          {/* ── Image — full width, no rounded corners ── */}
           <div className="relative overflow-hidden">
             <div className="relative aspect-[4/3]">
               {data.imageUrl ? (
-                <Image
-                  src={data.imageUrl}
-                  alt={data.title}
-                  fill
-                  className="object-cover transition-transform duration-[2s] ease-out group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 720px"
-                  unoptimized
-                />
+                <Image src={data.imageUrl} alt={data.title} fill className="object-cover transition-transform duration-[2s] ease-out group-hover:scale-105" sizes="(max-width: 768px) 100vw, 720px" unoptimized />
               ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-[#003048] to-[#001a2c]" />
               )}
             </div>
           </div>
-
-          {/* ── White content box overlapping image ── */}
           <div className="relative bg-white mx-6 sm:mx-10 -mt-10 sm:-mt-14 px-8 sm:px-10 py-8 sm:py-10 shadow-[0_4px_30px_rgba(0,0,0,0.08)]">
             <div className="text-center">
-              <h3 className="font-heading text-xl sm:text-2xl font-bold text-navy mb-3 leading-tight">
-                {data.title}
-              </h3>
-              <p className="text-navy/50 text-sm leading-relaxed mb-6 max-w-md mx-auto">
-                {data.excerpt}
-              </p>
+              <h3 className="font-heading text-xl sm:text-2xl font-bold text-navy mb-3 leading-tight">{data.title}</h3>
+              <p className="text-navy/50 text-sm leading-relaxed mb-6 max-w-md mx-auto">{data.excerpt}</p>
               <div className="inline-flex items-center gap-2 px-7 py-3 bg-[#003048] text-white text-sm font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300">
                 <span>{btnLabel}</span>
               </div>
@@ -247,15 +136,14 @@ function AutoFlipCard({
       {dots}
     </div>
   );
-}
+});
 
-/* ──────────────────────────────────────────
-   HomePage
-────────────────────────────────────────── */
 export default function HomePage() {
   const locale = useLocale();
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const topCardRef = useRef<AutoFlipCardHandle>(null);
+  const bottomCardRef = useRef<AutoFlipCardHandle>(null);
 
   /* state — fetch ALL articles for each type */
   const [events, setEvents] = useState<Article[]>([]);
@@ -307,6 +195,47 @@ export default function HomePage() {
     return () => ctx.revert();
   }, []);
 
+  /* ── Coordinated flip sequencer: top → pause → bottom → pause → repeat ── */
+  useEffect(() => {
+    let cancelled = false;
+    let enteredView = false;
+
+    const sequencer = async () => {
+      while (!cancelled) {
+        await new Promise(r => setTimeout(r, 5000));
+        if (cancelled) break;
+        /* Flip top card */
+        await topCardRef.current?.triggerFlip();
+        if (cancelled) break;
+        /* Pause between cards */
+        await new Promise(r => setTimeout(r, 3000));
+        if (cancelled) break;
+        /* Flip bottom card */
+        await bottomCardRef.current?.triggerFlip();
+      }
+    };
+
+    /* Start entrance + sequencer when section scrolls into view */
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: 'top 60%',
+        once: true,
+        onEnter: async () => {
+          if (enteredView) return;
+          enteredView = true;
+          /* Entrance: top first, then bottom */
+          await topCardRef.current?.enterView();
+          await bottomCardRef.current?.enterView();
+          /* Start sequenced flipping */
+          sequencer();
+        },
+      });
+    });
+
+    return () => { cancelled = true; ctx.revert(); };
+  }, []);
+
   return (
     <>
       <SandTexture fixed />
@@ -334,30 +263,25 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* ── Cards — stacked vertically, each auto-flips through articles ── */}
+          {/* ── Cards — sequenced: top flips, then bottom, never together ── */}
           <div className="flex flex-col gap-20 sm:gap-28">
-            {/* Events card — cycles through all event articles */}
             <AutoFlipCard
+              ref={topCardRef}
               articles={events}
               fallbackTitle="Upcoming Events"
               fallbackExcerpt="Discover our latest community events, celebrations, and gatherings across Taiwan"
               fallbackHref={`/${locale}/events`}
               btnLabel={locale === 'id' ? 'Lihat Acara' : '查看活動'}
               locale={locale}
-              flipInterval={13000}
-              startDelay={0}
             />
-
-            {/* Activities card — cycles through all lifestyle articles */}
             <AutoFlipCard
+              ref={bottomCardRef}
               articles={activities}
               fallbackTitle="Community Activities"
               fallbackExcerpt="See how our community enjoys Mahkota Taiwan products in their daily life"
               fallbackHref={`/${locale}/lifestyle`}
               btnLabel={locale === 'id' ? 'Lihat Aktivitas' : '查看活動'}
               locale={locale}
-              flipInterval={13000}
-              startDelay={6500}
             />
           </div>
         </div>
