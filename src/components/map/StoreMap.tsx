@@ -172,16 +172,16 @@ function injectPinStyles() {
       width: 5px;
     }
     .premium-dropdown-list::-webkit-scrollbar-track {
-      background: rgba(250,237,211,0.15);
+      background: rgba(250,237,211,0.04);
       border-radius: 10px;
       margin: 8px 0;
     }
     .premium-dropdown-list::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, rgba(193,33,38,0.2), rgba(0,48,72,0.15));
+      background: linear-gradient(180deg, rgba(193,33,38,0.4), rgba(250,237,211,0.12));
       border-radius: 10px;
     }
     .premium-dropdown-list::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(180deg, rgba(193,33,38,0.35), rgba(0,48,72,0.25));
+      background: linear-gradient(180deg, rgba(193,33,38,0.55), rgba(250,237,211,0.2));
     }
 
     /* Dropdown item hover glow */
@@ -193,7 +193,7 @@ function injectPinStyles() {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(250,237,211,0.5) 0%, rgba(193,33,38,0.03) 50%, transparent 100%);
+      background: linear-gradient(135deg, rgba(250,237,211,0.08) 0%, rgba(193,33,38,0.04) 50%, transparent 100%);
       opacity: 0;
       transition: opacity 0.3s ease;
       pointer-events: none;
@@ -262,15 +262,15 @@ const createStorePinIcon = (isActive = false) => {
   return L.divIcon({
     className: 'store-pin',
     html: `<div style="filter:${glow};transition:filter 0.4s cubic-bezier(0.22,1,0.36,1);">
-      <svg width="34" height="46" viewBox="0 0 32 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="22" height="30" viewBox="0 0 32 44" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 28 16 28s16-16 16-28C32 7.16 24.84 0 16 0z" fill="${color}" opacity="${isActive ? '1' : '0.9'}"/>
         <circle cx="16" cy="16" r="7" fill="#FAEDD3" opacity="0.95"/>
         <circle cx="16" cy="16" r="3.5" fill="${innerDot}"/>
       </svg>
     </div>`,
-    iconSize: [34, 46],
-    iconAnchor: [17, 46],
-    popupAnchor: [0, -48],
+    iconSize: [22, 30],
+    iconAnchor: [11, 30],
+    popupAnchor: [0, -32],
   });
 };
 
@@ -427,16 +427,16 @@ function PremiumDropdown({
 
   return (
     <div ref={dropdownRef} className="relative" style={{ zIndex: 1002 }}>
-      {/* ═══ Trigger Button ═══ */}
+      {/* ═══ Trigger Button — Blue Glass ═══ */}
       <button
         onClick={() => (isOpen ? closeDropdown() : openDropdown())}
-        className="premium-dropdown-trigger flex items-center gap-3 pl-4 pr-5 py-3.5 min-w-[230px] sm:min-w-[280px] rounded-2xl text-sm border-2 shadow-[0_8px_32px_rgba(0,48,72,0.08)] hover:shadow-[0_16px_48px_rgba(0,48,72,0.14)]"
+        className="premium-dropdown-trigger flex items-center gap-3 pl-4 pr-5 py-3.5 min-w-[230px] sm:min-w-[280px] rounded-2xl text-sm border shadow-[0_8px_32px_rgba(0,30,60,0.25)] hover:shadow-[0_16px_48px_rgba(0,30,60,0.35)]"
         style={{
           background: isOpen
-            ? 'linear-gradient(135deg, rgba(255,255,255,0.99) 0%, rgba(250,237,211,0.4) 100%)'
-            : 'linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(250,237,211,0.25) 100%)',
-          borderColor: isOpen ? 'rgba(193,33,38,0.25)' : 'rgba(0,48,72,0.08)',
-          backdropFilter: 'blur(20px)',
+            ? 'linear-gradient(135deg, rgba(0,48,72,0.88) 0%, rgba(0,30,55,0.92) 100%)'
+            : 'linear-gradient(135deg, rgba(0,48,72,0.82) 0%, rgba(0,35,60,0.86) 100%)',
+          borderColor: isOpen ? 'rgba(250,237,211,0.25)' : 'rgba(250,237,211,0.12)',
+          backdropFilter: 'blur(24px)',
         }}
       >
         {/* Animated dot indicator */}
@@ -448,7 +448,7 @@ function PremiumDropdown({
           <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red" />
         </span>
 
-        <span className="flex-1 text-left font-semibold text-navy truncate tracking-tight text-[13px]">
+        <span className="flex-1 text-left font-semibold truncate tracking-tight text-[13px]" style={{ color: '#FAEDD3' }}>
           {value === 'All' ? '🗺️  All Cities' : `📍 ${value}`}
         </span>
 
@@ -456,11 +456,11 @@ function PremiumDropdown({
         <div
           className="ml-1 p-1.5 rounded-xl transition-all duration-500"
           style={{
-            background: isOpen ? 'rgba(193,33,38,0.06)' : 'transparent',
+            background: isOpen ? 'rgba(250,237,211,0.1)' : 'transparent',
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
           }}
         >
-          <ChevronDown className={`w-4 h-4 transition-colors duration-300 ${isOpen ? 'text-red' : 'text-navy/40'}`} />
+          <ChevronDown className="w-4 h-4 transition-colors duration-300" style={{ color: isOpen ? '#FAEDD3' : 'rgba(250,237,211,0.5)' }} />
         </div>
 
         {/* Bottom aurora accent line */}
@@ -468,8 +468,8 @@ function PremiumDropdown({
           className="absolute bottom-0 left-4 right-4 h-[2px] rounded-full"
           style={{
             background: isOpen
-              ? 'linear-gradient(90deg, #C12126, #003048, #C12126)'
-              : 'linear-gradient(90deg, transparent, rgba(193,33,38,0.15), transparent)',
+              ? 'linear-gradient(90deg, #C12126, #FAEDD3, #C12126)'
+              : 'linear-gradient(90deg, transparent, rgba(250,237,211,0.2), transparent)',
             backgroundSize: '200% 100%',
             animation: isOpen ? 'auroraShift 3s ease infinite' : 'none',
             transition: 'all 0.4s ease',
@@ -483,10 +483,10 @@ function PremiumDropdown({
           ref={panelRef}
           className="absolute top-full mt-3 left-0 w-full min-w-[230px] sm:min-w-[280px] rounded-2xl z-[1003] overflow-hidden"
           style={{
-            background: 'linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(250,247,240,0.97) 100%)',
-            border: '2px solid rgba(193,33,38,0.08)',
-            boxShadow: '0 25px 80px rgba(0,48,72,0.14), 0 10px 30px rgba(193,33,38,0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
-            backdropFilter: 'blur(24px)',
+            background: 'linear-gradient(180deg, rgba(0,48,72,0.92) 0%, rgba(0,30,50,0.95) 100%)',
+            border: '1px solid rgba(250,237,211,0.15)',
+            boxShadow: '0 25px 80px rgba(0,20,40,0.4), 0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(250,237,211,0.08)',
+            backdropFilter: 'blur(28px)',
             transformOrigin: 'top center',
           }}
         >
@@ -494,7 +494,7 @@ function PremiumDropdown({
           <div
             className="h-[3px] mx-0 rounded-none"
             style={{
-              background: 'linear-gradient(90deg, #C12126, #003048, #FAEDD3, #003048, #C12126)',
+              background: 'linear-gradient(90deg, #C12126, #FAEDD3, #C12126)',
               backgroundSize: '200% 100%',
               animation: 'auroraShift 4s ease infinite',
             }}
@@ -502,8 +502,8 @@ function PremiumDropdown({
 
           {/* Header label */}
           <div className="px-4 pt-3 pb-2 flex items-center gap-2">
-            <div className="w-1 h-4 rounded-full bg-gradient-to-b from-red to-red/30" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-navy/35">Select City</span>
+            <div className="w-1 h-4 rounded-full bg-gradient-to-b from-red to-red/40" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'rgba(250,237,211,0.4)' }}>Select City</span>
           </div>
 
           <div ref={listRef} className="premium-dropdown-list overflow-y-auto max-h-[300px] px-2 pb-2">
@@ -519,7 +519,7 @@ function PremiumDropdown({
                   }`}
                   style={{
                     background: isActive
-                      ? 'linear-gradient(135deg, rgba(193,33,38,0.07) 0%, rgba(193,33,38,0.02) 100%)'
+                      ? 'linear-gradient(135deg, rgba(193,33,38,0.2) 0%, rgba(193,33,38,0.08) 100%)'
                       : 'transparent',
                   }}
                 >
@@ -528,7 +528,7 @@ function PremiumDropdown({
                     <div
                       className="absolute left-[5px] top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full"
                       style={{
-                        background: 'linear-gradient(180deg, #C12126, #8B1A1E)',
+                        background: 'linear-gradient(180deg, #C12126, #FF6B6B)',
                         animation: 'accentPulse 2s ease-in-out infinite',
                       }}
                     />
@@ -537,28 +537,34 @@ function PremiumDropdown({
                   {/* City indicator */}
                   <span className={`text-xs shrink-0 transition-transform duration-300 ${!isActive ? 'group-hover:scale-110' : ''}`}>
                     {city === 'All' ? '🌏' : isActive ? '📍' : (
-                      <span className="inline-block w-[6px] h-[6px] rounded-full border-[1.5px] border-navy/20" />
+                      <span className="inline-block w-[6px] h-[6px] rounded-full border-[1.5px]" style={{ borderColor: 'rgba(250,237,211,0.25)' }} />
                     )}
                   </span>
 
                   <span
-                    className={`flex-1 truncate transition-all duration-300 ${
-                      isActive
-                        ? 'text-red font-bold tracking-tight'
-                        : 'text-navy/60 font-medium hover:text-navy'
-                    }`}
+                    className="flex-1 truncate transition-all duration-300 font-medium"
+                    style={{
+                      color: isActive ? '#FF6B6B' : 'rgba(250,237,211,0.55)',
+                      fontWeight: isActive ? 700 : 500,
+                      letterSpacing: isActive ? '-0.01em' : 'normal',
+                    }}
+                    onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.color = 'rgba(250,237,211,0.9)'; }}
+                    onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.color = 'rgba(250,237,211,0.55)'; }}
                   >
                     {city === 'All' ? 'All Cities' : city}
                   </span>
 
                   {/* Arrow hint on hover for non-active */}
                   {!isActive && (
-                    <span className="text-navy/0 hover:text-navy/20 transition-all duration-300 text-[10px]">→</span>
+                    <span className="transition-all duration-300 text-[10px]" style={{ color: 'rgba(250,237,211,0)' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = 'rgba(250,237,211,0.3)'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(250,237,211,0)'}
+                    >→</span>
                   )}
 
                   {/* Active checkmark */}
                   {isActive && (
-                    <span className="text-red/60 text-[10px] font-bold">✓</span>
+                    <span className="text-[10px] font-bold" style={{ color: '#FF6B6B' }}>✓</span>
                   )}
                 </button>
               );
@@ -568,7 +574,7 @@ function PremiumDropdown({
           {/* Bottom decorative bar */}
           <div
             className="h-[2px] mx-0"
-            style={{ background: 'linear-gradient(90deg, transparent, rgba(0,48,72,0.05), transparent)' }}
+            style={{ background: 'linear-gradient(90deg, transparent, rgba(250,237,211,0.06), transparent)' }}
           />
         </div>
       )}
