@@ -535,84 +535,158 @@ function DecorativeElements() {
       {/* ═══ TAIWAN LAND ANIMALS — positioned over Taiwan area (42-60%, 28-58%) ═══ */}
 
       {/* 1. Formosan Macaque (monkey) — sitting on mid Taiwan */}
-      <svg style={{ position: 'absolute', top: '38%', left: '48%', width: '22px', height: '24px', opacity: 0.7, animation: 'monkeyBob 4s ease-in-out infinite' }} viewBox="0 0 24 28" fill="none">
-        <circle cx="12" cy="8" r="7" fill="#8B6914"/>
-        <circle cx="12" cy="8" r="5.5" fill="#A67C2E"/>
-        <circle cx="9.5" cy="7" r="1.2" fill="#333"/>
-        <circle cx="14.5" cy="7" r="1.2" fill="#333"/>
-        <ellipse cx="12" cy="10" rx="2.5" ry="1.5" fill="#D4A854"/>
-        <circle cx="5" cy="5" r="3" fill="#8B6914"/><circle cx="5" cy="5" r="1.8" fill="#D4A854"/>
-        <circle cx="19" cy="5" r="3" fill="#8B6914"/><circle cx="19" cy="5" r="1.8" fill="#D4A854"/>
-        <ellipse cx="12" cy="18" rx="5" ry="6" fill="#8B6914"/>
-        <path d="M8 24 Q12 20 16 24" stroke="#8B6914" strokeWidth="2" fill="none" strokeLinecap="round"/>
-      </svg>
+      <div className="land-creature" style={{ position: 'absolute', top: '38%', left: '48%' }}>
+        <svg style={{ width: '22px', height: '24px', opacity: 0.7, animation: 'monkeyBob 4s ease-in-out infinite' }} viewBox="0 0 24 28" fill="none">
+          <circle cx="12" cy="8" r="7" fill="#8B6914"/>
+          <circle cx="12" cy="8" r="5.5" fill="#A67C2E"/>
+          <circle cx="9.5" cy="7" r="1.2" fill="#333"/>
+          <circle cx="14.5" cy="7" r="1.2" fill="#333"/>
+          <ellipse cx="12" cy="10" rx="2.5" ry="1.5" fill="#D4A854"/>
+          <circle cx="5" cy="5" r="3" fill="#8B6914"/><circle cx="5" cy="5" r="1.8" fill="#D4A854"/>
+          <circle cx="19" cy="5" r="3" fill="#8B6914"/><circle cx="19" cy="5" r="1.8" fill="#D4A854"/>
+          <ellipse cx="12" cy="18" rx="5" ry="6" fill="#8B6914"/>
+          <path d="M8 24 Q12 20 16 24" stroke="#8B6914" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        </svg>
+      </div>
 
       {/* 2. Cat — near south Taiwan */}
-      <svg style={{ position: 'absolute', top: '50%', left: '52%', width: '18px', height: '20px', opacity: 0.65, animation: 'catTail 3s ease-in-out infinite 1s' }} viewBox="0 0 20 24" fill="none">
-        <polygon points="4,8 6,1 8,8" fill="#FF8C42"/>
-        <polygon points="12,8 14,1 16,8" fill="#FF8C42"/>
-        <ellipse cx="10" cy="11" rx="7" ry="6" fill="#FF8C42"/>
-        <circle cx="7.5" cy="9.5" r="1.2" fill="#333"/>
-        <circle cx="12.5" cy="9.5" r="1.2" fill="#333"/>
-        <ellipse cx="10" cy="12" rx="1" ry="0.6" fill="#FF6B6B"/>
-        <path d="M7 12.5 Q10 14 13 12.5" stroke="#A05020" strokeWidth="0.5" fill="none"/>
-        <ellipse cx="10" cy="19" rx="5.5" ry="5" fill="#FF8C42"/>
-        <path d="M16 16 Q20 12 18 18" stroke="#FF8C42" strokeWidth="2" fill="none" strokeLinecap="round"/>
-      </svg>
+      <div className="land-creature" style={{ position: 'absolute', top: '50%', left: '52%' }}>
+        <svg style={{ width: '18px', height: '20px', opacity: 0.65, animation: 'catTail 3s ease-in-out infinite 1s' }} viewBox="0 0 20 24" fill="none">
+          <polygon points="4,8 6,1 8,8" fill="#FF8C42"/>
+          <polygon points="12,8 14,1 16,8" fill="#FF8C42"/>
+          <ellipse cx="10" cy="11" rx="7" ry="6" fill="#FF8C42"/>
+          <circle cx="7.5" cy="9.5" r="1.2" fill="#333"/>
+          <circle cx="12.5" cy="9.5" r="1.2" fill="#333"/>
+          <ellipse cx="10" cy="12" rx="1" ry="0.6" fill="#FF6B6B"/>
+          <path d="M7 12.5 Q10 14 13 12.5" stroke="#A05020" strokeWidth="0.5" fill="none"/>
+          <ellipse cx="10" cy="19" rx="5.5" ry="5" fill="#FF8C42"/>
+          <path d="M16 16 Q20 12 18 18" stroke="#FF8C42" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        </svg>
+      </div>
 
       {/* 3. Sika Deer — north Taiwan */}
-      <svg style={{ position: 'absolute', top: '30%', left: '50%', width: '24px', height: '26px', opacity: 0.65, animation: 'bobFloat 5s ease-in-out infinite 2s' }} viewBox="0 0 28 32" fill="none">
-        <ellipse cx="14" cy="20" rx="8" ry="6" fill="#C4883A"/>
-        <circle cx="14" cy="8" r="5" fill="#C4883A"/>
-        <circle cx="11.5" cy="7" r="1" fill="#333"/>
-        <circle cx="16.5" cy="7" r="1" fill="#333"/>
-        <ellipse cx="14" cy="10" rx="1.5" ry="1" fill="#333"/>
-        <line x1="10" y1="1" x2="8" y2="-3" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round"/>
-        <line x1="18" y1="1" x2="20" y2="-3" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round"/>
-        <line x1="8" y1="-3" x2="6" y2="-5" stroke="#8B6914" strokeWidth="1" strokeLinecap="round"/>
-        <line x1="20" y1="-3" x2="22" y2="-5" stroke="#8B6914" strokeWidth="1" strokeLinecap="round"/>
-        <circle cx="11" cy="18" r="1" fill="white" opacity="0.6"/>
-        <circle cx="17" cy="19" r="0.8" fill="white" opacity="0.5"/>
-        <circle cx="14" cy="16" r="0.7" fill="white" opacity="0.5"/>
-        <line x1="9" y1="26" x2="8" y2="32" stroke="#8B6914" strokeWidth="1.5"/>
-        <line x1="12" y1="26" x2="11" y2="32" stroke="#8B6914" strokeWidth="1.5"/>
-        <line x1="16" y1="26" x2="17" y2="32" stroke="#8B6914" strokeWidth="1.5"/>
-        <line x1="19" y1="26" x2="20" y2="32" stroke="#8B6914" strokeWidth="1.5"/>
-      </svg>
+      <div className="land-creature" style={{ position: 'absolute', top: '30%', left: '50%' }}>
+        <svg style={{ width: '24px', height: '26px', opacity: 0.65, animation: 'bobFloat 5s ease-in-out infinite 2s' }} viewBox="0 0 28 32" fill="none">
+          <ellipse cx="14" cy="20" rx="8" ry="6" fill="#C4883A"/>
+          <circle cx="14" cy="8" r="5" fill="#C4883A"/>
+          <circle cx="11.5" cy="7" r="1" fill="#333"/>
+          <circle cx="16.5" cy="7" r="1" fill="#333"/>
+          <ellipse cx="14" cy="10" rx="1.5" ry="1" fill="#333"/>
+          <line x1="10" y1="1" x2="8" y2="-3" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="18" y1="1" x2="20" y2="-3" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="8" y1="-3" x2="6" y2="-5" stroke="#8B6914" strokeWidth="1" strokeLinecap="round"/>
+          <line x1="20" y1="-3" x2="22" y2="-5" stroke="#8B6914" strokeWidth="1" strokeLinecap="round"/>
+          <circle cx="11" cy="18" r="1" fill="white" opacity="0.6"/>
+          <circle cx="17" cy="19" r="0.8" fill="white" opacity="0.5"/>
+          <circle cx="14" cy="16" r="0.7" fill="white" opacity="0.5"/>
+          <line x1="9" y1="26" x2="8" y2="32" stroke="#8B6914" strokeWidth="1.5"/>
+          <line x1="12" y1="26" x2="11" y2="32" stroke="#8B6914" strokeWidth="1.5"/>
+          <line x1="16" y1="26" x2="17" y2="32" stroke="#8B6914" strokeWidth="1.5"/>
+          <line x1="19" y1="26" x2="20" y2="32" stroke="#8B6914" strokeWidth="1.5"/>
+        </svg>
+      </div>
 
       {/* 4. Butterfly — fluttering near Taiwan */}
-      <svg style={{ position: 'absolute', top: '42%', left: '55%', width: '20px', height: '16px', opacity: 0.7, animation: 'butterflyFloat 6s ease-in-out infinite' }} viewBox="0 0 24 18" fill="none">
-        <ellipse cx="12" cy="9" rx="1" ry="6" fill="#333"/>
-        <ellipse cx="7" cy="6" rx="5" ry="4" fill="#FF6B9D" opacity="0.8" transform="rotate(-15 7 6)">
-          <animate attributeName="rx" values="5;3.5;5" dur="0.8s" repeatCount="indefinite"/>
-        </ellipse>
-        <ellipse cx="17" cy="6" rx="5" ry="4" fill="#FF6B9D" opacity="0.8" transform="rotate(15 17 6)">
-          <animate attributeName="rx" values="5;3.5;5" dur="0.8s" repeatCount="indefinite"/>
-        </ellipse>
-        <ellipse cx="8" cy="12" rx="3.5" ry="3" fill="#FFB6D9" opacity="0.7" transform="rotate(-10 8 12)">
-          <animate attributeName="rx" values="3.5;2.5;3.5" dur="0.8s" repeatCount="indefinite"/>
-        </ellipse>
-        <ellipse cx="16" cy="12" rx="3.5" ry="3" fill="#FFB6D9" opacity="0.7" transform="rotate(10 16 12)">
-          <animate attributeName="rx" values="3.5;2.5;3.5" dur="0.8s" repeatCount="indefinite"/>
-        </ellipse>
-        <circle cx="7" cy="5.5" r="1" fill="#FF3D7F" opacity="0.6"/>
-        <circle cx="17" cy="5.5" r="1" fill="#FF3D7F" opacity="0.6"/>
-      </svg>
+      <div className="land-creature" style={{ position: 'absolute', top: '42%', left: '55%' }}>
+        <svg style={{ width: '20px', height: '16px', opacity: 0.7, animation: 'butterflyFloat 6s ease-in-out infinite' }} viewBox="0 0 24 18" fill="none">
+          <ellipse cx="12" cy="9" rx="1" ry="6" fill="#333"/>
+          <ellipse cx="7" cy="6" rx="5" ry="4" fill="#FF6B9D" opacity="0.8" transform="rotate(-15 7 6)">
+            <animate attributeName="rx" values="5;3.5;5" dur="0.8s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="17" cy="6" rx="5" ry="4" fill="#FF6B9D" opacity="0.8" transform="rotate(15 17 6)">
+            <animate attributeName="rx" values="5;3.5;5" dur="0.8s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="8" cy="12" rx="3.5" ry="3" fill="#FFB6D9" opacity="0.7" transform="rotate(-10 8 12)">
+            <animate attributeName="rx" values="3.5;2.5;3.5" dur="0.8s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="16" cy="12" rx="3.5" ry="3" fill="#FFB6D9" opacity="0.7" transform="rotate(10 16 12)">
+            <animate attributeName="rx" values="3.5;2.5;3.5" dur="0.8s" repeatCount="indefinite"/>
+          </ellipse>
+          <circle cx="7" cy="5.5" r="1" fill="#FF3D7F" opacity="0.6"/>
+          <circle cx="17" cy="5.5" r="1" fill="#FF3D7F" opacity="0.6"/>
+        </svg>
+      </div>
 
       {/* 5. Taiwan Blue Magpie — perched near Taiwan */}
-      <svg style={{ position: 'absolute', top: '34%', left: '44%', width: '22px', height: '22px', opacity: 0.65, animation: 'bobFloat 4.5s ease-in-out infinite 3s' }} viewBox="0 0 26 28" fill="none">
-        <ellipse cx="13" cy="10" rx="5" ry="4.5" fill="#2962A5"/>
-        <circle cx="13" cy="5" r="3.5" fill="#1A1A2E"/>
-        <circle cx="14.5" cy="4.5" r="0.8" fill="white"/>
-        <polygon points="16,5 20,4.5 16,6" fill="#E85A3A"/>
-        <path d="M8 14 Q4 22 6 28" stroke="#2962A5" strokeWidth="2" fill="none" strokeLinecap="round"/>
-        <path d="M10 14 Q8 20 10 26" stroke="#4A8AD4" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-        <line x1="13" y1="14" x2="12" y2="18" stroke="#8B6914" strokeWidth="1"/>
-        <line x1="15" y1="14" x2="16" y2="18" stroke="#8B6914" strokeWidth="1"/>
-      </svg>
+      <div className="land-creature" style={{ position: 'absolute', top: '34%', left: '44%' }}>
+        <svg style={{ width: '22px', height: '22px', opacity: 0.65, animation: 'bobFloat 4.5s ease-in-out infinite 3s' }} viewBox="0 0 26 28" fill="none">
+          <ellipse cx="13" cy="10" rx="5" ry="4.5" fill="#2962A5"/>
+          <circle cx="13" cy="5" r="3.5" fill="#1A1A2E"/>
+          <circle cx="14.5" cy="4.5" r="0.8" fill="white"/>
+          <polygon points="16,5 20,4.5 16,6" fill="#E85A3A"/>
+          <path d="M8 14 Q4 22 6 28" stroke="#2962A5" strokeWidth="2" fill="none" strokeLinecap="round"/>
+          <path d="M10 14 Q8 20 10 26" stroke="#4A8AD4" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+          <line x1="13" y1="14" x2="12" y2="18" stroke="#8B6914" strokeWidth="1"/>
+          <line x1="15" y1="14" x2="16" y2="18" stroke="#8B6914" strokeWidth="1"/>
+        </svg>
+      </div>
+
+      {/* 6. Dog (Shiba Inu) — cute dog near mid Taiwan */}
+      <div className="land-creature" style={{ position: 'absolute', top: '46%', left: '46%' }}>
+        <svg style={{ width: '20px', height: '22px', opacity: 0.7, animation: 'bobFloat 4s ease-in-out infinite 1.5s' }} viewBox="0 0 24 28" fill="none">
+          {/* Body */}
+          <ellipse cx="12" cy="18" rx="7" ry="6" fill="#D4A854"/>
+          {/* Head */}
+          <circle cx="12" cy="9" r="6" fill="#D4A854"/>
+          {/* Ears */}
+          <polygon points="5,6 7,0 9,6" fill="#8B6914"/>
+          <polygon points="15,6 17,0 19,6" fill="#8B6914"/>
+          {/* Eyes */}
+          <circle cx="9.5" cy="8" r="1.2" fill="#333"/>
+          <circle cx="14.5" cy="8" r="1.2" fill="#333"/>
+          {/* Eye shine */}
+          <circle cx="10" cy="7.5" r="0.4" fill="white"/>
+          <circle cx="15" cy="7.5" r="0.4" fill="white"/>
+          {/* Nose */}
+          <ellipse cx="12" cy="11" rx="1.2" ry="0.8" fill="#333"/>
+          {/* Tongue */}
+          <ellipse cx="12" cy="13" rx="1" ry="1.5" fill="#FF9999"/>
+          {/* Mouth lines */}
+          <path d="M10.5 11.5 Q12 12.5 13.5 11.5" stroke="#333" strokeWidth="0.4" fill="none"/>
+          {/* Legs */}
+          <line x1="8" y1="24" x2="8" y2="27" stroke="#C49A3C" strokeWidth="2" strokeLinecap="round"/>
+          <line x1="16" y1="24" x2="16" y2="27" stroke="#C49A3C" strokeWidth="2" strokeLinecap="round"/>
+          {/* Curled tail */}
+          <path d="M19 16 Q24 12 22 17" stroke="#D4A854" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        </svg>
+      </div>
+
+      {/* 7. Alpaca — fluffy white alpaca */}
+      <div className="land-creature" style={{ position: 'absolute', top: '35%', left: '53%' }}>
+        <svg style={{ width: '22px', height: '26px', opacity: 0.7, animation: 'bobFloat 5.5s ease-in-out infinite 3.5s' }} viewBox="0 0 26 32" fill="none">
+          {/* Fluffy body */}
+          <ellipse cx="13" cy="22" rx="8" ry="6" fill="#FFF5E6"/>
+          <ellipse cx="11" cy="20" rx="4" ry="3" fill="#FFFAF0" opacity="0.7"/>
+          <ellipse cx="16" cy="21" rx="3.5" ry="2.5" fill="#FFFAF0" opacity="0.6"/>
+          {/* Long fluffy neck */}
+          <ellipse cx="13" cy="14" rx="3.5" ry="7" fill="#FFF5E6"/>
+          <ellipse cx="11.5" cy="13" rx="2" ry="4" fill="#FFFAF0" opacity="0.5"/>
+          {/* Fluffy head */}
+          <circle cx="13" cy="6" r="4.5" fill="#FFF5E6"/>
+          <circle cx="11" cy="4.5" r="2" fill="#FFFAF0" opacity="0.6"/>
+          <circle cx="15" cy="4.5" r="2" fill="#FFFAF0" opacity="0.5"/>
+          {/* Ears */}
+          <ellipse cx="8.5" cy="4" rx="1.5" ry="2.5" fill="#FFF5E6" transform="rotate(-15 8.5 4)"/>
+          <ellipse cx="8.5" cy="4" rx="0.8" ry="1.5" fill="#FFB6C1" transform="rotate(-15 8.5 4)"/>
+          <ellipse cx="17.5" cy="4" rx="1.5" ry="2.5" fill="#FFF5E6" transform="rotate(15 17.5 4)"/>
+          <ellipse cx="17.5" cy="4" rx="0.8" ry="1.5" fill="#FFB6C1" transform="rotate(15 17.5 4)"/>
+          {/* Eyes */}
+          <circle cx="11" cy="6.5" r="1" fill="#333"/>
+          <circle cx="15" cy="6.5" r="1" fill="#333"/>
+          <circle cx="11.3" cy="6.2" r="0.35" fill="white"/>
+          <circle cx="15.3" cy="6.2" r="0.35" fill="white"/>
+          {/* Smile */}
+          <path d="M11.5 8.5 Q13 9.5 14.5 8.5" stroke="#999" strokeWidth="0.5" fill="none"/>
+          {/* Legs */}
+          <line x1="8" y1="27" x2="8" y2="31" stroke="#E8D5B7" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="11" y1="27" x2="11" y2="31" stroke="#E8D5B7" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="15" y1="27" x2="15" y2="31" stroke="#E8D5B7" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="18" y1="27" x2="18" y2="31" stroke="#E8D5B7" strokeWidth="1.5" strokeLinecap="round"/>
+        </svg>
+      </div>
 
       {/* ═══ CARS — driving across Taiwan land ═══ */}
-      <div style={{ position: 'absolute', top: '25%', left: '40%', width: '22%', height: '45%', overflow: 'hidden', pointerEvents: 'none' }}>
+      <div className="land-creature" style={{ position: 'absolute', top: '25%', left: '40%', width: '22%', height: '45%', overflow: 'hidden', pointerEvents: 'none' }}>
         {/* Car 1 — red/orange driving left to right */}
         <div style={{ position: 'absolute', top: '45%', left: 0, width: '100%', height: '18px' }}>
           <svg style={{ animation: 'carDriveRight 28s linear infinite' }} viewBox="0 0 36 18" fill="none" width="28" height="14">
@@ -822,6 +896,10 @@ function DecorativeElements() {
         /* Hide ocean creatures when zoomed into land */
         .ocean-creature { transition: opacity 0.5s ease; }
         .zoomed-to-land .ocean-creature { opacity: 0 !important; pointer-events: none; }
+
+        /* Show land creatures ONLY when zoomed into land */
+        .land-creature { opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
+        .zoomed-to-land .land-creature { opacity: 1; pointer-events: auto; }
       `}</style>
     </div>
   );
