@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useLocale } from 'next-intl';
-import { ArrowLeft, MapPin, Store } from 'lucide-react';
+import { ArrowLeft, MapPin, Store, Globe, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -17,14 +18,124 @@ gsap.registerPlugin(ScrollTrigger);
 const StoreMap = dynamic(() => import('@/components/map/StoreMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[500px] sm:h-[600px] lg:h-[700px] rounded-[2rem] bg-navy-dark/50 border border-cream/10 flex items-center justify-center">
+    <div className="w-full h-[500px] sm:h-[600px] lg:h-[700px] rounded-[2rem] bg-cream-light border border-cream-dark/30 flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <div className="w-10 h-10 border-2 border-red border-t-transparent rounded-full animate-spin" />
-        <p className="text-cream/40 text-sm">Loading map...</p>
+        <p className="text-navy/40 text-sm">Loading map...</p>
       </div>
     </div>
   ),
 });
+
+/* ─── Floating Particle Component ─── */
+function FloatingParticles() {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {Array.from({ length: 20 }).map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: Math.random() * 6 + 2,
+            height: Math.random() * 6 + 2,
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            background: i % 3 === 0
+              ? 'rgba(193, 33, 38, 0.15)'
+              : i % 3 === 1
+                ? 'rgba(0, 48, 72, 0.1)'
+                : 'rgba(250, 237, 211, 0.4)',
+          }}
+          animate={{
+            y: [0, -30 - Math.random() * 40, 0],
+            x: [0, (Math.random() - 0.5) * 30, 0],
+            opacity: [0, 0.8, 0],
+            scale: [0.5, 1.2, 0.5],
+          }}
+          transition={{
+            duration: 4 + Math.random() * 6,
+            repeat: Infinity,
+            delay: Math.random() * 5,
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ─── Decorative Geometric Shapes ─── */
+function DecorativeShapes() {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {/* Rotating diamond */}
+      <motion.div
+        className="absolute top-20 right-[8%] w-16 h-16 border border-red/10 rotate-45"
+        animate={{ rotate: [45, 405], scale: [1, 1.1, 1] }}
+        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+      />
+      {/* Pulsing circle */}
+      <motion.div
+        className="absolute bottom-32 left-[5%] w-24 h-24 rounded-full border border-navy/5"
+        animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      {/* Floating cross */}
+      <motion.div
+        className="absolute top-[40%] left-[12%]"
+        animate={{ y: [0, -15, 0], rotate: [0, 90, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <div className="w-8 h-0.5 bg-red/10 relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0.5 h-8 bg-red/10" />
+        </div>
+      </motion.div>
+      {/* Dotted arc */}
+      <motion.svg
+        className="absolute top-[15%] right-[15%] w-32 h-32 text-navy/5"
+        animate={{ rotate: [0, 360] }}
+        transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+      >
+        <circle cx="64" cy="64" r="50" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="6 8" />
+      </motion.svg>
+      {/* Small triangles */}
+      <motion.div
+        className="absolute bottom-[20%] right-[10%]"
+        animate={{ y: [0, -20, 0], opacity: [0.2, 0.5, 0.2] }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+      >
+        <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[14px] border-b-red/15" />
+      </motion.div>
+      <motion.div
+        className="absolute top-[60%] right-[25%]"
+        animate={{ y: [0, 15, 0], opacity: [0.15, 0.4, 0.15] }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+      >
+        <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-navy/10" />
+      </motion.div>
+    </div>
+  );
+}
+
+/* ─── Shimmer Line Decoration ─── */
+function ShimmerLines() {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <motion.div
+        className="absolute top-0 left-0 w-full h-px"
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(193,33,38,0.2), transparent)' }}
+        animate={{ x: ['-100%', '100%'] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className="absolute bottom-0 left-0 w-full h-px"
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(0,48,72,0.15), transparent)' }}
+        animate={{ x: ['100%', '-100%'] }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+      />
+    </div>
+  );
+}
 
 export default function WhereToBuyPage() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -43,50 +154,135 @@ export default function WhereToBuyPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Animations
+  // GSAP Animations
   useEffect(() => {
     if (!containerRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Hero text entrance — premium blur reveal
+      // Hero text entrance — premium staggered blur reveal
       gsap.from('.hero-text', {
         opacity: 0,
-        y: 50,
-        filter: 'blur(12px)',
-        scale: 0.95,
-        duration: 1.4,
-        stagger: 0.2,
+        y: 60,
+        filter: 'blur(16px)',
+        scale: 0.9,
+        duration: 1.6,
+        stagger: 0.25,
         ease: 'power4.out',
       });
 
-      // Map section entrance
-      gsap.from('.map-section', {
+      // Stats cards — cinematic cascade entrance
+      const statCards = gsap.utils.toArray('.stat-card') as HTMLElement[];
+      statCards.forEach((card, i) => {
+        gsap.fromTo(card,
+          {
+            opacity: 0,
+            y: 80,
+            scale: 0.8,
+            rotateY: 15,
+            filter: 'blur(12px)',
+          },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotateY: 0,
+            filter: 'blur(0px)',
+            duration: 1.2,
+            delay: i * 0.15,
+            ease: 'power4.out',
+            scrollTrigger: {
+              trigger: '.stats-section',
+              start: 'top 82%',
+              once: true,
+            },
+          }
+        );
+      });
+
+      // Stat number counter animation
+      statCards.forEach((card) => {
+        const numberEl = card.querySelector('.stat-number');
+        if (!numberEl) return;
+        const raw = numberEl.getAttribute('data-value') || '';
+        const numericPart = parseInt(raw.replace(/\D/g, ''), 10);
+        if (isNaN(numericPart)) return;
+        const suffix = raw.replace(/[0-9]/g, '');
+
+        const counter = { val: 0 };
+        gsap.to(counter, {
+          val: numericPart,
+          duration: 2.5,
+          delay: 0.5,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '.stats-section',
+            start: 'top 82%',
+            once: true,
+          },
+          onUpdate() {
+            numberEl.textContent = Math.round(counter.val) + suffix;
+          },
+        });
+      });
+
+      // Map section entrance — dramatic reveal
+      gsap.fromTo('.map-section',
+        {
+          opacity: 0,
+          y: 100,
+          scale: 0.95,
+          filter: 'blur(14px)',
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          filter: 'blur(0px)',
+          duration: 1.8,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: '.map-section',
+            start: 'top 80%',
+            once: true,
+          },
+        }
+      );
+
+      // Map section header text stagger
+      gsap.from('.map-header-text', {
         opacity: 0,
-        y: 80,
-        filter: 'blur(14px)',
-        scale: 0.96,
-        duration: 1.8,
-        ease: 'power4.out',
+        y: 40,
+        filter: 'blur(10px)',
+        duration: 1.2,
+        stagger: 0.15,
+        ease: 'power3.out',
         scrollTrigger: {
           trigger: '.map-section',
-          start: 'top 80%',
+          start: 'top 78%',
           once: true,
         },
       });
 
-      // Stats cards entrance
-      gsap.from('.stat-card', {
-        opacity: 0,
-        y: 50,
-        filter: 'blur(10px)',
-        scale: 0.92,
-        duration: 1.4,
-        stagger: 0.15,
-        ease: 'power4.out',
+      // Decorative glow orb parallax
+      gsap.to('.parallax-orb-1', {
+        y: -60,
+        ease: 'none',
         scrollTrigger: {
-          trigger: '.stats-section',
-          start: 'top 80%',
-          once: true,
+          trigger: containerRef.current,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1.5,
+        },
+      });
+      gsap.to('.parallax-orb-2', {
+        y: -40,
+        x: 20,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 2,
         },
       });
     }, containerRef);
@@ -94,57 +290,128 @@ export default function WhereToBuyPage() {
     return () => ctx.revert();
   }, []);
 
+  const stats = [
+    { number: '300+', label: 'Partner Stores', icon: Store, color: 'from-red/10 to-red/5', iconColor: 'text-red', borderColor: 'hover:border-red/30' },
+    { number: '22', label: 'Cities Covered', icon: MapPin, color: 'from-navy/10 to-navy/5', iconColor: 'text-navy', borderColor: 'hover:border-navy/30' },
+    { number: '6', label: 'Store Types', icon: Store, color: 'from-red/10 to-red/5', iconColor: 'text-red', borderColor: 'hover:border-red/30' },
+    { number: '24/7', label: 'Online Available', icon: Globe, color: 'from-navy/10 to-navy/5', iconColor: 'text-navy', borderColor: 'hover:border-navy/30' },
+  ];
+
   return (
-    <div ref={containerRef} className="min-h-screen bg-cream">
+    <div ref={containerRef} className="min-h-screen bg-cream relative">
+      {/* ─── Parallax Glow Orbs ─── */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="parallax-orb-1 absolute top-[20%] left-[10%] w-[500px] h-[500px] rounded-full bg-red/[0.04] blur-[120px]" />
+        <div className="parallax-orb-2 absolute top-[50%] right-[5%] w-[400px] h-[400px] rounded-full bg-navy/[0.04] blur-[100px]" />
+        <div className="absolute bottom-[10%] left-[30%] w-[350px] h-[350px] rounded-full bg-red/[0.03] blur-[100px]" />
+      </div>
+
       {/* ─── Dark Navy Hero ─── */}
-      <section className="relative bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] pt-32 pb-20 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] pt-32 pb-24 overflow-hidden">
         <HeroBackground />
+
+        {/* Extra hero decorations */}
+        <motion.div
+          className="absolute top-16 left-[10%] pointer-events-none"
+          animate={{ y: [0, -10, 0], opacity: [0.15, 0.3, 0.15] }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <Sparkles className="w-10 h-10 text-cream/20" />
+        </motion.div>
+        <motion.div
+          className="absolute bottom-10 right-[15%] pointer-events-none"
+          animate={{ y: [0, 8, 0], rotate: [0, 180, 360] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+        >
+          <div className="w-3 h-3 rounded-full bg-red/30" />
+        </motion.div>
 
         <div className="relative max-w-7xl mx-auto px-6 text-center">
           {/* Back link */}
           <div className="hero-text mb-8">
             <Link
               href={`/${locale}`}
-              className="inline-flex items-center gap-2 text-cream/60 hover:text-cream transition-colors text-sm"
+              className="inline-flex items-center gap-2 text-cream/60 hover:text-cream transition-colors text-sm group"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               Back to Home
             </Link>
           </div>
 
-          <span className="hero-text inline-block text-red/80 text-sm font-semibold tracking-widest uppercase mb-3">
-            Find Us
-          </span>
-          <h1 className="hero-text text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-4">
+          <motion.span
+            className="hero-text inline-block text-red/80 text-sm font-semibold tracking-[0.3em] uppercase mb-4"
+            animate={{ opacity: [0.6, 1, 0.6] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            ✦ Find Us ✦
+          </motion.span>
+          <h1 className="hero-text text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-5">
             Where to Buy
           </h1>
-          <p className="hero-text text-cream/60 text-base sm:text-lg max-w-2xl mx-auto">
-            Discover Mahkota Taiwan products at 300+ retail locations across the island
+          <p className="hero-text text-cream/60 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+            Discover Mahkota Taiwan products at <span className="text-cream/90 font-semibold">300+</span> retail locations across <span className="text-cream/90 font-semibold">22 cities</span> in Taiwan
           </p>
-          <div className="hero-text w-20 h-1 bg-red mx-auto mt-6 rounded-full" />
+
+          {/* Animated separator */}
+          <div className="hero-text relative mt-8 flex items-center justify-center gap-3">
+            <motion.div
+              className="w-12 h-px bg-gradient-to-r from-transparent to-red/60"
+              animate={{ scaleX: [0, 1] }}
+              transition={{ duration: 1.5, delay: 1.2, ease: 'power4.out' }}
+            />
+            <motion.div
+              className="w-2 h-2 rounded-full bg-red"
+              animate={{ scale: [0, 1.2, 1] }}
+              transition={{ duration: 0.5, delay: 1.8 }}
+            />
+            <motion.div
+              className="w-12 h-px bg-gradient-to-l from-transparent to-red/60"
+              animate={{ scaleX: [0, 1] }}
+              transition={{ duration: 1.5, delay: 1.2, ease: 'power4.out' }}
+            />
+          </div>
         </div>
       </section>
 
       {/* ─── Stats Section ─── */}
-      <section className="stats-section py-12 md:py-16">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { number: '300+', label: 'Partner Stores', icon: Store },
-              { number: '22', label: 'Cities Covered', icon: MapPin },
-              { number: '6', label: 'Store Types', icon: Store },
-              { number: '24/7', label: 'Online Available', icon: MapPin },
-            ].map((stat, idx) => (
+      <section className="stats-section relative py-16 md:py-20">
+        <FloatingParticles />
+        <ShimmerLines />
+
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {stats.map((stat, idx) => (
               <div
                 key={idx}
-                className="stat-card bg-white/80 backdrop-blur-sm border border-cream-dark/20 rounded-2xl p-5 text-center hover:shadow-lg hover:border-red/20 transition-all duration-500 group"
+                className={`stat-card group relative bg-white/90 backdrop-blur-sm border border-cream-dark/20 rounded-3xl p-6 md:p-8 text-center transition-all duration-700 hover:shadow-[0_20px_60px_-15px_rgba(0,48,72,0.15)] ${stat.borderColor} overflow-hidden`}
+                style={{ perspective: '600px' }}
               >
-                <stat.icon className="w-5 h-5 text-red mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                <div className="text-2xl md:text-3xl font-heading font-bold text-navy mb-1">
-                  {stat.number}
+                {/* Card shimmer effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                  <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                 </div>
-                <div className="text-navy/50 text-xs font-medium uppercase tracking-wider">
-                  {stat.label}
+
+                {/* Background gradient */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+
+                {/* Decorative corner */}
+                <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden rounded-bl-3xl">
+                  <div className="absolute -top-8 -right-8 w-16 h-16 bg-gradient-to-bl from-red/5 to-transparent rotate-45 group-hover:from-red/10 transition-colors duration-500" />
+                </div>
+
+                <div className="relative z-10">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-cream-light border border-cream-dark/10 mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                    <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
+                  </div>
+                  <div
+                    className="stat-number text-3xl md:text-4xl font-heading font-bold text-navy mb-2 tracking-tight"
+                    data-value={stat.number}
+                  >
+                    0
+                  </div>
+                  <div className="text-navy/50 text-xs font-semibold uppercase tracking-[0.15em]">
+                    {stat.label}
+                  </div>
                 </div>
               </div>
             ))}
@@ -153,31 +420,46 @@ export default function WhereToBuyPage() {
       </section>
 
       {/* ─── Interactive Map Section ─── */}
-      <section className="map-section pb-16 md:pb-24">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="map-section relative pb-20 md:pb-32">
+        <DecorativeShapes />
+
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
           {/* Section header */}
-          <div className="text-center mb-10">
-            <span className="text-red/80 text-sm font-semibold tracking-widest uppercase">
+          <div className="text-center mb-12">
+            <span className="map-header-text inline-block text-red/80 text-sm font-semibold tracking-[0.25em] uppercase">
               Interactive Map
             </span>
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-navy mt-2 mb-3">
+            <h2 className="map-header-text text-3xl md:text-4xl lg:text-5xl font-heading font-bold text-navy mt-3 mb-4">
               Find a Store Near You
             </h2>
-            <p className="text-navy/50 text-sm max-w-lg mx-auto">
+            <p className="map-header-text text-navy/50 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
               Click on any pin to see store details, contact information, and get directions
             </p>
+            <motion.div
+              className="map-header-text w-20 h-1 bg-gradient-to-r from-red to-red/40 mx-auto mt-5 rounded-full"
+              animate={{ scaleX: [0.5, 1, 0.5] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            />
           </div>
 
-          {/* Map */}
-          {!loading && <StoreMap stores={stores} />}
-          {loading && (
-            <div className="w-full h-[500px] sm:h-[600px] lg:h-[700px] rounded-[2rem] bg-navy-dark/50 border border-cream/10 flex items-center justify-center">
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-10 h-10 border-2 border-red border-t-transparent rounded-full animate-spin" />
-                <p className="text-cream/40 text-sm">Loading stores...</p>
-              </div>
+          {/* Map with premium frame */}
+          <div className="relative">
+            {/* Outer glow */}
+            <div className="absolute -inset-1 bg-gradient-to-br from-red/10 via-transparent to-navy/10 rounded-[2.5rem] blur-xl opacity-60" />
+
+            {/* Map wrapper */}
+            <div className="relative rounded-[2rem] overflow-hidden border border-cream-dark/20 shadow-[0_25px_80px_-15px_rgba(0,48,72,0.12)]">
+              {!loading && <StoreMap stores={stores} />}
+              {loading && (
+                <div className="w-full h-[500px] sm:h-[600px] lg:h-[700px] bg-cream-light flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-10 h-10 border-2 border-red border-t-transparent rounded-full animate-spin" />
+                    <p className="text-navy/40 text-sm">Loading stores...</p>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </section>
     </div>
