@@ -294,6 +294,7 @@ export default function ContactPage() {
               rotateY: 0,
               duration: 2.0,
               ease: 'power3.out',
+              delay: 0.3,
             });
             gsap.to(cards[1], {
               opacity: 1,
