@@ -144,6 +144,8 @@ export default function HomePage() {
   const headerRef = useRef<HTMLDivElement>(null);
   const topCardRef = useRef<AutoFlipCardHandle>(null);
   const bottomCardRef = useRef<AutoFlipCardHandle>(null);
+  const topWrapRef = useRef<HTMLDivElement>(null);
+  const bottomWrapRef = useRef<HTMLDivElement>(null);
 
   /* state — fetch ALL articles for each type */
   const [events, setEvents] = useState<Article[]>([]);
@@ -198,7 +200,8 @@ export default function HomePage() {
   /* ── Coordinated flip sequencer: top → pause → bottom → pause → repeat ── */
   useEffect(() => {
     let cancelled = false;
-    let enteredView = false;
+    let topEntered = false;
+    let bottomEntered = false;
 
     const sequencer = async () => {
       while (!cancelled) {
@@ -215,22 +218,33 @@ export default function HomePage() {
       }
     };
 
-    /* Start entrance + sequencer when section scrolls into view */
+    const tryStartSequencer = () => {
+      if (topEntered && bottomEntered && !cancelled) sequencer();
+    };
+
+    /* Each card has its own scroll trigger for entrance */
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: 'top 10%',
+        trigger: topWrapRef.current,
+        start: 'top 80%',
         once: true,
         onEnter: async () => {
-          if (enteredView) return;
-          enteredView = true;
-          /* Entrance: top first, then bottom after 1.5s delay */
+          if (topEntered) return;
+          topEntered = true;
           await topCardRef.current?.enterView();
-          await new Promise(r => setTimeout(r, 1500));
-          if (cancelled) return;
+          tryStartSequencer();
+        },
+      });
+
+      ScrollTrigger.create({
+        trigger: bottomWrapRef.current,
+        start: 'top 80%',
+        once: true,
+        onEnter: async () => {
+          if (bottomEntered) return;
+          bottomEntered = true;
           await bottomCardRef.current?.enterView();
-          /* Start sequenced flipping */
-          sequencer();
+          tryStartSequencer();
         },
       });
     });
@@ -267,24 +281,28 @@ export default function HomePage() {
 
           {/* ── Cards — sequenced: top flips, then bottom, never together ── */}
           <div className="flex flex-col gap-20 sm:gap-28">
-            <AutoFlipCard
-              ref={topCardRef}
-              articles={events}
-              fallbackTitle="Upcoming Events"
-              fallbackExcerpt="Discover our latest community events, celebrations, and gatherings across Taiwan"
-              fallbackHref={`/${locale}/events`}
-              btnLabel={locale === 'id' ? 'Lihat Acara' : '查看活動'}
-              locale={locale}
-            />
-            <AutoFlipCard
-              ref={bottomCardRef}
-              articles={activities}
-              fallbackTitle="Community Activities"
-              fallbackExcerpt="See how our community enjoys Mahkota Taiwan products in their daily life"
-              fallbackHref={`/${locale}/lifestyle`}
-              btnLabel={locale === 'id' ? 'Lihat Aktivitas' : '查看活動'}
-              locale={locale}
-            />
+            <div ref={topWrapRef}>
+              <AutoFlipCard
+                ref={topCardRef}
+                articles={events}
+                fallbackTitle="Upcoming Events"
+                fallbackExcerpt="Discover our latest community events, celebrations, and gatherings across Taiwan"
+                fallbackHref={`/${locale}/events`}
+                btnLabel={locale === 'id' ? 'Lihat Acara' : '查看活動'}
+                locale={locale}
+              />
+            </div>
+            <div ref={bottomWrapRef}>
+              <AutoFlipCard
+                ref={bottomCardRef}
+                articles={activities}
+                fallbackTitle="Community Activities"
+                fallbackExcerpt="See how our community enjoys Mahkota Taiwan products in their daily life"
+                fallbackHref={`/${locale}/lifestyle`}
+                btnLabel={locale === 'id' ? 'Lihat Aktivitas' : '查看活動'}
+                locale={locale}
+              />
+            </div>
           </div>
         </div>
       </section>
