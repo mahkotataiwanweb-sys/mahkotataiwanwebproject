@@ -154,18 +154,19 @@ function AutoFlipCard({
             rotateY: 0,
             duration: 2,
             ease: 'power2.out',
+            onComplete: () => {
+              /* Start auto-flipping only AFTER entrance animation finishes */
+              if (count > 1) {
+                const startTimer = setTimeout(() => {
+                  flipToNext();
+                  intervalRef.current = setInterval(() => {
+                    flipToNext();
+                  }, flipInterval);
+                }, startDelay);
+                intervalRef.current = startTimer as unknown as ReturnType<typeof setInterval>;
+              }
+            },
           });
-
-          /* Start auto-flipping after initial entrance + startDelay */
-          if (count > 1) {
-            const startTimer = setTimeout(() => {
-              flipToNext();
-              intervalRef.current = setInterval(() => {
-                flipToNext();
-              }, flipInterval);
-            }, startDelay);
-            intervalRef.current = startTimer as unknown as ReturnType<typeof setInterval>;
-          }
         },
       });
     });
