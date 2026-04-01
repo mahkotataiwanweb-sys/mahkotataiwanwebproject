@@ -269,14 +269,16 @@ export default function RecipeShowcaseSection() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         headingRef.current!.children,
-        { opacity: 0, y: 50, rotateX: -15 },
+        { opacity: 0, y: 50, filter: 'blur(14px)', scale: 0.92, rotateX: -15 },
         {
           opacity: 1,
           y: 0,
+          filter: 'blur(0px)',
+          scale: 1,
           rotateX: 0,
-          duration: 1.2,
-          stagger: 0.1,
-          ease: 'power3.out',
+          duration: 1.6,
+          stagger: 0.2,
+          ease: 'power4.out',
           scrollTrigger: {
             trigger: sectionRef.current,
             start: 'top 80%',
