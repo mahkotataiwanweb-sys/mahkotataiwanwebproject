@@ -157,18 +157,18 @@ const createCityPinIcon = () => {
   return L.divIcon({
     className: 'city-pin',
     html: `
-      <div style="position:relative;cursor:pointer;width:30px;height:40px;">
+      <div style="position:relative;cursor:pointer;width:24px;height:32px;">
         <div style="
-          position:absolute;left:50%;top:100%;width:18px;height:18px;border-radius:50%;
-          border:2px solid rgba(193,33,38,0.4);
+          position:absolute;left:50%;top:100%;width:14px;height:14px;border-radius:50%;
+          border:1.5px solid rgba(193,33,38,0.35);
           animation: cityPulseRing 2.5s ease-out infinite;pointer-events:none;
         "></div>
         <div style="
-          position:absolute;left:50%;top:100%;width:14px;height:14px;border-radius:50%;
-          border:1.5px solid rgba(193,33,38,0.25);
+          position:absolute;left:50%;top:100%;width:10px;height:10px;border-radius:50%;
+          border:1px solid rgba(193,33,38,0.2);
           animation: cityPulseRing2 3s ease-out infinite 0.5s;pointer-events:none;
         "></div>
-        <svg width="30" height="40" viewBox="0 0 40 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="24" height="32" viewBox="0 0 40 52" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <filter id="cityPinShadow">
               <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#C12126" flood-opacity="0.35"/>
@@ -181,9 +181,9 @@ const createCityPinIcon = () => {
         </svg>
       </div>
     `,
-    iconSize: [30, 40],
-    iconAnchor: [15, 40],
-    popupAnchor: [0, -42],
+    iconSize: [24, 32],
+    iconAnchor: [12, 32],
+    popupAnchor: [0, -34],
   });
 };
 
@@ -510,13 +510,20 @@ export default function StoreMap({ stores }: StoreMapProps) {
 
     mapRef.current = map;
 
+    /* Base tile layer for surrounding areas (light, clean style) */
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap © CARTO',
+    }).addTo(map);
+
+    /* Taiwan GeoJSON overlay on top — peach/salmon illustrated style */
     fetch('/taiwan.geo.json')
       .then((res) => res.json())
       .then((geojsonData) => {
         const geoLayer = L.geoJSON(geojsonData, {
           style: () => ({
             fillColor: '#F5CBA7',
-            fillOpacity: 1,
+            fillOpacity: 0.85,
             color: '#FFFFFF',
             weight: 2.5,
             opacity: 0.9,
@@ -527,7 +534,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
         geoJsonLayerRef.current = geoLayer;
       })
       .catch(() => {
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+        /* GeoJSON failed — tile layer already loaded so map still works */
       });
 
     return () => { map.remove(); mapRef.current = null; };
