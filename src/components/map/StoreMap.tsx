@@ -939,9 +939,11 @@ export default function StoreMap({ stores }: StoreMapProps) {
       maxBounds: L.latLngBounds([21.5, 119.0], [26.0, 122.5]),
       maxBoundsViscosity: 0.9,
       minZoom: 7,
-      fadeAnimation: false,         /* Prevent tile pop-in fade — instant render */
-      zoomAnimation: true,          /* Keep smooth zoom transition */
-      zoomSnap: 1,                  /* Snap to integer zooms for cleaner tile transitions */
+      maxZoom: 12,                  /* CRITICAL: only allow zoom levels we've preloaded */
+      fadeAnimation: false,         /* No tile pop-in fade */
+      zoomAnimation: false,         /* No zoom animation = no transition gap = no flicker */
+      markerZoomAnimation: false,   /* No marker animation during zoom */
+      zoomSnap: 1,                  /* Integer zooms only for clean tile boundaries */
     });
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -1087,27 +1089,26 @@ export default function StoreMap({ stores }: StoreMapProps) {
        transitions so there is NEVER a blank gap.
        ═══════════════════════════════════════════════════════════════ */
 
-    /* Shared tile layer options for maximum stability */
+    /* Shared tile layer options — all zoom levels we'll ever show are preloaded */
     const TILE_OPTS: L.TileLayerOptions = {
-      maxZoom: 19,
-      maxNativeZoom: 18,
-      keepBuffer: 25,
+      maxZoom: 12,
+      maxNativeZoom: 12,
+      keepBuffer: 50,               /* huge buffer — keep everything in DOM */
       updateWhenZooming: false,
       updateWhenIdle: true,
       crossOrigin: true,
     };
 
-    /* Helper: monkey-patch a tile layer so old zoom-level tiles are NOT
-       removed until 1 second after zoom ends — gives new tiles time to
-       render from browser cache, preventing any visual gap. */
+    /* Monkey-patch: NEVER remove old zoom tiles during session.
+       Since all tiles are preloaded, old tiles serve as seamless background
+       while new zoom level renders from cache. */
     const patchTileLayer = (layer: L.TileLayer) => {
-      const orig = (layer as any)._removeTilesAtZoom;
-      if (orig) {
-        (layer as any)._removeTilesAtZoom = function (zoom: number) {
-          setTimeout(() => {
-            try { orig.call(this, zoom); } catch (_) {}
-          }, 1000);
-        };
+      /* Prevent removal of tiles at old zoom levels entirely */
+      (layer as any)._removeTilesAtZoom = () => {};
+      /* Also prevent pruning of buffered tiles */
+      const origPrune = (layer as any)._pruneTiles;
+      if (origPrune) {
+        (layer as any)._pruneTiles = () => {};
       }
     };
 
@@ -1161,9 +1162,10 @@ export default function StoreMap({ stores }: StoreMapProps) {
       });
 
     /* ═══════════════════════════════════════════════════════════════
-       PRELOAD ALL TILES covering Taiwan for zoom 7-11
+       PRELOAD EVERY SINGLE TILE covering Taiwan for zoom 6-12
        (base + labels layers × retina-aware)
-       ~2500 tile images → warmed in browser cache before map reveals
+       This means EVERY tile the user can ever see is in browser cache.
+       No network requests during zoom/pan = absolute zero flicker.
        ═══════════════════════════════════════════════════════════════ */
     let preloadStarted = false;
     const preloadAllTaiwanTiles = (): Promise<void> => {
@@ -1177,7 +1179,8 @@ export default function StoreMap({ stores }: StoreMapProps) {
         const layers = ['rastertiles/voyager_nolabels', 'rastertiles/voyager_only_labels'];
         const urls: string[] = [];
 
-        for (let z = 7; z <= 11; z++) {
+        /* Zoom 6-12: covers EVERYTHING from overview to street-level detail */
+        for (let z = 6; z <= 12; z++) {
           const n = Math.pow(2, z);
           const xMin = Math.floor((LNG_MIN + 180) / 360 * n);
           const xMax = Math.floor((LNG_MAX + 180) / 360 * n);
@@ -1198,44 +1201,46 @@ export default function StoreMap({ stores }: StoreMapProps) {
         const total = urls.length;
         const onDone = () => { done++; if (done >= total) resolve(); };
 
-        /* Load in batches of 40 for faster throughput */
+        /* Load in batches of 60 for maximum throughput */
         let idx = 0;
         const batch = () => {
-          const chunk = urls.slice(idx, idx + 40);
-          idx += 40;
+          const chunk = urls.slice(idx, idx + 60);
+          idx += 60;
           chunk.forEach((url) => {
             const img = new Image();
             img.crossOrigin = 'anonymous';
             img.onload = img.onerror = onDone;
             img.src = url;
           });
-          if (idx < total) setTimeout(batch, 30);
+          if (idx < total) setTimeout(batch, 20);
         };
         batch();
 
-        /* Safety: resolve after 10s even if some tiles fail */
-        setTimeout(resolve, 10000);
+        /* Safety: resolve after 30s even if some tiles fail (large preload) */
+        setTimeout(resolve, 30000);
       });
     };
 
-    /* Wait for EVERYTHING — tiles preloaded + GeoJSON rendered — before revealing */
-    baseTiles.once('load', () => {
+    /* Wait for EVERYTHING — ALL tiles cached + GeoJSON rendered — before revealing.
+       The map stays hidden behind loading overlay until 100% ready. */
+    const revealWhenReady = () => {
       Promise.all([
         preloadAllTaiwanTiles(),
         oceanReady,
         taiwanReady,
-      ]).then(() => setMapReady(true));
-    });
-    /* Fallback: if baseTiles 'load' never fires, start preload after 2s */
-    setTimeout(() => {
-      Promise.all([
-        preloadAllTaiwanTiles(),
-        oceanReady,
-        taiwanReady,
-      ]).then(() => setMapReady(true));
-    }, 2000);
-    /* Hard safety: show map after 12s no matter what */
-    setTimeout(() => setMapReady(true), 12000);
+      ]).then(() => {
+        /* Force Leaflet to re-check tile cache after preload */
+        map.invalidateSize();
+        /* Small delay to let Leaflet render tiles from now-warm cache */
+        setTimeout(() => setMapReady(true), 300);
+      });
+    };
+
+    baseTiles.once('load', revealWhenReady);
+    /* Fallback: start preload after 2s even if 'load' doesn't fire */
+    setTimeout(revealWhenReady, 2000);
+    /* Hard safety: show map after 45s no matter what (large preload needs time) */
+    setTimeout(() => setMapReady(true), 45000);
 
     return () => { map.remove(); mapRef.current = null; };
   }, []);
@@ -1284,7 +1289,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
       });
       if (filteredStores.length > 0 && !selectedStore) {
         const group = L.featureGroup(markersRef.current);
-        map.fitBounds(group.getBounds().pad(0.3), { maxZoom: 14 });
+        map.fitBounds(group.getBounds().pad(0.3), { maxZoom: 12 });
       }
     }
   }, [filteredStores, cityClusters, filterCity, selectedStore]);
