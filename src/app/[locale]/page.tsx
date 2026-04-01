@@ -226,7 +226,7 @@ export default function HomePage() {
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: topWrapRef.current,
-        start: 'top 80%',
+        start: 'top 10%',
         once: true,
         onEnter: async () => {
           if (topEntered) return;
