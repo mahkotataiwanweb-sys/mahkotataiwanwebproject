@@ -983,6 +983,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
 
       let hideTimeout: ReturnType<typeof setTimeout>;
       let touchCount = 0;
+      let dragHintShown = false;  /* Only show once */
 
       container.addEventListener('touchstart', (e) => {
         touchCount = e.touches.length;
@@ -992,9 +993,10 @@ export default function StoreMap({ stores }: StoreMapProps) {
         }
       }, { passive: true });
 
-      /* Only show "two fingers" overlay when user actually SWIPES with one finger */
+      /* Only show "two fingers" overlay ONCE when user first swipes with one finger */
       container.addEventListener('touchmove', (e) => {
-        if (touchCount === 1 && e.touches.length === 1) {
+        if (!dragHintShown && touchCount === 1 && e.touches.length === 1) {
+          dragHintShown = true;
           dragOverlay.style.display = 'flex';
           dragOverlay.style.opacity = '1';
           clearTimeout(hideTimeout);
@@ -1194,7 +1196,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
             setTimeout(() => {
               overlay.style.opacity = '0';
               setTimeout(() => { overlay.style.display = 'none'; }, 300);
-            }, 2500);
+            }, 1200);
           }
         });
         marker.addTo(map);
