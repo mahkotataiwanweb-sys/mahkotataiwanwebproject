@@ -17,11 +17,11 @@ function injectPinStyles() {
   style.textContent = `
     /* ── Force Leaflet ocean background — deeper blue ── */
     .illustrated-map.leaflet-container {
-      background: #4A9FD9 !important;
+      background: #2E8BC0 !important;
     }
     .illustrated-map .leaflet-tile-pane {
       background: transparent !important;
-      mix-blend-mode: multiply;
+      opacity: 0.35;
     }
     .illustrated-map .leaflet-pane {
       background: transparent !important;
@@ -31,7 +31,7 @@ function injectPinStyles() {
     }
     .illustrated-map .leaflet-overlay-pane {
       background: transparent !important;
-      mix-blend-mode: normal;
+      opacity: 1 !important;
     }
 
     /* Smooth premium bounce for store pins */
@@ -916,10 +916,10 @@ export default function StoreMap({ stores }: StoreMapProps) {
         const geoLayer = L.geoJSON(geojsonData, {
           style: () => ({
             fillColor: '#F5CBA7',
-            fillOpacity: 0.5,
+            fillOpacity: 0.88,
             color: '#FFFFFF',
-            weight: 2,
-            opacity: 0.8,
+            weight: 2.5,
+            opacity: 0.9,
           }),
           interactive: false,
         });

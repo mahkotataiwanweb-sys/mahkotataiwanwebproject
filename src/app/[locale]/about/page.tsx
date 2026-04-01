@@ -165,37 +165,21 @@ function CharReveal({ text, className }: { text: string; className?: string }) {
     const chars = ref.current.querySelectorAll('.cr-char');
     if (chars.length === 0) return;
 
-    /* Pre-compute random values once to avoid recalculation */
+    /* Pre-compute random rain values */
     const charData = Array.from({ length: chars.length }, (_, i) => ({
-      /* Stagger: sequential base + random scatter for rain-like feel */
       delay: i * 0.025 + Math.random() * 0.35,
-      /* Each char falls from a random height */
       yStart: -(40 + Math.random() * 60),
-      /* Slight random horizontal drift for natural rain */
-      xStart: (Math.random() - 0.5) * 16,
-      /* Duration varies per char — slower = more dramatic */
       duration: 0.6 + Math.random() * 0.4,
     }));
 
     const ctx = gsap.context(() => {
       chars.forEach((char, i) => {
-        const isSpace = (char as HTMLElement).textContent === ' ';
-        if (isSpace) {
-          gsap.set(char, { opacity: 1 });
-          return;
-        }
-
         const d = charData[i];
         gsap.fromTo(char,
-          {
-            opacity: 0,
-            y: d.yStart,
-            x: d.xStart,
-          },
+          { opacity: 0, y: d.yStart },
           {
             opacity: 1,
             y: 0,
-            x: 0,
             duration: d.duration,
             delay: d.delay,
             ease: 'power2.out',
@@ -211,21 +195,34 @@ function CharReveal({ text, className }: { text: string; className?: string }) {
     return () => ctx.revert();
   }, [text]);
 
+  /* Split into words — wrap each word so line-breaks happen between words, not mid-word */
+  const words = text.split(' ');
+  let globalIdx = 0;
+
   return (
     <p ref={ref} className={className}>
-      {text.split('').map((char, i) => (
-        <span
-          key={i}
-          className="cr-char"
-          style={{
-            opacity: 0,
-            display: 'inline-block',
-            willChange: 'transform, opacity',
-          }}
-        >
-          {char === ' ' ? '\u00A0' : char}
-        </span>
-      ))}
+      {words.map((word, wi) => {
+        const chars = word.split('').map((char, ci) => {
+          const idx = globalIdx++;
+          return (
+            <span
+              key={idx}
+              className="cr-char"
+              style={{ opacity: 0, display: 'inline-block', willChange: 'transform, opacity' }}
+            >
+              {char}
+            </span>
+          );
+        });
+        // Increment globalIdx for the space between words
+        if (wi < words.length - 1) globalIdx++;
+        return (
+          <span key={wi} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
+            {chars}
+            {wi < words.length - 1 && <span className="cr-char" style={{ opacity: 1, display: 'inline' }}>&nbsp;</span>}
+          </span>
+        );
+      })}
     </p>
   );
 }
