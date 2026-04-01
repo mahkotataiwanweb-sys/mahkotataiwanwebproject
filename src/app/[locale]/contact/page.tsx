@@ -46,32 +46,34 @@ function CharReveal({ text, className }: { text: string; className?: string }) {
     const chars = ref.current.querySelectorAll('.cr-char');
     if (chars.length === 0) return;
 
-    /* Random rain — ALL lines start together */
-    const charData = Array.from({ length: chars.length }, () => ({
-      delay: Math.random() * 2.5,
-      yStart: -(50 + Math.random() * 80),
-      duration: 1.0 + Math.random() * 0.8,
-    }));
+    /* Assign random per-char Y offset */
+    chars.forEach((char) => {
+      const el = char as HTMLElement;
+      el.style.setProperty('--rain-y', `${-(60 + Math.random() * 100)}px`);
+    });
 
+    /* ONE ScrollTrigger → one timeline, random stagger */
     const ctx = gsap.context(() => {
-      chars.forEach((char, i) => {
-        const d = charData[i];
-        gsap.fromTo(char,
-          { opacity: 0, y: d.yStart },
-          {
-            opacity: 1,
-            y: 0,
-            duration: d.duration,
-            delay: d.delay,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: ref.current,
-              start: 'top 80%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: ref.current,
+          start: 'top 82%',
+          toggleActions: 'play none none reverse',
+        },
       });
+
+      tl.fromTo(
+        gsap.utils.shuffle([...chars]),
+        { opacity: 0, y: (i: number, el: HTMLElement) => el.style.getPropertyValue('--rain-y') },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.8,
+          stagger: { each: 0.04, from: 'random' },
+          ease: 'power2.out',
+        },
+        0
+      );
     });
     return () => ctx.revert();
   }, [text]);

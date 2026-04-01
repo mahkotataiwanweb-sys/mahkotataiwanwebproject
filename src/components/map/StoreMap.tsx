@@ -521,22 +521,22 @@ function DecorativeElements() {
 
       {/* ═══ AIRPLANE — occasional slow rise from bottom to top ═══ */}
       {[
-        { left: '15%', duration: '55s', delay: '0s' },
-        { left: '50%', duration: '62s', delay: '20s' },
-        { left: '82%', duration: '58s', delay: '38s' },
+        { left: '18%', duration: '50s', delay: '0s' },
+        { left: '48%', duration: '58s', delay: '18s' },
+        { left: '78%', duration: '54s', delay: '35s' },
       ].map((plane, i) => (
         <div
           key={`plane-${i}`}
           style={{
             position: 'absolute',
-            bottom: '-30px',
+            bottom: '-40px',
             left: plane.left,
             animation: `planeRise ${plane.duration} linear infinite ${plane.delay}`,
             opacity: 0,
-            zIndex: 1,
+            zIndex: 10,
           }}
         >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="rgba(0,48,72,0.3)">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="white" style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.25))' }}>
             <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
           </svg>
         </div>
@@ -588,11 +588,12 @@ function DecorativeElements() {
           75% { transform: translate(8px, -5px); }
         }
         @keyframes planeRise {
-          0%, 100% { transform: translateY(0); opacity: 0; }
-          2% { opacity: 0.4; }
-          44% { opacity: 0.4; }
-          47% { transform: translateY(-950px) translateX(-25px); opacity: 0; }
-          48% { transform: translateY(0); opacity: 0; }
+          0%   { transform: translateY(0) rotate(-8deg); opacity: 0; }
+          3%   { opacity: 0.85; }
+          42%  { opacity: 0.85; }
+          46%  { transform: translateY(-1100px) translateX(-30px) rotate(-8deg); opacity: 0; }
+          47%  { transform: translateY(0) rotate(-8deg); opacity: 0; }
+          100% { transform: translateY(0) rotate(-8deg); opacity: 0; }
         }
       `}</style>
     </div>
@@ -1161,7 +1162,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
           <img
             src="/images/branding/the-orange-fox-logo.png"
             alt="The Orange Fox"
-            className="h-[13px] sm:h-[15px] w-auto object-contain -mr-[1px]"
+            className="h-[9px] sm:h-[11px] w-auto object-contain -mr-[1px]"
           />
           <span className="font-bold" style={{ color: '#E8870C' }}>The Orange Fox</span>
         </div>
