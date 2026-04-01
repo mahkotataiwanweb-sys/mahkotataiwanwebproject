@@ -219,14 +219,14 @@ export default function HomePage() {
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: sectionRef.current,
-        start: 'top 60%',
+        start: 'top 35%',
         once: true,
         onEnter: async () => {
           if (enteredView) return;
           enteredView = true;
-          /* Entrance: top card first, then bottom 1.5s later */
-          topCardRef.current?.enterView();
-          await new Promise(r => setTimeout(r, 1500));
+          /* Entrance: top first, then bottom after 2.5s delay */
+          await topCardRef.current?.enterView();
+          await new Promise(r => setTimeout(r, 2500));
           if (cancelled) return;
           await bottomCardRef.current?.enterView();
           /* Start sequenced flipping */
