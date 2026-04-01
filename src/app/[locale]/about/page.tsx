@@ -496,9 +496,9 @@ export default function AboutPage() {
               opacity: 1,
               rotationX: 0,
               scale: 1,
-              duration: 0.7,
+              duration: 2.7,
               ease: 'power3.out',
-            }, i * 0.2);
+            }, i * 0.7);
           });
 
           // Gentle float after flip completes
@@ -543,9 +543,9 @@ export default function AboutPage() {
               scale: 1,
               filter: 'blur(0px) brightness(1)',
               y: 0,
-              duration: 0.9,
+              duration: 2.9,
               ease: 'back.out(1.2)',
-            }, i * 0.25);
+            }, i * 0.8);
           });
 
           // After all cards have flipped, add smooth floating effect
