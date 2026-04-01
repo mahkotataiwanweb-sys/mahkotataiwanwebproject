@@ -354,20 +354,20 @@ export default function ContactPage() {
 
         // ── Show blue arc the instant it starts drawing ──
         arcTl.set(gArc, { opacity: 1 }, 0);
-        // ── Navy blue draws — 8s constant speed ──
-        arcTl.to(gArc, { strokeDashoffset: 0, duration: 8, ease: 'none' }, 0);
+        // ── Navy blue draws — 6s constant speed ──
+        arcTl.to(gArc, { strokeDashoffset: 0, duration: 6, ease: 'none' }, 0);
 
         // ── Show red arc the instant it starts drawing ──
-        arcTl.set(yArc, { opacity: 1 }, 1.5);
-        // ── Red starts 1.5s after blue, 6.5s duration — BOTH FINISH at t=8 ──
-        arcTl.to(yArc, { strokeDashoffset: 0, duration: 6.5, ease: 'none' }, 1.5);
+        arcTl.set(yArc, { opacity: 1 }, 1.0);
+        // ── Red starts 1s after blue, 5s duration — BOTH FINISH at t=6 ──
+        arcTl.to(yArc, { strokeDashoffset: 0, duration: 5, ease: 'none' }, 1.0);
 
-        // ── Labels pop up at exactly t=4 ──
-        arcTl.to(gLabel, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)' }, 4);
-        arcTl.to(yLabel, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)' }, 4);
+        // ── Labels pop up at exactly t=3 ──
+        arcTl.to(gLabel, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)' }, 3);
+        arcTl.to(yLabel, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)' }, 3);
 
         // ── Hold both visible for 5s after arcs complete ──
-        arcTl.to({}, { duration: 5 }, 8);
+        arcTl.to({}, { duration: 5 }, 6);
 
         // ── Both fade out together ──
         arcTl.to([gArc, yArc, gLabel, yLabel], {
