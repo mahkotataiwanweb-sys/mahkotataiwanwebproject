@@ -157,75 +157,107 @@ function TiltCard({ children, className }: { children: React.ReactNode; classNam
   );
 }
 
-function CharReveal({ text, className }: { text: string; className?: string }) {
-  const ref = useRef<HTMLParagraphElement>(null);
+/* ── LineReveal: professional line-by-line cascade reveal ── */
+function LineReveal({ text, className }: { text: string; className?: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [lines, setLines] = useState<string[]>([]);
+  const measured = useRef(false);
 
+  /* Step 1: Render hidden text, measure which words fall on which visual line */
   useEffect(() => {
-    if (!ref.current) return;
-    const chars = ref.current.querySelectorAll('.cr-char');
-    if (chars.length === 0) return;
+    if (!containerRef.current || measured.current) return;
+    const el = containerRef.current;
+    const words = text.split(' ');
 
-    /* Assign random per-char values via CSS custom properties */
-    chars.forEach((char) => {
-      const el = char as HTMLElement;
-      el.style.setProperty('--rain-y', `${-(60 + Math.random() * 100)}px`);
-    });
+    // Create hidden measurement container matching the real layout
+    const measurer = document.createElement('p');
+    measurer.className = className || '';
+    measurer.style.cssText = 'visibility:hidden;position:absolute;top:0;left:0;right:0;pointer-events:none;';
+    el.parentElement?.appendChild(measurer);
 
-    /* ONE ScrollTrigger → one timeline, random delays via gsap.utils */
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: ref.current,
-          start: 'top 82%',
-          toggleActions: 'play none none reverse',
-        },
+    const detectedLines: string[] = [];
+    let currentLine = '';
+    let lastTop = -1;
+
+    words.forEach((word, i) => {
+      const testText = currentLine ? currentLine + ' ' + word : word;
+      measurer.textContent = testText;
+      // Use a span to measure position of last word
+      measurer.innerHTML = '';
+      testText.split(' ').forEach((w, wi) => {
+        if (wi > 0) measurer.appendChild(document.createTextNode(' '));
+        const span = document.createElement('span');
+        span.textContent = w;
+        measurer.appendChild(span);
       });
+      const spans = measurer.querySelectorAll('span');
+      const lastSpan = spans[spans.length - 1];
+      const top = lastSpan.offsetTop;
 
-      tl.fromTo(
-        gsap.utils.shuffle([...chars]),
-        { opacity: 0, y: (i: number, el: HTMLElement) => el.style.getPropertyValue('--rain-y') },
+      if (lastTop === -1) {
+        lastTop = top;
+        currentLine = word;
+      } else if (top > lastTop) {
+        // New visual line detected
+        detectedLines.push(currentLine);
+        currentLine = word;
+        lastTop = top;
+      } else {
+        currentLine = currentLine + ' ' + word;
+      }
+    });
+    if (currentLine) detectedLines.push(currentLine);
+    measurer.remove();
+
+    measured.current = true;
+    setLines(detectedLines);
+  }, [text, className]);
+
+  /* Step 2: Animate each line with GSAP cascade */
+  useEffect(() => {
+    if (!containerRef.current || lines.length === 0) return;
+    const lineEls = containerRef.current.querySelectorAll('.lr-line');
+    if (lineEls.length === 0) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        lineEls,
+        { opacity: 0, y: 28, filter: 'blur(6px)' },
         {
           opacity: 1,
           y: 0,
-          duration: 0.9,
-          stagger: { each: 0.02, from: 'random' },
-          ease: 'power2.out',
+          filter: 'blur(0px)',
+          duration: 0.8,
+          stagger: 0.12,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: 'top 82%',
+            toggleActions: 'play none none reverse',
+          },
         },
-        0
       );
     });
     return () => ctx.revert();
-  }, [text]);
-
-  /* Split into words — wrap each word so line-breaks happen between words, not mid-word */
-  const words = text.split(' ');
-  let globalIdx = 0;
+  }, [lines]);
 
   return (
-    <p ref={ref} className={className}>
-      {words.map((word, wi) => {
-        const chars = word.split('').map((char, ci) => {
-          const idx = globalIdx++;
-          return (
-            <span
-              key={idx}
-              className="cr-char"
-              style={{ opacity: 0, display: 'inline-block', willChange: 'transform, opacity' }}
-            >
-              {char}
-            </span>
-          );
-        });
-        // Increment globalIdx for the space between words
-        if (wi < words.length - 1) globalIdx++;
-        return (
-          <span key={wi} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
-            {chars}
-            {wi < words.length - 1 && <span className="cr-char" style={{ opacity: 1, display: 'inline' }}>&nbsp;</span>}
+    <div ref={containerRef} className={className}>
+      {lines.length === 0 ? (
+        /* Before measurement — invisible placeholder to reserve space */
+        <p style={{ visibility: 'hidden' }}>{text}</p>
+      ) : (
+        lines.map((line, i) => (
+          <span
+            key={i}
+            className="lr-line"
+            style={{ display: 'block', opacity: 0, willChange: 'transform, opacity, filter' }}
+          >
+            {line}
           </span>
-        );
-      })}
-    </p>
+        ))
+      )}
+    </div>
   );
 }
 
@@ -750,7 +782,7 @@ export default function AboutPage() {
 
               {/* Right column — Description */}
               <div>
-                <CharReveal
+                <LineReveal
                   text={t('description')}
                   className="text-navy/60 leading-relaxed text-base sm:text-lg tracking-wide mb-4 text-justify"
                 />
