@@ -220,12 +220,19 @@ export default function EventsPage() {
   useEffect(() => {
     if (!heroRef.current) return;
     const ctx = gsap.context(() => {
-      gsap.from('[data-hero-anim]', {
+      gsap.fromTo('[data-hero-anim]', {
         opacity: 0,
         y: 40,
-        duration: 0.9,
-        ease: 'power3.out',
-        stagger: 0.12,
+        filter: 'blur(12px)',
+        scale: 0.95,
+      }, {
+        opacity: 1,
+        y: 0,
+        filter: 'blur(0px)',
+        scale: 1,
+        duration: 1.9,
+        ease: 'power4.out',
+        stagger: 0.25,
       });
     }, heroRef);
     return () => ctx.revert();
@@ -241,11 +248,13 @@ export default function EventsPage() {
         const isEven = card.getAttribute('data-card') === 'even';
         gsap.fromTo(
           card,
-          { opacity: 0, x: isEven ? 80 : -80 },
+          { opacity: 0, x: isEven ? 80 : -80, filter: 'blur(8px)', scale: 0.92 },
           {
             opacity: 1,
             x: 0,
-            duration: 0.8,
+            filter: 'blur(0px)',
+            scale: 1,
+            duration: 1.8,
             ease: 'power3.out',
             scrollTrigger: {
               trigger: card,

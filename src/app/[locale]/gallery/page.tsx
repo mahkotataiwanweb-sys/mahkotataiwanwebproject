@@ -327,12 +327,19 @@ export default function GalleryPage() {
   useEffect(() => {
     if (!heroRef.current) return;
     const ctx = gsap.context(() => {
-      gsap.from('.hero-anim', {
+      gsap.fromTo('.hero-anim', {
         y: 60,
         opacity: 0,
-        stagger: 0.12,
-        duration: 1,
-        ease: 'power3.out',
+        filter: 'blur(12px)',
+        scale: 0.95,
+      }, {
+        y: 0,
+        opacity: 1,
+        filter: 'blur(0px)',
+        scale: 1,
+        stagger: 0.25,
+        duration: 2.0,
+        ease: 'power4.out',
       });
       gsap.from('.hero-orb', {
         scale: 0,
@@ -355,13 +362,15 @@ export default function GalleryPage() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         cards,
-        { y: 50, opacity: 0 },
+        { y: 50, opacity: 0, filter: 'blur(8px)', scale: 0.92 },
         {
           y: 0,
           opacity: 1,
+          filter: 'blur(0px)',
+          scale: 1,
           stagger: 0.06,
-          duration: 0.7,
-          ease: 'power2.out',
+          duration: 1.7,
+          ease: 'power3.out',
           scrollTrigger: {
             trigger: gridRef.current,
             start: 'top 85%',
@@ -574,10 +583,10 @@ export default function GalleryPage() {
               <div key={eventName} className="mb-16 last:mb-0">
                 {/* Section Header */}
                 <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, x: -20, filter: 'blur(8px)', scale: 0.95 }}
+                  whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)', scale: 1 }}
                   viewport={{ once: true, margin: '-50px' }}
-                  transition={{ duration: 0.6 }}
+                  transition={{ duration: 1.8 }}
                   className="flex items-end gap-4 mb-6 pb-4 border-b border-[#003048]/10"
                 >
                   <div>

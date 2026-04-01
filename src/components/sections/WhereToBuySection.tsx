@@ -43,6 +43,7 @@ const PIN_LOCATIONS = [
 
 export default function WhereToBuySection() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<SVGSVGElement>(null);
   const pinsRef = useRef<(SVGGElement | null)[]>([]);
   const topTextRef = useRef<HTMLParagraphElement>(null);
@@ -172,6 +173,32 @@ export default function WhereToBuySection() {
     return () => ctx.revert();
   }, []);
 
+  /* GSAP header reveal animation */
+  useEffect(() => {
+    if (!headerRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        headerRef.current!.children,
+        { opacity: 0, y: 50, filter: 'blur(14px)', scale: 0.92 },
+        {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          scale: 1,
+          duration: 1.6,
+          stagger: 0.2,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
+
   /* Looping bounce-in per letter animation */
   useEffect(() => {
     if (!sectionRef.current) return;
@@ -194,8 +221,10 @@ export default function WhereToBuySection() {
         }
       });
 
-      // One-time entrance animation — letters bounce in then stay visible
+      // Continuous looping animation — letters bounce in, hold, fade out, repeat
       const masterTl = gsap.timeline({
+        repeat: -1,
+        repeatDelay: 2.5,
         scrollTrigger: {
           trigger: sectionRef.current,
           start: 'top 65%',
@@ -203,6 +232,7 @@ export default function WhereToBuySection() {
         },
       });
 
+      // Phase 1: Letters bounce in with stagger
       let offset = 0;
       allGroups.forEach(({ els, stagger }) => {
         if (!els?.length) return;
@@ -216,6 +246,23 @@ export default function WhereToBuySection() {
           ease: 'bounce.out',
         }, offset);
         offset += els.length * stagger * 0.6;
+      });
+
+      // Phase 2: Hold visible for 3 seconds
+      masterTl.to({}, { duration: 3 });
+
+      // Phase 3: Letters fade out with reverse stagger
+      allGroups.forEach(({ els, stagger }) => {
+        if (!els?.length) return;
+        masterTl.to(els, {
+          opacity: 0,
+          y: -20,
+          scale: 0.5,
+          rotateX: -40,
+          duration: 0.4,
+          stagger: { each: stagger * 0.5, from: 'end' },
+          ease: 'power2.in',
+        }, '>-0.1');
       });
     }, sectionRef);
 
@@ -242,7 +289,7 @@ export default function WhereToBuySection() {
         </div>
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div ref={headerRef} className="text-center mb-12">
           <span className="inline-block text-red/80 text-sm font-semibold tracking-widest uppercase mb-3">
             Find Us
           </span>
