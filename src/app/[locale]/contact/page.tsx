@@ -275,48 +275,35 @@ export default function ContactPage() {
       /* ── Contact Cards — One-time flip entrance, top row then bottom row ── */
       if (contactCardsRef.current) {
         const cards = contactCardsRef.current.children;
-        // Set all cards hidden with flip
+        // Disable CSS transitions and hide with flip
         gsap.set(cards, {
           opacity: 0,
           rotateY: -90,
-          transformPerspective: 2500,
+          transformPerspective: 1200,
           transformOrigin: 'center center',
+          willChange: 'transform, opacity',
+          transition: 'none',
         });
+
+        const delays = [0.6, 1.0, 2.0, 2.8];
 
         ScrollTrigger.create({
           trigger: contactCardsRef.current,
           start: 'top 85%',
           once: true,
           onEnter: () => {
-            // Top row (cards 0 & 1) flip one by one
-            gsap.to(cards[0], {
-              opacity: 1,
-              rotateY: 0,
-              duration: 2.0,
-              ease: 'power3.out',
-              delay: 0.6,
-            });
-            gsap.to(cards[1], {
-              opacity: 1,
-              rotateY: 0,
-              duration: 2.0,
-              ease: 'power3.out',
-              delay: 1.0,
-            });
-            // Bottom row (cards 2 & 3) flip after top row
-            gsap.to(cards[2], {
-              opacity: 1,
-              rotateY: 0,
-              duration: 2.0,
-              ease: 'power3.out',
-              delay: 2.0,
-            });
-            gsap.to(cards[3], {
-              opacity: 1,
-              rotateY: 0,
-              duration: 2.0,
-              ease: 'power3.out',
-              delay: 2.8,
+            Array.from(cards).forEach((card, i) => {
+              gsap.to(card, {
+                opacity: 1,
+                rotateY: 0,
+                duration: 2.0,
+                ease: 'power2.out',
+                delay: delays[i],
+                onComplete: () => {
+                  // Re-enable CSS transitions for hover effects after GSAP is done
+                  gsap.set(card, { clearProps: 'transition,willChange' });
+                },
+              });
             });
           },
         });
