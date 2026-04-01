@@ -48,8 +48,8 @@
     "details": "View Details"
   },
   "contact": {
-    "title": "Contact Us",
-    "subtitle": "Interested in partnership or have questions about our products? Let's connect!",
+    "title": "Let's Connect",
+    "subtitle": "Have a collaboration idea, a question, or just want to say hello? We'd love to hear from you.",
     "form": {
       "name": "Full Name",
       "email": "Email Address",
