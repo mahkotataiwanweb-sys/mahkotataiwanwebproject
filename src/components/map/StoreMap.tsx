@@ -413,8 +413,8 @@ function DecorativeElements() {
           <ellipse cx="26" cy="8" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.65" transform="rotate(-10 26 8)"/>
           <ellipse cx="26" cy="12" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.65" transform="rotate(10 26 12)"/>
         </svg>
-        {/* Dolphin — swimming right in left ocean */}
-        <div style={{ position: 'absolute', top: '35%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
+        {/* Dolphin — swimming right in left ocean (desktop only) */}
+        <div className="hidden lg:block" style={{ position: 'absolute', top: '35%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
           <svg style={{ animation: 'dolphinSwimRight 20s ease-in-out infinite' }} viewBox="0 0 52 30" fill="none" width="52" height="30">
             {/* Body */}
             <path d="M10 18 Q14 6 26 5 Q38 4 44 12 Q46 15 42 17 Q38 19 30 20 Q20 22 10 18Z" fill="#5BAED6" opacity="0.85"/>
@@ -431,8 +431,8 @@ function DecorativeElements() {
             <path d="M42 14 Q44 15 43 16" stroke="#3A8AB0" strokeWidth="0.8" fill="none"/>
           </svg>
         </div>
-        {/* Orca — bobbing in left ocean */}
-        <div style={{ position: 'absolute', top: '70%', left: '10%', animation: 'orcaBob 8s ease-in-out infinite' }}>
+        {/* Orca — bobbing in left ocean (desktop only) */}
+        <div className="hidden lg:block" style={{ position: 'absolute', top: '70%', left: '10%', animation: 'orcaBob 8s ease-in-out infinite' }}>
           <svg viewBox="0 0 60 30" fill="none" width="60" height="30">
             {/* Main body */}
             <ellipse cx="30" cy="15" rx="22" ry="11" fill="#1A1A2E" opacity="0.9"/>
@@ -456,8 +456,8 @@ function DecorativeElements() {
       {/* ═══ RIGHT OCEAN — Pacific (65-100%) ═══ */}
       <div style={{ position: 'absolute', top: 0, left: '65%', width: '35%', height: '100%', overflow: 'hidden' }}>
         {/* Dolphin 1 — proper dolphin swimming left in right ocean */}
-        <div style={{ position: 'absolute', top: '25%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
-          <svg style={{ animation: 'dolphinSwimLeft 22s ease-in-out infinite' }} viewBox="0 0 52 30" fill="none" width="52" height="30">
+        <div className="sea-creature-dolphin" style={{ position: 'absolute', top: '25%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
+          <svg style={{ animation: 'dolphinSwimLeft 22s ease-in-out infinite' }} viewBox="0 0 52 30" fill="none">
             {/* Body */}
             <path d="M10 18 Q14 6 26 5 Q38 4 44 12 Q46 15 42 17 Q38 19 30 20 Q20 22 10 18Z" fill="#5BAED6" opacity="0.85"/>
             {/* Belly highlight */}
@@ -473,8 +473,8 @@ function DecorativeElements() {
             <path d="M42 14 Q44 15 43 16" stroke="#3A8AB0" strokeWidth="0.8" fill="none"/>
           </svg>
         </div>
-        {/* Dolphin 2 — second dolphin swimming left in right ocean */}
-        <div style={{ position: 'absolute', top: '45%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
+        {/* Dolphin 2 — second dolphin swimming left (desktop only) */}
+        <div className="hidden lg:block" style={{ position: 'absolute', top: '45%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
           <svg style={{ animation: 'dolphinSwimLeft 26s ease-in-out infinite 5s' }} viewBox="0 0 52 30" fill="none" width="52" height="30">
             {/* Body */}
             <path d="M10 18 Q14 6 26 5 Q38 4 44 12 Q46 15 42 17 Q38 19 30 20 Q20 22 10 18Z" fill="#5BAED6" opacity="0.85"/>
@@ -492,8 +492,8 @@ function DecorativeElements() {
           </svg>
         </div>
         {/* Orca — bobbing in right ocean */}
-        <div style={{ position: 'absolute', top: '65%', left: '15%', animation: 'orcaBob 9s ease-in-out infinite 2s' }}>
-          <svg viewBox="0 0 60 30" fill="none" width="60" height="30" style={{ transform: 'scaleX(-1)' }}>
+        <div className="sea-creature-orca" style={{ position: 'absolute', top: '65%', left: '15%', animation: 'orcaBob 9s ease-in-out infinite 2s' }}>
+          <svg viewBox="0 0 60 30" fill="none" style={{ transform: 'scaleX(-1)' }}>
             {/* Main body */}
             <ellipse cx="30" cy="15" rx="22" ry="11" fill="#1A1A2E" opacity="0.9"/>
             {/* White belly */}
@@ -630,8 +630,8 @@ function DecorativeElements() {
             <circle cx="25" cy="15" r="1" fill="#999"/>
           </svg>
         </div>
-        {/* Car 2 — blue driving right to left */}
-        <div style={{ position: 'absolute', top: '55%', left: 0, width: '100%', height: '18px' }}>
+        {/* Car 2 — blue driving right to left (desktop only) */}
+        <div className="hidden lg:block" style={{ position: 'absolute', top: '55%', left: 0, width: '100%', height: '18px' }}>
           <svg style={{ animation: 'carDriveLeft 32s linear infinite 10s' }} viewBox="0 0 36 18" fill="none" width="28" height="14">
             {/* Body */}
             <rect x="3" y="7" width="30" height="8" rx="2.5" fill="#4A90D9"/>
@@ -808,6 +808,15 @@ function DecorativeElements() {
         @keyframes carDriveLeft {
           0% { transform: translateX(calc(100% + 30px)) scaleX(-1); }
           100% { transform: translateX(-30px) scaleX(-1); }
+        }
+
+        /* Mobile: smaller dolphins & orcas */
+        .sea-creature-dolphin svg { width: 32px; height: 18px; }
+        .sea-creature-orca svg { width: 36px; height: 18px; }
+
+        @media (min-width: 1024px) {
+          .sea-creature-dolphin svg { width: 52px; height: 30px; }
+          .sea-creature-orca svg { width: 60px; height: 30px; }
         }
       `}</style>
     </div>
