@@ -126,7 +126,7 @@ export default function AboutSection() {
             {['highlight1', 'highlight2', 'highlight3'].map((key) => (
               <div key={key} className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-red shrink-0" />
-                <p className="text-navy/60 text-sm">{t(key)}</p>
+                <p className="text-navy/60 text-base sm:text-lg">{t(key)}</p>
               </div>
             ))}
           </div>
