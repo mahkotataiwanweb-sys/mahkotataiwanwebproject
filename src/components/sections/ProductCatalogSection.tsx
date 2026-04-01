@@ -84,7 +84,8 @@ function getProductName(p: ShowcaseProduct, locale: string): string {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Premium Product Popup — Pinterest-inspired                         */
+/* ------------------------------------------------------------------ */
+/*  Product Popup — Ultra Premium (unified with Products page)         */
 /* ------------------------------------------------------------------ */
 function ProductPopup({
   product,
@@ -106,60 +107,84 @@ function ProductPopup({
 
   const categoryMatch = categories.find((c) => c.slug === product.category);
   const categoryLabel = categoryMatch ? getCategoryName(categoryMatch, locale) : product.category;
+  const imageUrl = product.detail_image_url || product.image_url;
+  const hasDetailImage = !!product.detail_image_url;
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
-  }, []);
+    const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handleEsc);
+    return () => { document.body.style.overflow = ''; window.removeEventListener('keydown', handleEsc); };
+  }, [onClose]);
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
       onClick={onClose}
     >
-      {/* Backdrop with deep blur */}
+      {/* Deep cinematic backdrop */}
       <motion.div
-        className="absolute inset-0 bg-navy/60 backdrop-blur-xl"
+        className="absolute inset-0 bg-navy/75 backdrop-blur-2xl"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
+        transition={{ duration: 0.6 }}
       />
 
       {/* Card */}
       <motion.div
-        className="relative bg-cream rounded-[2rem] overflow-hidden max-w-md w-full shadow-[0_40px_100px_rgba(0,0,0,0.3)]"
-        initial={{ scale: 0.8, y: 60, opacity: 0, rotateX: 12 }}
-        animate={{ scale: 1, y: 0, opacity: 1, rotateX: 0 }}
-        exit={{ scale: 0.85, y: 40, opacity: 0 }}
-        transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+        className="relative bg-cream rounded-[2.5rem] overflow-hidden max-w-lg w-full max-h-[90vh] overflow-y-auto overscroll-contain"
+        initial={{ scale: 0.85, y: 80, opacity: 0, filter: 'blur(16px)' }}
+        animate={{ scale: 1, y: 0, opacity: 1, filter: 'blur(0px)' }}
+        exit={{ scale: 0.9, y: 50, opacity: 0, filter: 'blur(8px)' }}
+        transition={{ duration: 1.0, ease: [0.22, 0.68, 0, 1] }}
         onClick={(e) => e.stopPropagation()}
-        style={{ perspective: '1200px' }}
+        style={{
+          boxShadow: '0 50px 120px -20px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06) inset',
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgba(0,48,72,0.12) transparent',
+        }}
       >
-        {/* Close button */}
-        <button
+        {/* Close — frosted glass */}
+        <motion.button
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-white/15 backdrop-blur-md hover:bg-white/30 flex items-center justify-center transition-all duration-300 shadow-lg group"
+          className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full bg-white/12 backdrop-blur-xl hover:bg-white/25 flex items-center justify-center transition-all duration-500 shadow-lg group border border-white/10"
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5, duration: 0.5, ease: 'backOut' }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
         >
-          <X className="w-4 h-4 text-white group-hover:rotate-90 transition-transform duration-300" />
-        </button>
+          <X className="w-4 h-4 text-white group-hover:rotate-90 transition-transform duration-500" />
+        </motion.button>
 
-        {/* Image area — full bleed, dramatic */}
-        <div className={`relative aspect-square overflow-hidden ${product.detail_image_url ? 'bg-[#0a1628]' : 'bg-gradient-to-br from-cream-dark to-cream'}`}>
-          {(product.detail_image_url || product.image_url) ? (
+        {/* Image area */}
+        <div className={`relative aspect-square overflow-hidden ${hasDetailImage ? 'bg-[#0a1628]' : 'bg-gradient-to-br from-cream-dark/50 to-cream'}`}>
+          {imageUrl ? (
             <>
-              <Image
-                src={product.detail_image_url || product.image_url || ''}
-                alt={name}
-                fill
-                className={`${product.detail_image_url ? 'object-contain p-6' : 'object-contain p-10'}`}
-                sizes="(max-width: 448px) 100vw, 448px"
-                unoptimized
-              />
+              <motion.div
+                className="relative w-full h-full"
+                initial={{ scale: 1.08, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 1.2, ease: [0.22, 0.68, 0, 1] }}
+              >
+                <Image
+                  src={imageUrl}
+                  alt={name}
+                  fill
+                  className={hasDetailImage ? 'object-contain p-6' : 'object-contain p-4'}
+                  sizes="(max-width: 512px) 100vw, 512px"
+                  unoptimized
+                />
+              </motion.div>
               {/* Subtle vignette */}
-              <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.2)] pointer-events-none" />
+              <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.12)] pointer-events-none" />
+              {/* Bottom fade to cream */}
+              <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-cream via-cream/80 to-transparent" />
             </>
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -167,46 +192,42 @@ function ProductPopup({
             </div>
           )}
 
-          {/* Bottom gradient fade */}
-          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-cream via-cream/80 to-transparent" />
-
-          {/* Category pill on image */}
+          {/* Category pill — frosted glass */}
           <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="absolute top-5 left-5 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.15em] uppercase text-white/90 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10"
+            initial={{ opacity: 0, y: 12, filter: 'blur(8px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ delay: 0.35, duration: 0.6 }}
+            className="absolute top-5 left-5 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.18em] uppercase text-white/90 bg-white/10 backdrop-blur-xl px-4 py-2 rounded-full border border-white/10 shadow-lg"
           >
-            {categoryMatch && <CategoryIcon slug={categoryMatch.slug} size={12} className="opacity-80" />}
             {categoryLabel}
           </motion.span>
         </div>
 
         {/* Content */}
-        <div className="relative -mt-10 px-7 pb-8">
+        <div className="relative -mt-10 px-8 sm:px-10 pb-10">
           <motion.h3
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.5 }}
-            className="font-heading text-2xl sm:text-3xl font-bold text-navy mb-3 leading-tight"
+            initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ delay: 0.25, duration: 0.8, ease: [0.22, 0.68, 0, 1] }}
+            className="font-heading text-2xl sm:text-3xl font-bold text-navy mb-4 leading-tight"
           >
             {name}
           </motion.h3>
 
           <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ delay: 0.25, duration: 0.4 }}
-            className="w-12 h-[2px] bg-gradient-to-r from-red to-red/20 mb-4 origin-left rounded-full"
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 0.68, 0, 1] }}
+            className="w-14 h-[2px] bg-gradient-to-r from-red to-red/20 mb-5 origin-left rounded-full"
           />
 
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className="text-navy/55 text-sm leading-relaxed font-body"
+            initial={{ opacity: 0, y: 15, filter: 'blur(6px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ delay: 0.5, duration: 0.7, ease: [0.22, 0.68, 0, 1] }}
+            className="text-navy/55 text-sm sm:text-base leading-[1.85] whitespace-pre-line"
           >
-            {getDesc()}
+            {getDesc() || 'Premium quality Indonesian product, crafted with authentic recipes and the finest ingredients.'}
           </motion.p>
         </div>
       </motion.div>
