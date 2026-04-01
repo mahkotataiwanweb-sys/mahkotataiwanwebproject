@@ -307,13 +307,14 @@ export default function AboutPage() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         headerRef.current!.children,
-        { opacity: 0, y: 40, filter: 'blur(10px)' },
+        { opacity: 0, y: 60, filter: 'blur(16px)', scale: 0.92 },
         {
           opacity: 1,
           y: 0,
           filter: 'blur(0px)',
-          duration: 0.8,
-          stagger: 0.12,
+          scale: 1,
+          duration: 1.4,
+          stagger: 0.2,
           ease: 'power3.out',
         }
       );
@@ -324,17 +325,19 @@ export default function AboutPage() {
   // GSAP scroll-triggered animations
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Description section blur-deblur
+      // Description section — premium dramatic reveal
       if (textRef.current) {
+        const textChildren = textRef.current.children;
         gsap.fromTo(
-          textRef.current.children,
-          { opacity: 0, y: 40, filter: 'blur(8px)' },
+          textChildren,
+          { opacity: 0, y: 60, filter: 'blur(14px)', scale: 0.95 },
           {
             opacity: 1,
             y: 0,
             filter: 'blur(0px)',
-            duration: 0.8,
-            stagger: 0.15,
+            scale: 1,
+            duration: 1.6,
+            stagger: 0.35,
             ease: 'power3.out',
             scrollTrigger: {
               trigger: textRef.current,
@@ -345,14 +348,15 @@ export default function AboutPage() {
         );
       }
 
-      // Red decorative line draw on scroll
+      // Red decorative line draw on scroll — dramatic
       if (redLineRef.current) {
         gsap.fromTo(
           redLineRef.current,
-          { scaleX: 0 },
+          { scaleX: 0, opacity: 0 },
           {
             scaleX: 1,
-            duration: 1,
+            opacity: 1,
+            duration: 2.0,
             ease: 'power2.inOut',
             scrollTrigger: {
               trigger: redLineRef.current,
@@ -564,16 +568,17 @@ export default function AboutPage() {
         }
       }
 
-      // Partners section fade-in
+      // Partners section — dramatic fade-in
       if (partnersRef.current) {
         gsap.fromTo(
           partnersRef.current,
-          { opacity: 0, y: 40, filter: 'blur(6px)' },
+          { opacity: 0, y: 60, filter: 'blur(12px)', scale: 0.95 },
           {
             opacity: 1,
             y: 0,
             filter: 'blur(0px)',
-            duration: 0.8,
+            scale: 1,
+            duration: 1.6,
             ease: 'power3.out',
             scrollTrigger: {
               trigger: partnersRef.current,
@@ -602,7 +607,7 @@ export default function AboutPage() {
         );
       }
 
-      // Timeline dot markers scale in
+      // Timeline dot markers scale in — dramatic
       dotRefs.current.forEach((dot, i) => {
         if (!dot) return;
         gsap.fromTo(
@@ -611,8 +616,8 @@ export default function AboutPage() {
           {
             scale: 1,
             opacity: 1,
-            duration: 0.4,
-            ease: 'back.out(2)',
+            duration: 1.8,
+            ease: 'elastic.out(1, 0.4)',
             scrollTrigger: {
               trigger: dot,
               start: 'top 80%',
@@ -622,19 +627,21 @@ export default function AboutPage() {
         );
       });
 
-      // Story chapters stagger from alternating sides
+      // Story chapters stagger from alternating sides — dramatic
       if (storyRef.current) {
         const chapters = storyRef.current.querySelectorAll('.story-chapter');
         chapters.forEach((chapter, i) => {
           const fromLeft = i % 2 === 0;
           gsap.fromTo(
             chapter,
-            { opacity: 0, x: fromLeft ? -40 : 40, filter: 'blur(6px)' },
+            { opacity: 0, x: fromLeft ? -80 : 80, y: 30, filter: 'blur(12px)', scale: 0.92 },
             {
               opacity: 1,
               x: 0,
+              y: 0,
               filter: 'blur(0px)',
-              duration: 0.8,
+              scale: 1,
+              duration: 2.2,
               ease: 'power3.out',
               scrollTrigger: {
                 trigger: chapter,
@@ -817,10 +824,10 @@ export default function AboutPage() {
         <div ref={valuesRef} className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <motion.div
-              initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              initial={{ opacity: 0, y: 50, filter: 'blur(16px)', scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
             >
               <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">What We Stand For</p>
               <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">Our Values</h2>
@@ -874,10 +881,10 @@ export default function AboutPage() {
         <div ref={partnersRef} className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <motion.div
-              initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              initial={{ opacity: 0, y: 50, filter: 'blur(16px)', scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
             >
               <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Collaboration</p>
               <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">Trusted Partners</h2>
@@ -973,10 +980,10 @@ export default function AboutPage() {
           {/* Header */}
           <div className="text-center mb-14">
             <motion.div
-              initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              initial={{ opacity: 0, y: 50, filter: 'blur(16px)', scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
             >
               <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Our Story</p>
               <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">The Journey So Far</h2>
