@@ -522,31 +522,40 @@ export default function StoreMap({ stores }: StoreMapProps) {
 
     mapRef.current = map;
 
-    /* Base tile layer for surrounding areas (light, clean style) */
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    /* Layer 1: Base tile — no labels, just land shapes for surrounding areas */
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap © CARTO',
     }).addTo(map);
 
-    /* Taiwan GeoJSON overlay on top — peach/salmon illustrated style */
+    /* Layer 2: Taiwan GeoJSON overlay — peach/salmon illustrated style */
     fetch('/taiwan.geo.json')
       .then((res) => res.json())
       .then((geojsonData) => {
         const geoLayer = L.geoJSON(geojsonData, {
           style: () => ({
             fillColor: '#F5CBA7',
-            fillOpacity: 0.85,
+            fillOpacity: 0.7,
             color: '#FFFFFF',
-            weight: 2.5,
-            opacity: 0.9,
+            weight: 2,
+            opacity: 0.85,
           }),
           interactive: false,
         });
         geoLayer.addTo(map);
         geoJsonLayerRef.current = geoLayer;
+
+        /* Layer 3: Labels-only tile on top — city names, roads, places visible */
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+          maxZoom: 19,
+          pane: 'overlayPane',
+        }).addTo(map);
       })
       .catch(() => {
-        /* GeoJSON failed — tile layer already loaded so map still works */
+        /* GeoJSON failed — fallback to full tile layer with labels */
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          maxZoom: 19,
+        }).addTo(map);
       });
 
     return () => { map.remove(); mapRef.current = null; };
