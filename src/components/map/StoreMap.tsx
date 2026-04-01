@@ -17,7 +17,40 @@ function injectPinStyles() {
   style.textContent = `
     /* ── Clean map: full-opacity tiles + blue ocean GeoJSON overlay ── */
     .illustrated-map.leaflet-container {
-      background: #F5F5F3 !important;
+      background: #4A9FD9 !important;
+    }
+
+    /* ── ANTI-FLICKER: keep old tiles visible until new zoom tiles fully load ── */
+    .illustrated-map .leaflet-tile-pane {
+      will-change: transform;
+    }
+    .illustrated-map .leaflet-tile-container {
+      will-change: transform;
+      /* Keep ALL tile containers visible — old zoom tiles stay until new ones replace */
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .illustrated-map .leaflet-tile {
+      /* No fade animation — tiles appear instantly when loaded, no pop-in */
+      transition: none !important;
+      will-change: transform;
+      image-rendering: auto;
+      backface-visibility: hidden;
+    }
+    /* Smooth zoom animation without tile flash */
+    .illustrated-map .leaflet-zoom-anim .leaflet-tile-pane {
+      transition: none !important;
+    }
+    .illustrated-map .leaflet-fade-anim .leaflet-tile-container {
+      transition: none !important;
+    }
+    /* Prevent white/gray flash between zoom levels */
+    .illustrated-map .leaflet-tile-loaded {
+      opacity: 1 !important;
+    }
+    /* Prevent blank tile flash */
+    .illustrated-map .leaflet-tile:not(.leaflet-tile-loaded) {
+      opacity: 0 !important;
     }
 
     /* Smooth premium bounce for store pins */
@@ -892,6 +925,9 @@ export default function StoreMap({ stores }: StoreMapProps) {
       maxBounds: L.latLngBounds([21.5, 119.0], [26.0, 122.5]),
       maxBoundsViscosity: 0.9,
       minZoom: 7,
+      fadeAnimation: false,         /* Prevent tile pop-in fade — instant render */
+      zoomAnimation: true,          /* Keep smooth zoom transition */
+      zoomSnap: 1,                  /* Snap to integer zooms for cleaner tile transitions */
     });
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -1030,14 +1066,42 @@ export default function StoreMap({ stores }: StoreMapProps) {
     /* ── Layer 1: Voyager base tiles at FULL opacity — all land details visible ── */
     const baseTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
+      maxNativeZoom: 18,           /* CARTO native max — prevents 404s above 18 */
       attribution: '© OpenStreetMap © CARTO',
-      keepBuffer: 10,              /* cache 10 tile-widths around viewport */
+      keepBuffer: 25,              /* aggressive cache: 25 tile-widths around viewport */
       updateWhenZooming: false,     /* don't flash tiles mid-zoom animation */
       updateWhenIdle: true,         /* only load tiles after movement stops */
+      crossOrigin: true,           /* enable browser disk cache */
     }).addTo(map);
 
-    /* Signal map is ready once initial tiles are loaded */
-    baseTiles.once('load', () => setMapReady(true));
+    /* Preload tiles for adjacent zoom levels on initial load */
+    baseTiles.once('load', () => {
+      setMapReady(true);
+      /* Prefetch zoom 7, 8, 9, 10 tiles by briefly visiting them */
+      const currentZoom = map.getZoom();
+      [7, 8, 9, 10].forEach((z) => {
+        if (z !== currentZoom) {
+          const bounds = map.getBounds();
+          const tileUrl = 'https://a.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png';
+          /* Preload center tile for each zoom to warm browser cache */
+          const center = bounds.getCenter();
+          const x = Math.floor((center.lng + 180) / 360 * Math.pow(2, z));
+          const y = Math.floor((1 - Math.log(Math.tan(center.lat * Math.PI / 180) + 1 / Math.cos(center.lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, z));
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.src = tileUrl.replace('{z}', String(z)).replace('{x}', String(x)).replace('{y}', String(y));
+          /* Also preload surrounding tiles */
+          for (let dx = -2; dx <= 2; dx++) {
+            for (let dy = -2; dy <= 2; dy++) {
+              if (dx === 0 && dy === 0) continue;
+              const pi = new Image();
+              pi.crossOrigin = 'anonymous';
+              pi.src = tileUrl.replace('{z}', String(z)).replace('{x}', String(x + dx)).replace('{y}', String(y + dy));
+            }
+          }
+        }
+      });
+    });
     /* Fallback in case 'load' doesn't fire (e.g. tiles cached) */
     setTimeout(() => setMapReady(true), 2500);
 
@@ -1083,18 +1147,22 @@ export default function StoreMap({ stores }: StoreMapProps) {
         /* ── Layer 4: Labels on top — city names, roads, districts clearly visible ── */
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
           maxZoom: 19,
+          maxNativeZoom: 18,
           pane: 'labelsPane',
-          keepBuffer: 10,
+          keepBuffer: 25,
           updateWhenZooming: false,
           updateWhenIdle: true,
+          crossOrigin: true,
         }).addTo(map);
       })
       .catch(() => {
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
           maxZoom: 19,
-          keepBuffer: 10,
+          maxNativeZoom: 18,
+          keepBuffer: 25,
           updateWhenZooming: false,
           updateWhenIdle: true,
+          crossOrigin: true,
         }).addTo(map);
       });
 
