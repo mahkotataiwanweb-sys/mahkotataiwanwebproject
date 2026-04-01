@@ -52,9 +52,6 @@ const CITIES = [
   'Yilan',
   'Hualien',
   'Taitung',
-  'Penghu',
-  'Kinmen',
-  'Lienchiang',
 ];
 
 interface StoreMapProps {
@@ -94,6 +91,9 @@ export default function StoreMap({ stores }: StoreMapProps) {
       zoomControl: false,
       scrollWheelZoom: true,
       attributionControl: false,
+      maxBounds: L.latLngBounds([21.5, 119.0], [26.0, 122.5]),
+      maxBoundsViscosity: 0.9,
+      minZoom: 7,
     });
 
     // CartoDB Voyager — bright, colorful, fun & premium
