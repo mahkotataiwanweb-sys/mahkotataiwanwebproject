@@ -959,16 +959,18 @@ export default function StoreMap({ stores }: StoreMapProps) {
         }
       }, { passive: true });
 
-      /* Only show "two fingers" overlay when user actually SWIPES with one finger */
+      /* Only show "two fingers" overlay ONCE when user first swipes with one finger */
+      let dragOverlayShown = false;
       container.addEventListener('touchmove', (e) => {
-        if (touchCount === 1 && e.touches.length === 1) {
+        if (!dragOverlayShown && touchCount === 1 && e.touches.length === 1) {
+          dragOverlayShown = true;
           dragOverlay.style.display = 'flex';
           dragOverlay.style.opacity = '1';
           clearTimeout(hideTimeout);
           hideTimeout = setTimeout(() => {
             dragOverlay.style.opacity = '0';
             setTimeout(() => { dragOverlay.style.display = 'none'; }, 300);
-          }, 1200);
+          }, 1800);
         }
       }, { passive: true });
 
@@ -1114,7 +1116,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
             setTimeout(() => {
               overlay.style.opacity = '0';
               setTimeout(() => { overlay.style.display = 'none'; }, 300);
-            }, 2500);
+            }, 1800);
           }
         });
         marker.addTo(map);
