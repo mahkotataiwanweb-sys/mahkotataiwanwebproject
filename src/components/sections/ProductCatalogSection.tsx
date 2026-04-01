@@ -535,6 +535,7 @@ export default function ProductCatalogSection() {
   const locale = useLocale();
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -596,6 +597,32 @@ export default function ProductCatalogSection() {
     return () => ctx.revert();
   }, []);
 
+  /* GSAP header reveal animation */
+  useEffect(() => {
+    if (!headerRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        headerRef.current!.children,
+        { opacity: 0, y: 50, filter: 'blur(14px)', scale: 0.92 },
+        {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          scale: 1,
+          duration: 1.6,
+          stagger: 0.2,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
+
   const selectedCat = categories.find((c) => c.slug === selectedCategory);
   const selectedLabel = selectedCat ? getCategoryName(selectedCat, locale) : '';
 
@@ -611,7 +638,7 @@ export default function ProductCatalogSection() {
 
         <div ref={contentRef} className="relative z-10">
           {/* Section Heading */}
-          <div className="text-center mb-6 sm:mb-8 px-4">
+          <div ref={headerRef} className="text-center mb-6 sm:mb-8 px-4">
             <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-navy mb-2 drop-shadow-sm">
               {locale === 'id' ? 'Produk Kami' : locale === 'zh-TW' ? '我們的產品' : 'Our Products'}
             </h2>

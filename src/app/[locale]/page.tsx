@@ -78,32 +78,51 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
 
   useImperativeHandle(ref, () => ({
     triggerFlip: () => new Promise<void>((resolve) => {
-      if (count <= 1 || !cardRef.current || flippingRef.current) { resolve(); return; }
+      // Guard 1: Not enough content to flip
+      if (count <= 1) { resolve(); return; }
+      // Guard 2: No DOM element
+      if (!cardRef.current) { resolve(); return; }
+      // Guard 3: Already mid-flip — wait for it to finish, don't skip
+      if (flippingRef.current) {
+        // Poll until the current flip finishes, then resolve (don't start new flip)
+        const checkDone = setInterval(() => {
+          if (!flippingRef.current) { clearInterval(checkDone); resolve(); }
+        }, 50);
+        // Safety timeout — resolve after 3s max
+        setTimeout(() => { clearInterval(checkDone); resolve(); }, 3000);
+        return;
+      }
+
       const el = cardRef.current;
       flippingRef.current = true;
+
       // Kill any lingering tweens to prevent stacking
       gsap.killTweensOf(el);
+
       const nextIdx = (indexRef.current + 1) % count;
-      // Phase 1: flip out
+
+      // Phase 1: flip out (0.6s)
       gsap.to(el, {
         rotateY: 90,
         opacity: 0,
         scale: 0.97,
         duration: 0.6,
         ease: 'power2.in',
-        overwrite: true,
+        overwrite: 'auto',
         onComplete: () => {
+          if (!cardRef.current) { flippingRef.current = false; resolve(); return; }
           indexRef.current = nextIdx;
           setDisplayIndex(nextIdx);
           gsap.set(el, { rotateY: -90, scale: 0.97 });
-          // Phase 2: flip in
+
+          // Phase 2: flip in (0.8s)
           gsap.to(el, {
             rotateY: 0,
             opacity: 1,
             scale: 1,
             duration: 0.8,
             ease: 'power2.out',
-            overwrite: true,
+            overwrite: 'auto',
             onComplete: () => {
               flippingRef.current = false;
               resolve();
@@ -224,27 +243,48 @@ export default function HomePage() {
     let cancelled = false;
     let topEntered = false;
     let bottomEntered = false;
+    let sequencerRunning = false; // ← CRITICAL: prevents double sequencer
+
+    const wait = (ms: number) => new Promise<void>(r => {
+      const id = setTimeout(r, ms);
+      // Store for cleanup if needed
+      return () => clearTimeout(id);
+    });
 
     const sequencer = async () => {
+      if (sequencerRunning) return; // ← Guard: only ONE sequencer can run
+      sequencerRunning = true;
+
       while (!cancelled) {
         /* HOLD — let user read the current cards for 4 seconds */
-        await new Promise(r => setTimeout(r, 4000));
+        await wait(4000);
         if (cancelled) break;
-        /* Flip top card first */
-        await topCardRef.current?.triggerFlip();
+
+        /* Flip top card first — await completion */
+        if (topCardRef.current) {
+          await topCardRef.current.triggerFlip();
+        }
         if (cancelled) break;
+
         /* Pause 0.3s then flip bottom card */
-        await new Promise(r => setTimeout(r, 300));
+        await wait(300);
         if (cancelled) break;
-        await bottomCardRef.current?.triggerFlip();
+
+        /* Flip bottom card — await completion */
+        if (bottomCardRef.current) {
+          await bottomCardRef.current.triggerFlip();
+        }
         if (cancelled) break;
-        /* Small settle buffer before next cycle */
-        await new Promise(r => setTimeout(r, 500));
+
+        /* Settle buffer before next cycle */
+        await wait(500);
       }
+
+      sequencerRunning = false;
     };
 
     const tryStartSequencer = () => {
-      if (topEntered && bottomEntered && !cancelled) sequencer();
+      if (topEntered && bottomEntered && !cancelled && !sequencerRunning) sequencer();
     };
 
     /* Each card has its own scroll trigger for entrance */

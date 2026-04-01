@@ -200,6 +200,7 @@ function VideoProgressBar({
 export default function VideoShowcaseSection() {
   const locale = useLocale();
   const sectionRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
   const playerContainerRef = useRef<HTMLDivElement>(null);
   const ytPlayerRef = useRef<YTPlayer | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -353,6 +354,32 @@ export default function VideoShowcaseSection() {
     return () => ctx.revert();
   }, []);
 
+  /* ---------- GSAP header reveal ---------- */
+  useEffect(() => {
+    if (!headerRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        headerRef.current!.children,
+        { opacity: 0, y: 50, filter: 'blur(14px)', scale: 0.92 },
+        {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          scale: 1,
+          duration: 1.6,
+          stagger: 0.2,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
+
   /* ---------- Controls ---------- */
   const handlePlayPause = useCallback(() => {
     const p = ytPlayerRef.current;
@@ -406,7 +433,7 @@ export default function VideoShowcaseSection() {
     <section ref={sectionRef} className="bg-navy py-20 md:py-28 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div ref={headerRef} className="text-center mb-12">
           <span className="inline-block text-red/80 text-sm font-semibold tracking-widest uppercase mb-3">
             Featured
           </span>
