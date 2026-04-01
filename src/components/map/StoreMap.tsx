@@ -344,7 +344,7 @@ function DecorativeElements() {
   );
 }
 
-/* ─── World-Class Premium Dropdown Component ─── */
+/* ─── Premium Dropdown — Clean & Smart ─── */
 function PremiumDropdown({
   value,
   options,
@@ -356,8 +356,8 @@ function PremiumDropdown({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   /* Close on outside click */
@@ -374,39 +374,38 @@ function PremiumDropdown({
   const openDropdown = () => {
     setIsOpen(true);
     requestAnimationFrame(() => {
-      /* Panel entrance — spring physics with overshoot */
+      /* Smooth panel entrance */
       if (panelRef.current) {
-        gsap.fromTo(
-          panelRef.current,
-          { opacity: 0, y: 14, scaleY: 0.8, scaleX: 0.96, filter: 'blur(8px)' },
-          {
-            opacity: 1, y: 0, scaleY: 1, scaleX: 1, filter: 'blur(0px)',
-            duration: 0.55, ease: 'back.out(1.7)',
-          }
+        gsap.fromTo(panelRef.current,
+          { opacity: 0, y: 6, scale: 0.98 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: 'power3.out' }
         );
       }
-      /* Stagger items with spring cascade */
+      /* Subtle item stagger */
       itemRefs.current.forEach((el, i) => {
         if (el) {
-          gsap.fromTo(
-            el,
-            { opacity: 0, x: -16, scale: 0.95, filter: 'blur(3px)' },
-            {
-              opacity: 1, x: 0, scale: 1, filter: 'blur(0px)',
-              duration: 0.4, delay: 0.08 + i * 0.03,
-              ease: 'back.out(1.4)',
-            }
+          gsap.fromTo(el,
+            { opacity: 0, x: -6 },
+            { opacity: 1, x: 0, duration: 0.3, delay: 0.04 + i * 0.018, ease: 'power2.out' }
           );
         }
       });
+      /* Auto-scroll to active item */
+      setTimeout(() => {
+        const activeIdx = options.indexOf(value);
+        const activeEl = itemRefs.current[activeIdx];
+        if (activeEl && listRef.current && activeIdx > 4) {
+          activeEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+      }, 180);
     });
   };
 
   const closeDropdown = () => {
     if (panelRef.current) {
       gsap.to(panelRef.current, {
-        opacity: 0, y: 10, scaleY: 0.88, filter: 'blur(6px)',
-        duration: 0.28, ease: 'power3.in',
+        opacity: 0, y: 4, scale: 0.98,
+        duration: 0.22, ease: 'power2.in',
         onComplete: () => setIsOpen(false),
       });
     } else {
@@ -415,172 +414,114 @@ function PremiumDropdown({
   };
 
   const handleSelect = (city: string) => {
-    /* Micro-animation on selected item */
-    const idx = options.indexOf(city);
-    const el = itemRefs.current[idx];
-    if (el) {
-      gsap.fromTo(el, { scale: 0.96 }, { scale: 1, duration: 0.25, ease: 'back.out(3)' });
-    }
     onChange(city);
-    setTimeout(() => closeDropdown(), 120);
+    setTimeout(() => closeDropdown(), 60);
   };
+
+  const displayValue = value === 'All' ? 'All Cities' : value;
 
   return (
     <div ref={dropdownRef} className="relative" style={{ zIndex: 1002 }}>
-      {/* ═══ Trigger Button — Blue Glass ═══ */}
+      {/* ── Trigger ── */}
       <button
         onClick={() => (isOpen ? closeDropdown() : openDropdown())}
-        className="premium-dropdown-trigger flex items-center gap-3 pl-4 pr-5 py-3.5 min-w-[230px] sm:min-w-[280px] rounded-2xl text-sm border shadow-[0_8px_32px_rgba(0,30,60,0.25)] hover:shadow-[0_16px_48px_rgba(0,30,60,0.35)]"
+        className="flex items-center gap-3 px-5 py-3 min-w-[240px] sm:min-w-[280px] rounded-2xl text-[13px] font-medium border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
         style={{
-          background: isOpen
-            ? 'linear-gradient(135deg, rgba(0,48,72,0.88) 0%, rgba(0,30,55,0.92) 100%)'
-            : 'linear-gradient(135deg, rgba(0,48,72,0.82) 0%, rgba(0,35,60,0.86) 100%)',
-          borderColor: isOpen ? 'rgba(250,237,211,0.25)' : 'rgba(250,237,211,0.12)',
-          backdropFilter: 'blur(24px)',
+          background: 'rgba(0,48,72,0.88)',
+          borderColor: isOpen ? 'rgba(250,237,211,0.18)' : 'rgba(250,237,211,0.07)',
+          backdropFilter: 'blur(20px)',
+          boxShadow: isOpen
+            ? '0 16px 48px rgba(0,25,45,0.3)'
+            : '0 4px 16px rgba(0,25,45,0.12)',
+          color: '#FAEDD3',
         }}
       >
-        {/* Animated dot indicator */}
-        <span className="relative flex h-2.5 w-2.5 shrink-0">
-          <span
-            className="absolute inset-0 rounded-full bg-red"
-            style={{ animation: 'dotBreathe 2.5s ease-in-out infinite' }}
-          />
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red" />
-        </span>
-
-        <span className="flex-1 text-left font-semibold truncate tracking-tight text-[13px]" style={{ color: '#FAEDD3' }}>
-          {value === 'All' ? '🗺️  All Cities' : `📍 ${value}`}
-        </span>
-
-        {/* Animated chevron */}
-        <div
-          className="ml-1 p-1.5 rounded-xl transition-all duration-500"
+        <span
+          className="w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-500"
           style={{
-            background: isOpen ? 'rgba(250,237,211,0.1)' : 'transparent',
-            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            background: '#C12126',
+            boxShadow: isOpen ? '0 0 8px rgba(193,33,38,0.5)' : 'none',
           }}
-        >
-          <ChevronDown className="w-4 h-4 transition-colors duration-300" style={{ color: isOpen ? '#FAEDD3' : 'rgba(250,237,211,0.5)' }} />
-        </div>
-
-        {/* Bottom aurora accent line */}
-        <div
-          className="absolute bottom-0 left-4 right-4 h-[2px] rounded-full"
+        />
+        <span className="flex-1 text-left truncate tracking-tight">{displayValue}</span>
+        <ChevronDown
+          className="w-3.5 h-3.5 transition-all duration-400"
           style={{
-            background: isOpen
-              ? 'linear-gradient(90deg, #C12126, #FAEDD3, #C12126)'
-              : 'linear-gradient(90deg, transparent, rgba(250,237,211,0.2), transparent)',
-            backgroundSize: '200% 100%',
-            animation: isOpen ? 'auroraShift 3s ease infinite' : 'none',
-            transition: 'all 0.4s ease',
+            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            opacity: 0.4,
           }}
         />
       </button>
 
-      {/* ═══ Dropdown Panel ═══ */}
+      {/* ── Panel ── */}
       {isOpen && (
         <div
           ref={panelRef}
-          className="absolute top-full mt-3 left-0 w-full min-w-[230px] sm:min-w-[280px] rounded-2xl z-[1003] overflow-hidden"
+          className="absolute top-full mt-2 left-0 w-full min-w-[240px] sm:min-w-[280px] rounded-2xl overflow-hidden"
           style={{
-            background: 'linear-gradient(180deg, rgba(0,48,72,0.92) 0%, rgba(0,30,50,0.95) 100%)',
-            border: '1px solid rgba(250,237,211,0.15)',
-            boxShadow: '0 25px 80px rgba(0,20,40,0.4), 0 10px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(250,237,211,0.08)',
-            backdropFilter: 'blur(28px)',
+            background: 'rgba(0,38,58,0.94)',
+            border: '1px solid rgba(250,237,211,0.08)',
+            boxShadow: '0 24px 64px rgba(0,15,30,0.35)',
+            backdropFilter: 'blur(24px)',
             transformOrigin: 'top center',
           }}
         >
-          {/* Top decorative gradient bar */}
-          <div
-            className="h-[3px] mx-0 rounded-none"
-            style={{
-              background: 'linear-gradient(90deg, #C12126, #FAEDD3, #C12126)',
-              backgroundSize: '200% 100%',
-              animation: 'auroraShift 4s ease infinite',
-            }}
-          />
+          {/* Thin top accent */}
+          <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(193,33,38,0.3), transparent)' }} />
 
-          {/* Header label */}
-          <div className="px-4 pt-3 pb-2 flex items-center gap-2">
-            <div className="w-1 h-4 rounded-full bg-gradient-to-b from-red to-red/40" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'rgba(250,237,211,0.4)' }}>Select City</span>
-          </div>
-
-          <div ref={listRef} className="premium-dropdown-list overflow-y-auto max-h-[300px] px-2 pb-2">
+          <div ref={listRef} className="premium-dropdown-list overflow-y-auto max-h-[320px] py-1.5 px-1.5">
             {options.map((city, i) => {
               const isActive = value === city;
+              const label = city === 'All' ? 'All Cities' : city;
               return (
                 <button
                   key={city}
                   ref={(el) => { itemRefs.current[i] = el; }}
                   onClick={() => handleSelect(city)}
-                  className={`dropdown-item-hover relative w-full text-left px-4 py-2.5 rounded-xl text-[13px] flex items-center gap-3 my-[3px] transition-all duration-300 ${
-                    isActive ? '' : 'hover:pl-5'
-                  }`}
+                  className="relative w-full text-left px-4 py-2.5 rounded-xl text-[13px] flex items-center gap-3 transition-all duration-300 my-px"
                   style={{
-                    background: isActive
-                      ? 'linear-gradient(135deg, rgba(193,33,38,0.2) 0%, rgba(193,33,38,0.08) 100%)'
-                      : 'transparent',
+                    background: isActive ? 'rgba(193,33,38,0.1)' : 'transparent',
+                    color: isActive ? 'rgba(255,180,180,0.95)' : 'rgba(250,237,211,0.4)',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = 'rgba(250,237,211,0.05)';
+                      e.currentTarget.style.color = 'rgba(250,237,211,0.85)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.color = 'rgba(250,237,211,0.4)';
+                    }
                   }}
                 >
-                  {/* Animated active indicator bar */}
+                  {/* Active indicator */}
                   {isActive && (
-                    <div
-                      className="absolute left-[5px] top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full"
-                      style={{
-                        background: 'linear-gradient(180deg, #C12126, #FF6B6B)',
-                        animation: 'accentPulse 2s ease-in-out infinite',
-                      }}
-                    />
+                    <div className="absolute left-[6px] top-1/2 -translate-y-1/2 w-[2px] h-4 rounded-full bg-red" />
                   )}
-
-                  {/* City indicator */}
-                  <span className={`text-xs shrink-0 transition-transform duration-300 ${!isActive ? 'group-hover:scale-110' : ''}`}>
-                    {city === 'All' ? '🌏' : isActive ? '📍' : (
-                      <span className="inline-block w-[6px] h-[6px] rounded-full border-[1.5px]" style={{ borderColor: 'rgba(250,237,211,0.25)' }} />
-                    )}
-                  </span>
-
                   <span
-                    className="flex-1 truncate transition-all duration-300 font-medium"
-                    style={{
-                      color: isActive ? '#FF6B6B' : 'rgba(250,237,211,0.55)',
-                      fontWeight: isActive ? 700 : 500,
-                      letterSpacing: isActive ? '-0.01em' : 'normal',
-                    }}
-                    onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.color = 'rgba(250,237,211,0.9)'; }}
-                    onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.color = 'rgba(250,237,211,0.55)'; }}
+                    className="flex-1 truncate"
+                    style={{ fontWeight: isActive ? 600 : 400, letterSpacing: '-0.01em' }}
                   >
-                    {city === 'All' ? 'All Cities' : city}
+                    {label}
                   </span>
-
-                  {/* Arrow hint on hover for non-active */}
-                  {!isActive && (
-                    <span className="transition-all duration-300 text-[10px]" style={{ color: 'rgba(250,237,211,0)' }}
-                      onMouseEnter={(e) => e.currentTarget.style.color = 'rgba(250,237,211,0.3)'}
-                      onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(250,237,211,0)'}
-                    >→</span>
-                  )}
-
-                  {/* Active checkmark */}
                   {isActive && (
-                    <span className="text-[10px] font-bold" style={{ color: '#FF6B6B' }}>✓</span>
+                    <span className="text-[9px] opacity-50">\u2713</span>
                   )}
                 </button>
               );
             })}
           </div>
 
-          {/* Bottom decorative bar */}
-          <div
-            className="h-[2px] mx-0"
-            style={{ background: 'linear-gradient(90deg, transparent, rgba(250,237,211,0.06), transparent)' }}
-          />
+          {/* Thin bottom line */}
+          <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(250,237,211,0.04), transparent)' }} />
         </div>
       )}
     </div>
   );
 }
+
 
 export default function StoreMap({ stores }: StoreMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -783,61 +724,49 @@ export default function StoreMap({ stores }: StoreMapProps) {
 
         <div className="flex-1" />
 
-        {/* ═══ Back to All — Premium Navy Pill ═══ */}
+        {/* Back to All */}
         {filterCity !== 'All' && (
           <button
             onClick={handleBackToAll}
-            className="premium-btn group flex items-center gap-2.5 px-5 py-3 rounded-2xl text-[11px] font-bold tracking-widest uppercase whitespace-nowrap border-2 shadow-[0_8px_32px_rgba(0,48,72,0.12)] hover:shadow-[0_16px_48px_rgba(0,48,72,0.2)]"
+            className="group flex items-center gap-2 px-4 py-2.5 rounded-xl text-[12px] font-medium whitespace-nowrap transition-all duration-400 ease-out hover:-translate-y-0.5"
             style={{
-              background: 'linear-gradient(135deg, #003048 0%, #004a6e 100%)',
-              borderColor: 'rgba(250,237,211,0.12)',
-              color: '#FAEDD3',
+              background: 'rgba(0,48,72,0.88)',
+              color: 'rgba(250,237,211,0.85)',
+              backdropFilter: 'blur(16px)',
+              boxShadow: '0 4px 16px rgba(0,25,45,0.12)',
             }}
           >
-            <span className="inline-block transition-transform duration-300 group-hover:-translate-x-1 text-sm">←</span>
+            <span className="inline-block transition-transform duration-300 group-hover:-translate-x-0.5 text-sm opacity-60">←</span>
             <span>All Cities</span>
-            {/* Shimmer overlay */}
-            <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cream/[0.06] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-[1s]" />
-            </div>
           </button>
         )}
 
-        {/* ═══ Reset — Glass Circle ═══ */}
+        {/* Reset */}
         <button
           onClick={handleResetView}
-          className="premium-btn group flex items-center justify-center w-11 h-11 rounded-2xl border-2 shadow-[0_8px_28px_rgba(0,48,72,0.08)] hover:shadow-[0_12px_40px_rgba(0,48,72,0.14)]"
+          className="group flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-400 ease-out hover:-translate-y-0.5"
           title="Reset view"
           style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(250,237,211,0.35) 100%)',
-            borderColor: 'rgba(0,48,72,0.06)',
+            background: 'rgba(255,255,255,0.92)',
+            boxShadow: '0 2px 8px rgba(0,48,72,0.06)',
             backdropFilter: 'blur(12px)',
           }}
         >
-          <Locate className="w-4 h-4 text-navy/50 group-hover:text-red transition-colors duration-300 group-active:rotate-90 transition-transform" />
+          <Locate className="w-3.5 h-3.5 text-navy/40 group-hover:text-red transition-colors duration-300" />
         </button>
       </div>
 
-      {/* ═══ Counter Badge — Premium Floating Pill ═══ */}
+      {/* Counter Badge */}
       <div className="absolute bottom-20 left-4 z-[1000]">
         <div
-          className="premium-btn relative px-5 py-3 rounded-full text-[11px] font-semibold border-2 shadow-[0_8px_32px_rgba(0,48,72,0.1)] overflow-hidden tracking-wide"
+          className="relative px-4 py-2.5 rounded-full text-[11px] font-medium overflow-hidden"
           style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(250,237,211,0.4) 100%)',
-            borderColor: 'rgba(0,48,72,0.06)',
-            color: '#003048bb',
-            backdropFilter: 'blur(16px)',
+            background: 'rgba(255,255,255,0.92)',
+            color: 'rgba(0,48,72,0.6)',
+            backdropFilter: 'blur(12px)',
+            boxShadow: '0 2px 10px rgba(0,48,72,0.06)',
           }}
         >
-          {/* Shimmer animation */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'linear-gradient(90deg, transparent 0%, rgba(193,33,38,0.04) 50%, transparent 100%)',
-              backgroundSize: '200% 100%',
-              animation: 'badgeShimmer 4s linear infinite',
-            }}
-          />
           <span className="relative z-10">
             {filterCity === 'All' ? (
               <>
