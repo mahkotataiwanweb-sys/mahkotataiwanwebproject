@@ -1161,7 +1161,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
           <img
             src="/images/branding/the-orange-fox-logo.png"
             alt="The Orange Fox"
-            className="h-[18px] sm:h-[22px] w-auto object-contain -mr-[1px]"
+            className="h-[13px] sm:h-[15px] w-auto object-contain -mr-[1px]"
           />
           <span className="font-bold" style={{ color: '#E8870C' }}>The Orange Fox</span>
         </div>
