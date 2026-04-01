@@ -576,6 +576,21 @@ export default function ProductCatalogSection() {
     setProducts(allProducts.filter((p) => p.category === selectedCategory));
   }, [selectedCategory, allProducts]);
 
+  /* Preload ALL product images upfront so category switching is instant */
+  useEffect(() => {
+    if (allProducts.length === 0) return;
+    allProducts.forEach((p) => {
+      if (p.image_url) {
+        const img = new window.Image();
+        img.src = p.image_url;
+      }
+      if (p.detail_image_url) {
+        const img = new window.Image();
+        img.src = p.detail_image_url;
+      }
+    });
+  }, [allProducts]);
+
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
