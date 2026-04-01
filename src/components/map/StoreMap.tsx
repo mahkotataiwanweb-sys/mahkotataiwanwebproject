@@ -944,23 +944,31 @@ export default function StoreMap({ stores }: StoreMapProps) {
       `);
 
       let hideTimeout: ReturnType<typeof setTimeout>;
+      let touchCount = 0;
 
       container.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) {
+        touchCount = e.touches.length;
+        if (e.touches.length >= 2) {
+          dragOverlay.style.display = 'none';
+          map.dragging.enable();
+        }
+      }, { passive: true });
+
+      /* Only show "two fingers" overlay when user actually SWIPES with one finger */
+      container.addEventListener('touchmove', (e) => {
+        if (touchCount === 1 && e.touches.length === 1) {
           dragOverlay.style.display = 'flex';
           dragOverlay.style.opacity = '1';
           clearTimeout(hideTimeout);
           hideTimeout = setTimeout(() => {
             dragOverlay.style.opacity = '0';
             setTimeout(() => { dragOverlay.style.display = 'none'; }, 300);
-          }, 1500);
-        } else if (e.touches.length >= 2) {
-          dragOverlay.style.display = 'none';
-          map.dragging.enable();
+          }, 1200);
         }
       }, { passive: true });
 
       container.addEventListener('touchend', (e) => {
+        touchCount = e.touches.length;
         if (e.touches.length < 2) {
           map.dragging.disable();
         }
