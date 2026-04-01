@@ -322,7 +322,7 @@ export default function ContactPage() {
             ease: 'power3.out',
             scrollTrigger: {
               trigger: hoursSectionRef.current,
-              start: 'top 80%',
+              start: 'top 40%',
               toggleActions: 'play none none reverse',
             },
           }
@@ -379,7 +379,7 @@ export default function ContactPage() {
         // Play when section scrolls into view
         ScrollTrigger.create({
           trigger: hoursSectionRef.current,
-          start: 'top 85%',
+          start: 'top 40%',
           onEnter: () => arcTl.restart(),
         });
       }
