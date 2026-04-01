@@ -20,37 +20,41 @@ function injectPinStyles() {
       background: #4A9FD9 !important;
     }
 
-    /* ── ANTI-FLICKER: keep old tiles visible until new zoom tiles fully load ── */
+    /* ── ANTI-FLICKER: zero visual gaps during zoom/pan ── */
     .illustrated-map .leaflet-tile-pane {
       will-change: transform;
     }
-    .illustrated-map .leaflet-tile-container {
+    /* CRITICAL: Keep ALL tile containers (including old zoom levels) visible.
+       Leaflet normally hides/removes old containers, causing a flash.
+       With this, old tiles stay visible underneath until new ones cover them. */
+    .illustrated-map .leaflet-tile-pane > .leaflet-tile-container {
       will-change: transform;
-      /* Keep ALL tile containers visible — old zoom tiles stay until new ones replace */
       opacity: 1 !important;
       visibility: visible !important;
     }
     .illustrated-map .leaflet-tile {
-      /* No fade animation — tiles appear instantly when loaded, no pop-in */
       transition: none !important;
       will-change: transform;
       image-rendering: auto;
       backface-visibility: hidden;
     }
-    /* Smooth zoom animation without tile flash */
-    .illustrated-map .leaflet-zoom-anim .leaflet-tile-pane {
+    /* No Leaflet internal transitions during zoom */
+    .illustrated-map .leaflet-zoom-anim .leaflet-tile-pane,
+    .illustrated-map .leaflet-fade-anim .leaflet-tile-container,
+    .illustrated-map .leaflet-zoom-anim .leaflet-tile-container {
       transition: none !important;
     }
-    .illustrated-map .leaflet-fade-anim .leaflet-tile-container {
-      transition: none !important;
-    }
-    /* Prevent white/gray flash between zoom levels */
+    /* Loaded tiles: full opacity, instant */
     .illustrated-map .leaflet-tile-loaded {
       opacity: 1 !important;
     }
-    /* Prevent blank tile flash */
+    /* Unloaded new tiles: transparent. Old zoom tiles behind fill the gap. */
     .illustrated-map .leaflet-tile:not(.leaflet-tile-loaded) {
       opacity: 0 !important;
+    }
+    /* Ensure zoom-level tile containers NEVER get display:none */
+    .illustrated-map .leaflet-tile-pane > div {
+      display: block !important;
     }
 
     /* Smooth premium bounce for store pins */
@@ -1076,36 +1080,68 @@ export default function StoreMap({ stores }: StoreMapProps) {
       crossOrigin: true,           /* enable browser disk cache */
     }).addTo(map);
 
-    /* Preload tiles for adjacent zoom levels on initial load */
-    baseTiles.once('load', () => {
-      setMapReady(true);
-      /* Prefetch zoom 7, 8, 9, 10 tiles by briefly visiting them */
-      const currentZoom = map.getZoom();
-      [7, 8, 9, 10].forEach((z) => {
-        if (z !== currentZoom) {
-          const bounds = map.getBounds();
-          const tileUrl = 'https://a.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png';
-          /* Preload center tile for each zoom to warm browser cache */
-          const center = bounds.getCenter();
-          const x = Math.floor((center.lng + 180) / 360 * Math.pow(2, z));
-          const y = Math.floor((1 - Math.log(Math.tan(center.lat * Math.PI / 180) + 1 / Math.cos(center.lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, z));
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.src = tileUrl.replace('{z}', String(z)).replace('{x}', String(x)).replace('{y}', String(y));
-          /* Also preload surrounding tiles */
-          for (let dx = -2; dx <= 2; dx++) {
-            for (let dy = -2; dy <= 2; dy++) {
-              if (dx === 0 && dy === 0) continue;
-              const pi = new Image();
-              pi.crossOrigin = 'anonymous';
-              pi.src = tileUrl.replace('{z}', String(z)).replace('{x}', String(x + dx)).replace('{y}', String(y + dy));
+    /* ── AGGRESSIVE PRELOAD: fetch ALL tiles covering Taiwan for zoom 7-10 ──
+       This warms the browser cache so zoom/pan transitions are instant (no flicker).
+       Taiwan bounds: lat 21.5-26.0, lng 119.0-122.5 with padding */
+    const preloadAllTaiwanTiles = () => {
+      const LAT_MIN = 21.0, LAT_MAX = 26.5, LNG_MIN = 118.5, LNG_MAX = 123.0;
+      const subdomains = ['a', 'b', 'c', 'd'];
+      const retinaSuffix = (window.devicePixelRatio || 1) > 1 ? '@2x' : '';
+      const layers = [
+        'rastertiles/voyager_nolabels',
+        'rastertiles/voyager_only_labels',
+      ];
+      let loaded = 0;
+      let total = 0;
+      const urls: string[] = [];
+
+      for (let z = 7; z <= 10; z++) {
+        const n = Math.pow(2, z);
+        const xMin = Math.floor((LNG_MIN + 180) / 360 * n);
+        const xMax = Math.floor((LNG_MAX + 180) / 360 * n);
+        const latRadMin = LAT_MIN * Math.PI / 180;
+        const latRadMax = LAT_MAX * Math.PI / 180;
+        const yMax = Math.floor((1 - Math.log(Math.tan(latRadMin) + 1 / Math.cos(latRadMin)) / Math.PI) / 2 * n);
+        const yMin = Math.floor((1 - Math.log(Math.tan(latRadMax) + 1 / Math.cos(latRadMax)) / Math.PI) / 2 * n);
+
+        for (let x = xMin; x <= xMax; x++) {
+          for (let y = yMin; y <= yMax; y++) {
+            for (const layer of layers) {
+              const s = subdomains[(x + y) % subdomains.length];
+              urls.push(`https://${s}.basemaps.cartocdn.com/${layer}/${z}/${x}/${y}${retinaSuffix}.png`);
             }
           }
         }
-      });
-    });
-    /* Fallback in case 'load' doesn't fire (e.g. tiles cached) */
-    setTimeout(() => setMapReady(true), 2500);
+      }
+
+      total = urls.length;
+      if (total === 0) { setMapReady(true); return; }
+
+      /* Load in batches of 20 to avoid overwhelming the browser */
+      let idx = 0;
+      const loadBatch = () => {
+        const batch = urls.slice(idx, idx + 20);
+        idx += 20;
+        batch.forEach((url) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = img.onerror = () => {
+            loaded++;
+            if (loaded >= total) setMapReady(true);
+          };
+          img.src = url;
+        });
+        if (idx < total) setTimeout(loadBatch, 50);
+      };
+      loadBatch();
+
+      /* Safety fallback — show map after 6s even if some tiles fail */
+      setTimeout(() => setMapReady(true), 6000);
+    };
+
+    baseTiles.once('load', preloadAllTaiwanTiles);
+    /* Fallback in case initial 'load' doesn't fire */
+    setTimeout(preloadAllTaiwanTiles, 3000);
 
     /* ── Layer 2: Ocean GeoJSON overlay — blue ONLY over water ──
        Generated from 10m Natural Earth with 0.02° inland buffer = precise coastlines */
@@ -1196,7 +1232,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
             setTimeout(() => {
               overlay.style.opacity = '0';
               setTimeout(() => { overlay.style.display = 'none'; }, 300);
-            }, 1200);
+            }, 1800);
           }
         });
         marker.addTo(map);
