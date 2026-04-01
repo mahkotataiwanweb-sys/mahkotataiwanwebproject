@@ -292,7 +292,7 @@ export default function WhereToBuyPage() {
 
   const stats = [
     { number: '300+', label: 'Partner Stores', icon: Store, color: 'from-red/10 to-red/5', iconColor: 'text-red', borderColor: 'hover:border-red/30' },
-    { number: '22', label: 'Cities Covered', icon: MapPin, color: 'from-navy/10 to-navy/5', iconColor: 'text-navy', borderColor: 'hover:border-navy/30' },
+    { number: '19', label: 'Cities Covered', icon: MapPin, color: 'from-navy/10 to-navy/5', iconColor: 'text-navy', borderColor: 'hover:border-navy/30' },
     { number: '6', label: 'Store Types', icon: Store, color: 'from-red/10 to-red/5', iconColor: 'text-red', borderColor: 'hover:border-red/30' },
     { number: '24/7', label: 'Online Available', icon: Globe, color: 'from-navy/10 to-navy/5', iconColor: 'text-navy', borderColor: 'hover:border-navy/30' },
   ];
@@ -349,7 +349,7 @@ export default function WhereToBuyPage() {
             Where to Buy
           </h1>
           <p className="hero-text text-cream/60 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Discover Mahkota Taiwan products at <span className="text-cream/90 font-semibold">300+</span> retail locations across <span className="text-cream/90 font-semibold">22 cities</span> in Taiwan
+            Discover Mahkota Taiwan products at <span className="text-cream/90 font-semibold">300+</span> retail locations across <span className="text-cream/90 font-semibold">19 cities</span> in Taiwan
           </p>
 
           {/* Animated separator */}
