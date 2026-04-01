@@ -15,9 +15,14 @@ function injectPinStyles() {
   const style = document.createElement('style');
   style.id = STYLE_ID;
   style.textContent = `
-    /* ── Clean map: full-opacity tiles + blue ocean GeoJSON overlay ── */
+    /* ── Clean map: vivid blue ocean + full-opacity tiles ── */
     .illustrated-map.leaflet-container {
-      background: #3A8FCA !important;
+      background: #1565C0 !important;
+    }
+    /* Force ocean pane above tiles — absolute safeguard */
+    .leaflet-oceanPane-pane {
+      z-index: 350 !important;
+      pointer-events: none !important;
     }
 
     /* Smooth premium bounce for store pins */
@@ -1034,7 +1039,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
     /* ── Layer 2: Ocean GeoJSON overlay — blue ONLY over water ──
        Generated from 10m Natural Earth with 0.02° inland buffer = precise coastlines */
     const oceanPane = map.createPane('oceanPane');
-    oceanPane.style.zIndex = '250';
+    oceanPane.style.zIndex = '350';
     oceanPane.style.pointerEvents = 'none';
 
     fetch('/ocean.geo.json')
@@ -1044,14 +1049,14 @@ export default function StoreMap({ stores }: StoreMapProps) {
           pane: 'oceanPane',
           style: () => ({
             fillColor: '#1565C0',
-            fillOpacity: 0.68,
+            fillOpacity: 0.85,
             color: 'transparent',
             weight: 0,
           }),
           interactive: false,
         }).addTo(map);
       })
-      .catch(() => { /* Ocean overlay failed — tiles still work fine */ });
+      .catch((err) => { console.warn('Ocean GeoJSON failed:', err); });
 
     /* ── Layer 3: Taiwan GeoJSON overlay — peach/salmon illustrated style ── */
     fetch('/taiwan.geo.json')
@@ -1303,13 +1308,13 @@ export default function StoreMap({ stores }: StoreMapProps) {
       </div>
 
       {/* ─── Map ─── */}
-      <div className="relative overflow-hidden rounded-2xl" style={{ background: '#4A9FD9' }}>
+      <div className="relative overflow-hidden rounded-2xl" style={{ background: '#1565C0' }}>
         <DecorativeElements />
         <OceanWaterEffects />
         <div
           ref={mapContainerRef}
           className="illustrated-map w-full h-[600px] sm:h-[750px] lg:h-[900px] overflow-hidden"
-          style={{ background: '#4A9FD9' }}
+          style={{ background: '#1565C0' }}
         />
       </div>
 
