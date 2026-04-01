@@ -414,7 +414,7 @@ function DecorativeElements() {
           <ellipse cx="26" cy="12" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.65" transform="rotate(10 26 12)"/>
         </svg>
         {/* Dolphin — swimming right in left ocean (desktop only) */}
-        <div className="hidden lg:block" style={{ position: 'absolute', top: '35%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
+        <div className="hidden lg:block ocean-creature" style={{ position: 'absolute', top: '35%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
           <svg style={{ animation: 'dolphinSwimRight 20s ease-in-out infinite' }} viewBox="0 0 52 30" fill="none" width="52" height="30">
             {/* Body */}
             <path d="M10 18 Q14 6 26 5 Q38 4 44 12 Q46 15 42 17 Q38 19 30 20 Q20 22 10 18Z" fill="#5BAED6" opacity="0.85"/>
@@ -432,7 +432,7 @@ function DecorativeElements() {
           </svg>
         </div>
         {/* Orca — bobbing in left ocean (desktop only) */}
-        <div className="hidden lg:block" style={{ position: 'absolute', top: '70%', left: '10%', animation: 'orcaBob 8s ease-in-out infinite' }}>
+        <div className="hidden lg:block ocean-creature" style={{ position: 'absolute', top: '70%', left: '10%', animation: 'orcaBob 8s ease-in-out infinite' }}>
           <svg viewBox="0 0 60 30" fill="none" width="60" height="30">
             {/* Main body */}
             <ellipse cx="30" cy="15" rx="22" ry="11" fill="#1A1A2E" opacity="0.9"/>
@@ -456,7 +456,7 @@ function DecorativeElements() {
       {/* ═══ RIGHT OCEAN — Pacific (65-100%) ═══ */}
       <div style={{ position: 'absolute', top: 0, left: '65%', width: '35%', height: '100%', overflow: 'hidden' }}>
         {/* Dolphin 1 — proper dolphin swimming left in right ocean */}
-        <div className="sea-creature-dolphin" style={{ position: 'absolute', top: '25%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
+        <div className="sea-creature-dolphin ocean-creature" style={{ position: 'absolute', top: '25%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
           <svg style={{ animation: 'dolphinSwimLeft 22s ease-in-out infinite' }} viewBox="0 0 52 30" fill="none">
             {/* Body */}
             <path d="M10 18 Q14 6 26 5 Q38 4 44 12 Q46 15 42 17 Q38 19 30 20 Q20 22 10 18Z" fill="#5BAED6" opacity="0.85"/>
@@ -474,7 +474,7 @@ function DecorativeElements() {
           </svg>
         </div>
         {/* Dolphin 2 — second dolphin swimming left (desktop only) */}
-        <div className="hidden lg:block" style={{ position: 'absolute', top: '45%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
+        <div className="hidden lg:block ocean-creature" style={{ position: 'absolute', top: '45%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
           <svg style={{ animation: 'dolphinSwimLeft 26s ease-in-out infinite 5s' }} viewBox="0 0 52 30" fill="none" width="52" height="30">
             {/* Body */}
             <path d="M10 18 Q14 6 26 5 Q38 4 44 12 Q46 15 42 17 Q38 19 30 20 Q20 22 10 18Z" fill="#5BAED6" opacity="0.85"/>
@@ -492,7 +492,7 @@ function DecorativeElements() {
           </svg>
         </div>
         {/* Orca — bobbing in right ocean */}
-        <div className="sea-creature-orca" style={{ position: 'absolute', top: '65%', left: '15%', animation: 'orcaBob 9s ease-in-out infinite 2s' }}>
+        <div className="sea-creature-orca ocean-creature" style={{ position: 'absolute', top: '65%', left: '15%', animation: 'orcaBob 9s ease-in-out infinite 2s' }}>
           <svg viewBox="0 0 60 30" fill="none" style={{ transform: 'scaleX(-1)' }}>
             {/* Main body */}
             <ellipse cx="30" cy="15" rx="22" ry="11" fill="#1A1A2E" opacity="0.9"/>
@@ -818,6 +818,10 @@ function DecorativeElements() {
           .sea-creature-dolphin svg { width: 52px; height: 30px; }
           .sea-creature-orca svg { width: 60px; height: 30px; }
         }
+
+        /* Hide ocean creatures when zoomed into land */
+        .ocean-creature { transition: opacity 0.5s ease; }
+        .zoomed-to-land .ocean-creature { opacity: 0 !important; pointer-events: none; }
       `}</style>
     </div>
   );
@@ -1119,6 +1123,19 @@ export default function StoreMap({ stores }: StoreMapProps) {
     L.control.attribution({ position: 'bottomleft', prefix: false }).addAttribution('© OpenStreetMap').addTo(map);
 
     mapRef.current = map;
+
+    /* ── Hide ocean creatures (dolphins/orcas) when zoomed into land ── */
+    const mapContainer = mapContainerRef.current.parentElement;
+    const updateOceanCreatures = () => {
+      if (!mapContainer) return;
+      if (map.getZoom() >= 10) {
+        mapContainer.classList.add('zoomed-to-land');
+      } else {
+        mapContainer.classList.remove('zoomed-to-land');
+      }
+    };
+    map.on('zoomend', updateOceanCreatures);
+    updateOceanCreatures(); // initial check
 
     /* ── Mobile: two-finger gesture handling (like Google Maps) ── */
     if (isMobile && mapContainerRef.current) {
