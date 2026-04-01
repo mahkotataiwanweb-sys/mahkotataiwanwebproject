@@ -54,6 +54,7 @@ function AutoFlipCard({
   btnLabel,
   locale,
   flipInterval = 5000,
+  startDelay = 0,
 }: {
   articles: Article[];
   fallbackTitle: string;
@@ -62,6 +63,7 @@ function AutoFlipCard({
   btnLabel: string;
   locale: string;
   flipInterval?: number;
+  startDelay?: number;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -154,11 +156,15 @@ function AutoFlipCard({
             ease: 'power2.out',
           });
 
-          /* Start auto-flipping after initial entrance + small delay */
+          /* Start auto-flipping after initial entrance + startDelay */
           if (count > 1) {
-            intervalRef.current = setInterval(() => {
+            const startTimer = setTimeout(() => {
               flipToNext();
-            }, flipInterval);
+              intervalRef.current = setInterval(() => {
+                flipToNext();
+              }, flipInterval);
+            }, startDelay);
+            intervalRef.current = startTimer as unknown as ReturnType<typeof setInterval>;
           }
         },
       });
@@ -169,7 +175,7 @@ function AutoFlipCard({
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count, flipInterval]);
+  }, [count, flipInterval, startDelay]);
 
   /* Update flipToNext when currentIndex changes */
   useEffect(() => {
@@ -337,7 +343,8 @@ export default function HomePage() {
               fallbackHref={`/${locale}/events`}
               btnLabel={locale === 'id' ? 'Lihat Acara' : '查看活動'}
               locale={locale}
-              flipInterval={6500}
+              flipInterval={13000}
+              startDelay={0}
             />
 
             {/* Activities card — cycles through all lifestyle articles */}
@@ -348,7 +355,8 @@ export default function HomePage() {
               fallbackHref={`/${locale}/lifestyle`}
               btnLabel={locale === 'id' ? 'Lihat Aktivitas' : '查看活動'}
               locale={locale}
-              flipInterval={7500}
+              flipInterval={13000}
+              startDelay={6500}
             />
           </div>
         </div>
