@@ -243,6 +243,8 @@ export default function HomePage() {
         onEnter: async () => {
           if (bottomEntered) return;
           bottomEntered = true;
+          await new Promise(r => setTimeout(r, 200));
+          if (cancelled) return;
           await bottomCardRef.current?.enterView();
           tryStartSequencer();
         },
