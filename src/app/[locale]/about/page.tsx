@@ -1044,10 +1044,10 @@ export default function AboutPage() {
 
         <motion.div
           ref={ctaRef}
-          initial={{ opacity: 0, y: 60, scale: 0.95 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          initial={{ opacity: 0, y: 80, scale: 0.92, filter: 'blur(12px)' }}
+          whileInView={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
           viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.9, ease: [0.32, 0.72, 0, 1] }}
+          transition={{ duration: 2.3, ease: [0.22, 0.68, 0, 1] }}
           className="max-w-4xl mx-auto px-6 sm:px-8"
         >
           <div
