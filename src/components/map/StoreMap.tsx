@@ -1692,6 +1692,9 @@ export default function StoreMap({ stores }: StoreMapProps) {
   /* ─── Popup animations ─── */
   useEffect(() => {
     if (selectedStore && popupRef.current) {
+      // Stop Leaflet from swallowing click/touch events on the popup
+      L.DomEvent.disableClickPropagation(popupRef.current);
+      L.DomEvent.disableScrollPropagation(popupRef.current);
       gsap.fromTo(popupRef.current, { opacity: 0, y: 30, scale: 0.92, filter: 'blur(8px)' }, { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 0.6, ease: 'power3.out' });
     }
   }, [selectedStore]);
