@@ -590,3 +590,55 @@
 .product-card-float-wrapper {
   will-change: transform;
 }
+
+/* ===== Leaflet Dark Theme Overrides ===== */
+.leaflet-container {
+  font-family: var(--font-body) !important;
+  background: #001E2E !important;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid rgba(250, 237, 211, 0.1) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+.leaflet-control-zoom a {
+  background: rgba(0, 48, 72, 0.9) !important;
+  color: rgba(250, 237, 211, 0.7) !important;
+  border-bottom: 1px solid rgba(250, 237, 211, 0.08) !important;
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  font-size: 16px !important;
+  transition: all 0.2s ease !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: rgba(0, 48, 72, 1) !important;
+  color: rgba(250, 237, 211, 1) !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(0, 30, 46, 0.8) !important;
+  color: rgba(250, 237, 211, 0.3) !important;
+  font-size: 10px !important;
+  border-radius: 8px 8px 0 0 !important;
+  padding: 2px 8px !important;
+}
+
+.leaflet-control-attribution a {
+  color: rgba(250, 237, 211, 0.4) !important;
+}
+
+/* Custom pin cursor */
+.custom-pin {
+  background: none !important;
+  border: none !important;
+}
+
+/* Smooth tile transitions */
+.leaflet-tile {
+  filter: saturate(0.7) brightness(0.85) !important;
+}

@@ -530,3 +530,19 @@ export interface VideoShowcaseUpdate {
   sort_order?: number;
   is_active?: boolean;
 }
+
+// Store Locations
+export interface StoreLocation {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  district: string | null;
+  contact: string | null;
+  lat: number;
+  lng: number;
+  store_type: 'supermarket' | 'minimarket' | 'toko' | 'retail' | 'online';
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
