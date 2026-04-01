@@ -7,7 +7,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { StoreLocation } from '@/types/database';
 
-/* ─── Inject global CSS for pin animations ─── */
+/* ─── Inject global CSS for pin animations + decorative elements ─── */
 const STYLE_ID = 'store-map-pin-styles';
 function injectPinStyles() {
   if (typeof document === 'undefined') return;
@@ -54,21 +54,78 @@ function injectPinStyles() {
     /* Hover pause */
     .city-pin:hover > div { animation-play-state: paused; transform: translateY(-8px) scale(1.08); }
     .store-pin:hover > div { animation-play-state: paused; transform: translateY(-4px); }
+
+    /* ── Decorative animations ── */
+    @keyframes floatBird {
+      0% { transform: translateX(-60px) translateY(0px); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateX(calc(100% + 60px)) translateY(-30px); opacity: 0; }
+    }
+    @keyframes floatBird2 {
+      0% { transform: translateX(calc(100% + 60px)) translateY(0px) scaleX(-1); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateX(-60px) translateY(-20px) scaleX(-1); opacity: 0; }
+    }
+    @keyframes floatCloud {
+      0% { transform: translateX(-100px); }
+      100% { transform: translateX(calc(100% + 100px)); }
+    }
+    @keyframes waveMove {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    @keyframes fishSwim {
+      0% { transform: translateX(-40px) scaleX(1); opacity: 0; }
+      10% { opacity: 0.6; }
+      45% { transform: translateX(calc(50%)) scaleX(1); opacity: 0.6; }
+      50% { transform: translateX(calc(50%)) scaleX(-1); opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% { transform: translateX(-40px) scaleX(-1); opacity: 0; }
+    }
+    @keyframes bobFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+
+    /* Hide Leaflet default attribution styling */
+    .illustrated-map .leaflet-control-attribution {
+      background: transparent !important;
+      color: rgba(0,48,72,0.3) !important;
+      font-size: 9px !important;
+    }
+    .illustrated-map .leaflet-control-attribution a {
+      color: rgba(0,48,72,0.4) !important;
+    }
+    /* Soften zoom controls */
+    .illustrated-map .leaflet-control-zoom a {
+      background: rgba(255,255,255,0.9) !important;
+      color: #003048 !important;
+      border-color: rgba(0,48,72,0.1) !important;
+      border-radius: 12px !important;
+    }
+    .illustrated-map .leaflet-control-zoom {
+      border: none !important;
+      border-radius: 14px !important;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,48,72,0.1) !important;
+    }
   `;
   document.head.appendChild(style);
 }
 
-/* ─── City pin: teardrop SVG like homepage (red, no number, no label) ─── */
+/* ─── City pin: teardrop SVG (smaller size) ─── */
 const createCityPinIcon = () => {
   return L.divIcon({
     className: 'city-pin',
     html: `
-      <div style="position:relative;cursor:pointer;width:40px;height:52px;">
+      <div style="position:relative;cursor:pointer;width:30px;height:40px;">
         <!-- Pulse ring 1 -->
         <div style="
           position:absolute;
           left:50%;top:100%;
-          width:24px;height:24px;
+          width:18px;height:18px;
           border-radius:50%;
           border:2px solid rgba(193,33,38,0.4);
           animation: cityPulseRing 2.5s ease-out infinite;
@@ -78,14 +135,14 @@ const createCityPinIcon = () => {
         <div style="
           position:absolute;
           left:50%;top:100%;
-          width:20px;height:20px;
+          width:14px;height:14px;
           border-radius:50%;
           border:1.5px solid rgba(193,33,38,0.25);
           animation: cityPulseRing2 3s ease-out infinite 0.5s;
           pointer-events:none;
         "></div>
         <!-- Teardrop pin SVG -->
-        <svg width="40" height="52" viewBox="0 0 40 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="30" height="40" viewBox="0 0 40 52" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <filter id="cityPinShadow">
               <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#C12126" flood-opacity="0.35"/>
@@ -98,13 +155,13 @@ const createCityPinIcon = () => {
         </svg>
       </div>
     `,
-    iconSize: [40, 52],
-    iconAnchor: [20, 52],
-    popupAnchor: [0, -54],
+    iconSize: [30, 40],
+    iconAnchor: [15, 40],
+    popupAnchor: [0, -42],
   });
 };
 
-/* ─── Store pin SVG (navy blue, same size as before) ─── */
+/* ─── Store pin SVG (navy blue, unchanged size) ─── */
 const createStorePinIcon = (isActive = false) => {
   const color = isActive ? '#C12126' : '#003048';
   const innerDot = isActive ? '#C12126' : '#003048';
@@ -154,10 +211,118 @@ interface StoreMapProps {
   stores: StoreLocation[];
 }
 
+/* ─── Decorative SVG components ─── */
+function DecorativeElements() {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-[500]">
+      {/* ── Birds ── */}
+      <svg
+        style={{ position: 'absolute', top: '8%', left: 0, width: '100%', height: '40px', animation: 'floatBird 12s ease-in-out infinite' }}
+        viewBox="0 0 40 20" fill="none" xmlns="http://www.w3.org/2000/svg"
+        width="40" height="20"
+      >
+        <path d="M2 12 Q8 4 14 10 M14 10 Q20 4 26 12" stroke="#4A6B7A" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+      </svg>
+      <svg
+        style={{ position: 'absolute', top: '14%', left: 0, width: '100%', height: '30px', animation: 'floatBird 16s ease-in-out infinite 3s' }}
+        viewBox="0 0 30 16" fill="none" xmlns="http://www.w3.org/2000/svg"
+        width="30" height="16"
+      >
+        <path d="M2 10 Q6 3 10 8 M10 8 Q14 3 18 10" stroke="#6B8E9E" strokeWidth="2" fill="none" strokeLinecap="round"/>
+      </svg>
+      <svg
+        style={{ position: 'absolute', top: '22%', left: 0, width: '100%', height: '26px', animation: 'floatBird2 14s ease-in-out infinite 5s' }}
+        viewBox="0 0 26 14" fill="none" xmlns="http://www.w3.org/2000/svg"
+        width="26" height="14"
+      >
+        <path d="M2 8 Q5 2 8 6 M8 6 Q11 2 14 8" stroke="#7BA3B3" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+      </svg>
+
+      {/* ── Clouds ── */}
+      <svg
+        style={{ position: 'absolute', top: '6%', left: 0, width: '100%', height: '50px', animation: 'floatCloud 25s linear infinite', opacity: 0.5 }}
+        viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg"
+        width="120" height="40"
+      >
+        <ellipse cx="60" cy="25" rx="50" ry="14" fill="white"/>
+        <ellipse cx="40" cy="18" rx="25" ry="14" fill="white"/>
+        <ellipse cx="80" cy="20" rx="30" ry="12" fill="white"/>
+      </svg>
+      <svg
+        style={{ position: 'absolute', top: '30%', right: 0, width: '100%', height: '40px', animation: 'floatCloud 30s linear infinite 8s', opacity: 0.35 }}
+        viewBox="0 0 100 30" fill="none" xmlns="http://www.w3.org/2000/svg"
+        width="100" height="30"
+      >
+        <ellipse cx="50" cy="18" rx="40" ry="11" fill="white"/>
+        <ellipse cx="30" cy="13" rx="22" ry="10" fill="white"/>
+        <ellipse cx="70" cy="15" rx="25" ry="9" fill="white"/>
+      </svg>
+
+      {/* ── Waves (bottom) ── */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, width: '200%', height: '30px', animation: 'waveMove 8s linear infinite', opacity: 0.2 }}>
+        <svg viewBox="0 0 1200 30" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="30" preserveAspectRatio="none">
+          <path d="M0 15 Q50 0 100 15 Q150 30 200 15 Q250 0 300 15 Q350 30 400 15 Q450 0 500 15 Q550 30 600 15 Q650 0 700 15 Q750 30 800 15 Q850 0 900 15 Q950 30 1000 15 Q1050 0 1100 15 Q1150 30 1200 15" stroke="#4A6B7A" strokeWidth="2" fill="none"/>
+        </svg>
+      </div>
+      <div style={{ position: 'absolute', bottom: '8px', left: 0, width: '200%', height: '25px', animation: 'waveMove 10s linear infinite 1s', opacity: 0.15 }}>
+        <svg viewBox="0 0 1200 25" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="25" preserveAspectRatio="none">
+          <path d="M0 12 Q50 0 100 12 Q150 25 200 12 Q250 0 300 12 Q350 25 400 12 Q450 0 500 12 Q550 25 600 12 Q650 0 700 12 Q750 25 800 12 Q850 0 900 12 Q950 25 1000 12 Q1050 0 1100 12 Q1150 25 1200 12" stroke="#4A6B7A" strokeWidth="1.5" fill="none"/>
+        </svg>
+      </div>
+
+      {/* ── Small fish ── */}
+      <svg
+        style={{ position: 'absolute', bottom: '15%', left: 0, width: '100%', height: '20px', animation: 'fishSwim 18s ease-in-out infinite 2s' }}
+        viewBox="0 0 28 14" fill="none" xmlns="http://www.w3.org/2000/svg"
+        width="28" height="14"
+      >
+        <ellipse cx="12" cy="7" rx="10" ry="5" fill="#5B9BAD" opacity="0.5"/>
+        <polygon points="22,7 28,2 28,12" fill="#5B9BAD" opacity="0.5"/>
+        <circle cx="7" cy="6" r="1.2" fill="white" opacity="0.8"/>
+      </svg>
+      <svg
+        style={{ position: 'absolute', bottom: '25%', left: 0, width: '100%', height: '16px', animation: 'fishSwim 22s ease-in-out infinite 7s' }}
+        viewBox="0 0 24 12" fill="none" xmlns="http://www.w3.org/2000/svg"
+        width="24" height="12"
+      >
+        <ellipse cx="10" cy="6" rx="8" ry="4" fill="#6BAFBF" opacity="0.4"/>
+        <polygon points="18,6 24,2 24,10" fill="#6BAFBF" opacity="0.4"/>
+        <circle cx="6" cy="5" r="1" fill="white" opacity="0.7"/>
+      </svg>
+
+      {/* ── Tiny wave squiggles scattered ── */}
+      {[
+        { top: '45%', left: '5%', delay: '0s' },
+        { top: '65%', right: '8%', delay: '2s' },
+        { top: '75%', left: '12%', delay: '4s' },
+        { top: '55%', right: '15%', delay: '1s' },
+      ].map((pos, i) => (
+        <svg
+          key={i}
+          style={{
+            position: 'absolute',
+            ...pos,
+            width: '30px',
+            height: '10px',
+            animation: `bobFloat 3s ease-in-out infinite ${pos.delay}`,
+            opacity: 0.25,
+          }}
+          viewBox="0 0 30 10"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M2 5 Q8 1 14 5 Q20 9 26 5" stroke="#4A6B7A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+        </svg>
+      ))}
+    </div>
+  );
+}
+
 export default function StoreMap({ stores }: StoreMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
+  const geoJsonLayerRef = useRef<L.GeoJSON | null>(null);
   const [selectedStore, setSelectedStore] = useState<StoreLocation | null>(null);
   const [filterCity, setFilterCity] = useState('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -214,21 +379,41 @@ export default function StoreMap({ stores }: StoreMapProps) {
       minZoom: 7,
     });
 
-    L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-      { maxZoom: 19 }
-    ).addTo(map);
+    /* No tile layer — the ocean background is CSS, and Taiwan land is GeoJSON */
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     L.control
       .attribution({ position: 'bottomleft', prefix: false })
-      .addAttribution(
-        '© <a href="https://carto.com/">CARTO</a> © <a href="https://www.openstreetmap.org/">OSM</a>'
-      )
+      .addAttribution('© OpenStreetMap contributors')
       .addTo(map);
 
     mapRef.current = map;
+
+    /* Load Taiwan GeoJSON for illustrated land */
+    fetch('/taiwan.geo.json')
+      .then((res) => res.json())
+      .then((geojsonData) => {
+        const geoLayer = L.geoJSON(geojsonData, {
+          style: () => ({
+            fillColor: '#F5CBA7',
+            fillOpacity: 1,
+            color: '#FFFFFF',
+            weight: 2.5,
+            opacity: 0.9,
+          }),
+          interactive: false,
+        });
+        geoLayer.addTo(map);
+        geoJsonLayerRef.current = geoLayer;
+      })
+      .catch(() => {
+        /* Fallback: use a light tile layer if GeoJSON fails */
+        L.tileLayer(
+          'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+          { maxZoom: 19 }
+        ).addTo(map);
+      });
 
     return () => {
       map.remove();
@@ -451,12 +636,17 @@ export default function StoreMap({ stores }: StoreMapProps) {
         </div>
       </div>
 
-      {/* ─── Map container ─── */}
-      <div
-        ref={mapContainerRef}
-        className="w-full h-[500px] sm:h-[600px] lg:h-[700px] overflow-hidden"
-        style={{ background: '#F5F3EF' }}
-      />
+      {/* ─── Map container with ocean background ─── */}
+      <div className="relative overflow-hidden rounded-2xl">
+        {/* Decorative animated elements */}
+        <DecorativeElements />
+
+        <div
+          ref={mapContainerRef}
+          className="illustrated-map w-full h-[500px] sm:h-[600px] lg:h-[700px] overflow-hidden"
+          style={{ background: '#A8D8EA' }}
+        />
+      </div>
 
       {/* ─── Store detail popup ─── */}
       {selectedStore && (
