@@ -207,8 +207,8 @@ export default function HomePage() {
         /* Flip top card */
         await topCardRef.current?.triggerFlip();
         if (cancelled) break;
-        /* Pause between cards — 1.2s */
-        await new Promise(r => setTimeout(r, 1200));
+        /* Pause between cards — 0.5s */
+        await new Promise(r => setTimeout(r, 500));
         if (cancelled) break;
         /* Flip bottom card */
         await bottomCardRef.current?.triggerFlip();
@@ -219,7 +219,7 @@ export default function HomePage() {
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: sectionRef.current,
-        start: 'top 20%',
+        start: 'top 10%',
         once: true,
         onEnter: async () => {
           if (enteredView) return;
