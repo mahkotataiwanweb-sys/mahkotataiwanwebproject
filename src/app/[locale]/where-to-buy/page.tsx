@@ -432,8 +432,10 @@ export default function WhereToBuyPage() {
                 style={{ boxShadow: '0 1px 3px rgba(0,48,72,0.06), 0 0 0 1px rgba(0,48,72,0.04)' }}
               >
                 {/* Compact icon */}
-                <div className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-cream/60 mb-4">
-                  <stat.icon className="w-4 h-4 text-navy/30" />
+                <div className="inline-flex items-center justify-center w-9 h-9 rounded-xl mb-4"
+                  style={{ background: idx % 2 === 0 ? 'rgba(193,33,38,0.08)' : 'rgba(0,48,72,0.07)' }}
+                >
+                  <stat.icon className="w-4 h-4" style={{ color: idx % 2 === 0 ? '#C12126' : '#003048' }} />
                 </div>
 
                 {/* Number — clean single color */}
