@@ -17,50 +17,7 @@ function injectPinStyles() {
   style.textContent = `
     /* ── Clean map: full-opacity tiles + blue ocean GeoJSON overlay ── */
     .illustrated-map.leaflet-container {
-      background: #4A9FD9 !important;
-    }
-
-    /* ── ANTI-FLICKER: single combined layer, zero visual gaps ── */
-
-    /* GPU-accelerated tile pane — prevents browser repaints */
-    .illustrated-map .leaflet-tile-pane {
-      will-change: transform;
-      transform: translateZ(0);
-    }
-    /* ALL tile containers stay visible at all times (old + new zoom levels).
-       Old zoom tiles serve as background until new zoom tiles render from cache. */
-    .illustrated-map .leaflet-tile-pane > .leaflet-tile-container,
-    .illustrated-map .leaflet-tile-pane > div {
-      opacity: 1 !important;
-      visibility: visible !important;
-      display: block !important;
-      will-change: transform;
-      transform: translateZ(0);
-    }
-    /* Individual tiles: NO transitions, NO fade, instant visibility */
-    .illustrated-map .leaflet-tile {
-      transition: none !important;
-      will-change: transform;
-      backface-visibility: hidden;
-      transform: translateZ(0);
-    }
-    /* Override Leaflet's inline opacity on tile containers */
-    .illustrated-map .leaflet-tile-container[style] {
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
-    /* Kill ALL Leaflet animations on tiles — zero transition frames */
-    .illustrated-map .leaflet-zoom-anim .leaflet-tile-pane,
-    .illustrated-map .leaflet-fade-anim .leaflet-tile-container,
-    .illustrated-map .leaflet-zoom-anim .leaflet-tile-container,
-    .illustrated-map .leaflet-zoom-anim .leaflet-tile,
-    .illustrated-map .leaflet-zoom-animated {
-      transition: none !important;
-    }
-    /* Loaded tiles: always full opacity */
-    .illustrated-map .leaflet-tile-loaded {
-      opacity: 1 !important;
-      visibility: visible !important;
+      background: #3A8FCA !important;
     }
 
     /* Smooth premium bounce for store pins */
@@ -842,7 +799,6 @@ function PremiumDropdown({
 
 export default function StoreMap({ stores }: StoreMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const [mapReady, setMapReady] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null);
@@ -921,8 +877,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
-    /* Detect actual mobile/tablet — not touch-enabled laptops */
-    const isMobile = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth < 1024;
+    const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
     const map = L.map(mapContainerRef.current, {
       center: [23.7, 120.96],
@@ -935,11 +890,6 @@ export default function StoreMap({ stores }: StoreMapProps) {
       maxBounds: L.latLngBounds([21.5, 119.0], [26.0, 122.5]),
       maxBoundsViscosity: 0.9,
       minZoom: 7,
-      maxZoom: 12,                  /* CRITICAL: only allow zoom levels we've preloaded */
-      fadeAnimation: false,         /* No tile pop-in fade */
-      zoomAnimation: false,         /* No zoom animation = no transition gap = no flicker */
-      markerZoomAnimation: false,   /* No marker animation during zoom */
-      zoomSnap: 1,                  /* Integer zooms only for clean tile boundaries */
     });
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -995,7 +945,6 @@ export default function StoreMap({ stores }: StoreMapProps) {
 
       let hideTimeout: ReturnType<typeof setTimeout>;
       let touchCount = 0;
-      let dragHintShown = false;  /* Only show once */
 
       container.addEventListener('touchstart', (e) => {
         touchCount = e.touches.length;
@@ -1005,10 +954,9 @@ export default function StoreMap({ stores }: StoreMapProps) {
         }
       }, { passive: true });
 
-      /* Only show "two fingers" overlay ONCE when user first swipes with one finger */
+      /* Only show "two fingers" overlay when user actually SWIPES with one finger */
       container.addEventListener('touchmove', (e) => {
-        if (!dragHintShown && touchCount === 1 && e.touches.length === 1) {
-          dragHintShown = true;
+        if (touchCount === 1 && e.touches.length === 1) {
           dragOverlay.style.display = 'flex';
           dragOverlay.style.opacity = '1';
           clearTimeout(hideTimeout);
@@ -1069,153 +1017,70 @@ export default function StoreMap({ stores }: StoreMapProps) {
     map.on('dragstart', () => startMusicOnInteraction());
     map.on('zoomstart', () => startMusicOnInteraction());
 
-    /* ═══════════════════════════════════════════════════════════════
-       ZERO-FLICKER TILE SYSTEM
-       Strategy: preload ALL tiles for Taiwan (zoom 7-11) into browser
-       cache, wait for everything (tiles + GeoJSON) before revealing map,
-       and monkey-patch Leaflet to keep old zoom tiles visible during
-       transitions so there is NEVER a blank gap.
-       ═══════════════════════════════════════════════════════════════ */
+    /* ── Custom pane: labels on top of everything ── */
+    map.createPane('labelsPane');
+    const labelsPane = map.getPane('labelsPane');
+    if (labelsPane) {
+      labelsPane.style.zIndex = '450';
+      labelsPane.style.pointerEvents = 'none';
+    }
 
-    /* Shared tile layer options — all zoom levels we'll ever show are preloaded */
-    const TILE_OPTS: L.TileLayerOptions = {
-      maxZoom: 12,
-      maxNativeZoom: 12,
-      keepBuffer: 50,               /* huge buffer — keep everything in DOM */
-      updateWhenZooming: false,
-      updateWhenIdle: true,
-      crossOrigin: true,
-    };
+    /* ── Layer 1: Voyager base tiles at FULL opacity — all land details visible ── */
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap © CARTO',
+    }).addTo(map);
 
-    /* Monkey-patch: NEVER remove old zoom tiles during session.
-       Since all tiles are preloaded, old tiles serve as seamless background
-       while new zoom level renders from cache. */
-    const patchTileLayer = (layer: L.TileLayer) => {
-      /* Prevent removal of tiles at old zoom levels entirely */
-      (layer as any)._removeTilesAtZoom = () => {};
-      /* Also prevent pruning of buffered tiles */
-      const origPrune = (layer as any)._pruneTiles;
-      if (origPrune) {
-        (layer as any)._pruneTiles = () => {};
-      }
-    };
-
-    /* ── SINGLE combined tile layer: base map + labels in one ── */
-    /* Using combined 'voyager' instead of split 'nolabels'+'only_labels' prevents
-       label desync during zoom transitions (the #1 cause of flicker) */
-    const baseTiles = L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-      { ...TILE_OPTS, attribution: '© OpenStreetMap © CARTO' }
-    ).addTo(map);
-    patchTileLayer(baseTiles);
-
-    /* ── Layer 2: Ocean GeoJSON ── */
+    /* ── Layer 2: Ocean GeoJSON overlay — blue ONLY over water ──
+       Generated from 10m Natural Earth with 0.02° inland buffer = precise coastlines */
     const oceanPane = map.createPane('oceanPane');
     oceanPane.style.zIndex = '250';
     oceanPane.style.pointerEvents = 'none';
 
-    const oceanReady = fetch('/ocean.geo.json')
-      .then((r) => r.json())
-      .then((data) => {
-        L.geoJSON(data, {
+    fetch('/ocean.geo.json')
+      .then((res) => res.json())
+      .then((oceanData) => {
+        L.geoJSON(oceanData, {
           pane: 'oceanPane',
-          style: () => ({ fillColor: '#1E88C7', fillOpacity: 0.55, color: 'transparent', weight: 0 }),
+          style: () => ({
+            fillColor: '#1565C0',
+            fillOpacity: 0.68,
+            color: 'transparent',
+            weight: 0,
+          }),
           interactive: false,
         }).addTo(map);
       })
-      .catch(() => {});
+      .catch(() => { /* Ocean overlay failed — tiles still work fine */ });
 
-    /* ── Layer 3: Taiwan GeoJSON — reduced opacity so tile labels show through ── */
-    const taiwanReady = fetch('/taiwan.geo.json')
-      .then((r) => r.json())
-      .then((data) => {
-        const geo = L.geoJSON(data, {
-          style: () => ({ fillColor: '#F5CBA7', fillOpacity: 0.45, color: '#FFFFFF', weight: 2.5, opacity: 0.9 }),
+    /* ── Layer 3: Taiwan GeoJSON overlay — peach/salmon illustrated style ── */
+    fetch('/taiwan.geo.json')
+      .then((res) => res.json())
+      .then((geojsonData) => {
+        const geoLayer = L.geoJSON(geojsonData, {
+          style: () => ({
+            fillColor: '#F5CBA7',
+            fillOpacity: 0.75,
+            color: '#FFFFFF',
+            weight: 2.5,
+            opacity: 0.9,
+          }),
           interactive: false,
         });
-        geo.addTo(map);
-        geoJsonLayerRef.current = geo;
+        geoLayer.addTo(map);
+        geoJsonLayerRef.current = geoLayer;
+
+        /* ── Layer 4: Labels on top — city names, roads, districts clearly visible ── */
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
+          maxZoom: 19,
+          pane: 'labelsPane',
+        }).addTo(map);
       })
-      .catch(() => {});
-
-    /* ═══════════════════════════════════════════════════════════════
-       PRELOAD ALL TILES — single combined voyager layer, tight Taiwan bounds
-       ═══════════════════════════════════════════════════════════════
-       BEFORE: 2 layers × wide bounds = ~15,000+ tiles → cache eviction → flicker
-       NOW:    1 layer × tight bounds = ~5,300 tiles → stays in cache → zero flicker
-       ═══════════════════════════════════════════════════════════════ */
-    let preloadStarted = false;
-    const preloadAllTaiwanTiles = (): Promise<void> => {
-      if (preloadStarted) return Promise.resolve();
-      preloadStarted = true;
-
-      return new Promise<void>((resolve) => {
-        /* Tight bounds: Taiwan island + small buffer (not massive ocean) */
-        const LAT_MIN = 21.5, LAT_MAX = 26.0, LNG_MIN = 119.5, LNG_MAX = 122.2;
-        const subs = ['a', 'b', 'c', 'd'];
-        const r = (window.devicePixelRatio || 1) > 1 ? '@2x' : '';
-        const urls: string[] = [];
-
-        /* Single layer: 'rastertiles/voyager' (combined base + labels) */
-        for (let z = 7; z <= 12; z++) {
-          const n = Math.pow(2, z);
-          const xMin = Math.floor((LNG_MIN + 180) / 360 * n);
-          const xMax = Math.floor((LNG_MAX + 180) / 360 * n);
-          const yMin = Math.floor((1 - Math.log(Math.tan(LAT_MAX * Math.PI / 180) + 1 / Math.cos(LAT_MAX * Math.PI / 180)) / Math.PI) / 2 * n);
-          const yMax = Math.floor((1 - Math.log(Math.tan(LAT_MIN * Math.PI / 180) + 1 / Math.cos(LAT_MIN * Math.PI / 180)) / Math.PI) / 2 * n);
-          for (let x = xMin; x <= xMax; x++) {
-            for (let y = yMin; y <= yMax; y++) {
-              urls.push(`https://${subs[(x + y) % 4]}.basemaps.cartocdn.com/rastertiles/voyager/${z}/${x}/${y}${r}.png`);
-            }
-          }
-        }
-
-        if (urls.length === 0) { resolve(); return; }
-
-        let done = 0;
-        const total = urls.length;
-        const onDone = () => { done++; if (done >= total) resolve(); };
-
-        /* Large batches for fast throughput (4 subdomains = 24+ concurrent) */
-        let idx = 0;
-        const batch = () => {
-          const chunk = urls.slice(idx, idx + 100);
-          idx += 100;
-          chunk.forEach((url) => {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = img.onerror = onDone;
-            img.src = url;
-          });
-          if (idx < total) setTimeout(batch, 10);
-        };
-        batch();
-
-        /* Safety: resolve after 30s even if some tiles fail */
-        setTimeout(resolve, 30000);
+      .catch(() => {
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+          maxZoom: 19,
+        }).addTo(map);
       });
-    };
-
-    /* Wait for EVERYTHING — ALL tiles cached + GeoJSON rendered — before revealing.
-       The map stays hidden behind loading overlay until 100% ready. */
-    const revealWhenReady = () => {
-      Promise.all([
-        preloadAllTaiwanTiles(),
-        oceanReady,
-        taiwanReady,
-      ]).then(() => {
-        /* Force Leaflet to re-check tile cache after preload */
-        map.invalidateSize();
-        /* Small delay to let Leaflet render tiles from now-warm cache */
-        setTimeout(() => setMapReady(true), 300);
-      });
-    };
-
-    baseTiles.once('load', revealWhenReady);
-    /* Fallback: start preload after 2s even if 'load' doesn't fire */
-    setTimeout(revealWhenReady, 2000);
-    /* Hard safety: show map after 45s no matter what (large preload needs time) */
-    setTimeout(() => setMapReady(true), 45000);
 
     return () => { map.remove(); mapRef.current = null; };
   }, []);
@@ -1234,10 +1099,9 @@ export default function StoreMap({ stores }: StoreMapProps) {
         marker.on('click', () => {
           setSelectedStore(null);
           setFilterCity(cluster.city);
-          /* Show pinch-to-zoom hint once — ONLY on mobile */
+          /* Show pinch-to-zoom hint once on mobile */
           const container = mapContainerRef.current;
-          const isMobileDevice = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth < 1024;
-          if (isMobileDevice && container && (container as any).__pinchOverlay && !(container as any).__pinchShown) {
+          if (container && (container as any).__pinchOverlay && !(container as any).__pinchShown) {
             (container as any).__pinchShown = true;
             const overlay = (container as any).__pinchOverlay as HTMLElement;
             overlay.style.display = 'flex';
@@ -1245,7 +1109,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
             setTimeout(() => {
               overlay.style.opacity = '0';
               setTimeout(() => { overlay.style.display = 'none'; }, 300);
-            }, 1800);
+            }, 2500);
           }
         });
         marker.addTo(map);
@@ -1253,18 +1117,18 @@ export default function StoreMap({ stores }: StoreMapProps) {
       });
       if (cityClusters.length > 0) {
         const group = L.featureGroup(markersRef.current);
-        map.fitBounds(group.getBounds().pad(0.15), { maxZoom: 10, animate: false });
+        map.fitBounds(group.getBounds().pad(0.15), { maxZoom: 10 });
       }
     } else {
       filteredStores.forEach((store) => {
         const marker = L.marker([store.lat, store.lng], { icon: createStorePinIcon(selectedStore?.id === store.id) });
-        marker.on('click', () => { setSelectedStore(store); map.setView([store.lat, store.lng], 12, { animate: false }); });
+        marker.on('click', () => { setSelectedStore(store); map.flyTo([store.lat, store.lng], 14, { duration: 1.2 }); });
         marker.addTo(map);
         markersRef.current.push(marker);
       });
       if (filteredStores.length > 0 && !selectedStore) {
         const group = L.featureGroup(markersRef.current);
-        map.fitBounds(group.getBounds().pad(0.3), { maxZoom: 12, animate: false });
+        map.fitBounds(group.getBounds().pad(0.3), { maxZoom: 14 });
       }
     }
   }, [filteredStores, cityClusters, filterCity, selectedStore]);
@@ -1296,13 +1160,13 @@ export default function StoreMap({ stores }: StoreMapProps) {
   const handleResetView = () => {
     const map = mapRef.current; if (!map) return;
     setSelectedStore(null); setFilterCity('All');
-    map.setView([23.7, 120.96], 8, { animate: false });
+    map.flyTo([23.7, 120.96], 8, { duration: 1 });
   };
 
   const handleBackToAll = () => {
     const map = mapRef.current; if (!map) return;
     setSelectedStore(null); setFilterCity('All');
-    map.setView([23.7, 120.96], 8, { animate: false });
+    map.flyTo([23.7, 120.96], 8, { duration: 1 });
   };
 
   const storeTypeLabel = (type: string) => {
@@ -1447,25 +1311,6 @@ export default function StoreMap({ stores }: StoreMapProps) {
           className="illustrated-map w-full h-[600px] sm:h-[750px] lg:h-[900px] overflow-hidden"
           style={{ background: '#4A9FD9' }}
         />
-
-        {/* ── Loading overlay — covers map until tiles are fully rendered ── */}
-        <div
-          className={`absolute inset-0 z-[800] flex items-center justify-center transition-opacity duration-700 pointer-events-none ${
-            mapReady ? 'opacity-0' : 'opacity-100'
-          }`}
-          style={{ background: 'linear-gradient(135deg, #4A9FD9 0%, #3B8EC5 100%)' }}
-          onTransitionEnd={(e) => {
-            if (mapReady) (e.currentTarget as HTMLElement).style.display = 'none';
-          }}
-        >
-          <div className="flex flex-col items-center gap-3">
-            <div className="relative w-10 h-10">
-              <div className="absolute inset-0 rounded-full border-[3px] border-white/20" />
-              <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-white animate-spin" />
-            </div>
-            <span className="text-white/80 text-sm font-medium tracking-wide">Loading map...</span>
-          </div>
-        </div>
       </div>
 
       {/* ─── Store popup ─── */}
