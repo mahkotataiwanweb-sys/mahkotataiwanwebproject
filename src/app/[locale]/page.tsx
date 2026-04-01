@@ -238,7 +238,7 @@ export default function HomePage() {
 
       ScrollTrigger.create({
         trigger: bottomWrapRef.current,
-        start: 'top 80%',
+        start: 'top 10%',
         once: true,
         onEnter: async () => {
           if (bottomEntered) return;
