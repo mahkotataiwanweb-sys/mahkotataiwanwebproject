@@ -719,7 +719,7 @@ export default function AboutPage() {
 
               {/* Right column — Description */}
               <div>
-                <p className="text-navy/60 leading-relaxed text-base sm:text-lg tracking-wide mb-4">
+                <p className="text-navy/60 leading-relaxed text-base sm:text-lg tracking-wide mb-4 text-justify">
                   {t('description')}
                 </p>
               </div>

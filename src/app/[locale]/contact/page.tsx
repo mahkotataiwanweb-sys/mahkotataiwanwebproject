@@ -272,25 +272,41 @@ export default function ContactPage() {
         );
       }
 
-      /* ── Contact Cards Stagger (right side) ── */
+      /* ── Contact Cards — One-time flip entrance, top row then bottom row ── */
       if (contactCardsRef.current) {
-        gsap.fromTo(
-          contactCardsRef.current.children,
-          { opacity: 0, x: 60, filter: 'blur(8px)' },
-          {
-            opacity: 1,
-            x: 0,
-            filter: 'blur(0px)',
-            duration: 0.7,
-            stagger: 0.12,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: contactCardsRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
+        const cards = contactCardsRef.current.children;
+        // Set all cards hidden with flip
+        gsap.set(cards, {
+          opacity: 0,
+          rotateY: -90,
+          transformPerspective: 2500,
+          transformOrigin: 'center center',
+        });
+
+        ScrollTrigger.create({
+          trigger: contactCardsRef.current,
+          start: 'top 85%',
+          once: true,
+          onEnter: () => {
+            // Top row (cards 0 & 1) flip first
+            gsap.to([cards[0], cards[1]], {
+              opacity: 1,
+              rotateY: 0,
+              duration: 1.2,
+              stagger: 0.15,
+              ease: 'power2.out',
+            });
+            // Bottom row (cards 2 & 3) flip after top row finishes
+            gsap.to([cards[2], cards[3]], {
+              opacity: 1,
+              rotateY: 0,
+              duration: 1.2,
+              stagger: 0.15,
+              ease: 'power2.out',
+              delay: 1.4,
+            });
+          },
+        });
       }
 
       /* ── Business Hours Clock ── */
