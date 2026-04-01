@@ -207,8 +207,8 @@ export default function HomePage() {
         /* Flip top card */
         await topCardRef.current?.triggerFlip();
         if (cancelled) break;
-        /* Pause between cards */
-        await new Promise(r => setTimeout(r, 3000));
+        /* Pause between cards — 1.5s */
+        await new Promise(r => setTimeout(r, 1500));
         if (cancelled) break;
         /* Flip bottom card */
         await bottomCardRef.current?.triggerFlip();
@@ -224,8 +224,10 @@ export default function HomePage() {
         onEnter: async () => {
           if (enteredView) return;
           enteredView = true;
-          /* Entrance: top first, then bottom */
-          await topCardRef.current?.enterView();
+          /* Entrance: top card first, then bottom 1.5s later */
+          topCardRef.current?.enterView();
+          await new Promise(r => setTimeout(r, 1500));
+          if (cancelled) return;
           await bottomCardRef.current?.enterView();
           /* Start sequenced flipping */
           sequencer();
