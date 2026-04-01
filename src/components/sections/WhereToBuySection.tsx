@@ -194,18 +194,15 @@ export default function WhereToBuySection() {
         }
       });
 
-      // Build a looping master timeline
+      // One-time entrance animation — letters bounce in then stay visible
       const masterTl = gsap.timeline({
-        repeat: -1,
-        repeatDelay: 1.5,
         scrollTrigger: {
           trigger: sectionRef.current,
           start: 'top 65%',
-          toggleActions: 'play pause resume pause',
+          toggleActions: 'play none none none',
         },
       });
 
-      // Phase 1: Bounce-in all letters slowly, group by group
       let offset = 0;
       allGroups.forEach(({ els, stagger }) => {
         if (!els?.length) return;
@@ -218,22 +215,7 @@ export default function WhereToBuySection() {
           stagger: stagger,
           ease: 'bounce.out',
         }, offset);
-        offset += els.length * stagger * 0.6; // overlap groups slightly
-      });
-
-      // Phase 2: Hold all visible for 3 seconds
-      masterTl.to({}, { duration: 3 });
-
-      // Phase 3: Fade all out together softly
-      allGroups.forEach(({ els }) => {
-        if (!els?.length) return;
-        masterTl.to(els, {
-          opacity: 0,
-          y: -15,
-          scale: 0.8,
-          duration: 0.5,
-          ease: 'power2.in',
-        }, `>-0.5`); // overlap the fade-outs
+        offset += els.length * stagger * 0.6;
       });
     }, sectionRef);
 
