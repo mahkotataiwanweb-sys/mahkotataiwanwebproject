@@ -68,8 +68,8 @@ function CharReveal({ text, className }: { text: string; className?: string }) {
         {
           opacity: 1,
           y: 0,
-          duration: 1.8,
-          stagger: { each: 0.04, from: 'random' },
+          duration: 0.9,
+          stagger: { each: 0.02, from: 'random' },
           ease: 'power2.out',
         },
         0
