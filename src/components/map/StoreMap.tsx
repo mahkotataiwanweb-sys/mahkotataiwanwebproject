@@ -522,38 +522,46 @@ export default function StoreMap({ stores }: StoreMapProps) {
 
     mapRef.current = map;
 
-    /* Layer 1: Base tile — no labels, just land shapes for surrounding areas */
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+    /* Create a custom pane for labels so they sit on top of everything */
+    map.createPane('labelsPane');
+    const labelsPane = map.getPane('labelsPane');
+    if (labelsPane) {
+      labelsPane.style.zIndex = '450';
+      labelsPane.style.pointerEvents = 'none';
+    }
+
+    /* Layer 1: Base tile — full Voyager style for surrounding areas (land, ocean, roads) */
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap © CARTO',
     }).addTo(map);
 
-    /* Layer 2: Taiwan GeoJSON overlay — peach/salmon illustrated style */
+    /* Layer 2: Taiwan GeoJSON overlay — peach/salmon illustrated style (semi-transparent so roads peek through) */
     fetch('/taiwan.geo.json')
       .then((res) => res.json())
       .then((geojsonData) => {
         const geoLayer = L.geoJSON(geojsonData, {
           style: () => ({
             fillColor: '#F5CBA7',
-            fillOpacity: 0.7,
+            fillOpacity: 0.5,
             color: '#FFFFFF',
             weight: 2,
-            opacity: 0.85,
+            opacity: 0.8,
           }),
           interactive: false,
         });
         geoLayer.addTo(map);
         geoJsonLayerRef.current = geoLayer;
 
-        /* Layer 3: Labels-only tile on top — city names, roads, places visible */
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+        /* Layer 3: Bold Voyager labels on top — city names, roads, districts all clearly visible */
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
           maxZoom: 19,
-          pane: 'overlayPane',
+          pane: 'labelsPane',
         }).addTo(map);
       })
       .catch(() => {
-        /* GeoJSON failed — fallback to full tile layer with labels */
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        /* GeoJSON failed — fallback to full Voyager tile layer with everything */
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
           maxZoom: 19,
         }).addTo(map);
       });

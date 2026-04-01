@@ -358,8 +358,13 @@ export default function WhereToBuyPage() {
           </div>
 
           <motion.span
-            className="hero-text inline-block text-red/80 text-sm font-semibold tracking-[0.3em] uppercase mb-4"
-            animate={{ opacity: [0.6, 1, 0.6] }}
+            className="hero-text inline-block text-base sm:text-lg font-bold tracking-[0.35em] uppercase mb-5 px-6 py-2 rounded-full border border-cream/20"
+            style={{
+              background: 'linear-gradient(135deg, rgba(193,33,38,0.15), rgba(250,237,211,0.1))',
+              color: '#FAEDD3',
+              textShadow: '0 0 20px rgba(250,237,211,0.4), 0 0 40px rgba(193,33,38,0.2)',
+            }}
+            animate={{ opacity: [0.85, 1, 0.85], scale: [0.98, 1, 0.98] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
             ✦ Find Us ✦
