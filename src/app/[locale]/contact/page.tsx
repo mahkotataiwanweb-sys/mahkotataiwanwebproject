@@ -527,7 +527,7 @@ export default function ContactPage() {
                 Get in Touch
               </h2>
               <div className="w-16 h-[2px] bg-red mb-4" />
-              <p className="text-navy/60 text-sm tracking-wide leading-relaxed max-w-md mb-10">
+              <p className="text-navy/60 text-base sm:text-lg tracking-wide leading-relaxed max-w-md mb-10">
                 Whether you have questions about our products, partnerships, or services — we&apos;d love to hear from you. Reach out through any of these channels.
               </p>
 

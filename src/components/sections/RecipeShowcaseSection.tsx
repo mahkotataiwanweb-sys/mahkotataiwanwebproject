@@ -343,7 +343,7 @@ export default function RecipeShowcaseSection() {
 
           <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-red to-transparent mx-auto mb-4" />
 
-          <p className="text-cream/40 max-w-lg mx-auto text-sm sm:text-base tracking-wide">
+          <p className="text-cream/40 max-w-lg mx-auto text-base sm:text-lg tracking-wide">
             {subtitle}
           </p>
         </div>
