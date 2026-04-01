@@ -294,14 +294,14 @@ export default function ContactPage() {
               rotateY: 0,
               duration: 2.0,
               ease: 'power3.out',
-              delay: 0.3,
+              delay: 0.6,
             });
             gsap.to(cards[1], {
               opacity: 1,
               rotateY: 0,
               duration: 2.0,
               ease: 'power3.out',
-              delay: 0.8,
+              delay: 1.0,
             });
             // Bottom row (cards 2 & 3) flip after top row
             gsap.to(cards[2], {
