@@ -165,11 +165,11 @@ function CharReveal({ text, className }: { text: string; className?: string }) {
     const chars = ref.current.querySelectorAll('.cr-char');
     if (chars.length === 0) return;
 
-    /* Pre-compute random rain values */
-    const charData = Array.from({ length: chars.length }, (_, i) => ({
-      delay: i * 0.025 + Math.random() * 0.35,
-      yStart: -(40 + Math.random() * 60),
-      duration: 0.6 + Math.random() * 0.4,
+    /* Pre-compute random rain values — ALL lines start together (no sequential i*delay) */
+    const charData = Array.from({ length: chars.length }, () => ({
+      delay: Math.random() * 2.5,
+      yStart: -(50 + Math.random() * 80),
+      duration: 1.0 + Math.random() * 0.8,
     }));
 
     const ctx = gsap.context(() => {
@@ -395,7 +395,7 @@ export default function AboutPage() {
   // GSAP scroll-triggered animations
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Description section — premium dramatic reveal
+      // Description section — all elements reveal together, slow & dramatic
       if (textRef.current) {
         const textChildren = textRef.current.children;
         gsap.fromTo(
@@ -406,12 +406,12 @@ export default function AboutPage() {
             y: 0,
             filter: 'blur(0px)',
             scale: 1,
-            duration: 1.6,
-            stagger: 0.35,
-            ease: 'power3.out',
+            duration: 2.5,
+            stagger: 0,
+            ease: 'power2.out',
             scrollTrigger: {
               trigger: textRef.current,
-              start: 'top 80%',
+              start: 'top 85%',
               toggleActions: 'play none none reverse',
             },
           }
