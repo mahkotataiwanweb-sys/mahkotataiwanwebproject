@@ -302,13 +302,13 @@ function OceanWaterEffects() {
           }}
           viewBox="0 0 60 60"
         >
-          <circle cx="30" cy="30" r="8" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5">
+          <circle cx="30" cy="30" r="8" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2">
             <animate attributeName="r" from="4" to="28" dur="4s" begin={pos.delay} repeatCount="indefinite" />
-            <animate attributeName="opacity" from="0.4" to="0" dur="4s" begin={pos.delay} repeatCount="indefinite" />
+            <animate attributeName="opacity" from="0.6" to="0" dur="4s" begin={pos.delay} repeatCount="indefinite" />
           </circle>
-          <circle cx="30" cy="30" r="4" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1">
+          <circle cx="30" cy="30" r="4" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5">
             <animate attributeName="r" from="8" to="25" dur="4s" begin={`calc(${pos.delay} + 0.8s)`} repeatCount="indefinite" />
-            <animate attributeName="opacity" from="0.3" to="0" dur="4s" begin={`calc(${pos.delay} + 0.8s)`} repeatCount="indefinite" />
+            <animate attributeName="opacity" from="0.5" to="0" dur="4s" begin={`calc(${pos.delay} + 0.8s)`} repeatCount="indefinite" />
           </circle>
         </svg>
       ))}
@@ -360,8 +360,8 @@ function OceanWaterEffects() {
               width: size,
               height: size,
               borderRadius: '50%',
-              background: 'rgba(255,255,255,0.2)',
-              border: '0.5px solid rgba(255,255,255,0.3)',
+              background: 'rgba(255,255,255,0.45)',
+              border: '1px solid rgba(255,255,255,0.55)',
               animation: `bubbleRise ${duration}s ease-in infinite ${delay}s`,
             }}
           />
@@ -375,18 +375,18 @@ function OceanWaterEffects() {
           top: '18%',
           left: 0,
           width: '100%',
-          height: '24px',
+          height: '28px',
           animation: 'floatCloud 40s linear infinite 2s',
-          opacity: 0.3,
+          opacity: 0.7,
         }}
         viewBox="0 0 50 20"
         width="50"
         height="20"
         fill="none"
       >
-        <path d="M5 14 L10 14 L12 10 L15 6 L15 10 L25 10 L27 14 L30 14 L28 18 L3 18 Z" fill="#2C6E91" />
-        <line x1="15" y1="6" x2="15" y2="3" stroke="#2C6E91" strokeWidth="1" />
-        <polygon points="15,3 15,7 19,7" fill="#3A8AB5" opacity="0.7" />
+        <path d="M5 14 L10 14 L12 10 L15 6 L15 10 L25 10 L27 14 L30 14 L28 18 L3 18 Z" fill="#1A4F6E" />
+        <line x1="15" y1="6" x2="15" y2="3" stroke="#1A4F6E" strokeWidth="1.5" />
+        <polygon points="15,3 15,7 19,7" fill="#E85A3A" opacity="0.9" />
       </svg>
 
       {/* Starfish icon near bottom */}
@@ -395,43 +395,45 @@ function OceanWaterEffects() {
           position: 'absolute',
           bottom: '8%',
           left: '18%',
-          width: '18px',
-          height: '18px',
-          opacity: 0.2,
+          width: '24px',
+          height: '24px',
+          opacity: 0.7,
           animation: 'bobFloat 5s ease-in-out infinite 1s',
         }}
         viewBox="0 0 24 24"
-        fill="#E8A87C"
+        fill="#E8714A"
       >
         <path d="M12 2l2.5 7.5H22l-6 4.5 2.5 7.5L12 17l-6.5 4.5 2.5-7.5-6-4.5h7.5z" />
       </svg>
 
-      {/* Jellyfish silhouette */}
+      {/* Jellyfish */}
       <svg
         style={{
           position: 'absolute',
           bottom: '30%',
           right: '10%',
-          width: '20px',
-          height: '30px',
-          opacity: 0.15,
+          width: '26px',
+          height: '36px',
+          opacity: 0.65,
           animation: 'jellyfishFloat 7s ease-in-out infinite',
         }}
         viewBox="0 0 20 30"
         fill="none"
       >
-        <ellipse cx="10" cy="8" rx="8" ry="8" fill="#7BC8E8" />
-        <path d="M4 16 Q6 22 5 28" stroke="#7BC8E8" strokeWidth="1" fill="none" strokeLinecap="round" />
-        <path d="M8 16 Q9 24 7 28" stroke="#7BC8E8" strokeWidth="1" fill="none" strokeLinecap="round" />
-        <path d="M12 16 Q11 24 13 28" stroke="#7BC8E8" strokeWidth="1" fill="none" strokeLinecap="round" />
-        <path d="M16 16 Q14 22 15 28" stroke="#7BC8E8" strokeWidth="1" fill="none" strokeLinecap="round" />
+        <ellipse cx="10" cy="8" rx="8" ry="8" fill="#D988E8" />
+        <ellipse cx="10" cy="8" rx="5" ry="5" fill="#E8A8F5" opacity="0.6" />
+        <path d="M4 16 Q6 22 5 28" stroke="#D988E8" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        <path d="M8 16 Q9 24 7 28" stroke="#D988E8" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        <path d="M12 16 Q11 24 13 28" stroke="#D988E8" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        <path d="M16 16 Q14 22 15 28" stroke="#D988E8" strokeWidth="1.5" fill="none" strokeLinecap="round" />
       </svg>
 
       {/* Seaweed — gently swaying */}
       {[
-        { bottom: '0%', left: '5%', height: 40, delay: '0s' },
-        { bottom: '0%', left: '88%', height: 35, delay: '1s' },
-        { bottom: '0%', left: '30%', height: 28, delay: '2s' },
+        { bottom: '0%', left: '5%', height: 50, delay: '0s' },
+        { bottom: '0%', left: '88%', height: 45, delay: '1s' },
+        { bottom: '0%', left: '30%', height: 35, delay: '2s' },
+        { bottom: '0%', left: '60%', height: 42, delay: '0.5s' },
       ].map((pos, i) => (
         <svg
           key={`seaweed-${i}`}
@@ -439,16 +441,16 @@ function OceanWaterEffects() {
             position: 'absolute',
             bottom: pos.bottom,
             left: pos.left,
-            width: '14px',
+            width: '16px',
             height: `${pos.height}px`,
-            opacity: 0.15,
+            opacity: 0.6,
             animation: `seaweedSway 4s ease-in-out infinite ${pos.delay}`,
             transformOrigin: 'bottom center',
           }}
           viewBox="0 0 14 40"
           fill="none"
         >
-          <path d="M7 40 Q3 30 7 22 Q11 14 7 6 Q5 2 7 0" stroke="#2A8B5A" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          <path d="M7 40 Q3 30 7 22 Q11 14 7 6 Q5 2 7 0" stroke="#1B8C4E" strokeWidth="3" fill="none" strokeLinecap="round" />
         </svg>
       ))}
 
@@ -491,93 +493,93 @@ function OceanWaterEffects() {
 function DecorativeElements() {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-[500]">
-      {/* Birds */}
+      {/* Birds — bold dark strokes */}
       <svg style={{ position: 'absolute', top: '8%', left: 0, width: '100%', height: '40px', animation: 'floatBird 12s ease-in-out infinite' }} viewBox="0 0 40 20" fill="none" width="40" height="20">
-        <path d="M2 12 Q8 4 14 10 M14 10 Q20 4 26 12" stroke="#4A6B7A" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        <path d="M2 12 Q8 4 14 10 M14 10 Q20 4 26 12" stroke="#1A3D4E" strokeWidth="3" fill="none" strokeLinecap="round"/>
       </svg>
       <svg style={{ position: 'absolute', top: '14%', left: 0, width: '100%', height: '30px', animation: 'floatBird 16s ease-in-out infinite 3s' }} viewBox="0 0 30 16" fill="none" width="30" height="16">
-        <path d="M2 10 Q6 3 10 8 M10 8 Q14 3 18 10" stroke="#6B8E9E" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M2 10 Q6 3 10 8 M10 8 Q14 3 18 10" stroke="#2A5060" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
       </svg>
       <svg style={{ position: 'absolute', top: '22%', left: 0, width: '100%', height: '26px', animation: 'floatBird2 14s ease-in-out infinite 5s' }} viewBox="0 0 26 14" fill="none" width="26" height="14">
-        <path d="M2 8 Q5 2 8 6 M8 6 Q11 2 14 8" stroke="#7BA3B3" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        <path d="M2 8 Q5 2 8 6 M8 6 Q11 2 14 8" stroke="#1A3D4E" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
       </svg>
 
-      {/* Clouds */}
-      <svg style={{ position: 'absolute', top: '6%', left: 0, width: '100%', height: '50px', animation: 'floatCloud 25s linear infinite', opacity: 0.5 }} viewBox="0 0 120 40" fill="none" width="120" height="40">
+      {/* Clouds — soft white, visible */}
+      <svg style={{ position: 'absolute', top: '6%', left: 0, width: '100%', height: '50px', animation: 'floatCloud 25s linear infinite', opacity: 0.75 }} viewBox="0 0 120 40" fill="none" width="120" height="40">
         <ellipse cx="60" cy="25" rx="50" ry="14" fill="white"/><ellipse cx="40" cy="18" rx="25" ry="14" fill="white"/><ellipse cx="80" cy="20" rx="30" ry="12" fill="white"/>
       </svg>
-      <svg style={{ position: 'absolute', top: '30%', right: 0, width: '100%', height: '40px', animation: 'floatCloud 30s linear infinite 8s', opacity: 0.35 }} viewBox="0 0 100 30" fill="none" width="100" height="30">
+      <svg style={{ position: 'absolute', top: '30%', right: 0, width: '100%', height: '40px', animation: 'floatCloud 30s linear infinite 8s', opacity: 0.55 }} viewBox="0 0 100 30" fill="none" width="100" height="30">
         <ellipse cx="50" cy="18" rx="40" ry="11" fill="white"/><ellipse cx="30" cy="13" rx="22" ry="10" fill="white"/><ellipse cx="70" cy="15" rx="25" ry="9" fill="white"/>
       </svg>
 
-      {/* Waves */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, width: '200%', height: '30px', animation: 'waveMove 8s linear infinite', opacity: 0.2 }}>
+      {/* Waves — bolder */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, width: '200%', height: '30px', animation: 'waveMove 8s linear infinite', opacity: 0.45 }}>
         <svg viewBox="0 0 1200 30" fill="none" width="100%" height="30" preserveAspectRatio="none">
-          <path d="M0 15 Q50 0 100 15 Q150 30 200 15 Q250 0 300 15 Q350 30 400 15 Q450 0 500 15 Q550 30 600 15 Q650 0 700 15 Q750 30 800 15 Q850 0 900 15 Q950 30 1000 15 Q1050 0 1100 15 Q1150 30 1200 15" stroke="#4A6B7A" strokeWidth="2" fill="none"/>
+          <path d="M0 15 Q50 0 100 15 Q150 30 200 15 Q250 0 300 15 Q350 30 400 15 Q450 0 500 15 Q550 30 600 15 Q650 0 700 15 Q750 30 800 15 Q850 0 900 15 Q950 30 1000 15 Q1050 0 1100 15 Q1150 30 1200 15" stroke="#FFFFFF" strokeWidth="2.5" fill="none"/>
         </svg>
       </div>
-      <div style={{ position: 'absolute', bottom: '8px', left: 0, width: '200%', height: '25px', animation: 'waveMove 10s linear infinite 1s', opacity: 0.15 }}>
+      <div style={{ position: 'absolute', bottom: '8px', left: 0, width: '200%', height: '25px', animation: 'waveMove 10s linear infinite 1s', opacity: 0.3 }}>
         <svg viewBox="0 0 1200 25" fill="none" width="100%" height="25" preserveAspectRatio="none">
-          <path d="M0 12 Q50 0 100 12 Q150 25 200 12 Q250 0 300 12 Q350 25 400 12 Q450 0 500 12 Q550 25 600 12 Q650 0 700 12 Q750 25 800 12 Q850 0 900 12 Q950 25 1000 12 Q1050 0 1100 12 Q1150 25 1200 12" stroke="#4A6B7A" strokeWidth="1.5" fill="none"/>
+          <path d="M0 12 Q50 0 100 12 Q150 25 200 12 Q250 0 300 12 Q350 25 400 12 Q450 0 500 12 Q550 25 600 12 Q650 0 700 12 Q750 25 800 12 Q850 0 900 12 Q950 25 1000 12 Q1050 0 1100 12 Q1150 25 1200 12" stroke="#FFFFFF" strokeWidth="2" fill="none"/>
         </svg>
       </div>
 
-      {/* Fish */}
-      <svg style={{ position: 'absolute', bottom: '15%', left: 0, width: '100%', height: '20px', animation: 'fishSwim 18s ease-in-out infinite 2s' }} viewBox="0 0 28 14" fill="none" width="28" height="14">
-        <ellipse cx="12" cy="7" rx="10" ry="5" fill="#5B9BAD" opacity="0.5"/><polygon points="22,7 28,2 28,12" fill="#5B9BAD" opacity="0.5"/><circle cx="7" cy="6" r="1.2" fill="white" opacity="0.8"/>
+      {/* Fish — vivid colors */}
+      <svg style={{ position: 'absolute', bottom: '15%', left: 0, width: '100%', height: '22px', animation: 'fishSwim 18s ease-in-out infinite 2s' }} viewBox="0 0 28 14" fill="none" width="28" height="14">
+        <ellipse cx="12" cy="7" rx="10" ry="5" fill="#FF6B35" opacity="0.85"/><polygon points="22,7 28,2 28,12" fill="#FF6B35" opacity="0.85"/><circle cx="7" cy="6" r="1.5" fill="white"/>
       </svg>
-      <svg style={{ position: 'absolute', bottom: '25%', left: 0, width: '100%', height: '16px', animation: 'fishSwim 22s ease-in-out infinite 7s' }} viewBox="0 0 24 12" fill="none" width="24" height="12">
-        <ellipse cx="10" cy="6" rx="8" ry="4" fill="#6BAFBF" opacity="0.4"/><polygon points="18,6 24,2 24,10" fill="#6BAFBF" opacity="0.4"/><circle cx="6" cy="5" r="1" fill="white" opacity="0.7"/>
+      <svg style={{ position: 'absolute', bottom: '25%', left: 0, width: '100%', height: '18px', animation: 'fishSwim 22s ease-in-out infinite 7s' }} viewBox="0 0 24 12" fill="none" width="24" height="12">
+        <ellipse cx="10" cy="6" rx="8" ry="4" fill="#FFD93D" opacity="0.8"/><polygon points="18,6 24,2 24,10" fill="#FFD93D" opacity="0.8"/><circle cx="6" cy="5" r="1.2" fill="#333"/>
       </svg>
 
-      {/* Wave squiggles */}
+      {/* Wave squiggles — white, visible */}
       {[
         { top: '45%', left: '5%', delay: '0s' },
         { top: '65%', right: '8%', delay: '2s' },
         { top: '75%', left: '12%', delay: '4s' },
         { top: '55%', right: '15%', delay: '1s' },
       ].map((pos, i) => (
-        <svg key={i} style={{ position: 'absolute', ...pos, width: '30px', height: '10px', animation: `bobFloat 3s ease-in-out infinite ${pos.delay}`, opacity: 0.25 }} viewBox="0 0 30 10" fill="none">
-          <path d="M2 5 Q8 1 14 5 Q20 9 26 5" stroke="#4A6B7A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+        <svg key={i} style={{ position: 'absolute', ...pos, width: '35px', height: '12px', animation: `bobFloat 3s ease-in-out infinite ${pos.delay}`, opacity: 0.5 }} viewBox="0 0 30 10" fill="none">
+          <path d="M2 5 Q8 1 14 5 Q20 9 26 5" stroke="#FFFFFF" strokeWidth="2" fill="none" strokeLinecap="round"/>
         </svg>
       ))}
 
-      {/* Extra fish — different sizes and directions */}
-      <svg style={{ position: 'absolute', bottom: '40%', left: 0, width: '100%', height: '18px', animation: 'fishSwim 15s ease-in-out infinite 4s' }} viewBox="0 0 26 12" fill="none" width="26" height="12">
-        <ellipse cx="11" cy="6" rx="9" ry="4.5" fill="#4FBCD3" opacity="0.45"/><polygon points="20,6 26,2 26,10" fill="#4FBCD3" opacity="0.45"/><circle cx="6" cy="5" r="1.2" fill="white" opacity="0.7"/>
+      {/* Extra fish — teal and coral */}
+      <svg style={{ position: 'absolute', bottom: '40%', left: 0, width: '100%', height: '20px', animation: 'fishSwim 15s ease-in-out infinite 4s' }} viewBox="0 0 26 12" fill="none" width="26" height="12">
+        <ellipse cx="11" cy="6" rx="9" ry="4.5" fill="#00BCD4" opacity="0.8"/><polygon points="20,6 26,2 26,10" fill="#00BCD4" opacity="0.8"/><circle cx="6" cy="5" r="1.2" fill="white"/>
       </svg>
-      <svg style={{ position: 'absolute', bottom: '55%', left: 0, width: '100%', height: '14px', animation: 'fishSwim 20s ease-in-out infinite 9s' }} viewBox="0 0 22 10" fill="none" width="22" height="10">
-        <ellipse cx="9" cy="5" rx="7" ry="3.5" fill="#E8946A" opacity="0.35"/><polygon points="16,5 22,2 22,8" fill="#E8946A" opacity="0.35"/><circle cx="5" cy="4" r="1" fill="white" opacity="0.6"/>
-      </svg>
-
-      {/* Cute turtle swimming */}
-      <svg style={{ position: 'absolute', bottom: '20%', left: 0, width: '100%', height: '22px', animation: 'fishSwim 28s ease-in-out infinite 3s' }} viewBox="0 0 36 18" fill="none" width="36" height="18">
-        <ellipse cx="18" cy="10" rx="10" ry="6" fill="#5DAD7F" opacity="0.4"/>
-        <ellipse cx="18" cy="10" rx="7" ry="4" fill="#7CC99C" opacity="0.3"/>
-        <circle cx="8" cy="8" r="3" fill="#5DAD7F" opacity="0.4"/>
-        <circle cx="6" cy="7" r="0.8" fill="white" opacity="0.6"/>
-        {/* Flippers */}
-        <ellipse cx="12" cy="5" rx="3" ry="1.5" fill="#5DAD7F" opacity="0.35" transform="rotate(-20 12 5)"/>
-        <ellipse cx="12" cy="15" rx="3" ry="1.5" fill="#5DAD7F" opacity="0.35" transform="rotate(20 12 15)"/>
-        <ellipse cx="26" cy="8" rx="3" ry="1.5" fill="#5DAD7F" opacity="0.35" transform="rotate(-10 26 8)"/>
-        <ellipse cx="26" cy="12" rx="3" ry="1.5" fill="#5DAD7F" opacity="0.35" transform="rotate(10 26 12)"/>
+      <svg style={{ position: 'absolute', bottom: '55%', left: 0, width: '100%', height: '16px', animation: 'fishSwim 20s ease-in-out infinite 9s' }} viewBox="0 0 22 10" fill="none" width="22" height="10">
+        <ellipse cx="9" cy="5" rx="7" ry="3.5" fill="#E84855" opacity="0.75"/><polygon points="16,5 22,2 22,8" fill="#E84855" opacity="0.75"/><circle cx="5" cy="4" r="1" fill="white"/>
       </svg>
 
-      {/* Dolphin jumping arc */}
-      <svg style={{ position: 'absolute', top: '12%', left: 0, width: '100%', height: '28px', animation: 'floatBird 18s ease-in-out infinite 6s' }} viewBox="0 0 40 22" fill="none" width="40" height="22">
-        <path d="M4 18 Q10 2 20 8 Q30 14 36 4" stroke="#3B87A8" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.3"/>
-        <ellipse cx="20" cy="10" rx="6" ry="3" fill="#3B87A8" opacity="0.25"/>
-        <path d="M26 10 L30 7 L29 12 Z" fill="#3B87A8" opacity="0.25"/>
+      {/* Cute turtle swimming — green, bold */}
+      <svg style={{ position: 'absolute', bottom: '20%', left: 0, width: '100%', height: '26px', animation: 'fishSwim 28s ease-in-out infinite 3s' }} viewBox="0 0 36 18" fill="none" width="36" height="18">
+        <ellipse cx="18" cy="10" rx="10" ry="6" fill="#2E8B57" opacity="0.8"/>
+        <ellipse cx="18" cy="10" rx="7" ry="4" fill="#3CB371" opacity="0.7"/>
+        <circle cx="8" cy="8" r="3.5" fill="#2E8B57" opacity="0.8"/>
+        <circle cx="6" cy="7" r="1" fill="white"/>
+        <ellipse cx="12" cy="5" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.7" transform="rotate(-20 12 5)"/>
+        <ellipse cx="12" cy="15" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.7" transform="rotate(20 12 15)"/>
+        <ellipse cx="26" cy="8" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.7" transform="rotate(-10 26 8)"/>
+        <ellipse cx="26" cy="12" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.7" transform="rotate(10 26 12)"/>
       </svg>
 
-      {/* Tiny school of fish (3 dots swimming together) */}
-      <svg style={{ position: 'absolute', bottom: '45%', left: 0, width: '100%', height: '16px', animation: 'fishSwim 12s ease-in-out infinite 1s' }} viewBox="0 0 40 14" fill="none" width="40" height="14">
-        <ellipse cx="8" cy="5" rx="4" ry="2" fill="#5B9BAD" opacity="0.3"/>
-        <ellipse cx="16" cy="8" rx="4" ry="2" fill="#5B9BAD" opacity="0.25"/>
-        <ellipse cx="12" cy="12" rx="3.5" ry="1.8" fill="#5B9BAD" opacity="0.2"/>
-        <polygon points="12,5 16,3 16,7" fill="#5B9BAD" opacity="0.3"/>
-        <polygon points="20,8 24,6 24,10" fill="#5B9BAD" opacity="0.25"/>
-        <polygon points="15.5,12 19,10 19,14" fill="#5B9BAD" opacity="0.2"/>
+      {/* Dolphin — bold blue */}
+      <svg style={{ position: 'absolute', top: '12%', left: 0, width: '100%', height: '30px', animation: 'floatBird 18s ease-in-out infinite 6s' }} viewBox="0 0 40 22" fill="none" width="40" height="22">
+        <path d="M4 18 Q10 2 20 8 Q30 14 36 4" stroke="#1565C0" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <ellipse cx="20" cy="10" rx="6" ry="3.5" fill="#1565C0" opacity="0.65"/>
+        <path d="M26 10 L30 7 L29 12 Z" fill="#1565C0" opacity="0.65"/>
+        <circle cx="16" cy="9" r="1" fill="white" opacity="0.8"/>
+      </svg>
+
+      {/* School of fish — bright yellow */}
+      <svg style={{ position: 'absolute', bottom: '45%', left: 0, width: '100%', height: '18px', animation: 'fishSwim 12s ease-in-out infinite 1s' }} viewBox="0 0 40 14" fill="none" width="40" height="14">
+        <ellipse cx="8" cy="5" rx="4" ry="2.2" fill="#FFB300" opacity="0.8"/>
+        <ellipse cx="16" cy="8" rx="4" ry="2.2" fill="#FFB300" opacity="0.75"/>
+        <ellipse cx="12" cy="12" rx="3.5" ry="2" fill="#FFB300" opacity="0.7"/>
+        <polygon points="12,5 16,3 16,7" fill="#FFB300" opacity="0.8"/>
+        <polygon points="20,8 24,6 24,10" fill="#FFB300" opacity="0.75"/>
+        <polygon points="15.5,12 19,10 19,14" fill="#FFB300" opacity="0.7"/>
       </svg>
     </div>
   );
