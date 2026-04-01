@@ -15,13 +15,13 @@ function injectPinStyles() {
   const style = document.createElement('style');
   style.id = STYLE_ID;
   style.textContent = `
-    /* ── Force Leaflet ocean background — deeper blue ── */
+    /* ── Ocean = blue container bg; land shown via white GeoJSON base beneath semi-transparent tiles ── */
     .illustrated-map.leaflet-container {
-      background: #2E8BC0 !important;
+      background: #1B6FA0 !important;
     }
     .illustrated-map .leaflet-tile-pane {
       background: transparent !important;
-      opacity: 0.35;
+      opacity: 0.6;
     }
     .illustrated-map .leaflet-pane {
       background: transparent !important;
@@ -895,7 +895,16 @@ export default function StoreMap({ stores }: StoreMapProps) {
     map.on('dragstart', () => startMusicOnInteraction());
     map.on('zoomstart', () => startMusicOnInteraction());
 
-    /* Create a custom pane for labels so they sit on top of everything */
+    /* ── Custom panes for precise z-ordering ── */
+    /* landBasePane (z-150): white land shapes sit BELOW semi-transparent tiles */
+    map.createPane('landBasePane');
+    const landBase = map.getPane('landBasePane');
+    if (landBase) {
+      landBase.style.zIndex = '150';
+      landBase.style.pointerEvents = 'none';
+    }
+
+    /* labelsPane (z-450): city names, roads on top of everything */
     map.createPane('labelsPane');
     const labelsPane = map.getPane('labelsPane');
     if (labelsPane) {
@@ -903,20 +912,40 @@ export default function StoreMap({ stores }: StoreMapProps) {
       labelsPane.style.pointerEvents = 'none';
     }
 
-    /* Layer 1: Base tile — full Voyager style for surrounding areas (land, ocean, roads) */
+    /* ── Layer 0: World land GeoJSON — white fill below tiles ──
+       Over ocean: no polygon → blue container bg shows through faded tiles → BLUE ocean
+       Over land:  white polygon → faded tiles composite against white → VISIBLE land details */
+    fetch('/world-land.geo.json')
+      .then((res) => res.json())
+      .then((worldData) => {
+        L.geoJSON(worldData, {
+          style: () => ({
+            fillColor: '#FAFAFA',
+            fillOpacity: 1,
+            color: 'transparent',
+            weight: 0,
+          }),
+          pane: 'landBasePane',
+          interactive: false,
+        }).addTo(map);
+      })
+      .catch(() => { /* If world land fails, ocean just won't be as blue */ });
+
+    /* ── Layer 1: Voyager tiles at 0.6 opacity (set via CSS on tile-pane) ──
+       Blue bg bleeds through over ocean; white land base keeps land readable */
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap © CARTO',
     }).addTo(map);
 
-    /* Layer 2: Taiwan GeoJSON overlay — peach/salmon illustrated style (semi-transparent so roads peek through) */
+    /* ── Layer 2: Taiwan GeoJSON overlay — peach/salmon with semi-transparency so roads peek through ── */
     fetch('/taiwan.geo.json')
       .then((res) => res.json())
       .then((geojsonData) => {
         const geoLayer = L.geoJSON(geojsonData, {
           style: () => ({
             fillColor: '#F5CBA7',
-            fillOpacity: 0.88,
+            fillOpacity: 0.65,
             color: '#FFFFFF',
             weight: 2.5,
             opacity: 0.9,
@@ -926,14 +955,14 @@ export default function StoreMap({ stores }: StoreMapProps) {
         geoLayer.addTo(map);
         geoJsonLayerRef.current = geoLayer;
 
-        /* Layer 3: Bold Voyager labels on top — city names, roads, districts all clearly visible */
+        /* ── Layer 3: Labels on top — city names, roads, districts clearly visible ── */
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
           maxZoom: 19,
           pane: 'labelsPane',
         }).addTo(map);
       })
       .catch(() => {
-        /* GeoJSON failed — fallback to full Voyager tile layer with everything */
+        /* GeoJSON failed — fallback to full Voyager tile layer */
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
           maxZoom: 19,
         }).addTo(map);
