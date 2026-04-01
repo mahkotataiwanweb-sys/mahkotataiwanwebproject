@@ -17,7 +17,7 @@ function injectPinStyles() {
   style.textContent = `
     /* ── Clean map: vivid blue ocean + full-opacity tiles ── */
     .illustrated-map.leaflet-container {
-      background: #1565C0 !important;
+      background: #4AABE0 !important;
     }
     /* Force ocean pane above tiles — absolute safeguard */
     .leaflet-oceanPane-pane {
@@ -419,10 +419,10 @@ function DecorativeElements() {
       <div style={{ position: 'absolute', top: 0, left: '65%', width: '35%', height: '100%', overflow: 'hidden' }}>
         {/* Dolphin in right ocean */}
         <svg style={{ position: 'absolute', top: '30%', right: '-30px', animation: 'fishSwimLeft 40s linear infinite 3s' }} viewBox="0 0 40 22" fill="none" width="40" height="22">
-          <ellipse cx="20" cy="11" rx="8" ry="4.5" fill="#1565C0" opacity="0.65"/>
-          <path d="M28 11 L34 8 L33 14 Z" fill="#1565C0" opacity="0.6"/>
+          <ellipse cx="20" cy="11" rx="8" ry="4.5" fill="#5BC0EB" opacity="0.65"/>
+          <path d="M28 11 L34 8 L33 14 Z" fill="#5BC0EB" opacity="0.6"/>
           <circle cx="14" cy="10" r="1.2" fill="white" opacity="0.8"/>
-          <path d="M10 11 Q6 5 2 11" stroke="#1565C0" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.5"/>
+          <path d="M10 11 Q6 5 2 11" stroke="#5BC0EB" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.5"/>
         </svg>
         {/* Yellow fish school */}
         <svg style={{ position: 'absolute', top: '55%', right: '-25px', animation: 'fishSwimLeft 28s linear infinite 6s' }} viewBox="0 0 40 16" fill="none" width="40" height="16">
@@ -1050,8 +1050,8 @@ export default function StoreMap({ stores }: StoreMapProps) {
         L.geoJSON(oceanData, {
           pane: 'oceanPane',
           style: () => ({
-            fillColor: '#1565C0',
-            fillOpacity: 0.85,
+            fillColor: '#5BC0EB',
+            fillOpacity: 0.78,
             color: 'transparent',
             weight: 0,
           }),
@@ -1310,13 +1310,13 @@ export default function StoreMap({ stores }: StoreMapProps) {
       </div>
 
       {/* ─── Map ─── */}
-      <div className="relative overflow-hidden rounded-2xl" style={{ background: '#1565C0' }}>
+      <div className="relative overflow-hidden rounded-2xl" style={{ background: '#4AABE0' }}>
         <DecorativeElements />
         <OceanWaterEffects />
         <div
           ref={mapContainerRef}
           className="illustrated-map w-full h-[600px] sm:h-[750px] lg:h-[900px] overflow-hidden"
-          style={{ background: '#1565C0' }}
+          style={{ background: '#4AABE0' }}
         />
       </div>
 
