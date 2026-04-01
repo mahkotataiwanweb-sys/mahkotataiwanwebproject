@@ -77,17 +77,28 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
   useImperativeHandle(ref, () => ({
     triggerFlip: () => new Promise<void>((resolve) => {
       if (count <= 1 || !cardRef.current) { resolve(); return; }
+      const el = cardRef.current;
       const nextIdx = (indexRef.current + 1) % count;
-      gsap.to(cardRef.current, {
-        rotateY: 90, opacity: 0.3, duration: 0.5,
-        ease: 'power2.in', transformPerspective: 2500, transformOrigin: 'center center',
+      // Phase 1: flip out — rotate to edge, fade out fully
+      gsap.to(el, {
+        rotateY: 90,
+        opacity: 0,
+        scale: 0.97,
+        duration: 0.6,
+        ease: 'power2.in',
         onComplete: () => {
+          // Swap content
           indexRef.current = nextIdx;
           setDisplayIndex(nextIdx);
-          gsap.set(cardRef.current, { rotateY: -90 });
-          gsap.to(cardRef.current, {
-            rotateY: 0, opacity: 1, duration: 1,
-            ease: 'power2.out', transformPerspective: 2500,
+          // Set start position for flip in
+          gsap.set(el, { rotateY: -90, scale: 0.97 });
+          // Phase 2: flip in — smooth reveal
+          gsap.to(el, {
+            rotateY: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 0.8,
+            ease: 'power2.out',
             onComplete: resolve,
           });
         },
@@ -95,7 +106,7 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
     }),
     enterView: () => new Promise<void>((resolve) => {
       if (!cardRef.current) { resolve(); return; }
-      gsap.set(cardRef.current, { opacity: 0, rotateY: -100, transformPerspective: 2500, transformOrigin: 'center center' });
+      gsap.set(cardRef.current, { opacity: 0, rotateY: -100 });
       gsap.to(cardRef.current, { opacity: 1, rotateY: 0, duration: 2, ease: 'power2.out', onComplete: resolve });
     }),
   }), [count]);
@@ -111,8 +122,9 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
 
   return (
     <div>
-      <div ref={cardRef} style={{ perspective: '2500px', opacity: 0 }}>
-        <Link href={data.href} className="group block">
+      <div style={{ perspective: '2500px' }}>
+        <div ref={cardRef} style={{ opacity: 0, transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}>
+          <Link href={data.href} className="group block">
           <div className="relative overflow-hidden">
             <div className="relative aspect-[4/3]">
               {data.imageUrl ? (
@@ -131,7 +143,8 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
               </div>
             </div>
           </div>
-        </Link>
+          </Link>
+        </div>
       </div>
       {dots}
     </div>
