@@ -17,7 +17,7 @@ function injectPinStyles() {
   style.textContent = `
     /* ── Clean map: vivid blue ocean + full-opacity tiles ── */
     .illustrated-map.leaflet-container {
-      background: #4AABE0 !important;
+      background: #2E8BC9 !important;
     }
     /* Force ocean pane above tiles — absolute safeguard */
     .leaflet-oceanPane-pane {
@@ -283,6 +283,44 @@ function OceanWaterEffects() {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-[490]">
 
+      {/* ✨ Ocean sparkles — twinkling light reflections */}
+      {[
+        { top: '20%', left: '8%', delay: '0s' },
+        { top: '45%', left: '25%', delay: '1.5s' },
+        { top: '65%', left: '12%', delay: '3s' },
+        { top: '35%', left: '80%', delay: '0.8s' },
+        { top: '55%', left: '90%', delay: '2.5s' },
+        { top: '75%', left: '75%', delay: '4s' },
+        { top: '30%', left: '18%', delay: '5s' },
+        { top: '50%', left: '88%', delay: '1s' },
+      ].map((s, i) => (
+        <svg key={`sparkle-${i}`} style={{ position: 'absolute', top: s.top, left: s.left, width: '12px', height: '12px' }} viewBox="0 0 12 12">
+          <path d="M6 0 L7 4.5 L12 6 L7 7.5 L6 12 L5 7.5 L0 6 L5 4.5 Z" fill="white">
+            <animate attributeName="opacity" values="0;0.7;0" dur="3s" begin={s.delay} repeatCount="indefinite" />
+            <animateTransform attributeName="transform" type="scale" values="0.5;1;0.5" dur="3s" begin={s.delay} repeatCount="indefinite" additive="sum" />
+          </path>
+        </svg>
+      ))}
+
+      {/* 🫧 Foam patches near shoreline */}
+      <div style={{ position: 'absolute', top: '30%', left: '33%', width: '40px', height: '20px', opacity: 0.4 }}>
+        <svg viewBox="0 0 40 20" fill="none" width="40" height="20">
+          <circle cx="6" cy="14" r="5" fill="white" opacity="0.5"><animate attributeName="r" values="4;6;4" dur="4s" repeatCount="indefinite"/></circle>
+          <circle cx="16" cy="12" r="4" fill="white" opacity="0.4"><animate attributeName="r" values="3;5;3" dur="3.5s" repeatCount="indefinite" begin="0.5s"/></circle>
+          <circle cx="24" cy="15" r="3.5" fill="white" opacity="0.35"><animate attributeName="r" values="3;4.5;3" dur="4.5s" repeatCount="indefinite" begin="1s"/></circle>
+          <circle cx="33" cy="13" r="4.5" fill="white" opacity="0.4"><animate attributeName="r" values="3.5;5.5;3.5" dur="3.8s" repeatCount="indefinite" begin="1.5s"/></circle>
+        </svg>
+      </div>
+
+      <div style={{ position: 'absolute', top: '45%', left: '65%', width: '40px', height: '20px', opacity: 0.4, transform: 'scaleX(-1)' }}>
+        <svg viewBox="0 0 40 20" fill="none" width="40" height="20">
+          <circle cx="6" cy="14" r="5" fill="white" opacity="0.5"><animate attributeName="r" values="4;6;4" dur="4.2s" repeatCount="indefinite"/></circle>
+          <circle cx="16" cy="12" r="4" fill="white" opacity="0.4"><animate attributeName="r" values="3;5;3" dur="3.7s" repeatCount="indefinite" begin="0.8s"/></circle>
+          <circle cx="24" cy="15" r="3.5" fill="white" opacity="0.35"><animate attributeName="r" values="3;4.5;3" dur="4.3s" repeatCount="indefinite" begin="1.2s"/></circle>
+          <circle cx="33" cy="13" r="4.5" fill="white" opacity="0.4"><animate attributeName="r" values="3.5;5.5;3.5" dur="4s" repeatCount="indefinite" begin="2s"/></circle>
+        </svg>
+      </div>
+
       {/* Water ripples — ONLY in ocean zones */}
       {[
         { top: '30%', left: '10%', delay: '0s', size: 24 },
@@ -314,6 +352,7 @@ function OceanWaterEffects() {
       ))}
 
       {/* Boat — sails in LEFT ocean area only */}
+      <div className="ocean-creature">
       <div style={{ position: 'absolute', top: '25%', left: '0%', width: '38%', height: '28px', overflow: 'hidden' }}>
         <svg style={{ animation: 'boatSail 45s linear infinite', opacity: 0.7 }} viewBox="0 0 50 20" width="50" height="20" fill="none">
           <path d="M5 14 L10 14 L12 10 L15 6 L15 10 L25 10 L27 14 L30 14 L28 18 L3 18 Z" fill="#1A4F6E" />
@@ -321,8 +360,10 @@ function OceanWaterEffects() {
           <polygon points="15,3 15,7 19,7" fill="#E85A3A" opacity="0.9" />
         </svg>
       </div>
+      </div>
 
       {/* Jellyfish — right ocean only */}
+      <div className="ocean-creature">
       <svg style={{ position: 'absolute', bottom: '35%', right: '8%', width: '24px', height: '34px', opacity: 0.6, animation: 'jellyfishDrift 10s ease-in-out infinite' }} viewBox="0 0 20 30" fill="none">
         <ellipse cx="10" cy="8" rx="8" ry="8" fill="#D988E8" />
         <ellipse cx="10" cy="8" rx="5" ry="5" fill="#E8A8F5" opacity="0.5" />
@@ -331,13 +372,17 @@ function OceanWaterEffects() {
         <path d="M12 16 Q11 24 13 28" stroke="#C77DDB" strokeWidth="1.5" fill="none" strokeLinecap="round" />
         <path d="M16 16 Q14 22 15 28" stroke="#C77DDB" strokeWidth="1.5" fill="none" strokeLinecap="round" />
       </svg>
+      </div>
 
       {/* Starfish — bottom-left ocean floor */}
+      <div className="ocean-creature">
       <svg style={{ position: 'absolute', bottom: '6%', left: '12%', width: '22px', height: '22px', opacity: 0.65, animation: 'bobFloat 7s ease-in-out infinite 2s' }} viewBox="0 0 24 24" fill="#E8714A">
         <path d="M12 2l2.5 7.5H22l-6 4.5 2.5 7.5L12 17l-6.5 4.5 2.5-7.5-6-4.5h7.5z" />
       </svg>
+      </div>
 
       {/* Seaweed — bottom ocean areas only */}
+      <div className="ocean-creature">
       {[
         { left: '6%', h: 45, delay: '0s' },
         { left: '28%', h: 38, delay: '1.5s' },
@@ -348,6 +393,7 @@ function OceanWaterEffects() {
           <path d="M7 40 Q3 30 7 22 Q11 14 7 6 Q5 2 7 0" stroke="#1B8C4E" strokeWidth="3" fill="none" strokeLinecap="round" />
         </svg>
       ))}
+      </div>
 
       <style>{`
         @keyframes bubbleRise {
@@ -393,9 +439,9 @@ function DecorativeElements() {
         <ellipse cx="60" cy="25" rx="50" ry="14" fill="white"/><ellipse cx="40" cy="18" rx="25" ry="14" fill="white"/><ellipse cx="80" cy="20" rx="30" ry="12" fill="white"/>
       </svg>
 
-      {/* ═══ LEFT OCEAN — South China Sea (0-38%) ═══ */}
+      {/* ═══ LEFT OCEAN — South China Sea (0-33%) ═══ */}
       {/* Fish swimming left ocean */}
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '38%', height: '100%', overflow: 'hidden' }}>
+      <div className="ocean-creature" style={{ position: 'absolute', top: 0, left: 0, width: '33%', height: '100%', overflow: 'hidden' }}>
         <svg style={{ position: 'absolute', top: '40%', left: '-30px', animation: 'fishSwimRight 30s linear infinite 2s' }} viewBox="0 0 28 14" fill="none" width="28" height="14">
           <ellipse cx="12" cy="7" rx="10" ry="5" fill="#FF6B35" opacity="0.8"/><polygon points="22,7 28,2 28,12" fill="#FF6B35" opacity="0.8"/><circle cx="7" cy="6" r="1.5" fill="white"/>
         </svg>
@@ -453,8 +499,8 @@ function DecorativeElements() {
         </div>
       </div>
 
-      {/* ═══ RIGHT OCEAN — Pacific (65-100%) ═══ */}
-      <div style={{ position: 'absolute', top: 0, left: '65%', width: '35%', height: '100%', overflow: 'hidden' }}>
+      {/* ═══ RIGHT OCEAN — Pacific (70-100%) ═══ */}
+      <div className="ocean-creature" style={{ position: 'absolute', top: 0, left: '70%', width: '30%', height: '100%', overflow: 'hidden' }}>
         {/* Dolphin 1 — proper dolphin swimming left in right ocean */}
         <div className="sea-creature-dolphin ocean-creature" style={{ position: 'absolute', top: '25%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
           <svg style={{ animation: 'dolphinSwimLeft 22s ease-in-out infinite' }} viewBox="0 0 52 30" fill="none">
@@ -526,9 +572,76 @@ function DecorativeElements() {
       </div>
 
       {/* ═══ BOTTOM OCEAN — wave lines (bottom 20%) ═══ */}
+      <div className="ocean-creature">
       <div style={{ position: 'absolute', bottom: 0, left: 0, width: '200%', height: '25px', animation: 'waveMove 12s linear infinite', opacity: 0.35 }}>
         <svg viewBox="0 0 1200 25" fill="none" width="100%" height="25" preserveAspectRatio="none">
           <path d="M0 12 Q50 0 100 12 Q150 25 200 12 Q250 0 300 12 Q350 25 400 12 Q450 0 500 12 Q550 25 600 12 Q650 0 700 12 Q750 25 800 12 Q850 0 900 12 Q950 25 1000 12 Q1050 0 1100 12 Q1150 25 1200 12" stroke="#FFFFFF" strokeWidth="2" fill="none"/>
+        </svg>
+      </div>
+      </div>
+
+      {/* ═══ CRABS — at shoreline, always visible ═══ */}
+      {/* Crab 1 — left shoreline */}
+      <div style={{ position: 'absolute', top: '55%', left: '36%', animation: 'crabWalk 8s ease-in-out infinite' }}>
+        <svg viewBox="0 0 28 20" fill="none" width="20" height="14">
+          {/* Body */}
+          <ellipse cx="14" cy="12" rx="8" ry="5" fill="#E85A3A"/>
+          <ellipse cx="14" cy="12" rx="6" ry="3.5" fill="#F07050"/>
+          {/* Eyes on stalks */}
+          <line x1="10" y1="8" x2="8" y2="5" stroke="#E85A3A" strokeWidth="1.5"/>
+          <circle cx="8" cy="4.5" r="1.5" fill="#E85A3A"/>
+          <circle cx="8" cy="4.5" r="0.8" fill="#111"/>
+          <line x1="18" y1="8" x2="20" y2="5" stroke="#E85A3A" strokeWidth="1.5"/>
+          <circle cx="20" cy="4.5" r="1.5" fill="#E85A3A"/>
+          <circle cx="20" cy="4.5" r="0.8" fill="#111"/>
+          {/* Claws */}
+          <path d="M6 11 Q2 8 3 6 Q4 5 5 7 Q5 9 6 10" fill="#E85A3A"/>
+          <path d="M22 11 Q26 8 25 6 Q24 5 23 7 Q23 9 22 10" fill="#E85A3A"/>
+          {/* Legs */}
+          <line x1="8" y1="14" x2="4" y2="17" stroke="#C04020" strokeWidth="1"/>
+          <line x1="10" y1="15" x2="7" y2="18" stroke="#C04020" strokeWidth="1"/>
+          <line x1="18" y1="15" x2="21" y2="18" stroke="#C04020" strokeWidth="1"/>
+          <line x1="20" y1="14" x2="24" y2="17" stroke="#C04020" strokeWidth="1"/>
+        </svg>
+      </div>
+
+      {/* Crab 2 — right shoreline */}
+      <div style={{ position: 'absolute', top: '48%', left: '63%', animation: 'crabWalk 10s ease-in-out infinite 3s', transform: 'scaleX(-1)' }}>
+        <svg viewBox="0 0 28 20" fill="none" width="18" height="12">
+          <ellipse cx="14" cy="12" rx="8" ry="5" fill="#D94E30"/>
+          <ellipse cx="14" cy="12" rx="6" ry="3.5" fill="#E86850"/>
+          <line x1="10" y1="8" x2="8" y2="5" stroke="#D94E30" strokeWidth="1.5"/>
+          <circle cx="8" cy="4.5" r="1.5" fill="#D94E30"/>
+          <circle cx="8" cy="4.5" r="0.8" fill="#111"/>
+          <line x1="18" y1="8" x2="20" y2="5" stroke="#D94E30" strokeWidth="1.5"/>
+          <circle cx="20" cy="4.5" r="1.5" fill="#D94E30"/>
+          <circle cx="20" cy="4.5" r="0.8" fill="#111"/>
+          <path d="M6 11 Q2 8 3 6 Q4 5 5 7 Q5 9 6 10" fill="#D94E30"/>
+          <path d="M22 11 Q26 8 25 6 Q24 5 23 7 Q23 9 22 10" fill="#D94E30"/>
+          <line x1="8" y1="14" x2="4" y2="17" stroke="#B03818" strokeWidth="1"/>
+          <line x1="10" y1="15" x2="7" y2="18" stroke="#B03818" strokeWidth="1"/>
+          <line x1="18" y1="15" x2="21" y2="18" stroke="#B03818" strokeWidth="1"/>
+          <line x1="20" y1="14" x2="24" y2="17" stroke="#B03818" strokeWidth="1"/>
+        </svg>
+      </div>
+
+      {/* Crab 3 — in ocean bottom area */}
+      <div style={{ position: 'absolute', top: '82%', left: '18%', animation: 'crabWalk 12s ease-in-out infinite 6s' }}>
+        <svg viewBox="0 0 28 20" fill="none" width="16" height="11">
+          <ellipse cx="14" cy="12" rx="8" ry="5" fill="#E06040"/>
+          <ellipse cx="14" cy="12" rx="6" ry="3.5" fill="#F08060"/>
+          <line x1="10" y1="8" x2="8" y2="5" stroke="#E06040" strokeWidth="1.5"/>
+          <circle cx="8" cy="4.5" r="1.5" fill="#E06040"/>
+          <circle cx="8" cy="4.5" r="0.8" fill="#111"/>
+          <line x1="18" y1="8" x2="20" y2="5" stroke="#E06040" strokeWidth="1.5"/>
+          <circle cx="20" cy="4.5" r="1.5" fill="#E06040"/>
+          <circle cx="20" cy="4.5" r="0.8" fill="#111"/>
+          <path d="M6 11 Q2 8 3 6 Q4 5 5 7 Q5 9 6 10" fill="#E06040"/>
+          <path d="M22 11 Q26 8 25 6 Q24 5 23 7 Q23 9 22 10" fill="#E06040"/>
+          <line x1="8" y1="14" x2="4" y2="17" stroke="#C04828" strokeWidth="1"/>
+          <line x1="10" y1="15" x2="7" y2="18" stroke="#C04828" strokeWidth="1"/>
+          <line x1="18" y1="15" x2="21" y2="18" stroke="#C04828" strokeWidth="1"/>
+          <line x1="20" y1="14" x2="24" y2="17" stroke="#C04828" strokeWidth="1"/>
         </svg>
       </div>
 
@@ -761,7 +874,7 @@ function DecorativeElements() {
           <ellipse cx="50" cy="20" rx="40" ry="11" fill="white"/><ellipse cx="35" cy="14" rx="20" ry="10" fill="white"/><ellipse cx="65" cy="16" rx="25" ry="9" fill="white"/>
         </svg>
         {/* Extra fish — left ocean */}
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '38%', height: '100%', overflow: 'hidden' }}>
+        <div className="ocean-creature" style={{ position: 'absolute', top: 0, left: 0, width: '33%', height: '100%', overflow: 'hidden' }}>
           <svg style={{ position: 'absolute', top: '25%', left: '-20px', animation: 'fishSwimRight 26s linear infinite 4s' }} viewBox="0 0 22 10" fill="none" width="22" height="10">
             <ellipse cx="9" cy="5" rx="7" ry="3.5" fill="#FF9800" opacity="0.7"/><polygon points="16,5 22,2 22,8" fill="#FF9800" opacity="0.7"/><circle cx="5" cy="4" r="1" fill="white"/>
           </svg>
@@ -770,7 +883,7 @@ function DecorativeElements() {
           </svg>
         </div>
         {/* Extra fish — right ocean */}
-        <div style={{ position: 'absolute', top: 0, left: '65%', width: '35%', height: '100%', overflow: 'hidden' }}>
+        <div className="ocean-creature" style={{ position: 'absolute', top: 0, left: '70%', width: '30%', height: '100%', overflow: 'hidden' }}>
           <svg style={{ position: 'absolute', top: '40%', right: '-20px', animation: 'fishSwimLeft 24s linear infinite 7s' }} viewBox="0 0 22 10" fill="none" width="22" height="10">
             <ellipse cx="9" cy="5" rx="7" ry="3.5" fill="#AB47BC" opacity="0.7"/><polygon points="16,5 22,2 22,8" fill="#AB47BC" opacity="0.7"/><circle cx="5" cy="4" r="1" fill="white"/>
           </svg>
@@ -874,6 +987,12 @@ function DecorativeElements() {
           25% { transform: translateY(-6px) rotate(-2deg); }
           50% { transform: translateY(0) rotate(0deg); }
           75% { transform: translateY(-4px) rotate(2deg); }
+        }
+        @keyframes crabWalk {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(8px) translateY(-2px); }
+          50% { transform: translateX(-5px) translateY(1px); }
+          75% { transform: translateX(10px) translateY(-1px); }
         }
         @keyframes carDriveRight {
           0% { transform: translateX(-30px); }
@@ -1363,8 +1482,8 @@ export default function StoreMap({ stores }: StoreMapProps) {
         L.geoJSON(oceanData, {
           pane: 'oceanPane',
           style: () => ({
-            fillColor: '#5BC0EB',
-            fillOpacity: 0.78,
+            fillColor: '#3498DB',
+            fillOpacity: 0.82,
             color: 'transparent',
             weight: 0,
           }),
@@ -1623,13 +1742,13 @@ export default function StoreMap({ stores }: StoreMapProps) {
       </div>
 
       {/* ─── Map ─── */}
-      <div className="relative overflow-hidden rounded-2xl" style={{ background: '#4AABE0' }}>
+      <div className="relative overflow-hidden rounded-2xl" style={{ background: '#2E8BC9' }}>
         <DecorativeElements />
         <OceanWaterEffects />
         <div
           ref={mapContainerRef}
           className="illustrated-map w-full h-[600px] sm:h-[750px] lg:h-[900px] overflow-hidden"
-          style={{ background: '#4AABE0' }}
+          style={{ background: '#2E8BC9' }}
         />
       </div>
 
