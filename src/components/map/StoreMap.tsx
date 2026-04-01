@@ -20,41 +20,51 @@ function injectPinStyles() {
       background: #4A9FD9 !important;
     }
 
-    /* ── ANTI-FLICKER: zero visual gaps during zoom/pan ── */
+    /* ── ANTI-FLICKER: absolute zero visual gaps during zoom/pan ── */
+
+    /* GPU-accelerated tile pane */
     .illustrated-map .leaflet-tile-pane {
       will-change: transform;
+      transform: translateZ(0);
     }
-    /* CRITICAL: Keep ALL tile containers (including old zoom levels) visible.
-       Leaflet normally hides/removes old containers, causing a flash.
-       With this, old tiles stay visible underneath until new ones cover them. */
-    .illustrated-map .leaflet-tile-pane > .leaflet-tile-container {
-      will-change: transform;
+    /* CRITICAL: ALL tile containers (old + new zoom levels) stay visible.
+       Leaflet normally hides/removes old containers → flash. This prevents it.
+       Old tiles show through until new tiles fully cover them. */
+    .illustrated-map .leaflet-tile-pane > .leaflet-tile-container,
+    .illustrated-map .leaflet-tile-pane > div {
       opacity: 1 !important;
       visibility: visible !important;
+      display: block !important;
+      will-change: transform;
+      transform: translateZ(0);
     }
+    /* Individual tiles: no transitions, GPU-composited */
     .illustrated-map .leaflet-tile {
       transition: none !important;
       will-change: transform;
-      image-rendering: auto;
       backface-visibility: hidden;
+      transform: translateZ(0);
     }
-    /* No Leaflet internal transitions during zoom */
+    /* Kill ALL Leaflet internal fade/zoom transitions on tiles */
     .illustrated-map .leaflet-zoom-anim .leaflet-tile-pane,
     .illustrated-map .leaflet-fade-anim .leaflet-tile-container,
-    .illustrated-map .leaflet-zoom-anim .leaflet-tile-container {
+    .illustrated-map .leaflet-zoom-anim .leaflet-tile-container,
+    .illustrated-map .leaflet-zoom-anim .leaflet-tile {
       transition: none !important;
     }
-    /* Loaded tiles: full opacity, instant */
+    /* Loaded tiles: instant full visibility */
     .illustrated-map .leaflet-tile-loaded {
       opacity: 1 !important;
+      visibility: visible !important;
     }
-    /* Unloaded new tiles: transparent. Old zoom tiles behind fill the gap. */
+    /* Unloaded tiles at NEW zoom level: invisible (old zoom tiles behind fill gap) */
     .illustrated-map .leaflet-tile:not(.leaflet-tile-loaded) {
       opacity: 0 !important;
     }
-    /* Ensure zoom-level tile containers NEVER get display:none */
-    .illustrated-map .leaflet-tile-pane > div {
-      display: block !important;
+    /* Override any inline styles Leaflet puts on tile containers */
+    .illustrated-map .leaflet-tile-container[style] {
+      opacity: 1 !important;
+      visibility: visible !important;
     }
 
     /* Smooth premium bounce for store pins */
@@ -1069,140 +1079,163 @@ export default function StoreMap({ stores }: StoreMapProps) {
       labelsPane.style.pointerEvents = 'none';
     }
 
-    /* ── Layer 1: Voyager base tiles at FULL opacity — all land details visible ── */
-    const baseTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+    /* ═══════════════════════════════════════════════════════════════
+       ZERO-FLICKER TILE SYSTEM
+       Strategy: preload ALL tiles for Taiwan (zoom 7-11) into browser
+       cache, wait for everything (tiles + GeoJSON) before revealing map,
+       and monkey-patch Leaflet to keep old zoom tiles visible during
+       transitions so there is NEVER a blank gap.
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* Shared tile layer options for maximum stability */
+    const TILE_OPTS: L.TileLayerOptions = {
       maxZoom: 19,
-      maxNativeZoom: 18,           /* CARTO native max — prevents 404s above 18 */
-      attribution: '© OpenStreetMap © CARTO',
-      keepBuffer: 25,              /* aggressive cache: 25 tile-widths around viewport */
-      updateWhenZooming: false,     /* don't flash tiles mid-zoom animation */
-      updateWhenIdle: true,         /* only load tiles after movement stops */
-      crossOrigin: true,           /* enable browser disk cache */
-    }).addTo(map);
-
-    /* ── AGGRESSIVE PRELOAD: fetch ALL tiles covering Taiwan for zoom 7-10 ──
-       This warms the browser cache so zoom/pan transitions are instant (no flicker).
-       Taiwan bounds: lat 21.5-26.0, lng 119.0-122.5 with padding */
-    const preloadAllTaiwanTiles = () => {
-      const LAT_MIN = 21.0, LAT_MAX = 26.5, LNG_MIN = 118.5, LNG_MAX = 123.0;
-      const subdomains = ['a', 'b', 'c', 'd'];
-      const retinaSuffix = (window.devicePixelRatio || 1) > 1 ? '@2x' : '';
-      const layers = [
-        'rastertiles/voyager_nolabels',
-        'rastertiles/voyager_only_labels',
-      ];
-      let loaded = 0;
-      let total = 0;
-      const urls: string[] = [];
-
-      for (let z = 7; z <= 10; z++) {
-        const n = Math.pow(2, z);
-        const xMin = Math.floor((LNG_MIN + 180) / 360 * n);
-        const xMax = Math.floor((LNG_MAX + 180) / 360 * n);
-        const latRadMin = LAT_MIN * Math.PI / 180;
-        const latRadMax = LAT_MAX * Math.PI / 180;
-        const yMax = Math.floor((1 - Math.log(Math.tan(latRadMin) + 1 / Math.cos(latRadMin)) / Math.PI) / 2 * n);
-        const yMin = Math.floor((1 - Math.log(Math.tan(latRadMax) + 1 / Math.cos(latRadMax)) / Math.PI) / 2 * n);
-
-        for (let x = xMin; x <= xMax; x++) {
-          for (let y = yMin; y <= yMax; y++) {
-            for (const layer of layers) {
-              const s = subdomains[(x + y) % subdomains.length];
-              urls.push(`https://${s}.basemaps.cartocdn.com/${layer}/${z}/${x}/${y}${retinaSuffix}.png`);
-            }
-          }
-        }
-      }
-
-      total = urls.length;
-      if (total === 0) { setMapReady(true); return; }
-
-      /* Load in batches of 20 to avoid overwhelming the browser */
-      let idx = 0;
-      const loadBatch = () => {
-        const batch = urls.slice(idx, idx + 20);
-        idx += 20;
-        batch.forEach((url) => {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = img.onerror = () => {
-            loaded++;
-            if (loaded >= total) setMapReady(true);
-          };
-          img.src = url;
-        });
-        if (idx < total) setTimeout(loadBatch, 50);
-      };
-      loadBatch();
-
-      /* Safety fallback — show map after 6s even if some tiles fail */
-      setTimeout(() => setMapReady(true), 6000);
+      maxNativeZoom: 18,
+      keepBuffer: 25,
+      updateWhenZooming: false,
+      updateWhenIdle: true,
+      crossOrigin: true,
     };
 
-    baseTiles.once('load', preloadAllTaiwanTiles);
-    /* Fallback in case initial 'load' doesn't fire */
-    setTimeout(preloadAllTaiwanTiles, 3000);
+    /* Helper: monkey-patch a tile layer so old zoom-level tiles are NOT
+       removed until 1 second after zoom ends — gives new tiles time to
+       render from browser cache, preventing any visual gap. */
+    const patchTileLayer = (layer: L.TileLayer) => {
+      const orig = (layer as any)._removeTilesAtZoom;
+      if (orig) {
+        (layer as any)._removeTilesAtZoom = function (zoom: number) {
+          setTimeout(() => {
+            try { orig.call(this, zoom); } catch (_) {}
+          }, 1000);
+        };
+      }
+    };
 
-    /* ── Layer 2: Ocean GeoJSON overlay — blue ONLY over water ──
-       Generated from 10m Natural Earth with 0.02° inland buffer = precise coastlines */
+    /* ── Layer 1: Base tiles ── */
+    const baseTiles = L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png',
+      { ...TILE_OPTS, attribution: '© OpenStreetMap © CARTO' }
+    ).addTo(map);
+    patchTileLayer(baseTiles);
+
+    /* ── Layer 2: Ocean GeoJSON ── */
     const oceanPane = map.createPane('oceanPane');
     oceanPane.style.zIndex = '250';
     oceanPane.style.pointerEvents = 'none';
 
-    fetch('/ocean.geo.json')
-      .then((res) => res.json())
-      .then((oceanData) => {
-        L.geoJSON(oceanData, {
+    const oceanReady = fetch('/ocean.geo.json')
+      .then((r) => r.json())
+      .then((data) => {
+        L.geoJSON(data, {
           pane: 'oceanPane',
-          style: () => ({
-            fillColor: '#1E88C7',
-            fillOpacity: 0.55,
-            color: 'transparent',
-            weight: 0,
-          }),
+          style: () => ({ fillColor: '#1E88C7', fillOpacity: 0.55, color: 'transparent', weight: 0 }),
           interactive: false,
         }).addTo(map);
       })
-      .catch(() => { /* Ocean overlay failed — tiles still work fine */ });
+      .catch(() => {});
 
-    /* ── Layer 3: Taiwan GeoJSON overlay — peach/salmon illustrated style ── */
-    fetch('/taiwan.geo.json')
-      .then((res) => res.json())
-      .then((geojsonData) => {
-        const geoLayer = L.geoJSON(geojsonData, {
-          style: () => ({
-            fillColor: '#F5CBA7',
-            fillOpacity: 0.75,
-            color: '#FFFFFF',
-            weight: 2.5,
-            opacity: 0.9,
-          }),
+    /* ── Layer 3: Taiwan GeoJSON ── */
+    const taiwanReady = fetch('/taiwan.geo.json')
+      .then((r) => r.json())
+      .then((data) => {
+        const geo = L.geoJSON(data, {
+          style: () => ({ fillColor: '#F5CBA7', fillOpacity: 0.75, color: '#FFFFFF', weight: 2.5, opacity: 0.9 }),
           interactive: false,
         });
-        geoLayer.addTo(map);
-        geoJsonLayerRef.current = geoLayer;
+        geo.addTo(map);
+        geoJsonLayerRef.current = geo;
 
-        /* ── Layer 4: Labels on top — city names, roads, districts clearly visible ── */
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
-          maxZoom: 19,
-          maxNativeZoom: 18,
-          pane: 'labelsPane',
-          keepBuffer: 25,
-          updateWhenZooming: false,
-          updateWhenIdle: true,
-          crossOrigin: true,
-        }).addTo(map);
+        /* ── Layer 4: Labels on top ── */
+        const labels = L.tileLayer(
+          'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',
+          { ...TILE_OPTS, pane: 'labelsPane' }
+        ).addTo(map);
+        patchTileLayer(labels);
       })
       .catch(() => {
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-          maxZoom: 19,
-          maxNativeZoom: 18,
-          keepBuffer: 25,
-          updateWhenZooming: false,
-          updateWhenIdle: true,
-          crossOrigin: true,
-        }).addTo(map);
+        const fallback = L.tileLayer(
+          'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+          TILE_OPTS
+        ).addTo(map);
+        patchTileLayer(fallback);
       });
+
+    /* ═══════════════════════════════════════════════════════════════
+       PRELOAD ALL TILES covering Taiwan for zoom 7-11
+       (base + labels layers × retina-aware)
+       ~2500 tile images → warmed in browser cache before map reveals
+       ═══════════════════════════════════════════════════════════════ */
+    let preloadStarted = false;
+    const preloadAllTaiwanTiles = (): Promise<void> => {
+      if (preloadStarted) return Promise.resolve();
+      preloadStarted = true;
+
+      return new Promise<void>((resolve) => {
+        const LAT_MIN = 21.0, LAT_MAX = 26.5, LNG_MIN = 118.5, LNG_MAX = 123.0;
+        const subs = ['a', 'b', 'c', 'd'];
+        const r = (window.devicePixelRatio || 1) > 1 ? '@2x' : '';
+        const layers = ['rastertiles/voyager_nolabels', 'rastertiles/voyager_only_labels'];
+        const urls: string[] = [];
+
+        for (let z = 7; z <= 11; z++) {
+          const n = Math.pow(2, z);
+          const xMin = Math.floor((LNG_MIN + 180) / 360 * n);
+          const xMax = Math.floor((LNG_MAX + 180) / 360 * n);
+          const yMin = Math.floor((1 - Math.log(Math.tan(LAT_MAX * Math.PI / 180) + 1 / Math.cos(LAT_MAX * Math.PI / 180)) / Math.PI) / 2 * n);
+          const yMax = Math.floor((1 - Math.log(Math.tan(LAT_MIN * Math.PI / 180) + 1 / Math.cos(LAT_MIN * Math.PI / 180)) / Math.PI) / 2 * n);
+          for (let x = xMin; x <= xMax; x++) {
+            for (let y = yMin; y <= yMax; y++) {
+              for (const layer of layers) {
+                urls.push(`https://${subs[(x + y) % 4]}.basemaps.cartocdn.com/${layer}/${z}/${x}/${y}${r}.png`);
+              }
+            }
+          }
+        }
+
+        if (urls.length === 0) { resolve(); return; }
+
+        let done = 0;
+        const total = urls.length;
+        const onDone = () => { done++; if (done >= total) resolve(); };
+
+        /* Load in batches of 40 for faster throughput */
+        let idx = 0;
+        const batch = () => {
+          const chunk = urls.slice(idx, idx + 40);
+          idx += 40;
+          chunk.forEach((url) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = img.onerror = onDone;
+            img.src = url;
+          });
+          if (idx < total) setTimeout(batch, 30);
+        };
+        batch();
+
+        /* Safety: resolve after 10s even if some tiles fail */
+        setTimeout(resolve, 10000);
+      });
+    };
+
+    /* Wait for EVERYTHING — tiles preloaded + GeoJSON rendered — before revealing */
+    baseTiles.once('load', () => {
+      Promise.all([
+        preloadAllTaiwanTiles(),
+        oceanReady,
+        taiwanReady,
+      ]).then(() => setMapReady(true));
+    });
+    /* Fallback: if baseTiles 'load' never fires, start preload after 2s */
+    setTimeout(() => {
+      Promise.all([
+        preloadAllTaiwanTiles(),
+        oceanReady,
+        taiwanReady,
+      ]).then(() => setMapReady(true));
+    }, 2000);
+    /* Hard safety: show map after 12s no matter what */
+    setTimeout(() => setMapReady(true), 12000);
 
     return () => { map.remove(); mapRef.current = null; };
   }, []);
