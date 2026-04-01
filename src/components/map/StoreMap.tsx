@@ -1148,23 +1148,22 @@ export default function StoreMap({ stores }: StoreMapProps) {
       </div>
 
       {/* Custom Branding — replaces default map attribution */}
-      <div className="absolute bottom-2.5 left-3 sm:left-4 z-[1000]">
-        <div className="flex items-center gap-1 sm:gap-1.5 text-[8px] sm:text-[9px] font-medium" style={{ color: 'rgba(0,48,72,0.5)' }}>
+      <div className="absolute bottom-2 left-3 sm:left-4 z-[1000]">
+        <div className="flex items-center gap-[3px] sm:gap-1 text-[8px] sm:text-[9px] font-medium">
           <img
             src="/images/branding/mahkota-taiwan-logo.png"
             alt="Mahkota Taiwan"
             className="h-[14px] sm:h-[16px] w-auto object-contain"
-            style={{ opacity: 0.75 }}
+            style={{ opacity: 0.8 }}
           />
           <span className="font-semibold" style={{ color: 'rgba(0,48,72,0.55)' }}>Mahkota Taiwan</span>
-          <span style={{ color: 'rgba(0,48,72,0.35)' }}>Interactive Map by</span>
+          <span className="mx-[1px]" style={{ color: 'rgba(0,48,72,0.35)' }}>Interactive Map by</span>
           <img
             src="/images/branding/the-orange-fox-logo.png"
             alt="The Orange Fox"
-            className="h-[14px] sm:h-[16px] w-auto object-contain"
-            style={{ opacity: 0.8 }}
+            className="h-[18px] sm:h-[22px] w-auto object-contain -mr-[1px]"
           />
-          <span className="font-bold" style={{ color: 'rgba(232,135,12,0.7)' }}>The Orange Fox</span>
+          <span className="font-bold" style={{ color: '#E8870C' }}>The Orange Fox</span>
         </div>
       </div>
 
