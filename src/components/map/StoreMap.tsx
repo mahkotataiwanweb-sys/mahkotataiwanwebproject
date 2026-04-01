@@ -276,213 +276,97 @@ interface StoreMapProps {
 
 /* ─── Ocean Water Animated Effects ─── */
 function OceanWaterEffects() {
+  /* Ocean-only zones: left ocean (0-38%), right ocean (65-100%), bottom (70-100%) */
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-[490]">
-      {/* Animated water ripple circles scattered across ocean */}
+
+      {/* Water ripples — ONLY in ocean zones */}
       {[
-        { top: '60%', left: '8%', delay: '0s', size: 30 },
-        { top: '45%', left: '80%', delay: '2s', size: 22 },
-        { top: '70%', left: '45%', delay: '4s', size: 26 },
-        { top: '35%', left: '15%', delay: '1.5s', size: 18 },
-        { top: '80%', left: '70%', delay: '3s', size: 20 },
-        { top: '50%', left: '55%', delay: '5s', size: 24 },
-        { top: '25%', left: '90%', delay: '0.5s', size: 16 },
-        { top: '75%', left: '25%', delay: '2.5s', size: 28 },
+        { top: '30%', left: '10%', delay: '0s', size: 24 },
+        { top: '50%', left: '20%', delay: '2.5s', size: 20 },
+        { top: '75%', left: '15%', delay: '1s', size: 22 },
+        { top: '40%', left: '75%', delay: '3.5s', size: 18 },
+        { top: '60%', left: '85%', delay: '5s', size: 20 },
+        { top: '80%', left: '70%', delay: '1.5s', size: 16 },
       ].map((pos, i) => (
-        <svg
-          key={`ripple-${i}`}
-          style={{
-            position: 'absolute',
-            top: pos.top,
-            left: pos.left,
-            width: pos.size * 3,
-            height: pos.size * 3,
-            opacity: 0,
-            animation: `waterRipple 4s ease-out infinite ${pos.delay}`,
-          }}
-          viewBox="0 0 60 60"
-        >
-          <circle cx="30" cy="30" r="8" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2">
-            <animate attributeName="r" from="4" to="28" dur="4s" begin={pos.delay} repeatCount="indefinite" />
-            <animate attributeName="opacity" from="0.6" to="0" dur="4s" begin={pos.delay} repeatCount="indefinite" />
-          </circle>
-          <circle cx="30" cy="30" r="4" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5">
-            <animate attributeName="r" from="8" to="25" dur="4s" begin={`calc(${pos.delay} + 0.8s)`} repeatCount="indefinite" />
-            <animate attributeName="opacity" from="0.5" to="0" dur="4s" begin={`calc(${pos.delay} + 0.8s)`} repeatCount="indefinite" />
+        <svg key={`ripple-${i}`} style={{ position: 'absolute', top: pos.top, left: pos.left, width: pos.size * 3, height: pos.size * 3 }} viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="8" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5">
+            <animate attributeName="r" from="6" to="26" dur="5s" begin={pos.delay} repeatCount="indefinite" />
+            <animate attributeName="opacity" from="0.5" to="0" dur="5s" begin={pos.delay} repeatCount="indefinite" />
           </circle>
         </svg>
       ))}
 
-      {/* Shimmering water surface — horizontal light streaks */}
+      {/* Bubbles — only in ocean zones */}
       {[
-        { top: '40%', delay: '0s', width: '15%' },
-        { top: '55%', delay: '3s', width: '12%' },
-        { top: '68%', delay: '6s', width: '18%' },
-        { top: '30%', delay: '1.5s', width: '10%' },
-        { top: '78%', delay: '4.5s', width: '14%' },
-      ].map((pos, i) => (
-        <div
-          key={`shimmer-${i}`}
-          style={{
-            position: 'absolute',
-            top: pos.top,
-            left: 0,
-            width: '100%',
-            height: '2px',
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              width: pos.width,
-              height: '2px',
-              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-              borderRadius: '2px',
-              animation: `oceanShimmer 8s ease-in-out infinite ${pos.delay}`,
-            }}
-          />
-        </div>
+        { left: '8%', delay: 0 }, { left: '22%', delay: 3 }, { left: '32%', delay: 7 },
+        { left: '72%', delay: 2 }, { left: '85%', delay: 5 }, { left: '92%', delay: 9 },
+      ].map((b, i) => (
+        <div key={`bub-${i}`} style={{
+          position: 'absolute', bottom: '-8px', left: b.left,
+          width: 4 + (i % 3) * 2, height: 4 + (i % 3) * 2, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.5)',
+          animation: `bubbleRise ${8 + i * 2}s ease-in infinite ${b.delay}s`,
+        }} />
       ))}
 
-      {/* Animated bubbles rising from bottom */}
-      {Array.from({ length: 12 }).map((_, i) => {
-        const left = 5 + Math.random() * 90;
-        const size = 3 + Math.random() * 6;
-        const duration = 6 + Math.random() * 8;
-        const delay = Math.random() * 10;
-        return (
-          <div
-            key={`bubble-${i}`}
-            style={{
-              position: 'absolute',
-              bottom: '-10px',
-              left: `${left}%`,
-              width: size,
-              height: size,
-              borderRadius: '50%',
-              background: 'rgba(255,255,255,0.45)',
-              border: '1px solid rgba(255,255,255,0.55)',
-              animation: `bubbleRise ${duration}s ease-in infinite ${delay}s`,
-            }}
-          />
-        );
-      })}
+      {/* Boat — sails in LEFT ocean area only */}
+      <div style={{ position: 'absolute', top: '25%', left: '0%', width: '38%', height: '28px', overflow: 'hidden' }}>
+        <svg style={{ animation: 'boatSail 45s linear infinite', opacity: 0.7 }} viewBox="0 0 50 20" width="50" height="20" fill="none">
+          <path d="M5 14 L10 14 L12 10 L15 6 L15 10 L25 10 L27 14 L30 14 L28 18 L3 18 Z" fill="#1A4F6E" />
+          <line x1="15" y1="6" x2="15" y2="3" stroke="#1A4F6E" strokeWidth="1.5" />
+          <polygon points="15,3 15,7 19,7" fill="#E85A3A" opacity="0.9" />
+        </svg>
+      </div>
 
-      {/* Tiny boat/ship silhouette floating */}
-      <svg
-        style={{
-          position: 'absolute',
-          top: '18%',
-          left: 0,
-          width: '100%',
-          height: '28px',
-          animation: 'floatCloud 40s linear infinite 2s',
-          opacity: 0.7,
-        }}
-        viewBox="0 0 50 20"
-        width="50"
-        height="20"
-        fill="none"
-      >
-        <path d="M5 14 L10 14 L12 10 L15 6 L15 10 L25 10 L27 14 L30 14 L28 18 L3 18 Z" fill="#1A4F6E" />
-        <line x1="15" y1="6" x2="15" y2="3" stroke="#1A4F6E" strokeWidth="1.5" />
-        <polygon points="15,3 15,7 19,7" fill="#E85A3A" opacity="0.9" />
+      {/* Jellyfish — right ocean only */}
+      <svg style={{ position: 'absolute', bottom: '35%', right: '8%', width: '24px', height: '34px', opacity: 0.6, animation: 'jellyfishDrift 10s ease-in-out infinite' }} viewBox="0 0 20 30" fill="none">
+        <ellipse cx="10" cy="8" rx="8" ry="8" fill="#D988E8" />
+        <ellipse cx="10" cy="8" rx="5" ry="5" fill="#E8A8F5" opacity="0.5" />
+        <path d="M4 16 Q6 22 5 28" stroke="#C77DDB" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        <path d="M8 16 Q9 24 7 28" stroke="#C77DDB" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        <path d="M12 16 Q11 24 13 28" stroke="#C77DDB" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        <path d="M16 16 Q14 22 15 28" stroke="#C77DDB" strokeWidth="1.5" fill="none" strokeLinecap="round" />
       </svg>
 
-      {/* Starfish icon near bottom */}
-      <svg
-        style={{
-          position: 'absolute',
-          bottom: '8%',
-          left: '18%',
-          width: '24px',
-          height: '24px',
-          opacity: 0.7,
-          animation: 'bobFloat 5s ease-in-out infinite 1s',
-        }}
-        viewBox="0 0 24 24"
-        fill="#E8714A"
-      >
+      {/* Starfish — bottom-left ocean floor */}
+      <svg style={{ position: 'absolute', bottom: '6%', left: '12%', width: '22px', height: '22px', opacity: 0.65, animation: 'bobFloat 7s ease-in-out infinite 2s' }} viewBox="0 0 24 24" fill="#E8714A">
         <path d="M12 2l2.5 7.5H22l-6 4.5 2.5 7.5L12 17l-6.5 4.5 2.5-7.5-6-4.5h7.5z" />
       </svg>
 
-      {/* Jellyfish */}
-      <svg
-        style={{
-          position: 'absolute',
-          bottom: '30%',
-          right: '10%',
-          width: '26px',
-          height: '36px',
-          opacity: 0.65,
-          animation: 'jellyfishFloat 7s ease-in-out infinite',
-        }}
-        viewBox="0 0 20 30"
-        fill="none"
-      >
-        <ellipse cx="10" cy="8" rx="8" ry="8" fill="#D988E8" />
-        <ellipse cx="10" cy="8" rx="5" ry="5" fill="#E8A8F5" opacity="0.6" />
-        <path d="M4 16 Q6 22 5 28" stroke="#D988E8" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-        <path d="M8 16 Q9 24 7 28" stroke="#D988E8" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-        <path d="M12 16 Q11 24 13 28" stroke="#D988E8" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-        <path d="M16 16 Q14 22 15 28" stroke="#D988E8" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-      </svg>
-
-      {/* Seaweed — gently swaying */}
+      {/* Seaweed — bottom ocean areas only */}
       {[
-        { bottom: '0%', left: '5%', height: 50, delay: '0s' },
-        { bottom: '0%', left: '88%', height: 45, delay: '1s' },
-        { bottom: '0%', left: '30%', height: 35, delay: '2s' },
-        { bottom: '0%', left: '60%', height: 42, delay: '0.5s' },
-      ].map((pos, i) => (
-        <svg
-          key={`seaweed-${i}`}
-          style={{
-            position: 'absolute',
-            bottom: pos.bottom,
-            left: pos.left,
-            width: '16px',
-            height: `${pos.height}px`,
-            opacity: 0.6,
-            animation: `seaweedSway 4s ease-in-out infinite ${pos.delay}`,
-            transformOrigin: 'bottom center',
-          }}
-          viewBox="0 0 14 40"
-          fill="none"
-        >
+        { left: '6%', h: 45, delay: '0s' },
+        { left: '28%', h: 38, delay: '1.5s' },
+        { left: '78%', h: 42, delay: '0.8s' },
+        { left: '90%', h: 35, delay: '2.2s' },
+      ].map((s, i) => (
+        <svg key={`sw-${i}`} style={{ position: 'absolute', bottom: 0, left: s.left, width: '14px', height: `${s.h}px`, opacity: 0.5, animation: `seaweedSway 5s ease-in-out infinite ${s.delay}`, transformOrigin: 'bottom center' }} viewBox="0 0 14 40" fill="none">
           <path d="M7 40 Q3 30 7 22 Q11 14 7 6 Q5 2 7 0" stroke="#1B8C4E" strokeWidth="3" fill="none" strokeLinecap="round" />
         </svg>
       ))}
 
-      {/* Inline keyframes */}
       <style>{`
-        @keyframes waterRipple {
-          0% { opacity: 0; transform: scale(0.3); }
-          20% { opacity: 0.4; }
-          100% { opacity: 0; transform: scale(1.5); }
-        }
-        @keyframes oceanShimmer {
-          0% { transform: translateX(-100%); opacity: 0; }
-          30% { opacity: 1; }
-          70% { opacity: 1; }
-          100% { transform: translateX(800%); opacity: 0; }
-        }
         @keyframes bubbleRise {
-          0% { transform: translateY(0) translateX(0); opacity: 0; }
-          10% { opacity: 0.4; }
-          90% { opacity: 0.2; }
-          100% { transform: translateY(-600px) translateX(${Math.random() > 0.5 ? '' : '-'}20px); opacity: 0; }
+          0% { transform: translateY(0); opacity: 0; }
+          10% { opacity: 0.35; }
+          90% { opacity: 0.15; }
+          100% { transform: translateY(-650px); opacity: 0; }
         }
-        @keyframes jellyfishFloat {
+        @keyframes jellyfishDrift {
           0%, 100% { transform: translateY(0) translateX(0); }
-          25% { transform: translateY(-15px) translateX(5px); }
-          50% { transform: translateY(-8px) translateX(-3px); }
-          75% { transform: translateY(-20px) translateX(8px); }
+          25% { transform: translateY(-12px) translateX(4px); }
+          50% { transform: translateY(-5px) translateX(-3px); }
+          75% { transform: translateY(-18px) translateX(6px); }
         }
         @keyframes seaweedSway {
           0%, 100% { transform: rotate(0deg); }
-          25% { transform: rotate(5deg); }
-          75% { transform: rotate(-5deg); }
+          25% { transform: rotate(4deg); }
+          75% { transform: rotate(-4deg); }
+        }
+        @keyframes boatSail {
+          0% { transform: translateX(-60px); }
+          100% { transform: translateX(calc(100% + 60px)); }
         }
       `}</style>
     </div>
@@ -493,94 +377,196 @@ function OceanWaterEffects() {
 function DecorativeElements() {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-[500]">
-      {/* Birds — bold dark strokes */}
-      <svg style={{ position: 'absolute', top: '8%', left: 0, width: '100%', height: '40px', animation: 'floatBird 12s ease-in-out infinite' }} viewBox="0 0 40 20" fill="none" width="40" height="20">
-        <path d="M2 12 Q8 4 14 10 M14 10 Q20 4 26 12" stroke="#1A3D4E" strokeWidth="3" fill="none" strokeLinecap="round"/>
+
+      {/* ═══ SKY — birds & clouds (can go anywhere overhead) ═══ */}
+      <svg style={{ position: 'absolute', top: '5%', left: 0, width: '100%', height: '30px', animation: 'floatBird 18s ease-in-out infinite' }} viewBox="0 0 40 20" fill="none" width="40" height="20">
+        <path d="M2 12 Q8 4 14 10 M14 10 Q20 4 26 12" stroke="#1A3D4E" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
       </svg>
-      <svg style={{ position: 'absolute', top: '14%', left: 0, width: '100%', height: '30px', animation: 'floatBird 16s ease-in-out infinite 3s' }} viewBox="0 0 30 16" fill="none" width="30" height="16">
-        <path d="M2 10 Q6 3 10 8 M10 8 Q14 3 18 10" stroke="#2A5060" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-      </svg>
-      <svg style={{ position: 'absolute', top: '22%', left: 0, width: '100%', height: '26px', animation: 'floatBird2 14s ease-in-out infinite 5s' }} viewBox="0 0 26 14" fill="none" width="26" height="14">
-        <path d="M2 8 Q5 2 8 6 M8 6 Q11 2 14 8" stroke="#1A3D4E" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+      <svg style={{ position: 'absolute', top: '10%', left: 0, width: '100%', height: '24px', animation: 'floatBird 22s ease-in-out infinite 4s' }} viewBox="0 0 30 16" fill="none" width="30" height="16">
+        <path d="M2 10 Q6 3 10 8 M10 8 Q14 3 18 10" stroke="#2A5060" strokeWidth="2" fill="none" strokeLinecap="round"/>
       </svg>
 
-      {/* Clouds — soft white, visible */}
-      <svg style={{ position: 'absolute', top: '6%', left: 0, width: '100%', height: '50px', animation: 'floatCloud 25s linear infinite', opacity: 0.75 }} viewBox="0 0 120 40" fill="none" width="120" height="40">
+      <svg style={{ position: 'absolute', top: '3%', left: 0, width: '100%', height: '45px', animation: 'floatCloud 35s linear infinite', opacity: 0.65 }} viewBox="0 0 120 40" fill="none" width="120" height="40">
         <ellipse cx="60" cy="25" rx="50" ry="14" fill="white"/><ellipse cx="40" cy="18" rx="25" ry="14" fill="white"/><ellipse cx="80" cy="20" rx="30" ry="12" fill="white"/>
       </svg>
-      <svg style={{ position: 'absolute', top: '30%', right: 0, width: '100%', height: '40px', animation: 'floatCloud 30s linear infinite 8s', opacity: 0.55 }} viewBox="0 0 100 30" fill="none" width="100" height="30">
-        <ellipse cx="50" cy="18" rx="40" ry="11" fill="white"/><ellipse cx="30" cy="13" rx="22" ry="10" fill="white"/><ellipse cx="70" cy="15" rx="25" ry="9" fill="white"/>
-      </svg>
 
-      {/* Waves — bolder */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, width: '200%', height: '30px', animation: 'waveMove 8s linear infinite', opacity: 0.45 }}>
-        <svg viewBox="0 0 1200 30" fill="none" width="100%" height="30" preserveAspectRatio="none">
-          <path d="M0 15 Q50 0 100 15 Q150 30 200 15 Q250 0 300 15 Q350 30 400 15 Q450 0 500 15 Q550 30 600 15 Q650 0 700 15 Q750 30 800 15 Q850 0 900 15 Q950 30 1000 15 Q1050 0 1100 15 Q1150 30 1200 15" stroke="#FFFFFF" strokeWidth="2.5" fill="none"/>
+      {/* ═══ LEFT OCEAN — South China Sea (0-38%) ═══ */}
+      {/* Fish swimming left ocean */}
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '38%', height: '100%', overflow: 'hidden' }}>
+        <svg style={{ position: 'absolute', top: '40%', left: '-30px', animation: 'fishSwimRight 30s linear infinite 2s' }} viewBox="0 0 28 14" fill="none" width="28" height="14">
+          <ellipse cx="12" cy="7" rx="10" ry="5" fill="#FF6B35" opacity="0.8"/><polygon points="22,7 28,2 28,12" fill="#FF6B35" opacity="0.8"/><circle cx="7" cy="6" r="1.5" fill="white"/>
+        </svg>
+        <svg style={{ position: 'absolute', top: '60%', left: '-20px', animation: 'fishSwimRight 35s linear infinite 8s' }} viewBox="0 0 24 12" fill="none" width="24" height="12">
+          <ellipse cx="10" cy="6" rx="8" ry="4" fill="#00BCD4" opacity="0.75"/><polygon points="18,6 24,2 24,10" fill="#00BCD4" opacity="0.75"/><circle cx="6" cy="5" r="1.2" fill="white"/>
+        </svg>
+        {/* Turtle — slow swim in left ocean */}
+        <svg style={{ position: 'absolute', top: '50%', left: '-40px', animation: 'fishSwimRight 50s linear infinite 5s' }} viewBox="0 0 36 18" fill="none" width="36" height="18">
+          <ellipse cx="18" cy="10" rx="10" ry="6" fill="#2E8B57" opacity="0.75"/>
+          <ellipse cx="18" cy="10" rx="7" ry="4" fill="#3CB371" opacity="0.65"/>
+          <circle cx="8" cy="8" r="3.5" fill="#2E8B57" opacity="0.75"/>
+          <circle cx="6" cy="7" r="1" fill="white"/>
+          <ellipse cx="12" cy="5" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.65" transform="rotate(-20 12 5)"/>
+          <ellipse cx="12" cy="15" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.65" transform="rotate(20 12 15)"/>
+          <ellipse cx="26" cy="8" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.65" transform="rotate(-10 26 8)"/>
+          <ellipse cx="26" cy="12" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.65" transform="rotate(10 26 12)"/>
         </svg>
       </div>
-      <div style={{ position: 'absolute', bottom: '8px', left: 0, width: '200%', height: '25px', animation: 'waveMove 10s linear infinite 1s', opacity: 0.3 }}>
+
+      {/* ═══ RIGHT OCEAN — Pacific (65-100%) ═══ */}
+      <div style={{ position: 'absolute', top: 0, left: '65%', width: '35%', height: '100%', overflow: 'hidden' }}>
+        {/* Dolphin in right ocean */}
+        <svg style={{ position: 'absolute', top: '30%', right: '-30px', animation: 'fishSwimLeft 40s linear infinite 3s' }} viewBox="0 0 40 22" fill="none" width="40" height="22">
+          <ellipse cx="20" cy="11" rx="8" ry="4.5" fill="#1565C0" opacity="0.65"/>
+          <path d="M28 11 L34 8 L33 14 Z" fill="#1565C0" opacity="0.6"/>
+          <circle cx="14" cy="10" r="1.2" fill="white" opacity="0.8"/>
+          <path d="M10 11 Q6 5 2 11" stroke="#1565C0" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.5"/>
+        </svg>
+        {/* Yellow fish school */}
+        <svg style={{ position: 'absolute', top: '55%', right: '-25px', animation: 'fishSwimLeft 28s linear infinite 6s' }} viewBox="0 0 40 16" fill="none" width="40" height="16">
+          <ellipse cx="8" cy="5" rx="4" ry="2.2" fill="#FFB300" opacity="0.75"/>
+          <ellipse cx="16" cy="9" rx="4" ry="2.2" fill="#FFB300" opacity="0.7"/>
+          <ellipse cx="12" cy="13" rx="3.5" ry="2" fill="#FFB300" opacity="0.65"/>
+          <polygon points="12,5 16,3 16,7" fill="#FFB300" opacity="0.75"/>
+          <polygon points="20,9 24,7 24,11" fill="#FFB300" opacity="0.7"/>
+        </svg>
+        {/* Coral fish */}
+        <svg style={{ position: 'absolute', top: '75%', right: '-20px', animation: 'fishSwimLeft 32s linear infinite 10s' }} viewBox="0 0 22 10" fill="none" width="22" height="10">
+          <ellipse cx="9" cy="5" rx="7" ry="3.5" fill="#E84855" opacity="0.7"/><polygon points="16,5 22,2 22,8" fill="#E84855" opacity="0.7"/><circle cx="5" cy="4" r="1" fill="white"/>
+        </svg>
+      </div>
+
+      {/* ═══ BOTTOM OCEAN — wave lines (bottom 20%) ═══ */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, width: '200%', height: '25px', animation: 'waveMove 12s linear infinite', opacity: 0.35 }}>
         <svg viewBox="0 0 1200 25" fill="none" width="100%" height="25" preserveAspectRatio="none">
           <path d="M0 12 Q50 0 100 12 Q150 25 200 12 Q250 0 300 12 Q350 25 400 12 Q450 0 500 12 Q550 25 600 12 Q650 0 700 12 Q750 25 800 12 Q850 0 900 12 Q950 25 1000 12 Q1050 0 1100 12 Q1150 25 1200 12" stroke="#FFFFFF" strokeWidth="2" fill="none"/>
         </svg>
       </div>
 
-      {/* Fish — vivid colors */}
-      <svg style={{ position: 'absolute', bottom: '15%', left: 0, width: '100%', height: '22px', animation: 'fishSwim 18s ease-in-out infinite 2s' }} viewBox="0 0 28 14" fill="none" width="28" height="14">
-        <ellipse cx="12" cy="7" rx="10" ry="5" fill="#FF6B35" opacity="0.85"/><polygon points="22,7 28,2 28,12" fill="#FF6B35" opacity="0.85"/><circle cx="7" cy="6" r="1.5" fill="white"/>
-      </svg>
-      <svg style={{ position: 'absolute', bottom: '25%', left: 0, width: '100%', height: '18px', animation: 'fishSwim 22s ease-in-out infinite 7s' }} viewBox="0 0 24 12" fill="none" width="24" height="12">
-        <ellipse cx="10" cy="6" rx="8" ry="4" fill="#FFD93D" opacity="0.8"/><polygon points="18,6 24,2 24,10" fill="#FFD93D" opacity="0.8"/><circle cx="6" cy="5" r="1.2" fill="#333"/>
+      {/* ═══ TAIWAN LAND ANIMALS — positioned over Taiwan area (42-60%, 28-58%) ═══ */}
+
+      {/* 1. Formosan Macaque (monkey) — sitting on mid Taiwan */}
+      <svg style={{ position: 'absolute', top: '38%', left: '48%', width: '22px', height: '24px', opacity: 0.7, animation: 'monkeyBob 4s ease-in-out infinite' }} viewBox="0 0 24 28" fill="none">
+        <circle cx="12" cy="8" r="7" fill="#8B6914"/>
+        <circle cx="12" cy="8" r="5.5" fill="#A67C2E"/>
+        <circle cx="9.5" cy="7" r="1.2" fill="#333"/>
+        <circle cx="14.5" cy="7" r="1.2" fill="#333"/>
+        <ellipse cx="12" cy="10" rx="2.5" ry="1.5" fill="#D4A854"/>
+        <circle cx="5" cy="5" r="3" fill="#8B6914"/><circle cx="5" cy="5" r="1.8" fill="#D4A854"/>
+        <circle cx="19" cy="5" r="3" fill="#8B6914"/><circle cx="19" cy="5" r="1.8" fill="#D4A854"/>
+        <ellipse cx="12" cy="18" rx="5" ry="6" fill="#8B6914"/>
+        <path d="M8 24 Q12 20 16 24" stroke="#8B6914" strokeWidth="2" fill="none" strokeLinecap="round"/>
       </svg>
 
-      {/* Wave squiggles — white, visible */}
-      {[
-        { top: '45%', left: '5%', delay: '0s' },
-        { top: '65%', right: '8%', delay: '2s' },
-        { top: '75%', left: '12%', delay: '4s' },
-        { top: '55%', right: '15%', delay: '1s' },
-      ].map((pos, i) => (
-        <svg key={i} style={{ position: 'absolute', ...pos, width: '35px', height: '12px', animation: `bobFloat 3s ease-in-out infinite ${pos.delay}`, opacity: 0.5 }} viewBox="0 0 30 10" fill="none">
-          <path d="M2 5 Q8 1 14 5 Q20 9 26 5" stroke="#FFFFFF" strokeWidth="2" fill="none" strokeLinecap="round"/>
-        </svg>
-      ))}
-
-      {/* Extra fish — teal and coral */}
-      <svg style={{ position: 'absolute', bottom: '40%', left: 0, width: '100%', height: '20px', animation: 'fishSwim 15s ease-in-out infinite 4s' }} viewBox="0 0 26 12" fill="none" width="26" height="12">
-        <ellipse cx="11" cy="6" rx="9" ry="4.5" fill="#00BCD4" opacity="0.8"/><polygon points="20,6 26,2 26,10" fill="#00BCD4" opacity="0.8"/><circle cx="6" cy="5" r="1.2" fill="white"/>
-      </svg>
-      <svg style={{ position: 'absolute', bottom: '55%', left: 0, width: '100%', height: '16px', animation: 'fishSwim 20s ease-in-out infinite 9s' }} viewBox="0 0 22 10" fill="none" width="22" height="10">
-        <ellipse cx="9" cy="5" rx="7" ry="3.5" fill="#E84855" opacity="0.75"/><polygon points="16,5 22,2 22,8" fill="#E84855" opacity="0.75"/><circle cx="5" cy="4" r="1" fill="white"/>
+      {/* 2. Cat — near south Taiwan */}
+      <svg style={{ position: 'absolute', top: '50%', left: '52%', width: '18px', height: '20px', opacity: 0.65, animation: 'catTail 3s ease-in-out infinite 1s' }} viewBox="0 0 20 24" fill="none">
+        <polygon points="4,8 6,1 8,8" fill="#FF8C42"/>
+        <polygon points="12,8 14,1 16,8" fill="#FF8C42"/>
+        <ellipse cx="10" cy="11" rx="7" ry="6" fill="#FF8C42"/>
+        <circle cx="7.5" cy="9.5" r="1.2" fill="#333"/>
+        <circle cx="12.5" cy="9.5" r="1.2" fill="#333"/>
+        <ellipse cx="10" cy="12" rx="1" ry="0.6" fill="#FF6B6B"/>
+        <path d="M7 12.5 Q10 14 13 12.5" stroke="#A05020" strokeWidth="0.5" fill="none"/>
+        <ellipse cx="10" cy="19" rx="5.5" ry="5" fill="#FF8C42"/>
+        <path d="M16 16 Q20 12 18 18" stroke="#FF8C42" strokeWidth="2" fill="none" strokeLinecap="round"/>
       </svg>
 
-      {/* Cute turtle swimming — green, bold */}
-      <svg style={{ position: 'absolute', bottom: '20%', left: 0, width: '100%', height: '26px', animation: 'fishSwim 28s ease-in-out infinite 3s' }} viewBox="0 0 36 18" fill="none" width="36" height="18">
-        <ellipse cx="18" cy="10" rx="10" ry="6" fill="#2E8B57" opacity="0.8"/>
-        <ellipse cx="18" cy="10" rx="7" ry="4" fill="#3CB371" opacity="0.7"/>
-        <circle cx="8" cy="8" r="3.5" fill="#2E8B57" opacity="0.8"/>
-        <circle cx="6" cy="7" r="1" fill="white"/>
-        <ellipse cx="12" cy="5" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.7" transform="rotate(-20 12 5)"/>
-        <ellipse cx="12" cy="15" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.7" transform="rotate(20 12 15)"/>
-        <ellipse cx="26" cy="8" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.7" transform="rotate(-10 26 8)"/>
-        <ellipse cx="26" cy="12" rx="3.5" ry="1.8" fill="#2E8B57" opacity="0.7" transform="rotate(10 26 12)"/>
+      {/* 3. Sika Deer — north Taiwan */}
+      <svg style={{ position: 'absolute', top: '30%', left: '50%', width: '24px', height: '26px', opacity: 0.65, animation: 'bobFloat 5s ease-in-out infinite 2s' }} viewBox="0 0 28 32" fill="none">
+        <ellipse cx="14" cy="20" rx="8" ry="6" fill="#C4883A"/>
+        <circle cx="14" cy="8" r="5" fill="#C4883A"/>
+        <circle cx="11.5" cy="7" r="1" fill="#333"/>
+        <circle cx="16.5" cy="7" r="1" fill="#333"/>
+        <ellipse cx="14" cy="10" rx="1.5" ry="1" fill="#333"/>
+        <line x1="10" y1="1" x2="8" y2="-3" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="18" y1="1" x2="20" y2="-3" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="8" y1="-3" x2="6" y2="-5" stroke="#8B6914" strokeWidth="1" strokeLinecap="round"/>
+        <line x1="20" y1="-3" x2="22" y2="-5" stroke="#8B6914" strokeWidth="1" strokeLinecap="round"/>
+        <circle cx="11" cy="18" r="1" fill="white" opacity="0.6"/>
+        <circle cx="17" cy="19" r="0.8" fill="white" opacity="0.5"/>
+        <circle cx="14" cy="16" r="0.7" fill="white" opacity="0.5"/>
+        <line x1="9" y1="26" x2="8" y2="32" stroke="#8B6914" strokeWidth="1.5"/>
+        <line x1="12" y1="26" x2="11" y2="32" stroke="#8B6914" strokeWidth="1.5"/>
+        <line x1="16" y1="26" x2="17" y2="32" stroke="#8B6914" strokeWidth="1.5"/>
+        <line x1="19" y1="26" x2="20" y2="32" stroke="#8B6914" strokeWidth="1.5"/>
       </svg>
 
-      {/* Dolphin — bold blue */}
-      <svg style={{ position: 'absolute', top: '12%', left: 0, width: '100%', height: '30px', animation: 'floatBird 18s ease-in-out infinite 6s' }} viewBox="0 0 40 22" fill="none" width="40" height="22">
-        <path d="M4 18 Q10 2 20 8 Q30 14 36 4" stroke="#1565C0" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.7"/>
-        <ellipse cx="20" cy="10" rx="6" ry="3.5" fill="#1565C0" opacity="0.65"/>
-        <path d="M26 10 L30 7 L29 12 Z" fill="#1565C0" opacity="0.65"/>
-        <circle cx="16" cy="9" r="1" fill="white" opacity="0.8"/>
+      {/* 4. Butterfly — fluttering near Taiwan */}
+      <svg style={{ position: 'absolute', top: '42%', left: '55%', width: '20px', height: '16px', opacity: 0.7, animation: 'butterflyFloat 6s ease-in-out infinite' }} viewBox="0 0 24 18" fill="none">
+        <ellipse cx="12" cy="9" rx="1" ry="6" fill="#333"/>
+        <ellipse cx="7" cy="6" rx="5" ry="4" fill="#FF6B9D" opacity="0.8" transform="rotate(-15 7 6)">
+          <animate attributeName="rx" values="5;3.5;5" dur="0.8s" repeatCount="indefinite"/>
+        </ellipse>
+        <ellipse cx="17" cy="6" rx="5" ry="4" fill="#FF6B9D" opacity="0.8" transform="rotate(15 17 6)">
+          <animate attributeName="rx" values="5;3.5;5" dur="0.8s" repeatCount="indefinite"/>
+        </ellipse>
+        <ellipse cx="8" cy="12" rx="3.5" ry="3" fill="#FFB6D9" opacity="0.7" transform="rotate(-10 8 12)">
+          <animate attributeName="rx" values="3.5;2.5;3.5" dur="0.8s" repeatCount="indefinite"/>
+        </ellipse>
+        <ellipse cx="16" cy="12" rx="3.5" ry="3" fill="#FFB6D9" opacity="0.7" transform="rotate(10 16 12)">
+          <animate attributeName="rx" values="3.5;2.5;3.5" dur="0.8s" repeatCount="indefinite"/>
+        </ellipse>
+        <circle cx="7" cy="5.5" r="1" fill="#FF3D7F" opacity="0.6"/>
+        <circle cx="17" cy="5.5" r="1" fill="#FF3D7F" opacity="0.6"/>
       </svg>
 
-      {/* School of fish — bright yellow */}
-      <svg style={{ position: 'absolute', bottom: '45%', left: 0, width: '100%', height: '18px', animation: 'fishSwim 12s ease-in-out infinite 1s' }} viewBox="0 0 40 14" fill="none" width="40" height="14">
-        <ellipse cx="8" cy="5" rx="4" ry="2.2" fill="#FFB300" opacity="0.8"/>
-        <ellipse cx="16" cy="8" rx="4" ry="2.2" fill="#FFB300" opacity="0.75"/>
-        <ellipse cx="12" cy="12" rx="3.5" ry="2" fill="#FFB300" opacity="0.7"/>
-        <polygon points="12,5 16,3 16,7" fill="#FFB300" opacity="0.8"/>
-        <polygon points="20,8 24,6 24,10" fill="#FFB300" opacity="0.75"/>
-        <polygon points="15.5,12 19,10 19,14" fill="#FFB300" opacity="0.7"/>
+      {/* 5. Taiwan Blue Magpie — perched near Taiwan */}
+      <svg style={{ position: 'absolute', top: '34%', left: '44%', width: '22px', height: '22px', opacity: 0.65, animation: 'bobFloat 4.5s ease-in-out infinite 3s' }} viewBox="0 0 26 28" fill="none">
+        <ellipse cx="13" cy="10" rx="5" ry="4.5" fill="#2962A5"/>
+        <circle cx="13" cy="5" r="3.5" fill="#1A1A2E"/>
+        <circle cx="14.5" cy="4.5" r="0.8" fill="white"/>
+        <polygon points="16,5 20,4.5 16,6" fill="#E85A3A"/>
+        <path d="M8 14 Q4 22 6 28" stroke="#2962A5" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M10 14 Q8 20 10 26" stroke="#4A8AD4" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+        <line x1="13" y1="14" x2="12" y2="18" stroke="#8B6914" strokeWidth="1"/>
+        <line x1="15" y1="14" x2="16" y2="18" stroke="#8B6914" strokeWidth="1"/>
       </svg>
+
+      {/* ═══ KEYFRAMES ═══ */}
+      <style>{`
+        @keyframes floatBird {
+          0% { transform: translateX(-60px); }
+          100% { transform: translateX(calc(100% + 60px)); }
+        }
+        @keyframes floatBird2 {
+          0% { transform: translateX(calc(100% + 40px)); }
+          100% { transform: translateX(-40px); }
+        }
+        @keyframes floatCloud {
+          0% { transform: translateX(-150px); }
+          100% { transform: translateX(calc(100% + 150px)); }
+        }
+        @keyframes waveMove {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes fishSwimRight {
+          0% { transform: translateX(-40px); }
+          100% { transform: translateX(calc(100% + 40px)); }
+        }
+        @keyframes fishSwimLeft {
+          0% { transform: translateX(calc(100% + 40px)) scaleX(-1); }
+          100% { transform: translateX(-40px) scaleX(-1); }
+        }
+        @keyframes bobFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+        @keyframes monkeyBob {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          30% { transform: translateY(-3px) rotate(-2deg); }
+          70% { transform: translateY(-1px) rotate(2deg); }
+        }
+        @keyframes catTail {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-2px); }
+        }
+        @keyframes butterflyFloat {
+          0%, 100% { transform: translate(0, 0); }
+          25% { transform: translate(6px, -8px); }
+          50% { transform: translate(-4px, -12px); }
+          75% { transform: translate(8px, -5px); }
+        }
+      `}</style>
     </div>
   );
 }
@@ -897,15 +883,20 @@ export default function StoreMap({ stores }: StoreMapProps) {
       attribution: '© OpenStreetMap © CARTO',
     }).addTo(map);
 
-    /* ── Layer 2: Ocean GeoJSON overlay — blue fill ONLY over ocean areas ──
-       This is the world bounding box MINUS all land = pure ocean polygons */
+    /* ── Layer 2: Ocean GeoJSON overlay — blue ONLY over water ──
+       Generated from 10m Natural Earth with 0.02° inland buffer = precise coastlines */
+    const oceanPane = map.createPane('oceanPane');
+    oceanPane.style.zIndex = '250';
+    oceanPane.style.pointerEvents = 'none';
+
     fetch('/ocean.geo.json')
       .then((res) => res.json())
       .then((oceanData) => {
         L.geoJSON(oceanData, {
+          pane: 'oceanPane',
           style: () => ({
-            fillColor: '#2B8FC4',
-            fillOpacity: 0.7,
+            fillColor: '#1E88C7',
+            fillOpacity: 0.55,
             color: 'transparent',
             weight: 0,
           }),
