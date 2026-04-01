@@ -20,16 +20,15 @@ function injectPinStyles() {
       background: #4A9FD9 !important;
     }
 
-    /* ── ANTI-FLICKER: absolute zero visual gaps during zoom/pan ── */
+    /* ── ANTI-FLICKER: single combined layer, zero visual gaps ── */
 
-    /* GPU-accelerated tile pane */
+    /* GPU-accelerated tile pane — prevents browser repaints */
     .illustrated-map .leaflet-tile-pane {
       will-change: transform;
       transform: translateZ(0);
     }
-    /* CRITICAL: ALL tile containers (old + new zoom levels) stay visible.
-       Leaflet normally hides/removes old containers → flash. This prevents it.
-       Old tiles show through until new tiles fully cover them. */
+    /* ALL tile containers stay visible at all times (old + new zoom levels).
+       Old zoom tiles serve as background until new zoom tiles render from cache. */
     .illustrated-map .leaflet-tile-pane > .leaflet-tile-container,
     .illustrated-map .leaflet-tile-pane > div {
       opacity: 1 !important;
@@ -38,31 +37,28 @@ function injectPinStyles() {
       will-change: transform;
       transform: translateZ(0);
     }
-    /* Individual tiles: no transitions, GPU-composited */
+    /* Individual tiles: NO transitions, NO fade, instant visibility */
     .illustrated-map .leaflet-tile {
       transition: none !important;
       will-change: transform;
       backface-visibility: hidden;
       transform: translateZ(0);
     }
-    /* Kill ALL Leaflet internal fade/zoom transitions on tiles */
-    .illustrated-map .leaflet-zoom-anim .leaflet-tile-pane,
-    .illustrated-map .leaflet-fade-anim .leaflet-tile-container,
-    .illustrated-map .leaflet-zoom-anim .leaflet-tile-container,
-    .illustrated-map .leaflet-zoom-anim .leaflet-tile {
-      transition: none !important;
-    }
-    /* Loaded tiles: instant full visibility */
-    .illustrated-map .leaflet-tile-loaded {
+    /* Override Leaflet's inline opacity on tile containers */
+    .illustrated-map .leaflet-tile-container[style] {
       opacity: 1 !important;
       visibility: visible !important;
     }
-    /* Unloaded tiles at NEW zoom level: invisible (old zoom tiles behind fill gap) */
-    .illustrated-map .leaflet-tile:not(.leaflet-tile-loaded) {
-      opacity: 0 !important;
+    /* Kill ALL Leaflet animations on tiles — zero transition frames */
+    .illustrated-map .leaflet-zoom-anim .leaflet-tile-pane,
+    .illustrated-map .leaflet-fade-anim .leaflet-tile-container,
+    .illustrated-map .leaflet-zoom-anim .leaflet-tile-container,
+    .illustrated-map .leaflet-zoom-anim .leaflet-tile,
+    .illustrated-map .leaflet-zoom-animated {
+      transition: none !important;
     }
-    /* Override any inline styles Leaflet puts on tile containers */
-    .illustrated-map .leaflet-tile-container[style] {
+    /* Loaded tiles: always full opacity */
+    .illustrated-map .leaflet-tile-loaded {
       opacity: 1 !important;
       visibility: visible !important;
     }
@@ -1073,14 +1069,6 @@ export default function StoreMap({ stores }: StoreMapProps) {
     map.on('dragstart', () => startMusicOnInteraction());
     map.on('zoomstart', () => startMusicOnInteraction());
 
-    /* ── Custom pane: labels on top of everything ── */
-    map.createPane('labelsPane');
-    const labelsPane = map.getPane('labelsPane');
-    if (labelsPane) {
-      labelsPane.style.zIndex = '450';
-      labelsPane.style.pointerEvents = 'none';
-    }
-
     /* ═══════════════════════════════════════════════════════════════
        ZERO-FLICKER TILE SYSTEM
        Strategy: preload ALL tiles for Taiwan (zoom 7-11) into browser
@@ -1112,9 +1100,11 @@ export default function StoreMap({ stores }: StoreMapProps) {
       }
     };
 
-    /* ── Layer 1: Base tiles ── */
+    /* ── SINGLE combined tile layer: base map + labels in one ── */
+    /* Using combined 'voyager' instead of split 'nolabels'+'only_labels' prevents
+       label desync during zoom transitions (the #1 cause of flicker) */
     const baseTiles = L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png',
+      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
       { ...TILE_OPTS, attribution: '© OpenStreetMap © CARTO' }
     ).addTo(map);
     patchTileLayer(baseTiles);
@@ -1135,37 +1125,24 @@ export default function StoreMap({ stores }: StoreMapProps) {
       })
       .catch(() => {});
 
-    /* ── Layer 3: Taiwan GeoJSON ── */
+    /* ── Layer 3: Taiwan GeoJSON — reduced opacity so tile labels show through ── */
     const taiwanReady = fetch('/taiwan.geo.json')
       .then((r) => r.json())
       .then((data) => {
         const geo = L.geoJSON(data, {
-          style: () => ({ fillColor: '#F5CBA7', fillOpacity: 0.75, color: '#FFFFFF', weight: 2.5, opacity: 0.9 }),
+          style: () => ({ fillColor: '#F5CBA7', fillOpacity: 0.45, color: '#FFFFFF', weight: 2.5, opacity: 0.9 }),
           interactive: false,
         });
         geo.addTo(map);
         geoJsonLayerRef.current = geo;
-
-        /* ── Layer 4: Labels on top ── */
-        const labels = L.tileLayer(
-          'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',
-          { ...TILE_OPTS, pane: 'labelsPane' }
-        ).addTo(map);
-        patchTileLayer(labels);
       })
-      .catch(() => {
-        const fallback = L.tileLayer(
-          'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-          TILE_OPTS
-        ).addTo(map);
-        patchTileLayer(fallback);
-      });
+      .catch(() => {});
 
     /* ═══════════════════════════════════════════════════════════════
-       PRELOAD EVERY SINGLE TILE covering Taiwan for zoom 6-12
-       (base + labels layers × retina-aware)
-       This means EVERY tile the user can ever see is in browser cache.
-       No network requests during zoom/pan = absolute zero flicker.
+       PRELOAD ALL TILES — single combined voyager layer, tight Taiwan bounds
+       ═══════════════════════════════════════════════════════════════
+       BEFORE: 2 layers × wide bounds = ~15,000+ tiles → cache eviction → flicker
+       NOW:    1 layer × tight bounds = ~5,300 tiles → stays in cache → zero flicker
        ═══════════════════════════════════════════════════════════════ */
     let preloadStarted = false;
     const preloadAllTaiwanTiles = (): Promise<void> => {
@@ -1173,14 +1150,14 @@ export default function StoreMap({ stores }: StoreMapProps) {
       preloadStarted = true;
 
       return new Promise<void>((resolve) => {
-        const LAT_MIN = 21.0, LAT_MAX = 26.5, LNG_MIN = 118.5, LNG_MAX = 123.0;
+        /* Tight bounds: Taiwan island + small buffer (not massive ocean) */
+        const LAT_MIN = 21.5, LAT_MAX = 26.0, LNG_MIN = 119.5, LNG_MAX = 122.2;
         const subs = ['a', 'b', 'c', 'd'];
         const r = (window.devicePixelRatio || 1) > 1 ? '@2x' : '';
-        const layers = ['rastertiles/voyager_nolabels', 'rastertiles/voyager_only_labels'];
         const urls: string[] = [];
 
-        /* Zoom 6-12: covers EVERYTHING from overview to street-level detail */
-        for (let z = 6; z <= 12; z++) {
+        /* Single layer: 'rastertiles/voyager' (combined base + labels) */
+        for (let z = 7; z <= 12; z++) {
           const n = Math.pow(2, z);
           const xMin = Math.floor((LNG_MIN + 180) / 360 * n);
           const xMax = Math.floor((LNG_MAX + 180) / 360 * n);
@@ -1188,9 +1165,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
           const yMax = Math.floor((1 - Math.log(Math.tan(LAT_MIN * Math.PI / 180) + 1 / Math.cos(LAT_MIN * Math.PI / 180)) / Math.PI) / 2 * n);
           for (let x = xMin; x <= xMax; x++) {
             for (let y = yMin; y <= yMax; y++) {
-              for (const layer of layers) {
-                urls.push(`https://${subs[(x + y) % 4]}.basemaps.cartocdn.com/${layer}/${z}/${x}/${y}${r}.png`);
-              }
+              urls.push(`https://${subs[(x + y) % 4]}.basemaps.cartocdn.com/rastertiles/voyager/${z}/${x}/${y}${r}.png`);
             }
           }
         }
@@ -1201,22 +1176,22 @@ export default function StoreMap({ stores }: StoreMapProps) {
         const total = urls.length;
         const onDone = () => { done++; if (done >= total) resolve(); };
 
-        /* Load in batches of 60 for maximum throughput */
+        /* Large batches for fast throughput (4 subdomains = 24+ concurrent) */
         let idx = 0;
         const batch = () => {
-          const chunk = urls.slice(idx, idx + 60);
-          idx += 60;
+          const chunk = urls.slice(idx, idx + 100);
+          idx += 100;
           chunk.forEach((url) => {
             const img = new Image();
             img.crossOrigin = 'anonymous';
             img.onload = img.onerror = onDone;
             img.src = url;
           });
-          if (idx < total) setTimeout(batch, 20);
+          if (idx < total) setTimeout(batch, 10);
         };
         batch();
 
-        /* Safety: resolve after 30s even if some tiles fail (large preload) */
+        /* Safety: resolve after 30s even if some tiles fail */
         setTimeout(resolve, 30000);
       });
     };
@@ -1278,18 +1253,18 @@ export default function StoreMap({ stores }: StoreMapProps) {
       });
       if (cityClusters.length > 0) {
         const group = L.featureGroup(markersRef.current);
-        map.fitBounds(group.getBounds().pad(0.15), { maxZoom: 10 });
+        map.fitBounds(group.getBounds().pad(0.15), { maxZoom: 10, animate: false });
       }
     } else {
       filteredStores.forEach((store) => {
         const marker = L.marker([store.lat, store.lng], { icon: createStorePinIcon(selectedStore?.id === store.id) });
-        marker.on('click', () => { setSelectedStore(store); map.flyTo([store.lat, store.lng], 14, { duration: 1.2 }); });
+        marker.on('click', () => { setSelectedStore(store); map.setView([store.lat, store.lng], 12, { animate: false }); });
         marker.addTo(map);
         markersRef.current.push(marker);
       });
       if (filteredStores.length > 0 && !selectedStore) {
         const group = L.featureGroup(markersRef.current);
-        map.fitBounds(group.getBounds().pad(0.3), { maxZoom: 12 });
+        map.fitBounds(group.getBounds().pad(0.3), { maxZoom: 12, animate: false });
       }
     }
   }, [filteredStores, cityClusters, filterCity, selectedStore]);
@@ -1321,13 +1296,13 @@ export default function StoreMap({ stores }: StoreMapProps) {
   const handleResetView = () => {
     const map = mapRef.current; if (!map) return;
     setSelectedStore(null); setFilterCity('All');
-    map.flyTo([23.7, 120.96], 8, { duration: 1 });
+    map.setView([23.7, 120.96], 8, { animate: false });
   };
 
   const handleBackToAll = () => {
     const map = mapRef.current; if (!map) return;
     setSelectedStore(null); setFilterCity('All');
-    map.flyTo([23.7, 120.96], 8, { duration: 1 });
+    map.setView([23.7, 120.96], 8, { animate: false });
   };
 
   const storeTypeLabel = (type: string) => {
