@@ -337,7 +337,7 @@ export default function HomePage() {
               fallbackHref={`/${locale}/events`}
               btnLabel={locale === 'id' ? 'Lihat Acara' : '查看活動'}
               locale={locale}
-              flipInterval={5000}
+              flipInterval={6500}
             />
 
             {/* Activities card — cycles through all lifestyle articles */}
@@ -348,7 +348,7 @@ export default function HomePage() {
               fallbackHref={`/${locale}/lifestyle`}
               btnLabel={locale === 'id' ? 'Lihat Aktivitas' : '查看活動'}
               locale={locale}
-              flipInterval={6000}
+              flipInterval={7500}
             />
           </div>
         </div>
