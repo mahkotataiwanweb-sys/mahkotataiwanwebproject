@@ -1456,10 +1456,17 @@ export default function StoreMap({ stores }: StoreMapProps) {
       }, { passive: true });
     }
 
-    /* Start ambient music on first map interaction */
-    map.on('click', () => startMusicOnInteraction());
-    map.on('dragstart', () => startMusicOnInteraction());
-    map.on('zoomstart', () => startMusicOnInteraction());
+    /* Start ambient music only on real user click/tap on the map (not programmatic events) */
+    const mapEl = mapContainerRef.current;
+    if (mapEl) {
+      const handleUserGesture = () => {
+        startMusicOnInteraction();
+        mapEl.removeEventListener('click', handleUserGesture);
+        mapEl.removeEventListener('touchstart', handleUserGesture);
+      };
+      mapEl.addEventListener('click', handleUserGesture);
+      mapEl.addEventListener('touchstart', handleUserGesture, { passive: true });
+    }
 
     /* ── Custom pane: labels on top of everything ── */
     map.createPane('labelsPane');
