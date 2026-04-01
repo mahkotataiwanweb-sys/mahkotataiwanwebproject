@@ -96,12 +96,10 @@ function injectPinStyles() {
 
     /* ── Leaflet UI overrides ── */
     .illustrated-map .leaflet-control-attribution {
-      background: transparent !important;
-      color: rgba(0,48,72,0.3) !important;
-      font-size: 9px !important;
+      display: none !important;
     }
     .illustrated-map .leaflet-control-attribution a {
-      color: rgba(0,48,72,0.4) !important;
+      display: none !important;
     }
     .illustrated-map .leaflet-control-zoom a {
       background: rgba(255,255,255,0.9) !important;
@@ -521,6 +519,29 @@ function DecorativeElements() {
         <line x1="15" y1="14" x2="16" y2="18" stroke="#8B6914" strokeWidth="1"/>
       </svg>
 
+      {/* ═══ AIRPLANE — occasional slow rise from bottom to top ═══ */}
+      {[
+        { left: '15%', duration: '55s', delay: '0s' },
+        { left: '50%', duration: '62s', delay: '20s' },
+        { left: '82%', duration: '58s', delay: '38s' },
+      ].map((plane, i) => (
+        <div
+          key={`plane-${i}`}
+          style={{
+            position: 'absolute',
+            bottom: '-30px',
+            left: plane.left,
+            animation: `planeRise ${plane.duration} linear infinite ${plane.delay}`,
+            opacity: 0,
+            zIndex: 1,
+          }}
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="rgba(0,48,72,0.3)">
+            <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+          </svg>
+        </div>
+      ))}
+
       {/* ═══ KEYFRAMES ═══ */}
       <style>{`
         @keyframes floatBird {
@@ -565,6 +586,13 @@ function DecorativeElements() {
           25% { transform: translate(6px, -8px); }
           50% { transform: translate(-4px, -12px); }
           75% { transform: translate(8px, -5px); }
+        }
+        @keyframes planeRise {
+          0%, 100% { transform: translateY(0); opacity: 0; }
+          2% { opacity: 0.4; }
+          44% { opacity: 0.4; }
+          47% { transform: translateY(-950px) translateX(-25px); opacity: 0; }
+          48% { transform: translateY(0); opacity: 0; }
         }
       `}</style>
     </div>
@@ -652,7 +680,7 @@ function PremiumDropdown({
       {/* ── Trigger ── */}
       <button
         onClick={() => (isOpen ? closeDropdown() : openDropdown())}
-        className="flex items-center gap-3 px-5 py-3 min-w-[240px] sm:min-w-[280px] rounded-2xl text-[13px] font-medium border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
+        className="flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-2.5 sm:py-3 min-w-[140px] sm:min-w-[240px] md:min-w-[280px] rounded-2xl text-[12px] sm:text-[13px] font-medium border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
         style={{
           background: isOpen
             ? 'rgba(255,255,255,0.72)'
@@ -690,7 +718,7 @@ function PremiumDropdown({
       {isOpen && (
         <div
           ref={panelRef}
-          className="absolute top-full mt-2 left-0 w-full min-w-[240px] sm:min-w-[280px] rounded-2xl overflow-hidden"
+          className="absolute top-full mt-2 left-0 w-full min-w-[140px] sm:min-w-[240px] md:min-w-[280px] rounded-2xl overflow-hidden"
           style={{
             background: 'rgba(255,255,255,0.68)',
             border: '1px solid rgba(0,48,72,0.08)',
@@ -1025,7 +1053,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
   return (
     <div className="relative w-full">
       {/* ─── Top bar ─── */}
-      <div className="absolute top-4 left-4 right-4 z-[1000] flex items-center gap-3">
+      <div className="absolute top-4 left-3 right-3 sm:left-4 sm:right-4 z-[1000] flex items-center gap-2 sm:gap-3">
         {/* Premium dropdown */}
         <PremiumDropdown
           value={filterCity}
@@ -1039,7 +1067,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
         {filterCity !== 'All' && (
           <button
             onClick={handleBackToAll}
-            className="group flex items-center gap-2 px-4 py-2.5 rounded-xl text-[12px] font-medium whitespace-nowrap transition-all duration-400 ease-out hover:-translate-y-0.5"
+            className="group flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-[12px] font-medium whitespace-nowrap transition-all duration-400 ease-out hover:-translate-y-0.5"
             style={{
               background: 'rgba(0,48,72,0.88)',
               color: 'rgba(250,237,211,0.85)',
@@ -1090,7 +1118,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
       </div>
 
       {/* Counter Badge */}
-      <div className="absolute bottom-20 left-4 z-[1000]">
+      <div className="absolute bottom-12 left-4 z-[1000]">
         <div
           className="relative px-4 py-2.5 rounded-full text-[11px] font-medium overflow-hidden"
           style={{
@@ -1116,6 +1144,14 @@ export default function StoreMap({ stores }: StoreMapProps) {
               </>
             )}
           </span>
+        </div>
+      </div>
+
+      {/* Custom Branding — replaces default map attribution */}
+      <div className="absolute bottom-3 left-4 z-[1000]">
+        <div className="flex items-center gap-1.5 text-[9px] font-medium" style={{ color: 'rgba(0,48,72,0.45)' }}>
+          <span>Mahkota Interactive Map by</span>
+          <span className="font-bold" style={{ color: 'rgba(193,33,38,0.6)' }}>The Orange Fox</span>
         </div>
       </div>
 
