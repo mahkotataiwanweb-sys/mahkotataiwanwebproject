@@ -74,40 +74,49 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
     };
   }, [articles, count, locale, fallbackTitle, fallbackExcerpt, fallbackHref]);
 
+  const flippingRef = useRef(false);
+
   useImperativeHandle(ref, () => ({
     triggerFlip: () => new Promise<void>((resolve) => {
-      if (count <= 1 || !cardRef.current) { resolve(); return; }
+      if (count <= 1 || !cardRef.current || flippingRef.current) { resolve(); return; }
       const el = cardRef.current;
+      flippingRef.current = true;
+      // Kill any lingering tweens to prevent stacking
+      gsap.killTweensOf(el);
       const nextIdx = (indexRef.current + 1) % count;
-      // Phase 1: flip out — rotate to edge, fade out fully
+      // Phase 1: flip out
       gsap.to(el, {
         rotateY: 90,
         opacity: 0,
         scale: 0.97,
         duration: 0.6,
         ease: 'power2.in',
+        overwrite: true,
         onComplete: () => {
-          // Swap content
           indexRef.current = nextIdx;
           setDisplayIndex(nextIdx);
-          // Set start position for flip in
           gsap.set(el, { rotateY: -90, scale: 0.97 });
-          // Phase 2: flip in — smooth reveal
+          // Phase 2: flip in
           gsap.to(el, {
             rotateY: 0,
             opacity: 1,
             scale: 1,
             duration: 0.8,
             ease: 'power2.out',
-            onComplete: resolve,
+            overwrite: true,
+            onComplete: () => {
+              flippingRef.current = false;
+              resolve();
+            },
           });
         },
       });
     }),
     enterView: () => new Promise<void>((resolve) => {
       if (!cardRef.current) { resolve(); return; }
+      gsap.killTweensOf(cardRef.current);
       gsap.set(cardRef.current, { opacity: 0, rotateY: -100 });
-      gsap.to(cardRef.current, { opacity: 1, rotateY: 0, duration: 2, ease: 'power2.out', onComplete: resolve });
+      gsap.to(cardRef.current, { opacity: 1, rotateY: 0, duration: 2, ease: 'power2.out', overwrite: true, onComplete: resolve });
     }),
   }), [count]);
 
@@ -218,16 +227,19 @@ export default function HomePage() {
 
     const sequencer = async () => {
       while (!cancelled) {
+        /* HOLD — let user read the current cards for 5 seconds */
         await new Promise(r => setTimeout(r, 5000));
         if (cancelled) break;
-        /* Flip top card */
+        /* Flip top card first */
         await topCardRef.current?.triggerFlip();
         if (cancelled) break;
-        /* Pause between cards — 0.3s */
+        /* Pause 0.3s then flip bottom card */
         await new Promise(r => setTimeout(r, 300));
         if (cancelled) break;
-        /* Flip bottom card */
         await bottomCardRef.current?.triggerFlip();
+        if (cancelled) break;
+        /* Small settle buffer before next cycle */
+        await new Promise(r => setTimeout(r, 500));
       }
     };
 
