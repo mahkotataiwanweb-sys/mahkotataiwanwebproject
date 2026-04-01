@@ -154,7 +154,7 @@ export default function WhereToBuyPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // GSAP Animations
+  // GSAP Animations — hero, map, parallax (runs once on mount)
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -197,32 +197,6 @@ export default function WhereToBuyPage() {
             },
           }
         );
-      });
-
-      // Stat number counter animation
-      statCards.forEach((card) => {
-        const numberEl = card.querySelector('.stat-number');
-        if (!numberEl) return;
-        const raw = numberEl.getAttribute('data-value') || '';
-        const numericPart = parseInt(raw.replace(/\D/g, ''), 10);
-        if (isNaN(numericPart)) return;
-        const suffix = raw.replace(/[0-9]/g, '');
-
-        const counter = { val: 0 };
-        gsap.to(counter, {
-          val: numericPart,
-          duration: 2.5,
-          delay: 0.5,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: '.stats-section',
-            start: 'top 82%',
-            once: true,
-          },
-          onUpdate() {
-            numberEl.textContent = Math.round(counter.val) + suffix;
-          },
-        });
       });
 
       // Map section entrance — dramatic reveal
@@ -289,6 +263,46 @@ export default function WhereToBuyPage() {
 
     return () => ctx.revert();
   }, []);
+
+  // Counter animation — runs when store data arrives
+  const hasAnimatedRef = useRef(false);
+  useEffect(() => {
+    if (stores.length === 0 || hasAnimatedRef.current) return;
+    hasAnimatedRef.current = true;
+
+    const statCards = gsap.utils.toArray('.stat-card') as HTMLElement[];
+    statCards.forEach((card) => {
+      const numberEl = card.querySelector('.stat-number') as HTMLElement | null;
+      if (!numberEl) return;
+      const raw = numberEl.getAttribute('data-value') || '';
+
+      // "24/7" and other non-numeric values: just display directly, no animation
+      const pureDigits = raw.replace(/\D/g, '');
+      if (!pureDigits || raw.includes('/')) {
+        numberEl.textContent = raw;
+        return;
+      }
+
+      const numericPart = parseInt(pureDigits, 10);
+      const suffix = raw.replace(/[0-9]/g, '');
+
+      const counter = { val: 0 };
+      gsap.to(counter, {
+        val: numericPart,
+        duration: 2.5,
+        delay: 0.3,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '.stats-section',
+          start: 'top 82%',
+          once: true,
+        },
+        onUpdate() {
+          numberEl.textContent = Math.round(counter.val) + suffix;
+        },
+      });
+    });
+  }, [stores]);
 
   /* ─── Dynamic stats computed from DB data ─── */
   const storeCount = stores.length;
@@ -412,7 +426,7 @@ export default function WhereToBuyPage() {
                     className="stat-number text-3xl md:text-4xl font-heading font-bold text-navy mb-2 tracking-tight"
                     data-value={stat.number}
                   >
-                    0
+                    {stat.number.includes('/') ? stat.number : loading ? '—' : '0'}
                   </div>
                   <div className="text-navy/50 text-xs font-semibold uppercase tracking-[0.15em]">
                     {stat.label}

@@ -7,7 +7,52 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { StoreLocation } from '@/types/database';
 
-/* ─── Custom store pin SVG ─── */
+/* ─── Inject global CSS for pin animations ─── */
+const STYLE_ID = 'store-map-pin-styles';
+function injectPinStyles() {
+  if (typeof document === 'undefined') return;
+  if (document.getElementById(STYLE_ID)) return;
+  const style = document.createElement('style');
+  style.id = STYLE_ID;
+  style.textContent = `
+    /* Smooth premium bounce for all pins */
+    @keyframes pinBounce {
+      0%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-8px); }
+      60% { transform: translateY(-3px); }
+    }
+    @keyframes pinBounceCity {
+      0%, 100% { transform: translateY(0) scale(1); }
+      40% { transform: translateY(-6px) scale(1.05); }
+      60% { transform: translateY(-2px) scale(1.02); }
+    }
+    @keyframes pulseRing {
+      0% { transform: scale(1); opacity: 0.4; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    .custom-pin > div {
+      animation: pinBounce 2.8s cubic-bezier(0.36, 0, 0.66, 1) infinite;
+    }
+    .city-cluster-pin > div {
+      animation: pinBounceCity 3s cubic-bezier(0.36, 0, 0.66, 1) infinite;
+    }
+    /* Stagger animation delays per pin */
+    .custom-pin:nth-child(2n) > div { animation-delay: 0.3s; }
+    .custom-pin:nth-child(3n) > div { animation-delay: 0.6s; }
+    .custom-pin:nth-child(4n) > div { animation-delay: 0.9s; }
+    .custom-pin:nth-child(5n) > div { animation-delay: 1.2s; }
+    .city-cluster-pin:nth-child(2n) > div { animation-delay: 0.4s; }
+    .city-cluster-pin:nth-child(3n) > div { animation-delay: 0.8s; }
+    .city-cluster-pin:nth-child(4n) > div { animation-delay: 1.2s; }
+    .city-cluster-pin:nth-child(5n) > div { animation-delay: 1.6s; }
+    /* Hover pause */
+    .city-cluster-pin:hover > div { animation-play-state: paused; transform: translateY(-6px) scale(1.1); }
+    .custom-pin:hover > div { animation-play-state: paused; transform: translateY(-4px); }
+  `;
+  document.head.appendChild(style);
+}
+
+/* ─── Custom store pin SVG (navy blue, keeps existing size) ─── */
 const createPinIcon = (isActive = false) => {
   const color = isActive ? '#C12126' : '#003048';
   const innerBg = '#FAEDD3';
@@ -17,7 +62,7 @@ const createPinIcon = (isActive = false) => {
     : 'drop-shadow(0 2px 6px rgba(0,48,72,0.35))';
   return L.divIcon({
     className: 'custom-pin',
-    html: `<div style="filter:${glow};transition:all 0.4s cubic-bezier(0.22,1,0.36,1);transform:${isActive ? 'scale(1.3) translateY(-4px)' : 'scale(1)'}">
+    html: `<div style="filter:${glow};transition:filter 0.4s cubic-bezier(0.22,1,0.36,1);">
       <svg width="34" height="46" viewBox="0 0 32 44" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 28 16 28s16-16 16-28C32 7.16 24.84 0 16 0z" fill="${color}" opacity="${isActive ? '1' : '0.9'}"/>
         <circle cx="16" cy="16" r="7" fill="${innerBg}" opacity="0.95"/>
@@ -30,43 +75,40 @@ const createPinIcon = (isActive = false) => {
   });
 };
 
-/* ─── City cluster dot icon ─── */
-const createCityClusterIcon = (cityName: string, storeCount: number) => {
+/* ─── City cluster dot icon (small, elegant, red — no city name label) ─── */
+const createCityClusterIcon = (storeCount: number) => {
   return L.divIcon({
     className: 'city-cluster-pin',
     html: `
       <div style="
-        display:flex;flex-direction:column;align-items:center;cursor:pointer;
-        filter:drop-shadow(0 4px 12px rgba(0,48,72,0.25));
-        transition:all 0.3s cubic-bezier(0.22,1,0.36,1);
-      " onmouseover="this.style.transform='scale(1.12) translateY(-4px)'" onmouseout="this.style.transform='scale(1)'">
+        position:relative;
+        display:flex;align-items:center;justify-content:center;
+        cursor:pointer;
+      ">
+        <!-- Pulse ring -->
+        <div style="
+          position:absolute;
+          width:32px;height:32px;
+          border-radius:50%;
+          background:rgba(193,33,38,0.15);
+          animation: pulseRing 2.5s ease-out infinite;
+        "></div>
+        <!-- Main dot -->
         <div style="
           position:relative;
-          width:48px;height:48px;
+          width:32px;height:32px;
           background:linear-gradient(135deg,#C12126,#a01b1f);
           border-radius:50%;
           display:flex;align-items:center;justify-content:center;
-          border:3px solid #FAEDD3;
-          box-shadow:0 0 0 2px rgba(193,33,38,0.3);
+          border:2.5px solid rgba(250,237,211,0.9);
+          box-shadow:0 2px 10px rgba(193,33,38,0.35), 0 0 0 1px rgba(193,33,38,0.15);
         ">
-          <span style="color:#FAEDD3;font-weight:800;font-size:16px;line-height:1;">${storeCount}</span>
+          <span style="color:#FAEDD3;font-weight:700;font-size:12px;line-height:1;letter-spacing:-0.02em;">${storeCount}</span>
         </div>
-        <div style="
-          margin-top:4px;
-          background:white;
-          padding:2px 8px;
-          border-radius:10px;
-          font-size:11px;
-          font-weight:600;
-          color:#003048;
-          white-space:nowrap;
-          border:1px solid rgba(0,48,72,0.1);
-          box-shadow:0 2px 8px rgba(0,0,0,0.08);
-        ">${cityName}</div>
       </div>
     `,
-    iconSize: [80, 70],
-    iconAnchor: [40, 35],
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
   });
 };
 
@@ -107,6 +149,9 @@ export default function StoreMap({ stores }: StoreMapProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
+
+  /* Inject CSS once */
+  useEffect(() => { injectPinStyles(); }, []);
 
   /* ─── Compute city clusters (centroid + count) ─── */
   const cityClusters = useMemo(() => {
@@ -159,9 +204,9 @@ export default function StoreMap({ stores }: StoreMapProps) {
     );
   }, [cityClusters, searchQuery]);
 
-  /* ─── Display count: total stores in All mode, filtered in city mode ─── */
+  /* ─── Display count ─── */
   const displayCount = filterCity === 'All' ? stores.length : filteredStores.length;
-  const cityCount = filterCity === 'All' ? filteredClusters.length : null;
+  const cityCountNum = filterCity === 'All' ? filteredClusters.length : null;
 
   /* ─── Initialize map ─── */
   useEffect(() => {
@@ -210,16 +255,15 @@ export default function StoreMap({ stores }: StoreMapProps) {
     markersRef.current = [];
 
     if (filterCity === 'All') {
-      // ── CITY CLUSTER MODE: one dot per city ──
+      // ── CITY CLUSTER MODE: one small dot per city ──
       filteredClusters.forEach((cluster) => {
         const marker = L.marker([cluster.lat, cluster.lng], {
-          icon: createCityClusterIcon(cluster.city, cluster.count),
+          icon: createCityClusterIcon(cluster.count),
         });
 
         marker.on('click', () => {
           setSelectedStore(null);
           setFilterCity(cluster.city);
-          // Zoom to city - will trigger re-render with individual pins
         });
 
         marker.addTo(map);
@@ -416,7 +460,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
           {filterCity === 'All' ? (
             <>
               <span className="text-red font-bold">{displayCount}</span> stores across{' '}
-              <span className="text-red font-bold">{cityCount}</span> cities
+              <span className="text-red font-bold">{cityCountNum}</span> cities
             </>
           ) : (
             <>
