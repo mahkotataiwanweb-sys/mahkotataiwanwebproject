@@ -1732,7 +1732,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
           />
           <span className="font-semibold" style={{ color: 'rgba(0,48,72,0.55)' }}>Mahkota Taiwan</span>
           <span className="mx-[1px]" style={{ color: 'rgba(0,48,72,0.35)' }}>Interactive Map by</span>
-          <span className="font-bold inline-flex items-baseline" style={{ color: '#E8870C' }}>The <img src="/images/branding/the-orange-fox-logo.png" alt="O" className="inline-block w-auto object-contain" style={{ height: '1.15em', verticalAlign: '-0.1em', margin: '0 -0.5px' }} />range Fox</span>
+          <span className="font-bold" style={{ color: '#E8870C' }}>The&nbsp;<img src="/images/branding/the-orange-fox-logo.png" alt="O" style={{ display: 'inline', height: '0.85em', verticalAlign: 'baseline', margin: '0 -0.3px' }} />range Fox</span>
         </div>
       </div>
 
