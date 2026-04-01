@@ -1,16 +1,16 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { MapPin, Phone, Navigation, X, Search, ChevronDown, Locate } from 'lucide-react';
 import gsap from 'gsap';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { StoreLocation } from '@/types/database';
 
-/* ─── Custom pin SVG ─── */
+/* ─── Custom store pin SVG ─── */
 const createPinIcon = (isActive = false) => {
   const color = isActive ? '#C12126' : '#003048';
-  const innerBg = isActive ? '#FAEDD3' : '#FAEDD3';
+  const innerBg = '#FAEDD3';
   const innerDot = isActive ? '#C12126' : '#003048';
   const glow = isActive
     ? 'drop-shadow(0 0 12px rgba(193,33,38,0.6)) drop-shadow(0 3px 8px rgba(0,0,0,0.3))'
@@ -30,7 +30,47 @@ const createPinIcon = (isActive = false) => {
   });
 };
 
-/* ─── All 22 Taiwan cities/counties ─── */
+/* ─── City cluster dot icon ─── */
+const createCityClusterIcon = (cityName: string, storeCount: number) => {
+  return L.divIcon({
+    className: 'city-cluster-pin',
+    html: `
+      <div style="
+        display:flex;flex-direction:column;align-items:center;cursor:pointer;
+        filter:drop-shadow(0 4px 12px rgba(0,48,72,0.25));
+        transition:all 0.3s cubic-bezier(0.22,1,0.36,1);
+      " onmouseover="this.style.transform='scale(1.12) translateY(-4px)'" onmouseout="this.style.transform='scale(1)'">
+        <div style="
+          position:relative;
+          width:48px;height:48px;
+          background:linear-gradient(135deg,#C12126,#a01b1f);
+          border-radius:50%;
+          display:flex;align-items:center;justify-content:center;
+          border:3px solid #FAEDD3;
+          box-shadow:0 0 0 2px rgba(193,33,38,0.3);
+        ">
+          <span style="color:#FAEDD3;font-weight:800;font-size:16px;line-height:1;">${storeCount}</span>
+        </div>
+        <div style="
+          margin-top:4px;
+          background:white;
+          padding:2px 8px;
+          border-radius:10px;
+          font-size:11px;
+          font-weight:600;
+          color:#003048;
+          white-space:nowrap;
+          border:1px solid rgba(0,48,72,0.1);
+          box-shadow:0 2px 8px rgba(0,0,0,0.08);
+        ">${cityName}</div>
+      </div>
+    `,
+    iconSize: [80, 70],
+    iconAnchor: [40, 35],
+  });
+};
+
+/* ─── All Taiwan cities/counties ─── */
 const CITIES = [
   'All',
   'Taipei',
@@ -68,18 +108,60 @@ export default function StoreMap({ stores }: StoreMapProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
 
-  const filteredStores = stores.filter((s) => {
-    const matchCity =
-      filterCity === 'All' ||
-      s.city === filterCity ||
-      (filterCity === 'Other' && !CITIES.includes(s.city));
-    const matchSearch =
-      !searchQuery ||
-      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.address.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchCity && matchSearch;
-  });
+  /* ─── Compute city clusters (centroid + count) ─── */
+  const cityClusters = useMemo(() => {
+    const cityMap: Record<string, { stores: StoreLocation[]; totalLat: number; totalLng: number }> = {};
+    stores.forEach((s) => {
+      if (!cityMap[s.city]) {
+        cityMap[s.city] = { stores: [], totalLat: 0, totalLng: 0 };
+      }
+      cityMap[s.city].stores.push(s);
+      cityMap[s.city].totalLat += s.lat;
+      cityMap[s.city].totalLng += s.lng;
+    });
+
+    return Object.entries(cityMap).map(([city, data]) => ({
+      city,
+      count: data.stores.length,
+      lat: data.totalLat / data.stores.length,
+      lng: data.totalLng / data.stores.length,
+      stores: data.stores,
+    }));
+  }, [stores]);
+
+  /* ─── Filtered stores (only used when a city is selected) ─── */
+  const filteredStores = useMemo(() => {
+    return stores.filter((s) => {
+      const matchCity =
+        filterCity === 'All' ||
+        s.city === filterCity ||
+        (filterCity === 'Other' && !CITIES.includes(s.city));
+      const matchSearch =
+        !searchQuery ||
+        s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.address.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchCity && matchSearch;
+    });
+  }, [stores, filterCity, searchQuery]);
+
+  /* ─── Filtered city clusters for search in All mode ─── */
+  const filteredClusters = useMemo(() => {
+    if (!searchQuery) return cityClusters;
+    return cityClusters.filter(
+      (c) =>
+        c.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.stores.some(
+          (s) =>
+            s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            s.address.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    );
+  }, [cityClusters, searchQuery]);
+
+  /* ─── Display count: total stores in All mode, filtered in city mode ─── */
+  const displayCount = filterCity === 'All' ? stores.length : filteredStores.length;
+  const cityCount = filterCity === 'All' ? filteredClusters.length : null;
 
   /* ─── Initialize map ─── */
   useEffect(() => {
@@ -96,16 +178,13 @@ export default function StoreMap({ stores }: StoreMapProps) {
       minZoom: 7,
     });
 
-    // CartoDB Voyager — bright, colorful, fun & premium
     L.tileLayer(
       'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
       { maxZoom: 19 }
     ).addTo(map);
 
-    // Zoom control bottom-right
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Attribution
     L.control
       .attribution({ position: 'bottomleft', prefix: false })
       .addAttribution(
@@ -121,7 +200,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
     };
   }, []);
 
-  /* ─── Update markers when filters change ─── */
+  /* ─── Update markers ─── */
   const updateMarkers = useCallback(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -130,26 +209,51 @@ export default function StoreMap({ stores }: StoreMapProps) {
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
-    filteredStores.forEach((store) => {
-      const marker = L.marker([store.lat, store.lng], {
-        icon: createPinIcon(selectedStore?.id === store.id),
+    if (filterCity === 'All') {
+      // ── CITY CLUSTER MODE: one dot per city ──
+      filteredClusters.forEach((cluster) => {
+        const marker = L.marker([cluster.lat, cluster.lng], {
+          icon: createCityClusterIcon(cluster.city, cluster.count),
+        });
+
+        marker.on('click', () => {
+          setSelectedStore(null);
+          setFilterCity(cluster.city);
+          // Zoom to city - will trigger re-render with individual pins
+        });
+
+        marker.addTo(map);
+        markersRef.current.push(marker);
       });
 
-      marker.on('click', () => {
-        setSelectedStore(store);
-        map.flyTo([store.lat, store.lng], 14, { duration: 1.2 });
+      // Fit to all clusters
+      if (filteredClusters.length > 0) {
+        const group = L.featureGroup(markersRef.current);
+        map.fitBounds(group.getBounds().pad(0.15), { maxZoom: 10 });
+      }
+    } else {
+      // ── INDIVIDUAL STORE MODE ──
+      filteredStores.forEach((store) => {
+        const marker = L.marker([store.lat, store.lng], {
+          icon: createPinIcon(selectedStore?.id === store.id),
+        });
+
+        marker.on('click', () => {
+          setSelectedStore(store);
+          map.flyTo([store.lat, store.lng], 14, { duration: 1.2 });
+        });
+
+        marker.addTo(map);
+        markersRef.current.push(marker);
       });
 
-      marker.addTo(map);
-      markersRef.current.push(marker);
-    });
-
-    // Fit bounds
-    if (filteredStores.length > 0 && !selectedStore) {
-      const group = L.featureGroup(markersRef.current);
-      map.fitBounds(group.getBounds().pad(0.15), { maxZoom: 12 });
+      // Fit bounds to show all stores in selected city
+      if (filteredStores.length > 0 && !selectedStore) {
+        const group = L.featureGroup(markersRef.current);
+        map.fitBounds(group.getBounds().pad(0.3), { maxZoom: 14 });
+      }
     }
-  }, [filteredStores, selectedStore]);
+  }, [filteredStores, filteredClusters, filterCity, selectedStore]);
 
   useEffect(() => {
     updateMarkers();
@@ -157,13 +261,15 @@ export default function StoreMap({ stores }: StoreMapProps) {
 
   /* ─── Update pin style on selection ─── */
   useEffect(() => {
-    markersRef.current.forEach((marker, idx) => {
-      const store = filteredStores[idx];
-      if (store) {
-        marker.setIcon(createPinIcon(selectedStore?.id === store.id));
-      }
-    });
-  }, [selectedStore, filteredStores]);
+    if (filterCity !== 'All') {
+      markersRef.current.forEach((marker, idx) => {
+        const store = filteredStores[idx];
+        if (store) {
+          marker.setIcon(createPinIcon(selectedStore?.id === store.id));
+        }
+      });
+    }
+  }, [selectedStore, filteredStores, filterCity]);
 
   /* ─── Popup entrance animation ─── */
   useEffect(() => {
@@ -198,6 +304,15 @@ export default function StoreMap({ stores }: StoreMapProps) {
     setSelectedStore(null);
     setFilterCity('All');
     setSearchQuery('');
+    map.flyTo([23.7, 120.96], 8, { duration: 1 });
+  };
+
+  /* ─── Back to All Cities button ─── */
+  const handleBackToAll = () => {
+    const map = mapRef.current;
+    if (!map) return;
+    setSelectedStore(null);
+    setFilterCity('All');
     map.flyTo([23.7, 120.96], 8, { duration: 1 });
   };
 
@@ -283,11 +398,33 @@ export default function StoreMap({ stores }: StoreMapProps) {
         </button>
       </div>
 
+      {/* ─── Back to All Cities button (shown when viewing a specific city) ─── */}
+      {filterCity !== 'All' && (
+        <div className="absolute top-20 sm:top-4 sm:left-auto sm:right-[calc(4rem+12rem+4rem+3.5rem+1.5rem)] left-4 z-[1000]">
+          <button
+            onClick={handleBackToAll}
+            className="flex items-center gap-2 px-4 py-2.5 bg-navy/90 backdrop-blur-xl rounded-2xl text-white text-xs font-semibold hover:bg-navy transition-all shadow-lg"
+          >
+            ← All Cities
+          </button>
+        </div>
+      )}
+
       {/* ─── Counter badge ─── */}
       <div className="absolute bottom-20 left-4 z-[1000]">
         <div className="px-4 py-2.5 bg-white/95 backdrop-blur-xl border border-cream-dark/20 rounded-full text-navy/80 text-xs font-semibold shadow-lg shadow-navy/5">
-          <span className="text-red font-bold">{filteredStores.length}</span>{' '}
-          {filteredStores.length === 1 ? 'store' : 'stores'} found
+          {filterCity === 'All' ? (
+            <>
+              <span className="text-red font-bold">{displayCount}</span> stores across{' '}
+              <span className="text-red font-bold">{cityCount}</span> cities
+            </>
+          ) : (
+            <>
+              <span className="text-red font-bold">{displayCount}</span>{' '}
+              {displayCount === 1 ? 'store' : 'stores'} in{' '}
+              <span className="font-bold">{filterCity}</span>
+            </>
+          )}
         </div>
       </div>
 
