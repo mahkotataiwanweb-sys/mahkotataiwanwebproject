@@ -288,22 +288,34 @@ export default function ContactPage() {
           start: 'top 85%',
           once: true,
           onEnter: () => {
-            // Top row (cards 0 & 1) flip first
-            gsap.to([cards[0], cards[1]], {
+            // Top row (cards 0 & 1) flip one by one
+            gsap.to(cards[0], {
               opacity: 1,
               rotateY: 0,
-              duration: 1.2,
-              stagger: 0.15,
-              ease: 'power2.out',
+              duration: 2.0,
+              ease: 'power3.out',
             });
-            // Bottom row (cards 2 & 3) flip after top row finishes
-            gsap.to([cards[2], cards[3]], {
+            gsap.to(cards[1], {
               opacity: 1,
               rotateY: 0,
-              duration: 1.2,
-              stagger: 0.15,
-              ease: 'power2.out',
-              delay: 1.4,
+              duration: 2.0,
+              ease: 'power3.out',
+              delay: 0.8,
+            });
+            // Bottom row (cards 2 & 3) flip after top row
+            gsap.to(cards[2], {
+              opacity: 1,
+              rotateY: 0,
+              duration: 2.0,
+              ease: 'power3.out',
+              delay: 2.0,
+            });
+            gsap.to(cards[3], {
+              opacity: 1,
+              rotateY: 0,
+              duration: 2.0,
+              ease: 'power3.out',
+              delay: 2.8,
             });
           },
         });
