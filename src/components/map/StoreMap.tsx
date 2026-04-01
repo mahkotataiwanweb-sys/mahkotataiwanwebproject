@@ -878,7 +878,8 @@ export default function StoreMap({ stores }: StoreMapProps) {
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
-    const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    /* Detect actual mobile/tablet — not touch-enabled laptops */
+    const isMobile = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth < 1024;
 
     const map = L.map(mapContainerRef.current, {
       center: [23.7, 120.96],
@@ -1114,9 +1115,10 @@ export default function StoreMap({ stores }: StoreMapProps) {
         marker.on('click', () => {
           setSelectedStore(null);
           setFilterCity(cluster.city);
-          /* Show pinch-to-zoom hint once on mobile */
+          /* Show pinch-to-zoom hint once — ONLY on mobile */
           const container = mapContainerRef.current;
-          if (container && (container as any).__pinchOverlay && !(container as any).__pinchShown) {
+          const isMobileDevice = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth < 1024;
+          if (isMobileDevice && container && (container as any).__pinchOverlay && !(container as any).__pinchShown) {
             (container as any).__pinchShown = true;
             const overlay = (container as any).__pinchOverlay as HTMLElement;
             overlay.style.display = 'flex';
