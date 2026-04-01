@@ -21,12 +21,29 @@ export default function ContactSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      if (contentRef.current) {
-        gsap.fromTo(contentRef.current.children,
+      // Header "Get in Touch" — all lines reveal together, slow & dramatic
+      const header = contentRef.current?.querySelector('.text-center.mb-12');
+      if (header) {
+        gsap.fromTo(header.children,
+          { opacity: 0, y: 60, filter: 'blur(6px)' },
+          {
+            opacity: 1, y: 0, filter: 'blur(0px)',
+            duration: 2.2,
+            stagger: 0,
+            ease: 'power2.out',
+            scrollTrigger: { trigger: header, start: 'top 85%', toggleActions: 'play none none reverse' }
+          }
+        );
+      }
+
+      // Info cards & socials — staggered entrance after header
+      const remaining = contentRef.current ? Array.from(contentRef.current.children).slice(1) : [];
+      if (remaining.length) {
+        gsap.fromTo(remaining,
           { opacity: 0, y: 40 },
           {
-            opacity: 1, y: 0, duration: 0.8, stagger: 0.12, ease: 'power3.out',
-            scrollTrigger: { trigger: contentRef.current, start: 'top 80%', toggleActions: 'play none none reverse' }
+            opacity: 1, y: 0, duration: 1.2, stagger: 0.15, ease: 'power3.out',
+            scrollTrigger: { trigger: contentRef.current, start: 'top 75%', toggleActions: 'play none none reverse' }
           }
         );
       }
