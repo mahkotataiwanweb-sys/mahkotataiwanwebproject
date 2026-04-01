@@ -157,6 +157,42 @@ function TiltCard({ children, className }: { children: React.ReactNode; classNam
   );
 }
 
+function CharReveal({ text, className }: { text: string; className?: string }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const chars = ref.current.querySelectorAll('.cr-char');
+    if (chars.length === 0) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(chars,
+        { opacity: 0 },
+        {
+          opacity: 1,
+          duration: 0.05,
+          stagger: 0.015,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: ref.current,
+            start: 'top 80%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
+    });
+    return () => ctx.revert();
+  }, [text]);
+
+  return (
+    <p ref={ref} className={className}>
+      {text.split('').map((char, i) => (
+        <span key={i} className="cr-char" style={{ opacity: 0 }}>{char}</span>
+      ))}
+    </p>
+  );
+}
+
 export default function AboutPage() {
   const t = useTranslations('about');
   const locale = useLocale();
@@ -367,89 +403,41 @@ export default function AboutPage() {
         );
       }
 
-      // Stats — bubble entrance + animation (mobile-aware)
+      // Stats — simple bounce reveal (2s, repeating)
       const isMobile = window.innerWidth < 768;
 
       if (statsRef.current) {
         const bubbleItems = statsRef.current.querySelectorAll('.stat-bubble-item');
-        
-        if (isMobile) {
-          // ── MOBILE: clean simple fade-up entrance, gentle float only ──
-          gsap.fromTo(
-            bubbleItems,
-            { opacity: 0, y: 40, scale: 0.9 },
-            {
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              duration: 0.8,
-              stagger: 0.12,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: statsRef.current,
-                start: 'top 88%',
-                toggleActions: 'play none none reverse',
-              },
-            }
-          );
 
-          // Gentle subtle float — no bounce, no rotation, no X drift
-          bubbleItems.forEach((item, i) => {
-            gsap.to(item, {
-              y: -6,
-              duration: 2.8 + i * 0.4,
-              ease: 'sine.inOut',
-              repeat: -1,
-              yoyo: true,
-              delay: 1 + i * 0.2,
-            });
-          });
-        } else {
-          // ── DESKTOP: full dramatic cinematic entrance + advanced floating ──
-          gsap.fromTo(
-            bubbleItems,
-            { opacity: 0, scale: 0.3, y: 100, rotation: -15, filter: 'blur(16px)' },
-            {
-              opacity: 1,
-              scale: 1,
-              y: 0,
-              rotation: 0,
-              filter: 'blur(0px)',
-              duration: 1.4,
-              stagger: 0.2,
-              ease: 'elastic.out(1, 0.45)',
-              scrollTrigger: {
-                trigger: statsRef.current,
-                start: 'top 85%',
-                toggleActions: 'play none none reverse',
-              },
-            }
-          );
+        // Entrance: gentle scale + fade in
+        gsap.fromTo(bubbleItems,
+          { opacity: 0, scale: 0.6, y: 30 },
+          {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 1,
+            stagger: 0.15,
+            ease: 'back.out(1.7)',
+            scrollTrigger: {
+              trigger: statsRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
 
-          const floatConfigs = [
-            { y: -20, x: 8, rotate: 4, dur: 3.0, bounceDelay: 4.5 },
-            { y: -26, x: -10, rotate: -3, dur: 3.6, bounceDelay: 5.8 },
-            { y: -18, x: 9, rotate: 3.5, dur: 3.3, bounceDelay: 6.5 },
-            { y: -24, x: -7, rotate: -4, dur: 3.9, bounceDelay: 5.0 },
-          ];
-          
-          bubbleItems.forEach((item, i) => {
-            const cfg = floatConfigs[i % floatConfigs.length];
-            const baseDelay = 1.5 + (i * 0.3);
-            
-            gsap.to(item, { y: cfg.y, duration: cfg.dur, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: baseDelay });
-            gsap.to(item, { x: cfg.x, duration: cfg.dur * 1.2, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: baseDelay + 0.3 });
-            gsap.to(item, { rotation: cfg.rotate, duration: cfg.dur * 0.85, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: baseDelay + 0.5 });
-            gsap.to(item, { scale: 1.06, duration: cfg.dur * 1.1, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: baseDelay + 0.2 });
-            
-            const bounceTl = gsap.timeline({ repeat: -1, repeatDelay: cfg.bounceDelay, delay: cfg.bounceDelay });
-            bounceTl
-              .to(item, { scaleY: 0.88, scaleX: 1.12, duration: 0.15, ease: 'power2.in' })
-              .to(item, { scaleY: 1.18, scaleX: 0.88, y: '-=16', duration: 0.25, ease: 'power2.out' })
-              .to(item, { scaleY: 0.92, scaleX: 1.08, y: '+=16', duration: 0.2, ease: 'bounce.out' })
-              .to(item, { scaleY: 1, scaleX: 1, duration: 0.35, ease: 'elastic.out(1, 0.4)' });
+        // Repeating gentle bounce — 2s cycle, infinite
+        bubbleItems.forEach((item, i) => {
+          gsap.to(item, {
+            y: -10,
+            duration: 2,
+            ease: 'sine.inOut',
+            repeat: -1,
+            yoyo: true,
+            delay: 1.5 + i * 0.25,
           });
-        }
+        });
       }
 
       // Counter animation with dramatic counting
@@ -726,9 +714,10 @@ export default function AboutPage() {
 
               {/* Right column — Description */}
               <div>
-                <p className="text-navy/60 leading-relaxed text-base sm:text-lg tracking-wide mb-4 text-justify">
-                  {t('description')}
-                </p>
+                <CharReveal
+                  text={t('description')}
+                  className="text-navy/60 leading-relaxed text-base sm:text-lg tracking-wide mb-4 text-justify"
+                />
               </div>
             </div>
 
@@ -739,7 +728,7 @@ export default function AboutPage() {
             />
 
             {/* Highlights */}
-            <div className="flex flex-wrap justify-center gap-x-10 gap-y-4 mb-14">
+            <div className="flex flex-wrap justify-center gap-x-10 gap-y-4 mb-6">
               {['highlight1', 'highlight2', 'highlight3'].map((key) => (
                 <div key={key} className="flex items-center gap-3">
                   <div className="w-2.5 h-2.5 rounded-full bg-red shrink-0 shadow-[0_0_8px_rgba(193,33,38,0.3)]" />
@@ -755,7 +744,7 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Stats Section — Navy Strip
       ═══════════════════════════════════════════════════════════════ */}
-      <section ref={statsSectionRef} className="py-28 sm:py-36 relative overflow-hidden">
+      <section ref={statsSectionRef} className="py-10 sm:py-14 relative overflow-hidden">
         {/* Subtle ambient glow on cream background */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/3 left-[15%] w-72 h-72 bg-navy/[0.04] rounded-full blur-[120px]" />
@@ -774,7 +763,7 @@ export default function AboutPage() {
                     <div className="absolute -inset-4 rounded-full bg-navy/10 blur-2xl group-hover:bg-navy/15 transition-all duration-700" />
                     
                     {/* Main sphere */}
-                    <div className="relative w-20 h-20 sm:w-[5.5rem] sm:h-[5.5rem] rounded-full overflow-hidden shadow-[0_8px_28px_rgba(0,48,72,0.4),0_2px_10px_rgba(0,48,72,0.25),inset_0_-4px_12px_rgba(0,0,0,0.3),inset_0_2px_3px_rgba(255,255,255,0.08)]">
+                    <div className="relative w-16 h-16 sm:w-[4.5rem] sm:h-[4.5rem] rounded-full overflow-hidden shadow-[0_8px_28px_rgba(0,48,72,0.4),0_2px_10px_rgba(0,48,72,0.25),inset_0_-4px_12px_rgba(0,0,0,0.3),inset_0_2px_3px_rgba(255,255,255,0.08)]">
                       {/* Base gradient — deep navy spectrum */}
                       <div className="absolute inset-0 rounded-full" style={{ background: 'linear-gradient(135deg, #004A6E 0%, #003048 40%, #001E2E 100%)' }} />
                       
@@ -789,7 +778,7 @@ export default function AboutPage() {
                       
                       {/* White icon — clean contrast */}
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <Icon className="w-7 h-7 sm:w-9 sm:h-9 text-white/90 relative z-10" />
+                        <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white/90 relative z-10" />
                       </div>
                     </div>
                     
