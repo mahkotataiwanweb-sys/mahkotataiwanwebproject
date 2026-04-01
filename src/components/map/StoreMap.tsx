@@ -1312,7 +1312,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
       dragging: !isMobile,
       touchZoom: true,
       attributionControl: false,
-      maxBounds: L.latLngBounds([21.5, 119.0], [26.0, 122.5]),
+      maxBounds: L.latLngBounds([21.0, 117.5], [26.5, 122.5]),
       maxBoundsViscosity: 0.9,
       minZoom: 7,
     });
