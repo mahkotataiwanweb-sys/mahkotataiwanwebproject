@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useLocale } from 'next-intl';
-import { ArrowLeft, MapPin, Store, Globe, Sparkles } from 'lucide-react';
+import { ArrowLeft, MapPin, Store, Globe, Sparkles, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -307,13 +307,43 @@ export default function WhereToBuyPage() {
   /* ─── Dynamic stats computed from DB data ─── */
   const storeCount = stores.length;
   const cityCount = new Set(stores.map((s) => s.city)).size;
-  const storeTypeCount = new Set(stores.map((s) => s.store_type)).size;
-
   const stats = [
-    { number: String(storeCount), label: 'Partner Stores', icon: Store, color: 'from-red/10 to-red/5', iconColor: 'text-red', borderColor: 'hover:border-red/30' },
-    { number: String(cityCount), label: 'Cities Covered', icon: MapPin, color: 'from-navy/10 to-navy/5', iconColor: 'text-navy', borderColor: 'hover:border-navy/30' },
-    { number: String(storeTypeCount), label: 'Store Types', icon: Store, color: 'from-red/10 to-red/5', iconColor: 'text-red', borderColor: 'hover:border-red/30' },
-    { number: '24/7', label: 'Online Available', icon: Globe, color: 'from-navy/10 to-navy/5', iconColor: 'text-navy', borderColor: 'hover:border-navy/30' },
+    {
+      number: String(storeCount), label: 'Partner Stores', icon: Store,
+      gradient: '#C12126, transparent 40%, #FAEDD3, transparent 60%, #C12126',
+      iconBg: 'bg-gradient-to-br from-red/10 to-red/[0.03]',
+      iconColor: 'text-red',
+      numberGradient: 'linear-gradient(135deg, #C12126 0%, #8B1A1E 100%)',
+      glowColor: 'rgba(193,33,38,0.1)',
+      accentColor: '#C12126',
+    },
+    {
+      number: String(cityCount), label: 'Cities Covered', icon: MapPin,
+      gradient: '#003048, transparent 40%, #A8D8EA, transparent 60%, #003048',
+      iconBg: 'bg-gradient-to-br from-navy/10 to-navy/[0.03]',
+      iconColor: 'text-navy',
+      numberGradient: 'linear-gradient(135deg, #003048 0%, #0070A0 100%)',
+      glowColor: 'rgba(0,48,72,0.1)',
+      accentColor: '#003048',
+    },
+    {
+      number: '100%', label: 'Island Coverage', icon: Shield,
+      gradient: '#C12126, transparent 40%, #003048, transparent 60%, #C12126',
+      iconBg: 'bg-gradient-to-br from-red/8 to-navy/[0.03]',
+      iconColor: 'text-red',
+      numberGradient: 'linear-gradient(135deg, #C12126 0%, #003048 100%)',
+      glowColor: 'rgba(193,33,38,0.07)',
+      accentColor: '#C12126',
+    },
+    {
+      number: '24/7', label: 'Always Online', icon: Globe,
+      gradient: '#003048, transparent 40%, #C12126, transparent 60%, #003048',
+      iconBg: 'bg-gradient-to-br from-navy/10 to-red/[0.03]',
+      iconColor: 'text-navy',
+      numberGradient: 'linear-gradient(135deg, #003048 0%, #C12126 100%)',
+      glowColor: 'rgba(0,48,72,0.07)',
+      accentColor: '#003048',
+    },
   ];
 
   return (
@@ -403,41 +433,98 @@ export default function WhereToBuyPage() {
         <ShimmerLines />
 
         <div className="max-w-6xl mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-7">
             {stats.map((stat, idx) => (
-              <div
+              <motion.div
                 key={idx}
-                className={`stat-card group relative bg-white/90 backdrop-blur-sm border border-cream-dark/20 rounded-3xl p-6 md:p-8 text-center transition-all duration-700 hover:shadow-[0_20px_60px_-15px_rgba(0,48,72,0.15)] ${stat.borderColor} overflow-hidden`}
-                style={{ perspective: '600px' }}
+                className="stat-card group relative rounded-[1.75rem] p-[2px] cursor-default overflow-hidden"
+                whileHover={{ y: -8, scale: 1.03 }}
+                transition={{ type: 'spring', stiffness: 350, damping: 22 }}
               >
-                {/* Card shimmer effect */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                  <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                </div>
+                {/* ✦ Animated rotating conic-gradient border ✦ */}
+                <motion.div
+                  className="absolute"
+                  style={{
+                    inset: '-120%',
+                    background: `conic-gradient(from 0deg, ${stat.gradient})`,
+                    opacity: 0.7,
+                  }}
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 10 - idx * 0.8, repeat: Infinity, ease: 'linear' }}
+                />
 
-                {/* Background gradient */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-
-                {/* Decorative corner */}
-                <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden rounded-bl-3xl">
-                  <div className="absolute -top-8 -right-8 w-16 h-16 bg-gradient-to-bl from-red/5 to-transparent rotate-45 group-hover:from-red/10 transition-colors duration-500" />
-                </div>
-
-                <div className="relative z-10">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-cream-light border border-cream-dark/10 mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                    <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
-                  </div>
+                {/* Inner glass card */}
+                <div className="relative bg-white/[0.97] backdrop-blur-xl rounded-[calc(1.75rem-2px)] p-6 md:p-8 text-center overflow-hidden transition-all duration-500 group-hover:bg-white/[0.93]">
+                  {/* Radial glow on hover */}
                   <div
-                    className="stat-number text-3xl md:text-4xl font-heading font-bold text-navy mb-2 tracking-tight"
-                    data-value={stat.number}
-                  >
-                    {stat.number.includes('/') ? stat.number : loading ? '—' : '0'}
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+                    style={{ background: `radial-gradient(circle at 50% 40%, ${stat.glowColor}, transparent 70%)` }}
+                  />
+
+                  {/* Shimmer sweep */}
+                  <div className="absolute inset-0 overflow-hidden">
+                    <div
+                      className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1.4s] ease-out"
+                      style={{ background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.6) 50%, transparent 60%)' }}
+                    />
                   </div>
-                  <div className="text-navy/50 text-xs font-semibold uppercase tracking-[0.15em]">
-                    {stat.label}
+
+                  {/* Floating sparkles on hover */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                    {[...Array(4)].map((_, j) => (
+                      <motion.div
+                        key={j}
+                        className="absolute w-1 h-1 rounded-full"
+                        style={{
+                          background: stat.accentColor,
+                          left: `${20 + j * 20}%`,
+                          top: `${30 + (j % 2) * 40}%`,
+                          opacity: 0.3,
+                        }}
+                        animate={{ y: [0, -12, 0], opacity: [0.2, 0.5, 0.2] }}
+                        transition={{ duration: 2 + j * 0.5, repeat: Infinity, delay: j * 0.3, ease: 'easeInOut' }}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Content */}
+                  <div className="relative z-10">
+                    {/* Icon with spring interaction */}
+                    <motion.div
+                      className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl ${stat.iconBg} border border-cream-dark/10 mb-5 shadow-sm`}
+                      whileHover={{ scale: 1.2, rotate: 8 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 12 }}
+                    >
+                      <stat.icon className={`w-6 h-6 ${stat.iconColor}`} />
+                    </motion.div>
+
+                    {/* Number with gradient text */}
+                    <div
+                      className="stat-number text-4xl md:text-[2.75rem] font-heading font-bold mb-2 tracking-tight leading-none"
+                      data-value={stat.number}
+                      style={{
+                        background: stat.numberGradient,
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                      }}
+                    >
+                      {stat.number.includes('/') ? stat.number : loading ? '—' : '0'}
+                    </div>
+
+                    {/* Label */}
+                    <div className="text-navy/40 text-[10.5px] font-bold uppercase tracking-[0.2em] mt-1">
+                      {stat.label}
+                    </div>
+
+                    {/* Bottom accent bar */}
+                    <div
+                      className="mx-auto mt-4 h-[2px] w-8 group-hover:w-12 rounded-full transition-all duration-500 opacity-40 group-hover:opacity-80"
+                      style={{ background: stat.numberGradient }}
+                    />
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

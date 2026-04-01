@@ -129,15 +129,36 @@ function injectPinStyles() {
     }
 
     /* ── Premium dropdown styles ── */
+    @keyframes auroraShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes accentPulse {
+      0%, 100% { opacity: 0.5; transform: scaleX(0.7); }
+      50% { opacity: 1; transform: scaleX(1); }
+    }
+    @keyframes dotBreathe {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(193,33,38,0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(193,33,38,0); }
+    }
+    @keyframes badgeShimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
     .premium-dropdown-trigger {
       position: relative;
       overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .premium-dropdown-trigger:hover {
+      transform: translateY(-2px);
     }
     .premium-dropdown-trigger::after {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(110deg, transparent 33%, rgba(255,255,255,0.4) 50%, transparent 67%);
+      background: linear-gradient(110deg, transparent 33%, rgba(255,255,255,0.35) 50%, transparent 67%);
       transform: translateX(-100%);
       transition: none;
       pointer-events: none;
@@ -148,17 +169,49 @@ function injectPinStyles() {
 
     /* Custom scrollbar for dropdown */
     .premium-dropdown-list::-webkit-scrollbar {
-      width: 4px;
+      width: 5px;
     }
     .premium-dropdown-list::-webkit-scrollbar-track {
-      background: transparent;
+      background: rgba(250,237,211,0.15);
+      border-radius: 10px;
+      margin: 8px 0;
     }
     .premium-dropdown-list::-webkit-scrollbar-thumb {
-      background: rgba(193,33,38,0.15);
-      border-radius: 4px;
+      background: linear-gradient(180deg, rgba(193,33,38,0.2), rgba(0,48,72,0.15));
+      border-radius: 10px;
     }
     .premium-dropdown-list::-webkit-scrollbar-thumb:hover {
-      background: rgba(193,33,38,0.3);
+      background: linear-gradient(180deg, rgba(193,33,38,0.35), rgba(0,48,72,0.25));
+    }
+
+    /* Dropdown item hover glow */
+    .dropdown-item-hover {
+      position: relative;
+      overflow: hidden;
+    }
+    .dropdown-item-hover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(250,237,211,0.5) 0%, rgba(193,33,38,0.03) 50%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+    .dropdown-item-hover:hover::before {
+      opacity: 1;
+    }
+
+    /* Premium button hover lift */
+    .premium-btn {
+      transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .premium-btn:hover {
+      transform: translateY(-2px);
+    }
+    .premium-btn:active {
+      transform: translateY(0) scale(0.97);
     }
   `;
   document.head.appendChild(style);
@@ -291,7 +344,7 @@ function DecorativeElements() {
   );
 }
 
-/* ─── Premium Dropdown Component ─── */
+/* ─── World-Class Premium Dropdown Component ─── */
 function PremiumDropdown({
   value,
   options,
@@ -304,6 +357,7 @@ function PremiumDropdown({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   /* Close on outside click */
@@ -320,39 +374,39 @@ function PremiumDropdown({
   const openDropdown = () => {
     setIsOpen(true);
     requestAnimationFrame(() => {
-      if (listRef.current) {
-        /* Entrance: slide up + scale + fade + blur */
+      /* Panel entrance — spring physics with overshoot */
+      if (panelRef.current) {
         gsap.fromTo(
-          listRef.current,
-          { opacity: 0, y: 12, scaleY: 0.85, scaleX: 0.97, filter: 'blur(6px)' },
+          panelRef.current,
+          { opacity: 0, y: 14, scaleY: 0.8, scaleX: 0.96, filter: 'blur(8px)' },
           {
             opacity: 1, y: 0, scaleY: 1, scaleX: 1, filter: 'blur(0px)',
-            duration: 0.45, ease: 'power3.out',
+            duration: 0.55, ease: 'back.out(1.7)',
           }
         );
-        /* Stagger items */
-        itemRefs.current.forEach((el, i) => {
-          if (el) {
-            gsap.fromTo(
-              el,
-              { opacity: 0, x: -10, filter: 'blur(4px)' },
-              {
-                opacity: 1, x: 0, filter: 'blur(0px)',
-                duration: 0.35, delay: 0.05 + i * 0.025,
-                ease: 'power2.out',
-              }
-            );
-          }
-        });
       }
+      /* Stagger items with spring cascade */
+      itemRefs.current.forEach((el, i) => {
+        if (el) {
+          gsap.fromTo(
+            el,
+            { opacity: 0, x: -16, scale: 0.95, filter: 'blur(3px)' },
+            {
+              opacity: 1, x: 0, scale: 1, filter: 'blur(0px)',
+              duration: 0.4, delay: 0.08 + i * 0.03,
+              ease: 'back.out(1.4)',
+            }
+          );
+        }
+      });
     });
   };
 
   const closeDropdown = () => {
-    if (listRef.current) {
-      gsap.to(listRef.current, {
-        opacity: 0, y: 8, scaleY: 0.9, filter: 'blur(4px)',
-        duration: 0.25, ease: 'power2.in',
+    if (panelRef.current) {
+      gsap.to(panelRef.current, {
+        opacity: 0, y: 10, scaleY: 0.88, filter: 'blur(6px)',
+        duration: 0.28, ease: 'power3.in',
         onComplete: () => setIsOpen(false),
       });
     } else {
@@ -361,60 +415,98 @@ function PremiumDropdown({
   };
 
   const handleSelect = (city: string) => {
+    /* Micro-animation on selected item */
+    const idx = options.indexOf(city);
+    const el = itemRefs.current[idx];
+    if (el) {
+      gsap.fromTo(el, { scale: 0.96 }, { scale: 1, duration: 0.25, ease: 'back.out(3)' });
+    }
     onChange(city);
-    closeDropdown();
+    setTimeout(() => closeDropdown(), 120);
   };
 
-  const activeIdx = options.indexOf(value);
-
   return (
-    <div ref={dropdownRef} className="relative">
-      {/* Trigger button */}
+    <div ref={dropdownRef} className="relative" style={{ zIndex: 1002 }}>
+      {/* ═══ Trigger Button ═══ */}
       <button
         onClick={() => (isOpen ? closeDropdown() : openDropdown())}
-        className="premium-dropdown-trigger flex items-center gap-3 pl-4 pr-5 py-3.5 min-w-[220px] sm:min-w-[270px] rounded-2xl text-sm transition-all duration-300 border-2 shadow-[0_8px_32px_rgba(0,48,72,0.08)] hover:shadow-[0_12px_40px_rgba(0,48,72,0.12)]"
+        className="premium-dropdown-trigger flex items-center gap-3 pl-4 pr-5 py-3.5 min-w-[230px] sm:min-w-[280px] rounded-2xl text-sm border-2 shadow-[0_8px_32px_rgba(0,48,72,0.08)] hover:shadow-[0_16px_48px_rgba(0,48,72,0.14)]"
         style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(250,237,211,0.3) 100%)',
-          borderColor: isOpen ? 'rgba(193,33,38,0.3)' : 'rgba(0,48,72,0.08)',
+          background: isOpen
+            ? 'linear-gradient(135deg, rgba(255,255,255,0.99) 0%, rgba(250,237,211,0.4) 100%)'
+            : 'linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(250,237,211,0.25) 100%)',
+          borderColor: isOpen ? 'rgba(193,33,38,0.25)' : 'rgba(0,48,72,0.08)',
+          backdropFilter: 'blur(20px)',
         }}
       >
-        {/* Red dot indicator */}
+        {/* Animated dot indicator */}
         <span className="relative flex h-2.5 w-2.5 shrink-0">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red/40 opacity-75" />
+          <span
+            className="absolute inset-0 rounded-full bg-red"
+            style={{ animation: 'dotBreathe 2.5s ease-in-out infinite' }}
+          />
           <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red" />
         </span>
 
-        <span className="flex-1 text-left font-semibold text-navy truncate tracking-tight">
-          {value === 'All' ? '🏝️  All Cities' : `📍 ${value}`}
+        <span className="flex-1 text-left font-semibold text-navy truncate tracking-tight text-[13px]">
+          {value === 'All' ? '🗺️  All Cities' : `📍 ${value}`}
         </span>
 
+        {/* Animated chevron */}
         <div
-          className="ml-1 p-1 rounded-lg transition-all duration-300"
+          className="ml-1 p-1.5 rounded-xl transition-all duration-500"
           style={{
-            background: isOpen ? 'rgba(193,33,38,0.08)' : 'transparent',
+            background: isOpen ? 'rgba(193,33,38,0.06)' : 'transparent',
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
           }}
         >
-          <ChevronDown className="w-4 h-4 text-navy/50" />
+          <ChevronDown className={`w-4 h-4 transition-colors duration-300 ${isOpen ? 'text-red' : 'text-navy/40'}`} />
         </div>
+
+        {/* Bottom aurora accent line */}
+        <div
+          className="absolute bottom-0 left-4 right-4 h-[2px] rounded-full"
+          style={{
+            background: isOpen
+              ? 'linear-gradient(90deg, #C12126, #003048, #C12126)'
+              : 'linear-gradient(90deg, transparent, rgba(193,33,38,0.15), transparent)',
+            backgroundSize: '200% 100%',
+            animation: isOpen ? 'auroraShift 3s ease infinite' : 'none',
+            transition: 'all 0.4s ease',
+          }}
+        />
       </button>
 
-      {/* Dropdown list */}
+      {/* ═══ Dropdown Panel ═══ */}
       {isOpen && (
         <div
-          ref={listRef}
-          className="absolute top-full mt-3 left-0 w-full min-w-[220px] sm:min-w-[270px] max-h-[340px] rounded-2xl py-2 z-[1001] border-2 overflow-hidden"
+          ref={panelRef}
+          className="absolute top-full mt-3 left-0 w-full min-w-[230px] sm:min-w-[280px] rounded-2xl z-[1003] overflow-hidden"
           style={{
-            background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(250,245,235,0.95) 100%)',
-            borderColor: 'rgba(193,33,38,0.1)',
-            boxShadow: '0 20px 60px rgba(0,48,72,0.12), 0 8px 24px rgba(193,33,38,0.06)',
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(250,247,240,0.97) 100%)',
+            border: '2px solid rgba(193,33,38,0.08)',
+            boxShadow: '0 25px 80px rgba(0,48,72,0.14), 0 10px 30px rgba(193,33,38,0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
+            backdropFilter: 'blur(24px)',
             transformOrigin: 'top center',
           }}
         >
-          {/* Decorative top shimmer bar */}
-          <div className="h-[2px] mx-4 mb-1 rounded-full overflow-hidden" style={{ background: 'linear-gradient(90deg, transparent, rgba(193,33,38,0.2), rgba(0,48,72,0.15), transparent)' }} />
+          {/* Top decorative gradient bar */}
+          <div
+            className="h-[3px] mx-0 rounded-none"
+            style={{
+              background: 'linear-gradient(90deg, #C12126, #003048, #FAEDD3, #003048, #C12126)',
+              backgroundSize: '200% 100%',
+              animation: 'auroraShift 4s ease infinite',
+            }}
+          />
 
-          <div className="premium-dropdown-list overflow-y-auto max-h-[320px] px-1.5">
+          {/* Header label */}
+          <div className="px-4 pt-3 pb-2 flex items-center gap-2">
+            <div className="w-1 h-4 rounded-full bg-gradient-to-b from-red to-red/30" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-navy/35">Select City</span>
+          </div>
+
+          <div ref={listRef} className="premium-dropdown-list overflow-y-auto max-h-[300px] px-2 pb-2">
             {options.map((city, i) => {
               const isActive = value === city;
               return (
@@ -422,44 +514,62 @@ function PremiumDropdown({
                   key={city}
                   ref={(el) => { itemRefs.current[i] = el; }}
                   onClick={() => handleSelect(city)}
-                  className="relative group w-full text-left px-4 py-2.5 rounded-xl text-sm transition-all duration-200 flex items-center gap-3 my-0.5"
+                  className={`dropdown-item-hover relative w-full text-left px-4 py-2.5 rounded-xl text-[13px] flex items-center gap-3 my-[3px] transition-all duration-300 ${
+                    isActive ? '' : 'hover:pl-5'
+                  }`}
                   style={{
                     background: isActive
-                      ? 'linear-gradient(135deg, rgba(193,33,38,0.08) 0%, rgba(193,33,38,0.03) 100%)'
+                      ? 'linear-gradient(135deg, rgba(193,33,38,0.07) 0%, rgba(193,33,38,0.02) 100%)'
                       : 'transparent',
                   }}
                 >
-                  {/* Active indicator bar */}
+                  {/* Animated active indicator bar */}
                   {isActive && (
-                    <div className="absolute left-1 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-red" />
+                    <div
+                      className="absolute left-[5px] top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full"
+                      style={{
+                        background: 'linear-gradient(180deg, #C12126, #8B1A1E)',
+                        animation: 'accentPulse 2s ease-in-out infinite',
+                      }}
+                    />
                   )}
 
-                  {/* City icon */}
-                  <span className="text-xs shrink-0">
-                    {city === 'All' ? '🏝️' : isActive ? '📍' : '○'}
+                  {/* City indicator */}
+                  <span className={`text-xs shrink-0 transition-transform duration-300 ${!isActive ? 'group-hover:scale-110' : ''}`}>
+                    {city === 'All' ? '🌏' : isActive ? '📍' : (
+                      <span className="inline-block w-[6px] h-[6px] rounded-full border-[1.5px] border-navy/20" />
+                    )}
                   </span>
 
                   <span
-                    className={`flex-1 truncate transition-colors duration-200 ${
+                    className={`flex-1 truncate transition-all duration-300 ${
                       isActive
-                        ? 'text-red font-bold'
-                        : 'text-navy/65 font-medium group-hover:text-navy'
+                        ? 'text-red font-bold tracking-tight'
+                        : 'text-navy/60 font-medium hover:text-navy'
                     }`}
                   >
-                    {city}
+                    {city === 'All' ? 'All Cities' : city}
                   </span>
 
-                  {/* Hover shimmer */}
-                  <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                    style={{ background: isActive ? 'transparent' : 'linear-gradient(135deg, rgba(250,237,211,0.4) 0%, transparent 60%)' }}
-                  />
+                  {/* Arrow hint on hover for non-active */}
+                  {!isActive && (
+                    <span className="text-navy/0 hover:text-navy/20 transition-all duration-300 text-[10px]">→</span>
+                  )}
+
+                  {/* Active checkmark */}
+                  {isActive && (
+                    <span className="text-red/60 text-[10px] font-bold">✓</span>
+                  )}
                 </button>
               );
             })}
           </div>
 
-          {/* Decorative bottom bar */}
-          <div className="h-[2px] mx-4 mt-1 rounded-full" style={{ background: 'linear-gradient(90deg, transparent, rgba(0,48,72,0.06), transparent)' }} />
+          {/* Bottom decorative bar */}
+          <div
+            className="h-[2px] mx-0"
+            style={{ background: 'linear-gradient(90deg, transparent, rgba(0,48,72,0.05), transparent)' }}
+          />
         </div>
       )}
     </div>
@@ -667,57 +777,77 @@ export default function StoreMap({ stores }: StoreMapProps) {
 
         <div className="flex-1" />
 
-        {/* Back to All */}
+        {/* ═══ Back to All — Premium Navy Pill ═══ */}
         {filterCity !== 'All' && (
           <button
             onClick={handleBackToAll}
-            className="flex items-center gap-2 px-5 py-3.5 rounded-2xl text-xs font-bold tracking-wide transition-all duration-300 whitespace-nowrap border-2 shadow-[0_8px_32px_rgba(0,48,72,0.1)]"
+            className="premium-btn group flex items-center gap-2.5 px-5 py-3 rounded-2xl text-[11px] font-bold tracking-widest uppercase whitespace-nowrap border-2 shadow-[0_8px_32px_rgba(0,48,72,0.12)] hover:shadow-[0_16px_48px_rgba(0,48,72,0.2)]"
             style={{
               background: 'linear-gradient(135deg, #003048 0%, #004a6e 100%)',
-              borderColor: 'rgba(250,237,211,0.15)',
+              borderColor: 'rgba(250,237,211,0.12)',
               color: '#FAEDD3',
             }}
           >
-            <span className="text-base">←</span> All Cities
+            <span className="inline-block transition-transform duration-300 group-hover:-translate-x-1 text-sm">←</span>
+            <span>All Cities</span>
+            {/* Shimmer overlay */}
+            <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cream/[0.06] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-[1s]" />
+            </div>
           </button>
         )}
 
-        {/* Reset */}
+        {/* ═══ Reset — Glass Circle ═══ */}
         <button
           onClick={handleResetView}
-          className="flex items-center gap-2 p-3.5 rounded-2xl text-sm transition-all duration-300 border-2 shadow-[0_8px_32px_rgba(0,48,72,0.08)] hover:shadow-[0_12px_40px_rgba(0,48,72,0.12)]"
+          className="premium-btn group flex items-center justify-center w-11 h-11 rounded-2xl border-2 shadow-[0_8px_28px_rgba(0,48,72,0.08)] hover:shadow-[0_12px_40px_rgba(0,48,72,0.14)]"
           title="Reset view"
           style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(250,237,211,0.3) 100%)',
-            borderColor: 'rgba(0,48,72,0.08)',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(250,237,211,0.35) 100%)',
+            borderColor: 'rgba(0,48,72,0.06)',
+            backdropFilter: 'blur(12px)',
           }}
         >
-          <Locate className="w-4 h-4 text-navy/60" />
+          <Locate className="w-4 h-4 text-navy/50 group-hover:text-red transition-colors duration-300 group-active:rotate-90 transition-transform" />
         </button>
       </div>
 
-      {/* ─── Counter badge ─── */}
+      {/* ═══ Counter Badge — Premium Floating Pill ═══ */}
       <div className="absolute bottom-20 left-4 z-[1000]">
         <div
-          className="px-5 py-3 rounded-full text-xs font-semibold border-2 shadow-[0_8px_32px_rgba(0,48,72,0.08)]"
+          className="premium-btn relative px-5 py-3 rounded-full text-[11px] font-semibold border-2 shadow-[0_8px_32px_rgba(0,48,72,0.1)] overflow-hidden tracking-wide"
           style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(250,237,211,0.3) 100%)',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(250,237,211,0.4) 100%)',
             borderColor: 'rgba(0,48,72,0.06)',
-            color: '#003048cc',
+            color: '#003048bb',
+            backdropFilter: 'blur(16px)',
           }}
         >
-          {filterCity === 'All' ? (
-            <>
-              <span className="text-red font-bold text-sm">{displayCount}</span> stores across{' '}
-              <span className="text-red font-bold text-sm">{cityCountNum}</span> cities
-            </>
-          ) : (
-            <>
-              <span className="text-red font-bold text-sm">{displayCount}</span>{' '}
-              {displayCount === 1 ? 'store' : 'stores'} in{' '}
-              <span className="font-bold">{filterCity}</span>
-            </>
-          )}
+          {/* Shimmer animation */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(90deg, transparent 0%, rgba(193,33,38,0.04) 50%, transparent 100%)',
+              backgroundSize: '200% 100%',
+              animation: 'badgeShimmer 4s linear infinite',
+            }}
+          />
+          <span className="relative z-10">
+            {filterCity === 'All' ? (
+              <>
+                <span className="text-red font-bold text-[13px]">{displayCount}</span>
+                <span className="mx-1">stores across</span>
+                <span className="text-red font-bold text-[13px]">{cityCountNum}</span>
+                <span className="ml-1">cities</span>
+              </>
+            ) : (
+              <>
+                <span className="text-red font-bold text-[13px]">{displayCount}</span>
+                <span className="mx-1">{displayCount === 1 ? 'store' : 'stores'} in</span>
+                <span className="font-bold text-navy">{filterCity}</span>
+              </>
+            )}
+          </span>
         </div>
       </div>
 
