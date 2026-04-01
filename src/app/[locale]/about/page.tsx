@@ -165,14 +165,17 @@ function CharReveal({ text, className }: { text: string; className?: string }) {
     const chars = ref.current.querySelectorAll('.cr-char');
     if (chars.length === 0) return;
 
-    /* Seed random delays for each char — rain-like staggered fall */
-    const randomDelays: number[] = [];
-    for (let i = 0; i < chars.length; i++) {
-      /* Base sequential delay + random offset for rain feel */
-      const seqDelay = i * 0.008;
-      const randomOffset = Math.random() * 0.15;
-      randomDelays.push(seqDelay + randomOffset);
-    }
+    /* Pre-compute random values once to avoid recalculation */
+    const charData = Array.from({ length: chars.length }, (_, i) => ({
+      /* Stagger: sequential base + random scatter for rain-like feel */
+      delay: i * 0.025 + Math.random() * 0.35,
+      /* Each char falls from a random height */
+      yStart: -(40 + Math.random() * 60),
+      /* Slight random horizontal drift for natural rain */
+      xStart: (Math.random() - 0.5) * 16,
+      /* Duration varies per char — slower = more dramatic */
+      duration: 0.6 + Math.random() * 0.4,
+    }));
 
     const ctx = gsap.context(() => {
       chars.forEach((char, i) => {
@@ -181,23 +184,20 @@ function CharReveal({ text, className }: { text: string; className?: string }) {
           gsap.set(char, { opacity: 1 });
           return;
         }
-        /* Randomize the vertical start position per char for rain effect */
-        const yStart = -(25 + Math.random() * 35);
 
+        const d = charData[i];
         gsap.fromTo(char,
           {
             opacity: 0,
-            y: yStart,
-            scale: 0.3 + Math.random() * 0.4,
-            filter: 'blur(4px)',
+            y: d.yStart,
+            x: d.xStart,
           },
           {
             opacity: 1,
             y: 0,
-            scale: 1,
-            filter: 'blur(0px)',
-            duration: 0.25 + Math.random() * 0.15,
-            delay: randomDelays[i],
+            x: 0,
+            duration: d.duration,
+            delay: d.delay,
             ease: 'power2.out',
             scrollTrigger: {
               trigger: ref.current,
@@ -220,7 +220,7 @@ function CharReveal({ text, className }: { text: string; className?: string }) {
           style={{
             opacity: 0,
             display: 'inline-block',
-            willChange: 'transform, opacity, filter',
+            willChange: 'transform, opacity',
           }}
         >
           {char === ' ' ? '\u00A0' : char}
@@ -515,7 +515,7 @@ export default function AboutPage() {
           const flipTl = gsap.timeline({
             scrollTrigger: {
               trigger: valuesRef.current,
-              start: 'top 20%',
+              start: 'top 40%',
               toggleActions: 'play none none reverse',
             },
           });
@@ -559,7 +559,7 @@ export default function AboutPage() {
           const flipTl = gsap.timeline({
             scrollTrigger: {
               trigger: valuesRef.current,
-              start: 'top 20%',
+              start: 'top 40%',
               toggleActions: 'play none none reverse',
             },
           });
