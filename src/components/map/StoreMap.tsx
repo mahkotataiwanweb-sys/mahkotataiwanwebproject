@@ -900,45 +900,62 @@ export default function StoreMap({ stores }: StoreMapProps) {
     /* ── Mobile: two-finger gesture handling (like Google Maps) ── */
     if (isMobile && mapContainerRef.current) {
       const container = mapContainerRef.current;
-
-      // Create overlay
-      const overlay = document.createElement('div');
-      overlay.className = 'map-gesture-overlay';
-      overlay.innerHTML = `
-        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 10V6a2 2 0 0 1 4 0v1M14 6V5a2 2 0 0 1 4 0v5"/>
-            <path d="M10 5.5V4a2 2 0 0 1 4 0v2"/>
-            <path d="M6 10a2 2 0 0 0-2 2v1a8 8 0 0 0 8 8h.5a8 8 0 0 0 7.5-5.2L18.5 11"/>
-          </svg>
-          <span style="color:white;font-size:13px;font-weight:500;text-shadow:0 1px 4px rgba(0,0,0,0.4);">Use two fingers to move the map</span>
-        </div>
-      `;
-      overlay.style.cssText = `
-        position:absolute;inset:0;z-index:9999;display:none;
-        align-items:center;justify-content:center;
-        background:rgba(0,0,0,0.45);backdrop-filter:blur(2px);
-        pointer-events:none;border-radius:inherit;
-        transition:opacity 0.3s ease;
-      `;
       container.style.position = 'relative';
-      container.appendChild(overlay);
+
+      /* --- Shared overlay factory --- */
+      const makeOverlay = (html: string) => {
+        const el = document.createElement('div');
+        el.innerHTML = html;
+        el.style.cssText = `
+          position:absolute;inset:0;z-index:9999;display:none;
+          align-items:center;justify-content:center;
+          background:rgba(0,0,0,0.45);backdrop-filter:blur(2px);
+          pointer-events:none;border-radius:inherit;
+          transition:opacity 0.3s ease;
+        `;
+        container.appendChild(el);
+        return el;
+      };
+
+      const showOverlay = (el: HTMLElement, ms: number) => {
+        el.style.display = 'flex';
+        el.style.opacity = '1';
+        setTimeout(() => {
+          el.style.opacity = '0';
+          setTimeout(() => { el.style.display = 'none'; }, 300);
+        }, ms);
+      };
+
+      /* --- Overlay 1: "Use two fingers to move the map" --- */
+      const dragOverlay = makeOverlay(`
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <svg width="40" height="40" viewBox="0 0 64 64" fill="none">
+            <!-- Hand with exactly 2 fingers raised -->
+            <rect x="20" y="8" width="8" height="28" rx="4" fill="white"/>
+            <rect x="32" y="6" width="8" height="30" rx="4" fill="white"/>
+            <rect x="16" y="32" width="28" height="20" rx="8" fill="white"/>
+            <!-- Horizontal arrows showing drag -->
+            <path d="M4 30l6-4v8z" fill="rgba(255,255,255,0.8)"/>
+            <path d="M60 30l-6-4v8z" fill="rgba(255,255,255,0.8)"/>
+            <line x1="10" y1="30" x2="54" y2="30" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-dasharray="3 3"/>
+          </svg>
+          <span style="color:white;font-size:13px;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,0.5);">Use two fingers to move the map</span>
+        </div>
+      `);
 
       let hideTimeout: ReturnType<typeof setTimeout>;
 
       container.addEventListener('touchstart', (e) => {
         if (e.touches.length === 1) {
-          // Single finger → show overlay, keep page scrolling
-          overlay.style.display = 'flex';
-          overlay.style.opacity = '1';
+          dragOverlay.style.display = 'flex';
+          dragOverlay.style.opacity = '1';
           clearTimeout(hideTimeout);
           hideTimeout = setTimeout(() => {
-            overlay.style.opacity = '0';
-            setTimeout(() => { overlay.style.display = 'none'; }, 300);
+            dragOverlay.style.opacity = '0';
+            setTimeout(() => { dragOverlay.style.display = 'none'; }, 300);
           }, 1500);
         } else if (e.touches.length >= 2) {
-          // Two fingers → enable map dragging
-          overlay.style.display = 'none';
+          dragOverlay.style.display = 'none';
           map.dragging.enable();
         }
       }, { passive: true });
@@ -948,6 +965,43 @@ export default function StoreMap({ stores }: StoreMapProps) {
           map.dragging.disable();
         }
       }, { passive: true });
+
+      /* --- Overlay 2: "Pinch to zoom" — shown once on first city click --- */
+      const pinchOverlay = makeOverlay(`
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="position:relative;width:56px;height:56px;">
+            <!-- Two dots that animate pinch in/out -->
+            <div class="pinch-dot pinch-dot-top" style="position:absolute;width:14px;height:14px;background:white;border-radius:50%;left:50%;top:8px;transform:translateX(-50%);"></div>
+            <div class="pinch-dot pinch-dot-bottom" style="position:absolute;width:14px;height:14px;background:white;border-radius:50%;left:50%;bottom:8px;transform:translateX(-50%);"></div>
+            <!-- Arrows between dots -->
+            <svg style="position:absolute;inset:0;" viewBox="0 0 56 56" fill="none">
+              <path d="M28 18 L28 12 M25 14 L28 10 L31 14" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M28 38 L28 44 M25 42 L28 46 L31 42" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span style="color:white;font-size:13px;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,0.5);">Pinch to zoom in & out</span>
+        </div>
+      `);
+
+      /* Pinch animation keyframes */
+      const pinchStyle = document.createElement('style');
+      pinchStyle.textContent = `
+        @keyframes pinchIn {
+          0%, 100% { transform: translateX(-50%) translateY(0); }
+          50% { transform: translateX(-50%) translateY(6px); }
+        }
+        @keyframes pinchOut {
+          0%, 100% { transform: translateX(-50%) translateY(0); }
+          50% { transform: translateX(-50%) translateY(-6px); }
+        }
+        .pinch-dot-top { animation: pinchIn 1.5s ease-in-out infinite; }
+        .pinch-dot-bottom { animation: pinchOut 1.5s ease-in-out infinite; }
+      `;
+      document.head.appendChild(pinchStyle);
+
+      /* Expose pinch overlay for city-click to trigger (only once) */
+      (container as any).__pinchOverlay = pinchOverlay;
+      (container as any).__pinchShown = false;
     }
 
     /* Start ambient music on first map interaction */
@@ -1034,7 +1088,22 @@ export default function StoreMap({ stores }: StoreMapProps) {
     if (filterCity === 'All') {
       cityClusters.forEach((cluster) => {
         const marker = L.marker([cluster.lat, cluster.lng], { icon: createCityPinIcon() });
-        marker.on('click', () => { setSelectedStore(null); setFilterCity(cluster.city); });
+        marker.on('click', () => {
+          setSelectedStore(null);
+          setFilterCity(cluster.city);
+          /* Show pinch-to-zoom hint once on mobile */
+          const container = mapContainerRef.current;
+          if (container && (container as any).__pinchOverlay && !(container as any).__pinchShown) {
+            (container as any).__pinchShown = true;
+            const overlay = (container as any).__pinchOverlay as HTMLElement;
+            overlay.style.display = 'flex';
+            overlay.style.opacity = '1';
+            setTimeout(() => {
+              overlay.style.opacity = '0';
+              setTimeout(() => { overlay.style.display = 'none'; }, 300);
+            }, 2500);
+          }
+        });
         marker.addTo(map);
         markersRef.current.push(marker);
       });
