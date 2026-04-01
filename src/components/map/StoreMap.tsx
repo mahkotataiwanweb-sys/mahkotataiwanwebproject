@@ -441,7 +441,7 @@ function DecorativeElements() {
 
       {/* ═══ LEFT OCEAN — South China Sea (0-33%) ═══ */}
       {/* Fish swimming left ocean */}
-      <div className="ocean-creature" style={{ position: 'absolute', top: 0, left: 0, width: '33%', height: '100%', overflow: 'hidden' }}>
+      <div className="ocean-creature" style={{ position: 'absolute', top: 0, left: 0, width: '25%', height: '100%', overflow: 'hidden' }}>
         <svg style={{ position: 'absolute', top: '40%', left: '-30px', animation: 'fishSwimRight 30s linear infinite 2s' }} viewBox="0 0 28 14" fill="none" width="28" height="14">
           <ellipse cx="12" cy="7" rx="10" ry="5" fill="#FF6B35" opacity="0.8"/><polygon points="22,7 28,2 28,12" fill="#FF6B35" opacity="0.8"/><circle cx="7" cy="6" r="1.5" fill="white"/>
         </svg>
@@ -500,7 +500,7 @@ function DecorativeElements() {
       </div>
 
       {/* ═══ RIGHT OCEAN — Pacific (70-100%) ═══ */}
-      <div className="ocean-creature" style={{ position: 'absolute', top: 0, left: '70%', width: '30%', height: '100%', overflow: 'hidden' }}>
+      <div className="ocean-creature" style={{ position: 'absolute', top: 0, left: '78%', width: '22%', height: '100%', overflow: 'hidden' }}>
         {/* Dolphin 1 — proper dolphin swimming left in right ocean */}
         <div className="sea-creature-dolphin ocean-creature" style={{ position: 'absolute', top: '25%', left: 0, width: '100%', height: '30px', overflow: 'visible' }}>
           <svg style={{ animation: 'dolphinSwimLeft 22s ease-in-out infinite' }} viewBox="0 0 52 30" fill="none">
@@ -648,7 +648,7 @@ function DecorativeElements() {
       {/* ═══ TAIWAN LAND ANIMALS — positioned over Taiwan area (42-60%, 28-58%) ═══ */}
 
       {/* 1. Formosan Macaque (monkey) — sitting on mid Taiwan */}
-      <div className="land-creature" style={{ position: 'absolute', top: '38%', left: '48%' }}>
+      <div className="land-creature" style={{ position: 'absolute', top: '55%', left: '52%' }}>
         <svg style={{ width: '22px', height: '24px', opacity: 0.7, animation: 'monkeyBob 4s ease-in-out infinite' }} viewBox="0 0 24 28" fill="none">
           <circle cx="12" cy="8" r="7" fill="#8B6914"/>
           <circle cx="12" cy="8" r="5.5" fill="#A67C2E"/>
@@ -663,7 +663,7 @@ function DecorativeElements() {
       </div>
 
       {/* 2. Cat — near south Taiwan */}
-      <div className="land-creature" style={{ position: 'absolute', top: '50%', left: '52%' }}>
+      <div className="land-creature" style={{ position: 'absolute', top: '68%', left: '50%' }}>
         <svg style={{ width: '18px', height: '20px', opacity: 0.65, animation: 'catTail 3s ease-in-out infinite 1s' }} viewBox="0 0 20 24" fill="none">
           <polygon points="4,8 6,1 8,8" fill="#FF8C42"/>
           <polygon points="12,8 14,1 16,8" fill="#FF8C42"/>
@@ -678,7 +678,7 @@ function DecorativeElements() {
       </div>
 
       {/* 3. Sika Deer — north Taiwan */}
-      <div className="land-creature" style={{ position: 'absolute', top: '30%', left: '50%' }}>
+      <div className="land-creature" style={{ position: 'absolute', top: '22%', left: '49%' }}>
         <svg style={{ width: '24px', height: '26px', opacity: 0.65, animation: 'bobFloat 5s ease-in-out infinite 2s' }} viewBox="0 0 28 32" fill="none">
           <ellipse cx="14" cy="20" rx="8" ry="6" fill="#C4883A"/>
           <circle cx="14" cy="8" r="5" fill="#C4883A"/>
@@ -700,7 +700,7 @@ function DecorativeElements() {
       </div>
 
       {/* 4. Butterfly — fluttering near Taiwan */}
-      <div className="land-creature" style={{ position: 'absolute', top: '42%', left: '55%' }}>
+      <div className="land-creature" style={{ position: 'absolute', top: '35%', left: '57%' }}>
         <svg style={{ width: '20px', height: '16px', opacity: 0.7, animation: 'butterflyFloat 6s ease-in-out infinite' }} viewBox="0 0 24 18" fill="none">
           <ellipse cx="12" cy="9" rx="1" ry="6" fill="#333"/>
           <ellipse cx="7" cy="6" rx="5" ry="4" fill="#FF6B9D" opacity="0.8" transform="rotate(-15 7 6)">
@@ -721,7 +721,7 @@ function DecorativeElements() {
       </div>
 
       {/* 5. Taiwan Blue Magpie — perched near Taiwan */}
-      <div className="land-creature" style={{ position: 'absolute', top: '34%', left: '44%' }}>
+      <div className="land-creature" style={{ position: 'absolute', top: '30%', left: '46%' }}>
         <svg style={{ width: '22px', height: '22px', opacity: 0.65, animation: 'bobFloat 4.5s ease-in-out infinite 3s' }} viewBox="0 0 26 28" fill="none">
           <ellipse cx="13" cy="10" rx="5" ry="4.5" fill="#2962A5"/>
           <circle cx="13" cy="5" r="3.5" fill="#1A1A2E"/>
@@ -735,7 +735,7 @@ function DecorativeElements() {
       </div>
 
       {/* 6. Dog (Shiba Inu) — cute dog near mid Taiwan */}
-      <div className="land-creature" style={{ position: 'absolute', top: '46%', left: '46%' }}>
+      <div className="land-creature" style={{ position: 'absolute', top: '44%', left: '44%' }}>
         <svg style={{ width: '20px', height: '22px', opacity: 0.7, animation: 'bobFloat 4s ease-in-out infinite 1.5s' }} viewBox="0 0 24 28" fill="none">
           {/* Body */}
           <ellipse cx="12" cy="18" rx="7" ry="6" fill="#D4A854"/>
@@ -765,7 +765,7 @@ function DecorativeElements() {
       </div>
 
       {/* 7. Alpaca — fluffy white alpaca */}
-      <div className="land-creature" style={{ position: 'absolute', top: '35%', left: '53%' }}>
+      <div className="land-creature" style={{ position: 'absolute', top: '48%', left: '56%' }}>
         <svg style={{ width: '22px', height: '26px', opacity: 0.7, animation: 'bobFloat 5.5s ease-in-out infinite 3.5s' }} viewBox="0 0 26 32" fill="none">
           {/* Fluffy body */}
           <ellipse cx="13" cy="22" rx="8" ry="6" fill="#FFF5E6"/>
@@ -874,7 +874,7 @@ function DecorativeElements() {
           <ellipse cx="50" cy="20" rx="40" ry="11" fill="white"/><ellipse cx="35" cy="14" rx="20" ry="10" fill="white"/><ellipse cx="65" cy="16" rx="25" ry="9" fill="white"/>
         </svg>
         {/* Extra fish — left ocean */}
-        <div className="ocean-creature" style={{ position: 'absolute', top: 0, left: 0, width: '33%', height: '100%', overflow: 'hidden' }}>
+        <div className="ocean-creature" style={{ position: 'absolute', top: 0, left: 0, width: '25%', height: '100%', overflow: 'hidden' }}>
           <svg style={{ position: 'absolute', top: '25%', left: '-20px', animation: 'fishSwimRight 26s linear infinite 4s' }} viewBox="0 0 22 10" fill="none" width="22" height="10">
             <ellipse cx="9" cy="5" rx="7" ry="3.5" fill="#FF9800" opacity="0.7"/><polygon points="16,5 22,2 22,8" fill="#FF9800" opacity="0.7"/><circle cx="5" cy="4" r="1" fill="white"/>
           </svg>
@@ -883,7 +883,7 @@ function DecorativeElements() {
           </svg>
         </div>
         {/* Extra fish — right ocean */}
-        <div className="ocean-creature" style={{ position: 'absolute', top: 0, left: '70%', width: '30%', height: '100%', overflow: 'hidden' }}>
+        <div className="ocean-creature" style={{ position: 'absolute', top: 0, left: '78%', width: '22%', height: '100%', overflow: 'hidden' }}>
           <svg style={{ position: 'absolute', top: '40%', right: '-20px', animation: 'fishSwimLeft 24s linear infinite 7s' }} viewBox="0 0 22 10" fill="none" width="22" height="10">
             <ellipse cx="9" cy="5" rx="7" ry="3.5" fill="#AB47BC" opacity="0.7"/><polygon points="16,5 22,2 22,8" fill="#AB47BC" opacity="0.7"/><circle cx="5" cy="4" r="1" fill="white"/>
           </svg>
