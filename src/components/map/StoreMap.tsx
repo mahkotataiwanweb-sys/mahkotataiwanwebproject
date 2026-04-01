@@ -15,23 +15,9 @@ function injectPinStyles() {
   const style = document.createElement('style');
   style.id = STYLE_ID;
   style.textContent = `
-    /* ── Ocean = blue container bg; land shown via white GeoJSON base beneath semi-transparent tiles ── */
+    /* ── Clean map: full-opacity tiles + blue ocean GeoJSON overlay ── */
     .illustrated-map.leaflet-container {
-      background: #1B6FA0 !important;
-    }
-    .illustrated-map .leaflet-tile-pane {
-      background: transparent !important;
-      opacity: 0.6;
-    }
-    .illustrated-map .leaflet-pane {
-      background: transparent !important;
-    }
-    .illustrated-map .leaflet-tile {
-      background: transparent !important;
-    }
-    .illustrated-map .leaflet-overlay-pane {
-      background: transparent !important;
-      opacity: 1 !important;
+      background: #F5F5F3 !important;
     }
 
     /* Smooth premium bounce for store pins */
@@ -895,16 +881,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
     map.on('dragstart', () => startMusicOnInteraction());
     map.on('zoomstart', () => startMusicOnInteraction());
 
-    /* ── Custom panes for precise z-ordering ── */
-    /* landBasePane (z-150): white land shapes sit BELOW semi-transparent tiles */
-    map.createPane('landBasePane');
-    const landBase = map.getPane('landBasePane');
-    if (landBase) {
-      landBase.style.zIndex = '150';
-      landBase.style.pointerEvents = 'none';
-    }
-
-    /* labelsPane (z-450): city names, roads on top of everything */
+    /* ── Custom pane: labels on top of everything ── */
     map.createPane('labelsPane');
     const labelsPane = map.getPane('labelsPane');
     if (labelsPane) {
@@ -912,40 +889,37 @@ export default function StoreMap({ stores }: StoreMapProps) {
       labelsPane.style.pointerEvents = 'none';
     }
 
-    /* ── Layer 0: World land GeoJSON — white fill below tiles ──
-       Over ocean: no polygon → blue container bg shows through faded tiles → BLUE ocean
-       Over land:  white polygon → faded tiles composite against white → VISIBLE land details */
-    fetch('/world-land.geo.json')
-      .then((res) => res.json())
-      .then((worldData) => {
-        L.geoJSON(worldData, {
-          style: () => ({
-            fillColor: '#FAFAFA',
-            fillOpacity: 1,
-            color: 'transparent',
-            weight: 0,
-          }),
-          pane: 'landBasePane',
-          interactive: false,
-        }).addTo(map);
-      })
-      .catch(() => { /* If world land fails, ocean just won't be as blue */ });
-
-    /* ── Layer 1: Voyager tiles at 0.6 opacity (set via CSS on tile-pane) ──
-       Blue bg bleeds through over ocean; white land base keeps land readable */
+    /* ── Layer 1: Voyager base tiles at FULL opacity — all land details visible ── */
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap © CARTO',
     }).addTo(map);
 
-    /* ── Layer 2: Taiwan GeoJSON overlay — peach/salmon with semi-transparency so roads peek through ── */
+    /* ── Layer 2: Ocean GeoJSON overlay — blue fill ONLY over ocean areas ──
+       This is the world bounding box MINUS all land = pure ocean polygons */
+    fetch('/ocean.geo.json')
+      .then((res) => res.json())
+      .then((oceanData) => {
+        L.geoJSON(oceanData, {
+          style: () => ({
+            fillColor: '#2B8FC4',
+            fillOpacity: 0.7,
+            color: 'transparent',
+            weight: 0,
+          }),
+          interactive: false,
+        }).addTo(map);
+      })
+      .catch(() => { /* Ocean overlay failed — tiles still work fine */ });
+
+    /* ── Layer 3: Taiwan GeoJSON overlay — peach/salmon illustrated style ── */
     fetch('/taiwan.geo.json')
       .then((res) => res.json())
       .then((geojsonData) => {
         const geoLayer = L.geoJSON(geojsonData, {
           style: () => ({
             fillColor: '#F5CBA7',
-            fillOpacity: 0.65,
+            fillOpacity: 0.75,
             color: '#FFFFFF',
             weight: 2.5,
             opacity: 0.9,
@@ -955,14 +929,13 @@ export default function StoreMap({ stores }: StoreMapProps) {
         geoLayer.addTo(map);
         geoJsonLayerRef.current = geoLayer;
 
-        /* ── Layer 3: Labels on top — city names, roads, districts clearly visible ── */
+        /* ── Layer 4: Labels on top — city names, roads, districts clearly visible ── */
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
           maxZoom: 19,
           pane: 'labelsPane',
         }).addTo(map);
       })
       .catch(() => {
-        /* GeoJSON failed — fallback to full Voyager tile layer */
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
           maxZoom: 19,
         }).addTo(map);
