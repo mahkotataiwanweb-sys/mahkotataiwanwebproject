@@ -43,18 +43,18 @@ export default function AboutSection() {
         );
       }
 
-      // Smoother stagger on text elements
+      // All text lines reveal together — slow & dramatic
       if (textRef.current) {
         gsap.fromTo(textRef.current.children,
-          { opacity: 0, y: 50, filter: 'blur(4px)' },
+          { opacity: 0, y: 60, filter: 'blur(6px)' },
           {
             opacity: 1, y: 0, filter: 'blur(0px)',
-            duration: 1,
-            stagger: 0.12,
-            ease: 'power4.out',
+            duration: 2.2,
+            stagger: 0,
+            ease: 'power2.out',
             scrollTrigger: {
               trigger: textRef.current,
-              start: 'top 80%',
+              start: 'top 85%',
               toggleActions: 'play none none reverse',
             }
           }
