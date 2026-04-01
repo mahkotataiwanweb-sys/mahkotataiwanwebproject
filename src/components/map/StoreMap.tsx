@@ -1304,18 +1304,32 @@ export default function StoreMap({ stores }: StoreMapProps) {
 
     const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
+    // Taiwan main island bounds — used for consistent focus across all device sizes
+    const taiwanMainBounds = L.latLngBounds([21.85, 119.3], [25.4, 122.1]);
+
     const map = L.map(mapContainerRef.current, {
-      center: [23.7, 120.96],
+      center: [23.69, 120.96],
       zoom: 8,
       zoomControl: false,
       scrollWheelZoom: !isMobile,
       dragging: !isMobile,
       touchZoom: true,
       attributionControl: false,
-      maxBounds: L.latLngBounds([21.0, 117.5], [26.5, 122.5]),
+      maxBounds: L.latLngBounds([20.5, 118.0], [26.5, 123.0]),
       maxBoundsViscosity: 0.9,
       minZoom: 7,
     });
+
+    // Fit to Taiwan main island — automatically calculates optimal zoom for any screen size
+    map.fitBounds(taiwanMainBounds, {
+      paddingTopLeft: L.point(isMobile ? 10 : 20, isMobile ? 50 : 60),
+      paddingBottomRight: L.point(isMobile ? 10 : 20, isMobile ? 50 : 60),
+      maxZoom: 9,
+    });
+
+    // Invalidate size on window resize so Leaflet recalculates correctly
+    const handleResize = () => { map.invalidateSize(); };
+    window.addEventListener('resize', handleResize);
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
     L.control.attribution({ position: 'bottomleft', prefix: false }).addAttribution('© OpenStreetMap').addTo(map);
@@ -1522,7 +1536,11 @@ export default function StoreMap({ stores }: StoreMapProps) {
         }).addTo(map);
       });
 
-    return () => { map.remove(); mapRef.current = null; };
+    return () => { 
+      window.removeEventListener('resize', handleResize);
+      map.remove(); 
+      mapRef.current = null; 
+    };
   }, []);
 
   /* ─── Update markers ─── */
@@ -1556,8 +1574,14 @@ export default function StoreMap({ stores }: StoreMapProps) {
         markersRef.current.push(marker);
       });
       if (cityClusters.length > 0) {
-        const group = L.featureGroup(markersRef.current);
-        map.fitBounds(group.getBounds().pad(0.15), { maxZoom: 10 });
+        // Fit to Taiwan main island bounds for consistent focus across all screen sizes
+        const taiwanMainBounds = L.latLngBounds([21.85, 119.3], [25.4, 122.1]);
+        const isMobileView = window.innerWidth < 640;
+        map.fitBounds(taiwanMainBounds, {
+          paddingTopLeft: L.point(isMobileView ? 10 : 20, isMobileView ? 50 : 60),
+          paddingBottomRight: L.point(isMobileView ? 10 : 20, isMobileView ? 50 : 60),
+          maxZoom: 9,
+        });
       }
     } else {
       filteredStores.forEach((store) => {
@@ -1600,13 +1624,27 @@ export default function StoreMap({ stores }: StoreMapProps) {
   const handleResetView = () => {
     const map = mapRef.current; if (!map) return;
     setSelectedStore(null); setFilterCity('All');
-    map.flyTo([23.7, 120.96], 8, { duration: 1 });
+    const taiwanMainBounds = L.latLngBounds([21.85, 119.3], [25.4, 122.1]);
+    const isMobileView = window.innerWidth < 640;
+    map.flyToBounds(taiwanMainBounds, {
+      paddingTopLeft: L.point(isMobileView ? 10 : 20, isMobileView ? 50 : 60),
+      paddingBottomRight: L.point(isMobileView ? 10 : 20, isMobileView ? 50 : 60),
+      maxZoom: 9,
+      duration: 1,
+    });
   };
 
   const handleBackToAll = () => {
     const map = mapRef.current; if (!map) return;
     setSelectedStore(null); setFilterCity('All');
-    map.flyTo([23.7, 120.96], 8, { duration: 1 });
+    const taiwanMainBounds = L.latLngBounds([21.85, 119.3], [25.4, 122.1]);
+    const isMobileView = window.innerWidth < 640;
+    map.flyToBounds(taiwanMainBounds, {
+      paddingTopLeft: L.point(isMobileView ? 10 : 20, isMobileView ? 50 : 60),
+      paddingBottomRight: L.point(isMobileView ? 10 : 20, isMobileView ? 50 : 60),
+      maxZoom: 9,
+      duration: 1,
+    });
   };
 
   const storeTypeLabel = (type: string) => {
