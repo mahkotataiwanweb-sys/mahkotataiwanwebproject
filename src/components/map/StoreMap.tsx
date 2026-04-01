@@ -1789,10 +1789,10 @@ export default function StoreMap({ stores }: StoreMapProps) {
       {/* ─── Store popup ─── */}
       {selectedStore && (
         <div ref={popupRef} className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] w-[calc(100%-2rem)] max-w-md">
-          <div className="relative bg-white border border-cream-dark/20 rounded-[1.5rem] p-6 shadow-[0_20px_80px_rgba(0,48,72,0.12)] overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red via-red/60 to-transparent" />
-            <button onClick={handleClosePopup} className="absolute top-3 right-3 w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center bg-cream-light hover:bg-red/10 active:bg-red/20 rounded-full transition-all duration-200 group cursor-pointer z-20" style={{ touchAction: 'manipulation' }}>
-              <X className="w-5 h-5 text-navy/50 group-hover:text-red group-active:text-red transition-colors" />
+          <div className="relative bg-white border border-cream-dark/20 rounded-[1.5rem] p-6 shadow-[0_20px_80px_rgba(0,48,72,0.12)]">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red via-red/60 to-transparent rounded-t-[1.5rem]" />
+            <button onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleClosePopup(); }} onPointerDown={(e) => e.stopPropagation()} onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); handleClosePopup(); }} className="absolute -top-2 -right-2 w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center bg-white hover:bg-red/10 active:bg-red/20 rounded-full shadow-md border border-cream-dark/20 transition-all duration-200 group cursor-pointer z-30" style={{ touchAction: 'manipulation' }}>
+              <X className="w-5 h-5 text-navy/60 group-hover:text-red group-active:text-red transition-colors" />
             </button>
             <span className={`inline-block px-3 py-1 text-[11px] font-semibold uppercase tracking-wider rounded-full border ${storeTypeColor(selectedStore.store_type)} mb-3`}>
               {storeTypeLabel(selectedStore.store_type)}
