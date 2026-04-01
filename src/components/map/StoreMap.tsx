@@ -1497,8 +1497,8 @@ export default function StoreMap({ stores }: StoreMapProps) {
         L.geoJSON(oceanData, {
           pane: 'oceanPane',
           style: () => ({
-            fillColor: '#3498DB',
-            fillOpacity: 0.82,
+            fillColor: '#2E8BC9',
+            fillOpacity: 0.93,
             color: 'transparent',
             weight: 0,
           }),
