@@ -172,16 +172,16 @@ function injectPinStyles() {
       width: 5px;
     }
     .premium-dropdown-list::-webkit-scrollbar-track {
-      background: rgba(250,237,211,0.04);
+      background: rgba(0,48,72,0.03);
       border-radius: 10px;
       margin: 8px 0;
     }
     .premium-dropdown-list::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, rgba(193,33,38,0.4), rgba(250,237,211,0.12));
+      background: rgba(193,33,38,0.2);
       border-radius: 10px;
     }
     .premium-dropdown-list::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(180deg, rgba(193,33,38,0.55), rgba(250,237,211,0.2));
+      background: rgba(193,33,38,0.35);
     }
 
     /* Dropdown item hover glow */
@@ -193,7 +193,7 @@ function injectPinStyles() {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(250,237,211,0.08) 0%, rgba(193,33,38,0.04) 50%, transparent 100%);
+      background: linear-gradient(135deg, rgba(0,48,72,0.03) 0%, rgba(193,33,38,0.02) 50%, transparent 100%);
       opacity: 0;
       transition: opacity 0.3s ease;
       pointer-events: none;
@@ -427,28 +427,34 @@ function PremiumDropdown({
         onClick={() => (isOpen ? closeDropdown() : openDropdown())}
         className="flex items-center gap-3 px-5 py-3 min-w-[240px] sm:min-w-[280px] rounded-2xl text-[13px] font-medium border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
         style={{
-          background: 'rgba(0,48,72,0.88)',
-          borderColor: isOpen ? 'rgba(250,237,211,0.18)' : 'rgba(250,237,211,0.07)',
-          backdropFilter: 'blur(20px)',
+          background: isOpen
+            ? 'rgba(255,255,255,0.72)'
+            : 'rgba(255,255,255,0.55)',
+          borderColor: isOpen ? 'rgba(0,48,72,0.12)' : 'rgba(0,48,72,0.06)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
           boxShadow: isOpen
-            ? '0 16px 48px rgba(0,25,45,0.3)'
-            : '0 4px 16px rgba(0,25,45,0.12)',
-          color: '#FAEDD3',
+            ? '0 16px 48px rgba(0,25,45,0.12), inset 0 1px 0 rgba(255,255,255,0.5)'
+            : '0 4px 16px rgba(0,25,45,0.06), inset 0 1px 0 rgba(255,255,255,0.4)',
+          color: '#003048',
         }}
       >
-        <span
-          className="w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-500"
-          style={{
-            background: '#C12126',
-            boxShadow: isOpen ? '0 0 8px rgba(193,33,38,0.5)' : 'none',
-          }}
-        />
-        <span className="flex-1 text-left truncate tracking-tight">{displayValue}</span>
+        {value === 'All' ? (
+          <span className="text-base leading-none shrink-0">🇹🇼</span>
+        ) : (
+          <svg width="12" height="16" viewBox="0 0 20 26" className="shrink-0">
+            <path d="M10 0C4.48 0 0 4.48 0 10c0 7.5 10 16 10 16s10-8.5 10-16C20 4.48 15.52 0 10 0z" fill="#C12126"/>
+            <circle cx="10" cy="10" r="4" fill="white"/>
+            <circle cx="10" cy="10" r="2" fill="#C12126"/>
+          </svg>
+        )}
+        <span className="flex-1 text-left truncate tracking-tight font-medium">{displayValue}</span>
         <ChevronDown
           className="w-3.5 h-3.5 transition-all duration-400"
           style={{
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-            opacity: 0.4,
+            opacity: 0.35,
+            color: '#003048',
           }}
         />
       </button>
@@ -459,20 +465,22 @@ function PremiumDropdown({
           ref={panelRef}
           className="absolute top-full mt-2 left-0 w-full min-w-[240px] sm:min-w-[280px] rounded-2xl overflow-hidden"
           style={{
-            background: 'rgba(0,38,58,0.94)',
-            border: '1px solid rgba(250,237,211,0.08)',
-            boxShadow: '0 24px 64px rgba(0,15,30,0.35)',
-            backdropFilter: 'blur(24px)',
+            background: 'rgba(255,255,255,0.68)',
+            border: '1px solid rgba(0,48,72,0.08)',
+            boxShadow: '0 24px 64px rgba(0,25,45,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
+            backdropFilter: 'blur(28px)',
+            WebkitBackdropFilter: 'blur(28px)',
             transformOrigin: 'top center',
           }}
         >
           {/* Thin top accent */}
-          <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(193,33,38,0.3), transparent)' }} />
+          <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(193,33,38,0.2), transparent)' }} />
 
           <div ref={listRef} className="premium-dropdown-list overflow-y-auto max-h-[320px] py-1.5 px-1.5">
             {options.map((city, i) => {
               const isActive = value === city;
               const label = city === 'All' ? 'All Cities' : city;
+              const isAll = city === 'All';
               return (
                 <button
                   key={city}
@@ -480,22 +488,32 @@ function PremiumDropdown({
                   onClick={() => handleSelect(city)}
                   className="relative w-full text-left px-4 py-2.5 rounded-xl text-[13px] flex items-center gap-3 transition-all duration-300 my-px"
                   style={{
-                    background: isActive ? 'rgba(193,33,38,0.1)' : 'transparent',
-                    color: isActive ? 'rgba(255,180,180,0.95)' : 'rgba(250,237,211,0.4)',
+                    background: isActive ? 'rgba(193,33,38,0.08)' : 'transparent',
+                    color: isActive ? '#C12126' : 'rgba(0,48,72,0.45)',
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.background = 'rgba(250,237,211,0.05)';
-                      e.currentTarget.style.color = 'rgba(250,237,211,0.85)';
+                      e.currentTarget.style.background = 'rgba(0,48,72,0.04)';
+                      e.currentTarget.style.color = 'rgba(0,48,72,0.8)';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!isActive) {
                       e.currentTarget.style.background = 'transparent';
-                      e.currentTarget.style.color = 'rgba(250,237,211,0.4)';
+                      e.currentTarget.style.color = 'rgba(0,48,72,0.45)';
                     }
                   }}
                 >
+                  {/* Icon: Taiwan flag for All, pin for cities */}
+                  {isAll ? (
+                    <span className="text-sm leading-none shrink-0">🇹🇼</span>
+                  ) : (
+                    <svg width="10" height="13" viewBox="0 0 20 26" className="shrink-0" style={{ opacity: isActive ? 1 : 0.35 }}>
+                      <path d="M10 0C4.48 0 0 4.48 0 10c0 7.5 10 16 10 16s10-8.5 10-16C20 4.48 15.52 0 10 0z" fill={isActive ? '#C12126' : '#003048'}/>
+                      <circle cx="10" cy="10" r="4" fill="white"/>
+                      <circle cx="10" cy="10" r="2" fill={isActive ? '#C12126' : '#003048'}/>
+                    </svg>
+                  )}
                   {/* Active indicator */}
                   {isActive && (
                     <div className="absolute left-[6px] top-1/2 -translate-y-1/2 w-[2px] h-4 rounded-full bg-red" />
@@ -507,7 +525,7 @@ function PremiumDropdown({
                     {label}
                   </span>
                   {isActive && (
-                    <span className="text-[9px] opacity-50">\u2713</span>
+                    <span className="text-[9px] opacity-40 text-red">{'\u2713'}</span>
                   )}
                 </button>
               );
@@ -515,7 +533,7 @@ function PremiumDropdown({
           </div>
 
           {/* Thin bottom line */}
-          <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(250,237,211,0.04), transparent)' }} />
+          <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(0,48,72,0.04), transparent)' }} />
         </div>
       )}
     </div>
