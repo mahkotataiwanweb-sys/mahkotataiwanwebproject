@@ -37,6 +37,75 @@ function LineIcon({ className }: { className?: string }) {
 
 gsap.registerPlugin(ScrollTrigger);
 
+/* ── CharReveal: per-letter rain animation (all lines simultaneous) ── */
+function CharReveal({ text, className }: { text: string; className?: string }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const chars = ref.current.querySelectorAll('.cr-char');
+    if (chars.length === 0) return;
+
+    /* Random rain — ALL lines start together */
+    const charData = Array.from({ length: chars.length }, () => ({
+      delay: Math.random() * 2.5,
+      yStart: -(50 + Math.random() * 80),
+      duration: 1.0 + Math.random() * 0.8,
+    }));
+
+    const ctx = gsap.context(() => {
+      chars.forEach((char, i) => {
+        const d = charData[i];
+        gsap.fromTo(char,
+          { opacity: 0, y: d.yStart },
+          {
+            opacity: 1,
+            y: 0,
+            duration: d.duration,
+            delay: d.delay,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: ref.current,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      });
+    });
+    return () => ctx.revert();
+  }, [text]);
+
+  const words = text.split(' ');
+  let globalIdx = 0;
+
+  return (
+    <p ref={ref} className={className}>
+      {words.map((word, wi) => {
+        const chars = word.split('').map((char) => {
+          const idx = globalIdx++;
+          return (
+            <span
+              key={idx}
+              className="cr-char"
+              style={{ opacity: 0, display: 'inline-block', willChange: 'transform, opacity' }}
+            >
+              {char}
+            </span>
+          );
+        });
+        if (wi < words.length - 1) globalIdx++;
+        return (
+          <span key={wi} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
+            {chars}
+            {wi < words.length - 1 && <span className="cr-char" style={{ opacity: 1, display: 'inline' }}>&nbsp;</span>}
+          </span>
+        );
+      })}
+    </p>
+  );
+}
+
 const socials = [
   { icon: Music2, href: 'https://www.tiktok.com/@mahkotataiwan', label: 'TikTok' },
   { icon: Facebook, href: 'https://www.facebook.com/share/1DhYShuL19/?mibextid=wwXIfr', label: 'Facebook' },
@@ -251,7 +320,7 @@ export default function ContactPage() {
         );
       }
 
-      /* ── Contact Left Column ── */
+      /* ── Contact Left Column — all lines appear together, slow & dramatic ── */
       if (contactLeftRef.current) {
         gsap.fromTo(
           contactLeftRef.current.children,
@@ -260,12 +329,12 @@ export default function ContactPage() {
             opacity: 1,
             x: 0,
             filter: 'blur(0px)',
-            duration: 0.8,
-            stagger: 0.12,
-            ease: 'power3.out',
+            duration: 2.2,
+            stagger: 0,
+            ease: 'power2.out',
             scrollTrigger: {
               trigger: contactSectionRef.current,
-              start: 'top 80%',
+              start: 'top 85%',
               toggleActions: 'play none none reverse',
             },
           }
@@ -528,9 +597,10 @@ export default function ContactPage() {
                 Get in Touch
               </h2>
               <div className="w-16 h-[2px] bg-red mb-4" />
-              <p className="text-navy/60 text-base sm:text-lg tracking-wide leading-relaxed max-w-md mb-10">
-                Whether you have questions about our products, partnerships, or services — we&apos;d love to hear from you. Reach out through any of these channels.
-              </p>
+              <CharReveal
+                text="Whether you have questions about our products, partnerships, or services — we'd love to hear from you. Reach out through any of these channels."
+                className="text-navy/60 text-base sm:text-lg tracking-wide leading-relaxed max-w-md mb-10"
+              />
 
               {/* Social Links */}
               <div>
