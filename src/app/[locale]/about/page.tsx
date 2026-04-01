@@ -165,21 +165,48 @@ function CharReveal({ text, className }: { text: string; className?: string }) {
     const chars = ref.current.querySelectorAll('.cr-char');
     if (chars.length === 0) return;
 
+    /* Seed random delays for each char — rain-like staggered fall */
+    const randomDelays: number[] = [];
+    for (let i = 0; i < chars.length; i++) {
+      /* Base sequential delay + random offset for rain feel */
+      const seqDelay = i * 0.008;
+      const randomOffset = Math.random() * 0.15;
+      randomDelays.push(seqDelay + randomOffset);
+    }
+
     const ctx = gsap.context(() => {
-      gsap.fromTo(chars,
-        { opacity: 0 },
-        {
-          opacity: 1,
-          duration: 0.05,
-          stagger: 0.015,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: ref.current,
-            start: 'top 80%',
-            toggleActions: 'play none none reverse',
-          },
+      chars.forEach((char, i) => {
+        const isSpace = (char as HTMLElement).textContent === ' ';
+        if (isSpace) {
+          gsap.set(char, { opacity: 1 });
+          return;
         }
-      );
+        /* Randomize the vertical start position per char for rain effect */
+        const yStart = -(25 + Math.random() * 35);
+
+        gsap.fromTo(char,
+          {
+            opacity: 0,
+            y: yStart,
+            scale: 0.3 + Math.random() * 0.4,
+            filter: 'blur(4px)',
+          },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 0.25 + Math.random() * 0.15,
+            delay: randomDelays[i],
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: ref.current,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      });
     });
     return () => ctx.revert();
   }, [text]);
@@ -187,7 +214,17 @@ function CharReveal({ text, className }: { text: string; className?: string }) {
   return (
     <p ref={ref} className={className}>
       {text.split('').map((char, i) => (
-        <span key={i} className="cr-char" style={{ opacity: 0 }}>{char}</span>
+        <span
+          key={i}
+          className="cr-char"
+          style={{
+            opacity: 0,
+            display: 'inline-block',
+            willChange: 'transform, opacity, filter',
+          }}
+        >
+          {char === ' ' ? '\u00A0' : char}
+        </span>
       ))}
     </p>
   );
@@ -478,7 +515,7 @@ export default function AboutPage() {
           const flipTl = gsap.timeline({
             scrollTrigger: {
               trigger: valuesRef.current,
-              start: 'top 88%',
+              start: 'top 20%',
               toggleActions: 'play none none reverse',
             },
           });
@@ -522,7 +559,7 @@ export default function AboutPage() {
           const flipTl = gsap.timeline({
             scrollTrigger: {
               trigger: valuesRef.current,
-              start: 'top 82%',
+              start: 'top 20%',
               toggleActions: 'play none none reverse',
             },
           });

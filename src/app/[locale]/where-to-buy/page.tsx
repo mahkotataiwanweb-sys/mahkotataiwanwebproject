@@ -18,7 +18,7 @@ gsap.registerPlugin(ScrollTrigger);
 const StoreMap = dynamic(() => import('@/components/map/StoreMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[500px] sm:h-[600px] lg:h-[700px] rounded-[2rem] bg-cream-light border border-cream-dark/30 flex items-center justify-center">
+    <div className="w-full h-[600px] sm:h-[750px] lg:h-[900px] rounded-[2rem] bg-cream-light border border-cream-dark/30 flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <div className="w-10 h-10 border-2 border-red border-t-transparent rounded-full animate-spin" />
         <p className="text-navy/40 text-sm">Loading map...</p>
@@ -170,24 +170,20 @@ export default function WhereToBuyPage() {
         ease: 'power4.out',
       });
 
-      // Stats cards — dramatic slow reveal
+      // Stats cards — clean, stable reveal (no heavy blur/scale)
       const statCards = gsap.utils.toArray('.stat-card') as HTMLElement[];
       statCards.forEach((card, i) => {
         gsap.fromTo(card,
           {
             opacity: 0,
-            y: 140,
-            scale: 0.88,
-            filter: 'blur(25px)',
+            y: 30,
           },
           {
             opacity: 1,
             y: 0,
-            scale: 1,
-            filter: 'blur(0px)',
-            duration: 2.2,
-            delay: i * 0.3,
-            ease: 'power3.out',
+            duration: 0.8,
+            delay: i * 0.12,
+            ease: 'power2.out',
             scrollTrigger: {
               trigger: '.stats-section',
               start: 'top 85%',
@@ -425,48 +421,33 @@ export default function WhereToBuyPage() {
         </div>
       </section>
 
-      {/* ─── Stats Section ─── */}
-      <section className="stats-section relative py-16 md:py-20">
-        <FloatingParticles />
-        <ShimmerLines />
-
-        <div className="max-w-6xl mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+      {/* ─── Stats Section — Clean & Compact ─── */}
+      <section className="stats-section relative py-10 md:py-14">
+        <div className="max-w-5xl mx-auto px-6 relative z-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
             {stats.map((stat, idx) => (
               <div
                 key={idx}
-                className="stat-card group relative bg-white rounded-3xl p-7 md:p-10 text-center transition-all duration-[0.9s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1.5 hover:shadow-[0_20px_60px_-15px_rgba(0,48,72,0.08)]"
-                style={{ boxShadow: '0 1px 2px rgba(0,48,72,0.04), 0 0 0 1px rgba(0,48,72,0.03)' }}
+                className="stat-card group relative bg-white/80 backdrop-blur-sm rounded-2xl p-5 md:p-6 text-center transition-all duration-500 ease-out hover:-translate-y-1"
+                style={{ boxShadow: '0 1px 3px rgba(0,48,72,0.06), 0 0 0 1px rgba(0,48,72,0.04)' }}
               >
-                {/* Subtle icon */}
-                <div className={`inline-flex items-center justify-center w-10 h-10 rounded-2xl ${stat.iconBg} mb-7`}>
-                  <stat.icon className={`w-[18px] h-[18px] ${stat.iconColor} opacity-40`} />
+                {/* Compact icon */}
+                <div className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-cream/60 mb-4">
+                  <stat.icon className="w-4 h-4 text-navy/30" />
                 </div>
 
-                {/* Large number with gradient */}
+                {/* Number — clean single color */}
                 <div
-                  className="stat-number text-[2.5rem] md:text-[3.25rem] font-heading font-bold mb-2.5 tracking-[-0.03em] leading-none"
+                  className="stat-number text-2xl md:text-3xl font-heading font-bold mb-1.5 tracking-[-0.02em] leading-none text-navy"
                   data-value={stat.number}
-                  style={{
-                    background: stat.numberGradient,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}
                 >
                   {stat.number.includes('/') ? stat.number : loading ? '\u2014' : '0'}
                 </div>
 
                 {/* Label */}
-                <div className="text-navy/30 text-[10px] font-semibold uppercase tracking-[0.25em]">
+                <div className="text-navy/35 text-[10px] font-semibold uppercase tracking-[0.2em]">
                   {stat.label}
                 </div>
-
-                {/* Hover accent line — grows in from center */}
-                <div
-                  className="mx-auto mt-6 h-px w-0 group-hover:w-8 rounded-full transition-all duration-[1.2s] ease-out opacity-0 group-hover:opacity-40"
-                  style={{ background: stat.accentColor }}
-                />
               </div>
             ))}
           </div>
@@ -477,7 +458,7 @@ export default function WhereToBuyPage() {
       <section className="map-section relative pb-20 md:pb-32">
         <DecorativeShapes />
 
-        <div className="max-w-6xl mx-auto px-6 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           {/* Section header */}
           <div className="text-center mb-12">
             <span className="map-header-text inline-block text-red/80 text-sm font-semibold tracking-[0.25em] uppercase">
@@ -505,7 +486,7 @@ export default function WhereToBuyPage() {
             <div className="relative rounded-[2rem] overflow-hidden border border-cream-dark/20 shadow-[0_25px_80px_-15px_rgba(0,48,72,0.12)]">
               {!loading && <StoreMap stores={stores} />}
               {loading && (
-                <div className="w-full h-[500px] sm:h-[600px] lg:h-[700px] bg-cream-light flex items-center justify-center">
+                <div className="w-full h-[600px] sm:h-[750px] lg:h-[900px] bg-cream-light flex items-center justify-center">
                   <div className="flex flex-col items-center gap-3">
                     <div className="w-10 h-10 border-2 border-red border-t-transparent rounded-full animate-spin" />
                     <p className="text-navy/40 text-sm">Loading stores...</p>

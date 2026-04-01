@@ -15,12 +15,12 @@ function injectPinStyles() {
   const style = document.createElement('style');
   style.id = STYLE_ID;
   style.textContent = `
-    /* ── Force Leaflet ocean background everywhere ── */
+    /* ── Force Leaflet ocean background — deeper blue ── */
     .illustrated-map.leaflet-container {
-      background: #A8D8EA !important;
+      background: #4A9FD9 !important;
     }
     .illustrated-map .leaflet-tile-pane {
-      background: #A8D8EA !important;
+      background: #4A9FD9 !important;
     }
     .illustrated-map .leaflet-pane {
       background: transparent !important;
@@ -286,6 +286,219 @@ interface StoreMapProps {
   stores: StoreLocation[];
 }
 
+/* ─── Ocean Water Animated Effects ─── */
+function OceanWaterEffects() {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-[490]">
+      {/* Animated water ripple circles scattered across ocean */}
+      {[
+        { top: '60%', left: '8%', delay: '0s', size: 30 },
+        { top: '45%', left: '80%', delay: '2s', size: 22 },
+        { top: '70%', left: '45%', delay: '4s', size: 26 },
+        { top: '35%', left: '15%', delay: '1.5s', size: 18 },
+        { top: '80%', left: '70%', delay: '3s', size: 20 },
+        { top: '50%', left: '55%', delay: '5s', size: 24 },
+        { top: '25%', left: '90%', delay: '0.5s', size: 16 },
+        { top: '75%', left: '25%', delay: '2.5s', size: 28 },
+      ].map((pos, i) => (
+        <svg
+          key={`ripple-${i}`}
+          style={{
+            position: 'absolute',
+            top: pos.top,
+            left: pos.left,
+            width: pos.size * 3,
+            height: pos.size * 3,
+            opacity: 0,
+            animation: `waterRipple 4s ease-out infinite ${pos.delay}`,
+          }}
+          viewBox="0 0 60 60"
+        >
+          <circle cx="30" cy="30" r="8" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5">
+            <animate attributeName="r" from="4" to="28" dur="4s" begin={pos.delay} repeatCount="indefinite" />
+            <animate attributeName="opacity" from="0.4" to="0" dur="4s" begin={pos.delay} repeatCount="indefinite" />
+          </circle>
+          <circle cx="30" cy="30" r="4" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1">
+            <animate attributeName="r" from="8" to="25" dur="4s" begin={`calc(${pos.delay} + 0.8s)`} repeatCount="indefinite" />
+            <animate attributeName="opacity" from="0.3" to="0" dur="4s" begin={`calc(${pos.delay} + 0.8s)`} repeatCount="indefinite" />
+          </circle>
+        </svg>
+      ))}
+
+      {/* Shimmering water surface — horizontal light streaks */}
+      {[
+        { top: '40%', delay: '0s', width: '15%' },
+        { top: '55%', delay: '3s', width: '12%' },
+        { top: '68%', delay: '6s', width: '18%' },
+        { top: '30%', delay: '1.5s', width: '10%' },
+        { top: '78%', delay: '4.5s', width: '14%' },
+      ].map((pos, i) => (
+        <div
+          key={`shimmer-${i}`}
+          style={{
+            position: 'absolute',
+            top: pos.top,
+            left: 0,
+            width: '100%',
+            height: '2px',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              width: pos.width,
+              height: '2px',
+              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+              borderRadius: '2px',
+              animation: `oceanShimmer 8s ease-in-out infinite ${pos.delay}`,
+            }}
+          />
+        </div>
+      ))}
+
+      {/* Animated bubbles rising from bottom */}
+      {Array.from({ length: 12 }).map((_, i) => {
+        const left = 5 + Math.random() * 90;
+        const size = 3 + Math.random() * 6;
+        const duration = 6 + Math.random() * 8;
+        const delay = Math.random() * 10;
+        return (
+          <div
+            key={`bubble-${i}`}
+            style={{
+              position: 'absolute',
+              bottom: '-10px',
+              left: `${left}%`,
+              width: size,
+              height: size,
+              borderRadius: '50%',
+              background: 'rgba(255,255,255,0.2)',
+              border: '0.5px solid rgba(255,255,255,0.3)',
+              animation: `bubbleRise ${duration}s ease-in infinite ${delay}s`,
+            }}
+          />
+        );
+      })}
+
+      {/* Tiny boat/ship silhouette floating */}
+      <svg
+        style={{
+          position: 'absolute',
+          top: '18%',
+          left: 0,
+          width: '100%',
+          height: '24px',
+          animation: 'floatCloud 40s linear infinite 2s',
+          opacity: 0.3,
+        }}
+        viewBox="0 0 50 20"
+        width="50"
+        height="20"
+        fill="none"
+      >
+        <path d="M5 14 L10 14 L12 10 L15 6 L15 10 L25 10 L27 14 L30 14 L28 18 L3 18 Z" fill="#2C6E91" />
+        <line x1="15" y1="6" x2="15" y2="3" stroke="#2C6E91" strokeWidth="1" />
+        <polygon points="15,3 15,7 19,7" fill="#3A8AB5" opacity="0.7" />
+      </svg>
+
+      {/* Starfish icon near bottom */}
+      <svg
+        style={{
+          position: 'absolute',
+          bottom: '8%',
+          left: '18%',
+          width: '18px',
+          height: '18px',
+          opacity: 0.2,
+          animation: 'bobFloat 5s ease-in-out infinite 1s',
+        }}
+        viewBox="0 0 24 24"
+        fill="#E8A87C"
+      >
+        <path d="M12 2l2.5 7.5H22l-6 4.5 2.5 7.5L12 17l-6.5 4.5 2.5-7.5-6-4.5h7.5z" />
+      </svg>
+
+      {/* Jellyfish silhouette */}
+      <svg
+        style={{
+          position: 'absolute',
+          bottom: '30%',
+          right: '10%',
+          width: '20px',
+          height: '30px',
+          opacity: 0.15,
+          animation: 'jellyfishFloat 7s ease-in-out infinite',
+        }}
+        viewBox="0 0 20 30"
+        fill="none"
+      >
+        <ellipse cx="10" cy="8" rx="8" ry="8" fill="#7BC8E8" />
+        <path d="M4 16 Q6 22 5 28" stroke="#7BC8E8" strokeWidth="1" fill="none" strokeLinecap="round" />
+        <path d="M8 16 Q9 24 7 28" stroke="#7BC8E8" strokeWidth="1" fill="none" strokeLinecap="round" />
+        <path d="M12 16 Q11 24 13 28" stroke="#7BC8E8" strokeWidth="1" fill="none" strokeLinecap="round" />
+        <path d="M16 16 Q14 22 15 28" stroke="#7BC8E8" strokeWidth="1" fill="none" strokeLinecap="round" />
+      </svg>
+
+      {/* Seaweed — gently swaying */}
+      {[
+        { bottom: '0%', left: '5%', height: 40, delay: '0s' },
+        { bottom: '0%', left: '88%', height: 35, delay: '1s' },
+        { bottom: '0%', left: '30%', height: 28, delay: '2s' },
+      ].map((pos, i) => (
+        <svg
+          key={`seaweed-${i}`}
+          style={{
+            position: 'absolute',
+            bottom: pos.bottom,
+            left: pos.left,
+            width: '14px',
+            height: `${pos.height}px`,
+            opacity: 0.15,
+            animation: `seaweedSway 4s ease-in-out infinite ${pos.delay}`,
+            transformOrigin: 'bottom center',
+          }}
+          viewBox="0 0 14 40"
+          fill="none"
+        >
+          <path d="M7 40 Q3 30 7 22 Q11 14 7 6 Q5 2 7 0" stroke="#2A8B5A" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        </svg>
+      ))}
+
+      {/* Inline keyframes */}
+      <style>{`
+        @keyframes waterRipple {
+          0% { opacity: 0; transform: scale(0.3); }
+          20% { opacity: 0.4; }
+          100% { opacity: 0; transform: scale(1.5); }
+        }
+        @keyframes oceanShimmer {
+          0% { transform: translateX(-100%); opacity: 0; }
+          30% { opacity: 1; }
+          70% { opacity: 1; }
+          100% { transform: translateX(800%); opacity: 0; }
+        }
+        @keyframes bubbleRise {
+          0% { transform: translateY(0) translateX(0); opacity: 0; }
+          10% { opacity: 0.4; }
+          90% { opacity: 0.2; }
+          100% { transform: translateY(-600px) translateX(${Math.random() > 0.5 ? '' : '-'}20px); opacity: 0; }
+        }
+        @keyframes jellyfishFloat {
+          0%, 100% { transform: translateY(0) translateX(0); }
+          25% { transform: translateY(-15px) translateX(5px); }
+          50% { transform: translateY(-8px) translateX(-3px); }
+          75% { transform: translateY(-20px) translateX(8px); }
+        }
+        @keyframes seaweedSway {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(5deg); }
+          75% { transform: rotate(-5deg); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 /* ─── Decorative SVG components ─── */
 function DecorativeElements() {
   return (
@@ -340,6 +553,44 @@ function DecorativeElements() {
           <path d="M2 5 Q8 1 14 5 Q20 9 26 5" stroke="#4A6B7A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
         </svg>
       ))}
+
+      {/* Extra fish — different sizes and directions */}
+      <svg style={{ position: 'absolute', bottom: '40%', left: 0, width: '100%', height: '18px', animation: 'fishSwim 15s ease-in-out infinite 4s' }} viewBox="0 0 26 12" fill="none" width="26" height="12">
+        <ellipse cx="11" cy="6" rx="9" ry="4.5" fill="#4FBCD3" opacity="0.45"/><polygon points="20,6 26,2 26,10" fill="#4FBCD3" opacity="0.45"/><circle cx="6" cy="5" r="1.2" fill="white" opacity="0.7"/>
+      </svg>
+      <svg style={{ position: 'absolute', bottom: '55%', left: 0, width: '100%', height: '14px', animation: 'fishSwim 20s ease-in-out infinite 9s' }} viewBox="0 0 22 10" fill="none" width="22" height="10">
+        <ellipse cx="9" cy="5" rx="7" ry="3.5" fill="#E8946A" opacity="0.35"/><polygon points="16,5 22,2 22,8" fill="#E8946A" opacity="0.35"/><circle cx="5" cy="4" r="1" fill="white" opacity="0.6"/>
+      </svg>
+
+      {/* Cute turtle swimming */}
+      <svg style={{ position: 'absolute', bottom: '20%', left: 0, width: '100%', height: '22px', animation: 'fishSwim 28s ease-in-out infinite 3s' }} viewBox="0 0 36 18" fill="none" width="36" height="18">
+        <ellipse cx="18" cy="10" rx="10" ry="6" fill="#5DAD7F" opacity="0.4"/>
+        <ellipse cx="18" cy="10" rx="7" ry="4" fill="#7CC99C" opacity="0.3"/>
+        <circle cx="8" cy="8" r="3" fill="#5DAD7F" opacity="0.4"/>
+        <circle cx="6" cy="7" r="0.8" fill="white" opacity="0.6"/>
+        {/* Flippers */}
+        <ellipse cx="12" cy="5" rx="3" ry="1.5" fill="#5DAD7F" opacity="0.35" transform="rotate(-20 12 5)"/>
+        <ellipse cx="12" cy="15" rx="3" ry="1.5" fill="#5DAD7F" opacity="0.35" transform="rotate(20 12 15)"/>
+        <ellipse cx="26" cy="8" rx="3" ry="1.5" fill="#5DAD7F" opacity="0.35" transform="rotate(-10 26 8)"/>
+        <ellipse cx="26" cy="12" rx="3" ry="1.5" fill="#5DAD7F" opacity="0.35" transform="rotate(10 26 12)"/>
+      </svg>
+
+      {/* Dolphin jumping arc */}
+      <svg style={{ position: 'absolute', top: '12%', left: 0, width: '100%', height: '28px', animation: 'floatBird 18s ease-in-out infinite 6s' }} viewBox="0 0 40 22" fill="none" width="40" height="22">
+        <path d="M4 18 Q10 2 20 8 Q30 14 36 4" stroke="#3B87A8" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.3"/>
+        <ellipse cx="20" cy="10" rx="6" ry="3" fill="#3B87A8" opacity="0.25"/>
+        <path d="M26 10 L30 7 L29 12 Z" fill="#3B87A8" opacity="0.25"/>
+      </svg>
+
+      {/* Tiny school of fish (3 dots swimming together) */}
+      <svg style={{ position: 'absolute', bottom: '45%', left: 0, width: '100%', height: '16px', animation: 'fishSwim 12s ease-in-out infinite 1s' }} viewBox="0 0 40 14" fill="none" width="40" height="14">
+        <ellipse cx="8" cy="5" rx="4" ry="2" fill="#5B9BAD" opacity="0.3"/>
+        <ellipse cx="16" cy="8" rx="4" ry="2" fill="#5B9BAD" opacity="0.25"/>
+        <ellipse cx="12" cy="12" rx="3.5" ry="1.8" fill="#5B9BAD" opacity="0.2"/>
+        <polygon points="12,5 16,3 16,7" fill="#5B9BAD" opacity="0.3"/>
+        <polygon points="20,8 24,6 24,10" fill="#5B9BAD" opacity="0.25"/>
+        <polygon points="15.5,12 19,10 19,14" fill="#5B9BAD" opacity="0.2"/>
+      </svg>
     </div>
   );
 }
@@ -550,6 +801,46 @@ export default function StoreMap({ stores }: StoreMapProps) {
   const [filterCity, setFilterCity] = useState('All');
   const popupRef = useRef<HTMLDivElement>(null);
 
+  /* ─── Ambient Music ─── */
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const musicStartedRef = useRef(false);
+
+  useEffect(() => {
+    const audio = new Audio('/map-ambient.mp3');
+    audio.loop = true;
+    audio.volume = 0.3;
+    audioRef.current = audio;
+
+    return () => {
+      audio.pause();
+      audio.src = '';
+      audioRef.current = null;
+    };
+  }, []);
+
+  /* Start music on first map interaction (click/touch) — auto-play policy requires user gesture */
+  const startMusicOnInteraction = useCallback(() => {
+    if (musicStartedRef.current || !audioRef.current) return;
+    musicStartedRef.current = true;
+    audioRef.current.play().then(() => {
+      setMusicPlaying(true);
+    }).catch(() => {
+      /* Autoplay blocked — user can toggle manually */
+      musicStartedRef.current = false;
+    });
+  }, []);
+
+  const toggleMusic = useCallback(() => {
+    if (!audioRef.current) return;
+    if (musicPlaying) {
+      audioRef.current.pause();
+      setMusicPlaying(false);
+    } else {
+      audioRef.current.play().then(() => setMusicPlaying(true)).catch(() => {});
+    }
+  }, [musicPlaying]);
+
   useEffect(() => { injectPinStyles(); }, []);
 
   /* ─── City clusters ─── */
@@ -596,6 +887,11 @@ export default function StoreMap({ stores }: StoreMapProps) {
     L.control.attribution({ position: 'bottomleft', prefix: false }).addAttribution('© OpenStreetMap').addTo(map);
 
     mapRef.current = map;
+
+    /* Start ambient music on first map interaction */
+    map.on('click', () => startMusicOnInteraction());
+    map.on('dragstart', () => startMusicOnInteraction());
+    map.on('zoomstart', () => startMusicOnInteraction());
 
     /* Create a custom pane for labels so they sit on top of everything */
     map.createPane('labelsPane');
@@ -759,6 +1055,28 @@ export default function StoreMap({ stores }: StoreMapProps) {
           </button>
         )}
 
+        {/* Music toggle */}
+        <button
+          onClick={toggleMusic}
+          className="group flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-400 ease-out hover:-translate-y-0.5"
+          title={musicPlaying ? 'Mute music' : 'Play ambient music'}
+          style={{
+            background: musicPlaying ? 'rgba(193,33,38,0.12)' : 'rgba(255,255,255,0.92)',
+            boxShadow: '0 2px 8px rgba(0,48,72,0.06)',
+            backdropFilter: 'blur(12px)',
+          }}
+        >
+          {musicPlaying ? (
+            <svg className="w-3.5 h-3.5 text-red" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            </svg>
+          ) : (
+            <svg className="w-3.5 h-3.5 text-navy/40 group-hover:text-red transition-colors duration-300" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+            </svg>
+          )}
+        </button>
+
         {/* Reset */}
         <button
           onClick={handleResetView}
@@ -805,12 +1123,13 @@ export default function StoreMap({ stores }: StoreMapProps) {
       </div>
 
       {/* ─── Map ─── */}
-      <div className="relative overflow-hidden rounded-2xl" style={{ background: '#A8D8EA' }}>
+      <div className="relative overflow-hidden rounded-2xl" style={{ background: '#4A9FD9' }}>
         <DecorativeElements />
+        <OceanWaterEffects />
         <div
           ref={mapContainerRef}
-          className="illustrated-map w-full h-[500px] sm:h-[600px] lg:h-[700px] overflow-hidden"
-          style={{ background: '#A8D8EA' }}
+          className="illustrated-map w-full h-[600px] sm:h-[750px] lg:h-[900px] overflow-hidden"
+          style={{ background: '#4A9FD9' }}
         />
       </div>
 
