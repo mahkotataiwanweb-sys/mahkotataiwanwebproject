@@ -799,6 +799,7 @@ function PremiumDropdown({
 
 export default function StoreMap({ stores }: StoreMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [mapReady, setMapReady] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null);
@@ -1026,10 +1027,18 @@ export default function StoreMap({ stores }: StoreMapProps) {
     }
 
     /* ── Layer 1: Voyager base tiles at FULL opacity — all land details visible ── */
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+    const baseTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap © CARTO',
+      keepBuffer: 10,              /* cache 10 tile-widths around viewport */
+      updateWhenZooming: false,     /* don't flash tiles mid-zoom animation */
+      updateWhenIdle: true,         /* only load tiles after movement stops */
     }).addTo(map);
+
+    /* Signal map is ready once initial tiles are loaded */
+    baseTiles.once('load', () => setMapReady(true));
+    /* Fallback in case 'load' doesn't fire (e.g. tiles cached) */
+    setTimeout(() => setMapReady(true), 2500);
 
     /* ── Layer 2: Ocean GeoJSON overlay — blue ONLY over water ──
        Generated from 10m Natural Earth with 0.02° inland buffer = precise coastlines */
@@ -1074,11 +1083,17 @@ export default function StoreMap({ stores }: StoreMapProps) {
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
           maxZoom: 19,
           pane: 'labelsPane',
+          keepBuffer: 10,
+          updateWhenZooming: false,
+          updateWhenIdle: true,
         }).addTo(map);
       })
       .catch(() => {
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
           maxZoom: 19,
+          keepBuffer: 10,
+          updateWhenZooming: false,
+          updateWhenIdle: true,
         }).addTo(map);
       });
 
@@ -1311,6 +1326,25 @@ export default function StoreMap({ stores }: StoreMapProps) {
           className="illustrated-map w-full h-[600px] sm:h-[750px] lg:h-[900px] overflow-hidden"
           style={{ background: '#4A9FD9' }}
         />
+
+        {/* ── Loading overlay — covers map until tiles are fully rendered ── */}
+        <div
+          className={`absolute inset-0 z-[800] flex items-center justify-center transition-opacity duration-700 pointer-events-none ${
+            mapReady ? 'opacity-0' : 'opacity-100'
+          }`}
+          style={{ background: 'linear-gradient(135deg, #4A9FD9 0%, #3B8EC5 100%)' }}
+          onTransitionEnd={(e) => {
+            if (mapReady) (e.currentTarget as HTMLElement).style.display = 'none';
+          }}
+        >
+          <div className="flex flex-col items-center gap-3">
+            <div className="relative w-10 h-10">
+              <div className="absolute inset-0 rounded-full border-[3px] border-white/20" />
+              <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-white animate-spin" />
+            </div>
+            <span className="text-white/80 text-sm font-medium tracking-wide">Loading map...</span>
+          </div>
+        </div>
       </div>
 
       {/* ─── Store popup ─── */}
