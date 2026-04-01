@@ -227,8 +227,8 @@ export default function HomePage() {
 
     const sequencer = async () => {
       while (!cancelled) {
-        /* HOLD — let user read the current cards for 5 seconds */
-        await new Promise(r => setTimeout(r, 5000));
+        /* HOLD — let user read the current cards for 4 seconds */
+        await new Promise(r => setTimeout(r, 4000));
         if (cancelled) break;
         /* Flip top card first */
         await topCardRef.current?.triggerFlip();
