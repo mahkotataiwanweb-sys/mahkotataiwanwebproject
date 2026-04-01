@@ -426,17 +426,18 @@ export default function ContactPage() {
         );
       }
 
-      /* ── Map Section ── */
+      /* ── Map Section — Slow Dramatic Reveal ── */
       if (mapRef.current) {
         gsap.fromTo(
           mapRef.current,
-          { opacity: 0, y: 40, scale: 0.97 },
+          { opacity: 0, y: 60, scale: 0.94, filter: 'blur(10px)' },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 0.9,
-            ease: 'power3.out',
+            filter: 'blur(0px)',
+            duration: 2.3,
+            ease: 'power2.out',
             scrollTrigger: {
               trigger: mapRef.current,
               start: 'top 80%',
@@ -591,12 +592,18 @@ export default function ContactPage() {
           ╚═══════════════════════════════════════════╝ */}
       <section ref={hoursSectionRef} className="py-24 sm:py-32 relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-6">
-          {/* Section Header */}
-          <div className="text-center mb-14">
+          {/* Section Header — Premium Reveal */}
+          <motion.div
+            className="text-center mb-14"
+            initial={{ opacity: 0, y: 50, filter: 'blur(14px)' }}
+            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.6, ease: [0.22, 0.68, 0, 1] }}
+          >
             <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Availability</p>
             <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">Business Hours</h2>
             <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
-          </div>
+          </motion.div>
 
           {/* Clock with animated arcs — moon clock face image + SVG arcs */}
           <div ref={hoursCardRef} className="flex justify-center">
@@ -800,15 +807,21 @@ export default function ContactPage() {
         <div className="absolute bottom-20 left-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
 
         <div className="max-w-6xl mx-auto px-6">
-          {/* Section Header */}
-          <div className="text-center mb-14">
+          {/* Section Header — Premium Reveal */}
+          <motion.div
+            className="text-center mb-14"
+            initial={{ opacity: 0, y: 50, filter: 'blur(14px)' }}
+            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.6, ease: [0.22, 0.68, 0, 1] }}
+          >
             <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Find Us</p>
             <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">Our Location</h2>
             <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
             <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">
               Visit our office in Linkou, New Taipei City
             </p>
-          </div>
+          </motion.div>
 
           <div ref={mapRef}>
             <div className="bg-white rounded-3xl p-3 sm:p-4 shadow-[0_4px_30px_rgba(0,48,72,0.08)] border border-navy/[0.04] overflow-hidden">
@@ -860,10 +873,10 @@ export default function ContactPage() {
 
         <motion.div
           ref={ctaRef}
-          initial={{ opacity: 0, y: 60, scale: 0.95 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          initial={{ opacity: 0, y: 80, scale: 0.92, filter: 'blur(12px)' }}
+          whileInView={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
           viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.9, ease: [0.32, 0.72, 0, 1] }}
+          transition={{ duration: 2.3, ease: [0.22, 0.68, 0, 1] }}
           className="max-w-4xl mx-auto px-6 sm:px-8"
         >
           <div className="relative bg-navy rounded-[2rem] p-10 sm:p-14 lg:p-16 text-center overflow-hidden shadow-[0_40px_100px_-25px_rgba(0,48,72,0.5),0_0_0_1px_rgba(255,255,255,0.05)_inset]"
