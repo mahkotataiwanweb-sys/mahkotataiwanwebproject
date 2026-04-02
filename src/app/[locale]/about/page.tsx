@@ -269,6 +269,7 @@ export default function AboutPage() {
   const statsRef = useRef<HTMLDivElement>(null);
   const statsSectionRef = useRef<HTMLDivElement>(null);
   const valuesRef = useRef<HTMLDivElement>(null);
+  const valuesTitleRef = useRef<HTMLDivElement>(null);
   const partnersRef = useRef<HTMLDivElement>(null);
   const storyRef = useRef<HTMLDivElement>(null);
   const timelineLineRef = useRef<HTMLDivElement>(null);
@@ -513,6 +514,35 @@ export default function AboutPage() {
           },
         });
       });
+
+      // Values title — dramatic reveal, triggers just before cards
+      if (valuesTitleRef.current) {
+        const titleChildren = valuesTitleRef.current.children;
+        gsap.set(titleChildren, {
+          opacity: 0,
+          y: 80,
+          scale: 0.7,
+          rotationX: -40,
+          transformPerspective: 800,
+          filter: 'blur(10px)',
+        });
+
+        gsap.to(titleChildren, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          rotationX: 0,
+          filter: 'blur(0px)',
+          duration: 1.4,
+          stagger: 0.15,
+          ease: 'expo.out',
+          scrollTrigger: {
+            trigger: valuesTitleRef.current,
+            start: 'top 80%',
+            toggleActions: 'play none none reverse',
+          },
+        });
+      }
 
       // Values section — sequential flip-forward animation + smooth float
       if (valuesRef.current) {
@@ -864,16 +894,11 @@ export default function AboutPage() {
       <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
 <div ref={valuesRef} className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
-            <motion.div
-              initial={{ opacity: 0, y: 50, scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
-            >
+            <div ref={valuesTitleRef}>
               <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">What We Stand For</p>
               <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">Our Values</h2>
               <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
-            </motion.div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-7">
