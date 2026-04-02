@@ -486,17 +486,7 @@ export default function AboutPage() {
           }
         );
 
-        // Repeating gentle bounce — 2s cycle, infinite
-        bubbleItems.forEach((item, i) => {
-          gsap.to(item, {
-            y: -10,
-            duration: 2,
-            ease: 'sine.inOut',
-            repeat: -1,
-            yoyo: true,
-            delay: 1.5 + i * 0.25,
-          });
-        });
+        // No bouncing — clean and minimal
       }
 
       // Counter animation with dramatic counting
@@ -799,99 +789,70 @@ export default function AboutPage() {
           Mission / Description Section
       ═══════════════════════════════════════════════════════════════ */}
       <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
-<div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-4xl mx-auto px-6">
           <div ref={textRef}>
-            {/* 2-Column layout on desktop */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-12">
-              {/* Left column — Heading & tagline */}
-              <div>
-                <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-navy leading-tight mb-4">
-                  Bridging Indonesian Flavors to Taiwan
-                </h2>
-                <p className="text-red font-semibold text-sm sm:text-base tracking-wide">
-                  More than a distributor — a cultural ambassador bringing the taste of home.
-                </p>
-              </div>
-
-              {/* Right column — Description */}
-              <div>
-                <LineReveal
-                  text={t('description')}
-                  className="text-navy/60 leading-relaxed text-base sm:text-lg tracking-wide mb-4 text-justify"
-                />
-              </div>
+            {/* Centered heading */}
+            <div className="text-center mb-12">
+              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Our Mission</p>
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy leading-tight mb-4">
+                Bridging Indonesian Flavors to Taiwan
+              </h2>
+              <div
+                ref={redLineRef}
+                className="w-16 h-[2px] bg-red mx-auto mb-6 origin-center"
+              />
+              <p className="text-red/80 font-medium text-sm sm:text-base tracking-wide">
+                More than a distributor — a cultural ambassador bringing the taste of home.
+              </p>
             </div>
 
-            {/* Decorative red line that draws on scroll */}
-            <div
-              ref={redLineRef}
-              className="w-16 h-[2px] bg-red mx-auto mb-10 origin-left"
-            />
+            {/* Clean description paragraph */}
+            <div className="mb-12">
+              <p className="text-navy/60 leading-[1.9] text-base sm:text-lg text-center max-w-3xl mx-auto">
+                {t('description')}
+              </p>
+            </div>
 
-            {/* Highlights */}
-            <div className="flex flex-wrap justify-center gap-x-10 gap-y-4 mb-6">
+            {/* Highlights — clean horizontal pills */}
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
               {['highlight1', 'highlight2', 'highlight3'].map((key) => (
-                <div key={key} className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red shrink-0 shadow-[0_0_8px_rgba(193,33,38,0.3)]" />
-                  <p className="text-navy/60 text-sm sm:text-base">{t(key)}</p>
+                <div key={key} className="flex items-center gap-2.5 bg-white/80 border border-navy/[0.06] rounded-full px-5 py-2.5 shadow-sm">
+                  <div className="w-1.5 h-1.5 rounded-full bg-red shrink-0" />
+                  <p className="text-navy/70 text-sm font-medium">{t(key)}</p>
                 </div>
               ))}
             </div>
-
-</div>
+          </div>
         </div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════
           Stats Section — Navy Strip
       ═══════════════════════════════════════════════════════════════ */}
-      <section ref={statsSectionRef} className="py-10 sm:py-14 relative overflow-hidden">
-        {/* Subtle ambient glow on cream background */}
-        <div className="absolute inset-0 pointer-events-none">
-
-</div>
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-16">
+      <section ref={statsSectionRef} className="py-16 sm:py-20 relative overflow-hidden">
+        <div className="max-w-5xl mx-auto px-6 relative z-10">
+          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {stats.map((stat, i) => {
               const Icon = stat.icon;
               return (
-                <div key={stat.key} className="flex flex-col items-center group stat-bubble-item">
-                  {/* ── Floating Navy Bubble ── */}
-                  <div className="relative mb-6">
-                    {/* Soft warm glow */}
-{/* Main sphere */}
-                    <div className="relative w-16 h-16 sm:w-[4.5rem] sm:h-[4.5rem] rounded-full overflow-hidden shadow-[0_8px_28px_rgba(0,48,72,0.4),0_2px_10px_rgba(0,48,72,0.25),inset_0_-4px_12px_rgba(0,0,0,0.3),inset_0_2px_3px_rgba(255,255,255,0.08)]">
-                      {/* Base gradient — deep navy spectrum */}
-                      <div className="absolute inset-0 rounded-full" style={{ background: 'linear-gradient(135deg, #004A6E 0%, #003048 40%, #001E2E 100%)' }} />
-                      
-                      {/* Subtle top highlight */}
-                      <div className="absolute top-0 left-[12%] right-[12%] h-[38%] rounded-t-full bg-gradient-to-b from-white/18 via-white/6 to-transparent" />
-                      
-                      {/* Tiny specular dot */}
-{/* Red accent ring — subtle brand warmth */}
-                      <div className="absolute inset-[2px] rounded-full ring-1 ring-red/15" />
-                      
-                      {/* White icon — clean contrast */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white/90 relative z-10" />
-                      </div>
+                <div key={stat.key} className="stat-bubble-item text-center group">
+                  {/* Clean card */}
+                  <div className="bg-white border border-navy/[0.06] rounded-2xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
+                    {/* Minimal icon */}
+                    <div className="w-10 h-10 rounded-xl bg-navy/[0.06] flex items-center justify-center mx-auto mb-4 group-hover:bg-red/10 transition-colors duration-300">
+                      <Icon className="w-5 h-5 text-navy/50 group-hover:text-red transition-colors duration-300" />
                     </div>
-                    
-                    {/* Floor shadow — navy tint */}
-</div>
 
-                  {/* ── Number — dark text on cream ── */}
-                  <div className="text-4xl sm:text-5xl font-heading font-bold text-navy mb-1.5 relative">
-                    <span className="relative">
+                    {/* Number */}
+                    <div className="text-3xl sm:text-4xl font-heading font-bold text-navy mb-1">
                       {stat.prefix}
                       <span ref={(el) => { counterRefs.current[i] = el; }}>0</span>
                       {stat.suffix}
-                    </span>
-                  </div>
+                    </div>
 
-                  {/* ── Label — muted dark ── */}
-                  <p className="text-navy/50 text-sm font-medium tracking-[0.15em] uppercase">{t(`stats.${stat.key}`)}</p>
+                    {/* Label */}
+                    <p className="text-navy/40 text-xs sm:text-sm font-medium tracking-[0.12em] uppercase">{t(`stats.${stat.key}`)}</p>
+                  </div>
                 </div>
               );
             })}
