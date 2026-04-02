@@ -462,40 +462,32 @@ export default function AboutPage() {
         );
       }
 
-      // Stats — simple bounce reveal (2s, repeating)
+      // Stats — dramatic pop-up reveal, repeating continuously
       const isMobile = window.innerWidth < 768;
 
       if (statsRef.current) {
         const bubbleItems = statsRef.current.querySelectorAll('.stat-bubble-item');
 
-        // Entrance: gentle scale + fade in
-        gsap.fromTo(bubbleItems,
-          { opacity: 0, scale: 0.6, y: 30 },
-          {
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            duration: 1,
-            stagger: 0.15,
-            ease: 'back.out(1.7)',
-            scrollTrigger: {
-              trigger: statsRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
-
-        // Elegant staggered reveal
+        // Dramatic pop-up entrance with continuous repeat
         bubbleItems.forEach((item, i) => {
-          gsap.fromTo(item, 
-            { opacity: 0, y: 30 },
+          gsap.fromTo(item,
+            { opacity: 0, scale: 0.3, y: 40 },
             {
               opacity: 1,
+              scale: 1,
               y: 0,
-              duration: 0.8,
+              duration: 1,
               delay: i * 0.12,
-              ease: 'power2.out',
+              ease: 'back.out(2.5)',
+              repeat: -1,
+              repeatDelay: 2.5,
+              yoyo: true,
+              yoyoEase: 'power2.in',
+              scrollTrigger: {
+                trigger: statsRef.current,
+                start: 'top 85%',
+                toggleActions: 'play pause resume reverse',
+              },
             }
           );
         });
@@ -841,23 +833,23 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Stats Section — Navy Strip
       ═══════════════════════════════════════════════════════════════ */}
-      <section ref={statsSectionRef} className="py-14 sm:py-18 relative overflow-hidden">
-        <div className="max-w-5xl mx-auto px-6 relative z-10">
-          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-6">
+      <section ref={statsSectionRef} className="py-6 sm:py-8 relative overflow-hidden -mt-4">
+        <div className="max-w-4xl mx-auto px-6 relative z-10">
+          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
             {stats.map((stat, i) => {
               const Icon = stat.icon;
               return (
                 <div key={stat.key} className="stat-bubble-item text-center group">
-                  <div className="bg-white border border-navy/[0.06] rounded-2xl p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
-                    <div className="w-10 h-10 rounded-xl bg-navy/[0.06] flex items-center justify-center mx-auto mb-3 group-hover:bg-red/10 transition-colors duration-300">
-                      <Icon className="w-5 h-5 text-navy/50 group-hover:text-red transition-colors duration-300" />
+                  <div className="bg-white border border-navy/[0.06] rounded-xl p-3.5 sm:p-5 shadow-sm hover:shadow-md transition-shadow duration-300">
+                    <div className="w-8 h-8 rounded-lg bg-navy/[0.06] flex items-center justify-center mx-auto mb-2.5 group-hover:bg-red/10 transition-colors duration-300">
+                      <Icon className="w-4 h-4 text-navy/50 group-hover:text-red transition-colors duration-300" />
                     </div>
-                    <div className="text-2xl sm:text-3xl font-heading font-bold text-navy mb-1">
+                    <div className="text-xl sm:text-2xl font-heading font-bold text-navy mb-0.5">
                       {stat.prefix}
                       <span ref={(el) => { counterRefs.current[i] = el; }}>0</span>
                       {stat.suffix}
                     </div>
-                    <p className="text-navy/40 text-[11px] sm:text-xs font-medium tracking-[0.12em] uppercase">{t(`stats.${stat.key}`)}</p>
+                    <p className="text-navy/40 text-[10px] sm:text-[11px] font-medium tracking-[0.12em] uppercase">{t(`stats.${stat.key}`)}</p>
                   </div>
                 </div>
               );
@@ -884,13 +876,13 @@ export default function AboutPage() {
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-7">
             {values.map((val) => {
               const Icon = val.icon;
               return (
                 <TiltCard
                   key={val.title}
-                  className="value-card relative bg-navy rounded-3xl p-8 sm:p-10 text-center group cursor-default overflow-hidden ring-1 ring-white/[0.06]"
+                  className="value-card relative bg-navy rounded-3xl p-6 sm:p-8 text-center group cursor-default overflow-hidden ring-1 ring-white/[0.06]"
                 >
                   {/* Ambient glow underneath card */}
 {/* Top-right decorative glow */}
@@ -899,12 +891,12 @@ export default function AboutPage() {
                   <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
                   <div className="relative z-10" style={{ transform: 'translateZ(40px)' }}>
-                    <div className="w-[72px] h-[72px] sm:w-20 sm:h-20 rounded-3xl bg-red/20 flex items-center justify-center mx-auto mb-5 sm:mb-6 group-hover:bg-red/30 transition-all duration-500 shadow-[0_0_40px_rgba(193,33,38,0.2)] group-hover:shadow-[0_0_50px_rgba(193,33,38,0.35)]">
-                      <Icon className="w-8 h-8 sm:w-9 sm:h-9 text-red group-hover:scale-110 transition-transform duration-500" />
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-red/20 flex items-center justify-center mx-auto mb-4 sm:mb-5 group-hover:bg-red/30 transition-all duration-500 shadow-[0_0_35px_rgba(193,33,38,0.2)] group-hover:shadow-[0_0_45px_rgba(193,33,38,0.35)]">
+                      <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-red group-hover:scale-110 transition-transform duration-500" />
                     </div>
-                    <h3 className="font-heading text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">{val.title}</h3>
-                    <div className="w-10 h-[2px] bg-red/50 mx-auto mb-4 sm:mb-5 group-hover:w-16 transition-all duration-500" />
-                    <p className="text-cream/60 text-sm sm:text-base leading-relaxed">{val.description}</p>
+                    <h3 className="font-heading text-base sm:text-lg font-bold text-white mb-2 sm:mb-2.5">{val.title}</h3>
+                    <div className="w-9 h-[2px] bg-red/50 mx-auto mb-3.5 sm:mb-4 group-hover:w-14 transition-all duration-500" />
+                    <p className="text-cream/60 text-xs sm:text-sm leading-relaxed">{val.description}</p>
                   </div>
 
                   {/* Bottom accent glow bar */}
