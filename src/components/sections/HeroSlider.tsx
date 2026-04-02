@@ -268,7 +268,7 @@ export default function HeroSlider() {
     enter: () => ({
       opacity: 0,
       scale: 1.35,
-      filter: 'brightness(1.3)',
+      filter: 'brightness(1.15)',
       zIndex: 2,
     }),
     center: {
@@ -280,7 +280,7 @@ export default function HeroSlider() {
     exit: () => ({
       opacity: 0,
       scale: 0.82,
-      filter: 'brightness(0.7)',
+      filter: 'brightness(0.8)',
       zIndex: 1,
     }),
   };
@@ -381,7 +381,7 @@ export default function HeroSlider() {
       <motion.div
         ref={imageRef}
         className="absolute inset-0"
-        initial={{ scale: 1.05 }}
+        initial={{ scale: 1.12 }}
         animate={{ scale: 1 }}
         transition={{ duration: 10, ease: 'linear' }}
       >
