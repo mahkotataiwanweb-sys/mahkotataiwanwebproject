@@ -267,7 +267,7 @@ export default function HeroSlider() {
   const slideVariants = {
     enter: () => ({
       opacity: 0,
-      scale: 1.2,
+      scale: 1.35,
       filter: 'brightness(1.3)',
       zIndex: 2,
     }),
@@ -279,7 +279,7 @@ export default function HeroSlider() {
     },
     exit: () => ({
       opacity: 0,
-      scale: 0.92,
+      scale: 0.82,
       filter: 'brightness(0.7)',
       zIndex: 1,
     }),
@@ -294,7 +294,7 @@ export default function HeroSlider() {
   };
 
   const textItemVariants = {
-    hidden: { opacity: 0, y: 60, filter: 'blur(8px)' },
+    hidden: { opacity: 0, y: 60, filter: 'blur(5px)' },
     visible: {
       opacity: 1,
       y: 0,
