@@ -261,13 +261,21 @@ function InfiniteSlider({
   const singleSetWidthRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const isVisibleRef = useRef(true);
-  const prevCenterIdxRef = useRef(-1);
-  const centerDwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const floatReadyRef = useRef(false);
 
-  const DEFAULT_SPEED = 0.8;
-  const FRICTION = 0.92;
-  const RETURN_RATE = 0.02;
+  /* ---- Lerp state for each slot ---- */
+  const lerpStateRef = useRef<{
+    scale: number[];
+    opacity: number[];
+    yLift: number[];
+    shadowOpacity: number[];
+    nameOpacity: number[];
+    nameScale: number[];
+  }>({ scale: [], opacity: [], yLift: [], shadowOpacity: [], nameOpacity: [], nameScale: [] });
+
+  const DEFAULT_SPEED = 0.65;
+  const FRICTION = 0.94;
+  const RETURN_RATE = 0.015;
+  const LERP_FACTOR = 0.08; // smooth interpolation speed
   const ITEM_WIDTH_MOBILE = 160;
   const ITEM_WIDTH_DESKTOP = 260;
   const [itemWidth, setItemWidth] = useState(ITEM_WIDTH_DESKTOP);
@@ -289,9 +297,26 @@ function InfiniteSlider({
 
   const items = [...products, ...products, ...products];
 
+  /* Initialize lerp arrays when item count changes */
+  useEffect(() => {
+    const count = items.length;
+    const s = lerpStateRef.current;
+    if (s.scale.length !== count) {
+      s.scale = Array(count).fill(0.7);
+      s.opacity = Array(count).fill(0.4);
+      s.yLift = Array(count).fill(0);
+      s.shadowOpacity = Array(count).fill(0.1);
+      s.nameOpacity = Array(count).fill(0.3);
+      s.nameScale = Array(count).fill(0.88);
+    }
+  }, [items.length]);
+
   const measureSetWidth = useCallback(() => {
     singleSetWidthRef.current = products.length * itemWidth;
   }, [products.length, itemWidth]);
+
+  /* ---- Smooth easing function (sine curve) ---- */
+  const easeOutSine = (t: number) => Math.sin((t * Math.PI) / 2);
 
   const applyItemTransforms = useCallback(() => {
     const container = containerRef.current;
@@ -301,9 +326,8 @@ function InfiniteSlider({
     const containerRect = container.getBoundingClientRect();
     const centerX = containerRect.left + containerRect.width / 2;
     const children = track.children;
-
-    let closestIdx = -1;
-    let closestDist = Infinity;
+    const s = lerpStateRef.current;
+    const lf = LERP_FACTOR;
 
     for (let i = 0; i < children.length; i++) {
       const child = children[i] as HTMLElement;
@@ -314,43 +338,34 @@ function InfiniteSlider({
       const rect = child.getBoundingClientRect();
       const childCenter = rect.left + rect.width / 2;
       const dist = Math.abs(childCenter - centerX);
-      const maxDist = containerRect.width * 0.5;
+      const maxDist = containerRect.width * 0.55;
       const proximity = Math.max(0, 1 - dist / maxDist);
+      const easedProximity = easeOutSine(proximity);
 
-      const scale = 0.4 + proximity * proximity * 1.1;
-      const opacity = 0.25 + proximity * 0.75;
+      /* Target values — dramatic but smooth */
+      const targetScale = 0.65 + easedProximity * 0.55;      // 0.65 → 1.2
+      const targetOpacity = 0.35 + easedProximity * 0.65;     // 0.35 → 1.0
+      const targetYLift = -easedProximity * easedProximity * 28; // 0 → -28px lift
+      const targetShadow = 0.08 + easedProximity * 0.42;      // subtle → dramatic shadow
+      const targetNameOpacity = 0.25 + easedProximity * 0.75;
+      const targetNameScale = 0.88 + easedProximity * 0.14;
 
-      imgContainer.style.transform = `scale(${scale})`;
-      imgContainer.style.opacity = `${opacity}`;
-      imgContainer.style.transition = 'transform 0.35s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease';
+      /* Lerp to targets — this is what makes it silky smooth */
+      s.scale[i] += (targetScale - s.scale[i]) * lf;
+      s.opacity[i] += (targetOpacity - s.opacity[i]) * lf;
+      s.yLift[i] += (targetYLift - s.yLift[i]) * lf;
+      s.shadowOpacity[i] += (targetShadow - s.shadowOpacity[i]) * lf;
+      s.nameOpacity[i] += (targetNameOpacity - s.nameOpacity[i]) * lf;
+      s.nameScale[i] += (targetNameScale - s.nameScale[i]) * lf;
 
-      nameEl.style.opacity = `${0.2 + proximity * 0.8}`;
-      nameEl.style.transform = `scale(${0.85 + proximity * 0.25})`;
-      nameEl.style.color = `rgba(0,48,72,${0.3 + proximity * 0.7})`;
-      nameEl.style.transition = 'all 0.35s ease';
+      /* Apply with single composite transform — NO CSS transition, pure rAF smoothness */
+      imgContainer.style.transform = `translateY(${s.yLift[i]}px) scale(${s.scale[i]})`;
+      imgContainer.style.opacity = `${s.opacity[i]}`;
+      imgContainer.style.filter = `drop-shadow(0 ${12 + s.shadowOpacity[i] * 30}px ${20 + s.shadowOpacity[i] * 40}px rgba(0,0,0,${s.shadowOpacity[i]}))`;
 
-      if (dist < closestDist) {
-        closestDist = dist;
-        closestIdx = i % products.length;
-      }
-
-      const isCentered = dist < itemWidth * 0.35;
-      if (isCentered) {
-        imgContainer.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.5))';
-        if (floatReadyRef.current && closestIdx === prevCenterIdxRef.current) {
-          imgContainer.classList.add('product-float-active');
-        }
-      } else {
-        imgContainer.classList.remove('product-float-active');
-        imgContainer.style.filter = 'drop-shadow(0 8px 16px rgba(0,0,0,0.15))';
-      }
-    }
-
-    if (closestIdx !== prevCenterIdxRef.current) {
-      prevCenterIdxRef.current = closestIdx;
-      floatReadyRef.current = false;
-      if (centerDwellTimerRef.current) clearTimeout(centerDwellTimerRef.current);
-      centerDwellTimerRef.current = setTimeout(() => { floatReadyRef.current = true; }, 500);
+      nameEl.style.opacity = `${s.nameOpacity[i]}`;
+      nameEl.style.transform = `scale(${s.nameScale[i]})`;
+      nameEl.style.color = `rgba(0,48,72,${0.3 + easedProximity * 0.7})`;
     }
   }, [products.length, itemWidth]);
 
@@ -371,7 +386,7 @@ function InfiniteSlider({
     }
 
     if (isPausedRef.current && !isDraggingRef.current) {
-      velocityRef.current *= 0.95;
+      velocityRef.current *= 0.96;
       if (Math.abs(velocityRef.current) < 0.01) velocityRef.current = 0;
     }
 
@@ -398,7 +413,6 @@ function InfiniteSlider({
     return () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener('resize', handleResize);
-      if (centerDwellTimerRef.current) clearTimeout(centerDwellTimerRef.current);
     };
   }, [animate, measureSetWidth]);
 
@@ -420,7 +434,7 @@ function InfiniteSlider({
     const now = performance.now();
     const dx = e.clientX - lastPointerXRef.current;
     const dt = now - lastMoveTimeRef.current;
-    if (dt > 0) dragVelocityRef.current = (dx / dt) * 16;
+    if (dt > 0) dragVelocityRef.current = dragVelocityRef.current * 0.6 + (dx / dt) * 16 * 0.4;
     dragDistRef.current += Math.abs(dx);
     offsetRef.current += dx;
     lastPointerXRef.current = e.clientX;
@@ -439,7 +453,7 @@ function InfiniteSlider({
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
     if (Math.abs(dragVelocityRef.current) > 0.5) {
-      velocityRef.current = dragVelocityRef.current;
+      velocityRef.current = dragVelocityRef.current * 0.7;
       baseDirectionRef.current = dragVelocityRef.current > 0 ? 1 : -1;
     }
     isPausedRef.current = false;
@@ -461,17 +475,17 @@ function InfiniteSlider({
   return (
     <div
       ref={containerRef}
-      className="relative overflow-hidden py-8 sm:py-12"
+      className="relative overflow-hidden py-8 sm:py-16"
       style={{ cursor: isDraggingRef.current ? 'grabbing' : 'grab' }}
     >
       <div className="absolute top-0 left-1/2 -translate-x-px w-[2px] h-full bg-navy/8 pointer-events-none z-0" />
 
       <div
-        className="absolute top-0 left-0 w-20 sm:w-36 h-full z-10 pointer-events-none"
+        className="absolute top-0 left-0 w-24 sm:w-44 h-full z-10 pointer-events-none"
         style={{ background: 'linear-gradient(to right, var(--color-cream-deeper), transparent)' }}
       />
       <div
-        className="absolute top-0 right-0 w-20 sm:w-36 h-full z-10 pointer-events-none"
+        className="absolute top-0 right-0 w-24 sm:w-44 h-full z-10 pointer-events-none"
         style={{ background: 'linear-gradient(to left, var(--color-cream-deeper), transparent)' }}
       />
 
@@ -496,7 +510,7 @@ function InfiniteSlider({
             }}
           >
             <div
-              className="product-img-wrap relative cursor-pointer"
+              className="product-img-wrap relative cursor-pointer will-change-transform"
               style={{
                 width: itemWidth < 200 ? '132px' : '220px',
                 height: itemWidth < 200 ? '132px' : '220px',
@@ -519,7 +533,7 @@ function InfiniteSlider({
             </div>
 
             <p
-              className="product-name mt-4 text-center font-heading font-semibold text-sm sm:text-base sm:whitespace-nowrap"
+              className="product-name mt-4 text-center font-heading font-semibold text-sm sm:text-base sm:whitespace-nowrap will-change-transform"
               style={{
                 maxWidth: itemWidth < 200 ? '120px' : '200px',
                 lineHeight: '1.3',
