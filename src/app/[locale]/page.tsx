@@ -108,13 +108,13 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
         overwrite: 'auto',
       });
 
-      // Phase 1b: Image box flips out AFTER text nearly finishes (0.8s delay → text 80% done)
+      // Phase 1b: Image box flips out AFTER text (0.4s delay)
       gsap.to(imgEl, {
         rotateY: 90,
         opacity: 0,
         scale: 0.92,
         duration: 1.0,
-        delay: 0.8,
+        delay: 0.4,
         ease: 'power3.in',
         overwrite: 'auto',
         onComplete: () => {
@@ -136,13 +136,13 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
             overwrite: 'auto',
           });
 
-          // Phase 2b: Image box follows after text is 90% settled (0.8s delay)
+          // Phase 2b: Image box follows after text (0.4s delay)
           gsap.to(imgEl, {
             rotateY: 0,
             opacity: 1,
             scale: 1,
             duration: 1.0,
-            delay: 0.8,
+            delay: 0.4,
             ease: 'back.out(1.2)',
             overwrite: 'auto',
             onComplete: () => {
@@ -161,7 +161,7 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
       gsap.set(textBoxRef.current, { opacity: 0, rotateY: -90, scale: 0.92 });
       gsap.set(imageBoxRef.current, { opacity: 0, rotateY: -90, scale: 0.92 });
       gsap.to(textBoxRef.current, { opacity: 1, rotateY: 0, scale: 1, duration: 1.0, ease: 'back.out(1.2)', overwrite: true });
-      gsap.to(imageBoxRef.current, { opacity: 1, rotateY: 0, scale: 1, duration: 1.0, delay: 0.8, ease: 'back.out(1.2)', overwrite: true, onComplete: resolve });
+      gsap.to(imageBoxRef.current, { opacity: 1, rotateY: 0, scale: 1, duration: 1.0, delay: 0.4, ease: 'back.out(1.2)', overwrite: true, onComplete: resolve });
     }),
   }), [count]);
 
