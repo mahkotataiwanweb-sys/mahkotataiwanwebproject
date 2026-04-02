@@ -421,7 +421,7 @@ export default function HeroSlider() {
           {/* Slide content */}
           <div className="absolute inset-0 flex items-center justify-center">
             <motion.div
-              className="max-w-4xl mx-auto px-6 text-center hero-text-content"
+              className="max-w-4xl mx-auto px-6 pb-16 sm:pb-8 text-center hero-text-content"
               variants={textContainerVariants}
               initial="hidden"
               animate="visible"
@@ -451,7 +451,7 @@ export default function HeroSlider() {
 
               <motion.p
                 variants={textItemVariants}
-                className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow"
+                className="text-base sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow"
               >
                 {subtitle}
               </motion.p>
@@ -492,7 +492,7 @@ export default function HeroSlider() {
 
       {/* Dots Indicator */}
       {slides.length > 1 && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
+        <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
           {slides.map((_, index) => (
             <button
               key={index}
