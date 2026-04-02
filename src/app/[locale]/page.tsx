@@ -327,10 +327,11 @@ export default function HomePage() {
     };
 
     /* Each card has its own scroll trigger for entrance */
+    const flipStart = window.innerWidth < 768 ? 'top 30%' : 'top 10%';
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: topWrapRef.current,
-        start: 'top 10%',
+        start: flipStart,
         once: true,
         onEnter: async () => {
           if (topEntered) return;
@@ -342,7 +343,7 @@ export default function HomePage() {
 
       ScrollTrigger.create({
         trigger: bottomWrapRef.current,
-        start: 'top 10%',
+        start: flipStart,
         once: true,
         onEnter: async () => {
           if (bottomEntered) return;
