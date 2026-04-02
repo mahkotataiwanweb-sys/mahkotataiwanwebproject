@@ -607,14 +607,14 @@ export default function ContactPage() {
       if (faqRef.current) {
         gsap.fromTo(
           faqRef.current.querySelectorAll('.faq-item'),
-          { opacity: 0, y: 70, scale: 0.85, filter: 'blur(6px)' },
+          { opacity: 0, y: 70, scale: 0.85, filter: 'blur(4px)' },
           {
             opacity: 1,
             y: 0,
             scale: 1,
             filter: 'blur(0px)',
-            duration: 2.1,
-            stagger: 0.15,
+            duration: 4,
+            stagger: 0.4,
             ease: 'expo.out',
             scrollTrigger: {
               trigger: faqRef.current,
