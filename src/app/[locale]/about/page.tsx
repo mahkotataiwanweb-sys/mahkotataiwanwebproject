@@ -465,14 +465,15 @@ export default function AboutPage() {
           );
         }
 
-        // 3. Description paragraph — sweeps up with blur
+        // 3. Description paragraph — cinematic clip reveal + rise
         if (descBlock) {
+          // First: clip-path wipe from bottom to top
           gsap.fromTo(
             descBlock,
-            { opacity: 0, y: 60, filter: 'blur(6px)' },
+            { clipPath: 'inset(100% 0% 0% 0%)', opacity: 0, y: 50, scale: 0.96 },
             {
-              opacity: 1, y: 0, filter: 'blur(0px)',
-              duration: 1.6, ease: 'expo.out', delay: 0.6,
+              clipPath: 'inset(0% 0% 0% 0%)', opacity: 1, y: 0, scale: 1,
+              duration: 2.0, ease: 'expo.out', delay: 0.8,
               scrollTrigger: {
                 trigger: textRef.current,
                 start: 'top 40%',
