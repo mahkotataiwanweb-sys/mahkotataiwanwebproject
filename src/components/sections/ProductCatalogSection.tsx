@@ -235,6 +235,11 @@ function ProductPopup({
 }
 
 /* ------------------------------------------------------------------ */
+/*  Sine easing (module-level for stability)                            */
+/* ------------------------------------------------------------------ */
+const easeOutSine = (t: number) => Math.sin((t * Math.PI) / 2);
+
+/* ------------------------------------------------------------------ */
 /*  Infinite Carousel Slider                                           */
 /* ------------------------------------------------------------------ */
 function InfiniteSlider({
@@ -261,21 +266,18 @@ function InfiniteSlider({
   const singleSetWidthRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const isVisibleRef = useRef(true);
+  const needsSnapRef = useRef(true); /* snap lerp on first frame & after wraps */
 
   /* ---- Lerp state for each slot ---- */
   const lerpStateRef = useRef<{
-    scale: number[];
-    opacity: number[];
-    yLift: number[];
-    shadowOpacity: number[];
-    nameOpacity: number[];
-    nameScale: number[];
+    scale: number[]; opacity: number[]; yLift: number[];
+    shadowOpacity: number[]; nameOpacity: number[]; nameScale: number[];
   }>({ scale: [], opacity: [], yLift: [], shadowOpacity: [], nameOpacity: [], nameScale: [] });
 
   const DEFAULT_SPEED = 0.65;
   const FRICTION = 0.94;
   const RETURN_RATE = 0.015;
-  const LERP_FACTOR = 0.08; // smooth interpolation speed
+  const LERP_FACTOR = 0.12; /* faster response — was 0.08 */
   const ITEM_WIDTH_MOBILE = 160;
   const ITEM_WIDTH_DESKTOP = 260;
   const [itemWidth, setItemWidth] = useState(ITEM_WIDTH_DESKTOP);
@@ -302,12 +304,13 @@ function InfiniteSlider({
     const count = items.length;
     const s = lerpStateRef.current;
     if (s.scale.length !== count) {
-      s.scale = Array(count).fill(0.7);
-      s.opacity = Array(count).fill(0.4);
+      s.scale = Array(count).fill(0.65);
+      s.opacity = Array(count).fill(0.35);
       s.yLift = Array(count).fill(0);
-      s.shadowOpacity = Array(count).fill(0.1);
-      s.nameOpacity = Array(count).fill(0.3);
+      s.shadowOpacity = Array(count).fill(0.08);
+      s.nameOpacity = Array(count).fill(0.25);
       s.nameScale = Array(count).fill(0.88);
+      needsSnapRef.current = true;
     }
   }, [items.length]);
 
@@ -315,10 +318,8 @@ function InfiniteSlider({
     singleSetWidthRef.current = products.length * itemWidth;
   }, [products.length, itemWidth]);
 
-  /* ---- Smooth easing function (sine curve) ---- */
-  const easeOutSine = (t: number) => Math.sin((t * Math.PI) / 2);
-
-  const applyItemTransforms = useCallback(() => {
+  /* ---- Unified transform with optional snap (instant jump) mode ---- */
+  const applyItemTransforms = useCallback((snap: boolean = false) => {
     const container = containerRef.current;
     const track = trackRef.current;
     if (!container || !track) return;
@@ -327,7 +328,7 @@ function InfiniteSlider({
     const centerX = containerRect.left + containerRect.width / 2;
     const children = track.children;
     const s = lerpStateRef.current;
-    const lf = LERP_FACTOR;
+    const lf = snap ? 1.0 : LERP_FACTOR; /* snap = jump instantly to target */
 
     for (let i = 0; i < children.length; i++) {
       const child = children[i] as HTMLElement;
@@ -340,34 +341,49 @@ function InfiniteSlider({
       const dist = Math.abs(childCenter - centerX);
       const maxDist = containerRect.width * 0.55;
       const proximity = Math.max(0, 1 - dist / maxDist);
-      const easedProximity = easeOutSine(proximity);
+      const ep = easeOutSine(proximity);
 
-      /* Target values — dramatic but smooth */
-      const targetScale = 0.65 + easedProximity * 0.55;      // 0.65 → 1.2
-      const targetOpacity = 0.35 + easedProximity * 0.65;     // 0.35 → 1.0
-      const targetYLift = -easedProximity * easedProximity * 28; // 0 → -28px lift
-      const targetShadow = 0.08 + easedProximity * 0.42;      // subtle → dramatic shadow
-      const targetNameOpacity = 0.25 + easedProximity * 0.75;
-      const targetNameScale = 0.88 + easedProximity * 0.14;
+      /* Target values */
+      const tScale = 0.65 + ep * 0.55;
+      const tOpacity = 0.35 + ep * 0.65;
+      const tYLift = -Math.pow(ep, 1.5) * 28; /* smoother curve than ep*ep */
+      const tShadow = 0.08 + ep * 0.42;
+      const tNameOp = 0.25 + ep * 0.75;
+      const tNameSc = 0.88 + ep * 0.14;
 
-      /* Lerp to targets — this is what makes it silky smooth */
-      s.scale[i] += (targetScale - s.scale[i]) * lf;
-      s.opacity[i] += (targetOpacity - s.opacity[i]) * lf;
-      s.yLift[i] += (targetYLift - s.yLift[i]) * lf;
-      s.shadowOpacity[i] += (targetShadow - s.shadowOpacity[i]) * lf;
-      s.nameOpacity[i] += (targetNameOpacity - s.nameOpacity[i]) * lf;
-      s.nameScale[i] += (targetNameScale - s.nameScale[i]) * lf;
+      /* Lerp (or snap) to targets */
+      s.scale[i] += (tScale - s.scale[i]) * lf;
+      s.opacity[i] += (tOpacity - s.opacity[i]) * lf;
+      s.yLift[i] += (tYLift - s.yLift[i]) * lf;
+      s.shadowOpacity[i] += (tShadow - s.shadowOpacity[i]) * lf;
+      s.nameOpacity[i] += (tNameOp - s.nameOpacity[i]) * lf;
+      s.nameScale[i] += (tNameSc - s.nameScale[i]) * lf;
 
-      /* Apply with single composite transform — NO CSS transition, pure rAF smoothness */
+      /* Apply transforms */
       imgContainer.style.transform = `translateY(${s.yLift[i]}px) scale(${s.scale[i]})`;
       imgContainer.style.opacity = `${s.opacity[i]}`;
       imgContainer.style.filter = `drop-shadow(0 ${12 + s.shadowOpacity[i] * 30}px ${20 + s.shadowOpacity[i] * 40}px rgba(0,0,0,${s.shadowOpacity[i]}))`;
 
       nameEl.style.opacity = `${s.nameOpacity[i]}`;
       nameEl.style.transform = `scale(${s.nameScale[i]})`;
-      nameEl.style.color = `rgba(0,48,72,${0.3 + easedProximity * 0.7})`;
+      nameEl.style.color = `rgba(0,48,72,${0.3 + ep * 0.7})`;
     }
   }, [products.length, itemWidth]);
+
+  /* ---- Center offset on mount & product/width change ---- */
+  useEffect(() => {
+    if (!containerRef.current || products.length === 0) return;
+    measureSetWidth();
+    const containerWidth = containerRef.current.clientWidth;
+    const setWidth = singleSetWidthRef.current;
+    if (setWidth <= 0) return;
+    /* Place first item of middle copy at container center */
+    offsetRef.current = -setWidth + (containerWidth - itemWidth) / 2;
+    /* Normalize into wrap range [-setWidth, 0) */
+    while (offsetRef.current < -setWidth) offsetRef.current += setWidth;
+    while (offsetRef.current > 0) offsetRef.current -= setWidth;
+    needsSnapRef.current = true;
+  }, [products.length, itemWidth, measureSetWidth]);
 
   const animate = useCallback(() => {
     const track = trackRef.current;
@@ -394,13 +410,20 @@ function InfiniteSlider({
       offsetRef.current += velocityRef.current;
     }
 
+    /* Wrap detection — snap lerp states instantly to prevent visual pop */
+    let wrapped = false;
     if (setWidth > 0) {
-      while (offsetRef.current < -setWidth) offsetRef.current += setWidth;
-      while (offsetRef.current > 0) offsetRef.current -= setWidth;
+      while (offsetRef.current < -setWidth) { offsetRef.current += setWidth; wrapped = true; }
+      while (offsetRef.current > 0) { offsetRef.current -= setWidth; wrapped = true; }
     }
 
     track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
-    applyItemTransforms();
+
+    /* Snap on first frame, after wrap, or after resize — eliminates glitch */
+    const shouldSnap = needsSnapRef.current || wrapped;
+    if (needsSnapRef.current) needsSnapRef.current = false;
+    applyItemTransforms(shouldSnap);
+
     rafRef.current = requestAnimationFrame(animate);
   }, [applyItemTransforms]);
 
@@ -408,7 +431,7 @@ function InfiniteSlider({
     measureSetWidth();
     velocityRef.current = DEFAULT_SPEED * baseDirectionRef.current;
     rafRef.current = requestAnimationFrame(animate);
-    const handleResize = () => measureSetWidth();
+    const handleResize = () => { measureSetWidth(); needsSnapRef.current = true; };
     window.addEventListener('resize', handleResize);
     return () => {
       cancelAnimationFrame(rafRef.current);
@@ -443,9 +466,11 @@ function InfiniteSlider({
     const track = trackRef.current;
     const setWidth = singleSetWidthRef.current;
     if (track && setWidth > 0) {
-      while (offsetRef.current < -setWidth) offsetRef.current += setWidth;
-      while (offsetRef.current > 0) offsetRef.current -= setWidth;
+      let dragWrapped = false;
+      while (offsetRef.current < -setWidth) { offsetRef.current += setWidth; dragWrapped = true; }
+      while (offsetRef.current > 0) { offsetRef.current -= setWidth; dragWrapped = true; }
       track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
+      if (dragWrapped) needsSnapRef.current = true;
     }
   }, []);
 
