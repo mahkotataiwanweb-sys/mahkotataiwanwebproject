@@ -6,7 +6,7 @@ import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChevronDown, X } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import CategoryIcon from '@/components/ui/CategoryIcon';
 import { supabase } from '@/lib/supabase';
 
@@ -85,156 +85,6 @@ function getProductName(p: ShowcaseProduct, locale: string): string {
 
 /* ------------------------------------------------------------------ */
 /* ------------------------------------------------------------------ */
-/*  Product Popup — Ultra Premium (unified with Products page)         */
-/* ------------------------------------------------------------------ */
-function ProductPopup({
-  product,
-  locale,
-  categories,
-  onClose,
-}: {
-  product: ShowcaseProduct;
-  locale: string;
-  categories: CategoryData[];
-  onClose: () => void;
-}) {
-  const name = getProductName(product, locale);
-  const getDesc = () => {
-    if (locale === 'zh-TW' && product.description_zh) return product.description_zh;
-    if (locale === 'id' && product.description_id) return product.description_id;
-    return product.description_en || '';
-  };
-
-  const categoryMatch = categories.find((c) => c.slug === product.category);
-  const categoryLabel = categoryMatch ? getCategoryName(categoryMatch, locale) : product.category;
-  const imageUrl = product.detail_image_url || product.image_url;
-  const hasDetailImage = !!product.detail_image_url;
-
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', handleEsc);
-    return () => { document.body.style.overflow = ''; window.removeEventListener('keydown', handleEsc); };
-  }, [onClose]);
-
-  return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
-      onClick={onClose}
-    >
-      {/* Deep cinematic backdrop */}
-      <motion.div
-        className="absolute inset-0 bg-navy/75 backdrop-blur-2xl"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.6 }}
-      />
-
-      {/* Card */}
-      <motion.div
-        className="relative bg-cream rounded-[2.5rem] overflow-hidden max-w-lg w-full max-h-[90vh] overflow-y-auto overscroll-contain"
-        initial={{ scale: 0.85, y: 80, opacity: 0 }}
-        animate={{ scale: 1, y: 0, opacity: 1 }}
-        exit={{ scale: 0.9, y: 50, opacity: 0 }}
-        transition={{ duration: 1.0, ease: [0.22, 0.68, 0, 1] }}
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          boxShadow: '0 50px 120px -20px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06) inset',
-          scrollbarWidth: 'thin',
-          scrollbarColor: 'rgba(0,48,72,0.12) transparent',
-        }}
-      >
-        {/* Close — frosted glass */}
-        <motion.button
-          onClick={onClose}
-          className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full bg-white/12 backdrop-blur-xl hover:bg-white/25 flex items-center justify-center transition-all duration-500 shadow-lg group border border-white/10"
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5, duration: 0.5, ease: 'backOut' }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <X className="w-4 h-4 text-white group-hover:rotate-90 transition-transform duration-500" />
-        </motion.button>
-
-        {/* Image area */}
-        <div className={`relative aspect-square overflow-hidden ${hasDetailImage ? 'bg-[#0a1628]' : 'bg-gradient-to-br from-cream-dark/50 to-cream'}`}>
-          {imageUrl ? (
-            <>
-              <motion.div
-                className="relative w-full h-full"
-                initial={{ scale: 1.08, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 1.2, ease: [0.22, 0.68, 0, 1] }}
-              >
-                <Image
-                  src={imageUrl}
-                  alt={name}
-                  fill
-                  className={hasDetailImage ? 'object-contain p-6' : 'object-contain p-4'}
-                  sizes="(max-width: 512px) 100vw, 512px"
-                />
-              </motion.div>
-              {/* Subtle vignette */}
-              <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.12)] pointer-events-none" />
-              {/* Bottom fade to cream */}
-              <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-cream via-cream/80 to-transparent" />
-            </>
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="text-7xl opacity-20">🍽️</span>
-            </div>
-          )}
-
-          {/* Category pill — frosted glass */}
-          <motion.span
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.6 }}
-            className="absolute top-5 left-5 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.18em] uppercase text-white/90 bg-white/10 backdrop-blur-xl px-4 py-2 rounded-full border border-white/10 shadow-lg"
-          >
-            {categoryLabel}
-          </motion.span>
-        </div>
-
-        {/* Content */}
-        <div className="relative -mt-10 px-8 sm:px-10 pb-10">
-          <motion.h3
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.8, ease: [0.22, 0.68, 0, 1] }}
-            className="font-heading text-2xl sm:text-3xl font-bold text-navy mb-4 leading-tight"
-          >
-            {name}
-          </motion.h3>
-
-          <motion.div
-            initial={{ scaleX: 0, opacity: 0 }}
-            animate={{ scaleX: 1, opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 0.68, 0, 1] }}
-            className="w-14 h-[2px] bg-gradient-to-r from-red to-red/20 mb-5 origin-left rounded-full"
-          />
-
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.7, ease: [0.22, 0.68, 0, 1] }}
-            className="text-navy/55 text-sm sm:text-base leading-[1.85] whitespace-pre-line"
-          >
-            {getDesc() || 'Premium quality Indonesian product, crafted with authentic recipes and the finest ingredients.'}
-          </motion.p>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
 /*  Sine easing (module-level for stability)                            */
 /* ------------------------------------------------------------------ */
 const easeOutSine = (t: number) => Math.sin((t * Math.PI) / 2);
@@ -245,11 +95,10 @@ const easeOutSine = (t: number) => Math.sin((t * Math.PI) / 2);
 function InfiniteSlider({
   products,
   locale,
-  onProductClick,
 }: {
   products: ShowcaseProduct[];
   locale: string;
-  onProductClick: (p: ShowcaseProduct) => void;
+
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);
@@ -500,7 +349,7 @@ function InfiniteSlider({
   return (
     <div
       ref={containerRef}
-      className="relative overflow-hidden py-8 sm:py-16"
+      className="relative overflow-x-clip overflow-y-visible py-12 sm:py-20"
       style={{ cursor: isDraggingRef.current ? 'grabbing' : 'grab' }}
     >
       <div className="absolute top-0 left-1/2 -translate-x-px w-[2px] h-full bg-navy/8 pointer-events-none z-0" />
@@ -528,18 +377,14 @@ function InfiniteSlider({
             key={`${product.id}-${i}`}
             className="flex-shrink-0 flex flex-col items-center justify-end"
             style={{ width: `${itemWidth}px`, padding: '0 12px' }}
-            onClick={(e) => {
-              if (dragDistRef.current > 5) return;
-              e.stopPropagation();
-              onProductClick(product);
-            }}
+
           >
             <div
               className="product-img-wrap relative cursor-pointer will-change-transform"
               style={{
                 width: itemWidth < 200 ? '132px' : '220px',
                 height: itemWidth < 200 ? '132px' : '220px',
-                transformOrigin: 'center bottom',
+                transformOrigin: 'center center',
               }}
             >
               {product.image_url ? (
@@ -588,7 +433,6 @@ export default function ProductCatalogSection() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [products, setProducts] = useState<ShowcaseProduct[]>([]);
   const [allProducts, setAllProducts] = useState<ShowcaseProduct[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<ShowcaseProduct | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -769,24 +613,12 @@ export default function ProductCatalogSection() {
               <InfiniteSlider
                 products={products}
                 locale={locale}
-                onProductClick={setSelectedProduct}
               />
             </motion.div>
           </AnimatePresence>
         </div>
       </section>
 
-      {/* Product Popup */}
-      <AnimatePresence>
-        {selectedProduct && (
-          <ProductPopup
-            product={selectedProduct}
-            locale={locale}
-            categories={categories}
-            onClose={() => setSelectedProduct(null)}
-          />
-        )}
-      </AnimatePresence>
     </>
   );
 }
