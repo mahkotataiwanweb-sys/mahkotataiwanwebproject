@@ -59,7 +59,7 @@ export default function WhereToBuySection() {
       gsap.from(sectionRef.current, {
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 50%',
+          start: 'top 20%',
           toggleActions: 'play none none reverse',
         },
         opacity: 0,
@@ -79,7 +79,7 @@ export default function WhereToBuySection() {
             ease: 'power2.out',
             scrollTrigger: {
               trigger: mapRef.current,
-              start: 'top 50%',
+              start: 'top 20%',
               toggleActions: 'play none none reverse',
             },
           }
@@ -90,7 +90,7 @@ export default function WhereToBuySection() {
       gsap.from('.taiwan-map-group', {
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 50%',
+          start: 'top 20%',
           toggleActions: 'play none none reverse',
         },
         opacity: 0,
@@ -116,7 +116,7 @@ export default function WhereToBuySection() {
               ease: 'power2.inOut',
               scrollTrigger: {
                 trigger: sectionRef.current,
-                start: 'top 50%',
+                start: 'top 20%',
                 toggleActions: 'play none none reverse',
               },
             });
@@ -143,7 +143,7 @@ export default function WhereToBuySection() {
         repeatDelay: 1,
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 50%',
+          start: 'top 20%',
           toggleActions: 'play none none none',
         },
       });
@@ -195,7 +195,7 @@ export default function WhereToBuySection() {
         ease: 'power3.out',
         scrollTrigger: {
           trigger: headerRef.current,
-          start: 'top 50%',
+          start: 'top 20%',
           toggleActions: 'play none none reverse',
         },
       });
@@ -212,7 +212,7 @@ export default function WhereToBuySection() {
             ease: 'power2.inOut',
             scrollTrigger: {
               trigger: headerRef.current,
-              start: 'top 50%',
+              start: 'top 20%',
               toggleActions: 'play none none reverse',
             },
             delay: 0.8,
@@ -251,7 +251,7 @@ export default function WhereToBuySection() {
         repeatDelay: 2.5,
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 50%',
+          start: 'top 20%',
           toggleActions: 'play none none none',
         },
       });
