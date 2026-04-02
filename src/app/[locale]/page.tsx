@@ -98,23 +98,23 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
 
       const nextIdx = (indexRef.current + 1) % count;
 
-      // Phase 1a: Text box flips out FIRST (0.8s)
+      // Phase 1a: Text box flips out FIRST (1.0s)
       gsap.to(textEl, {
         rotateY: 90,
         opacity: 0,
         scale: 0.92,
-        duration: 0.8,
+        duration: 1.0,
         ease: 'power3.in',
         overwrite: 'auto',
       });
 
-      // Phase 1b: Image box flips out AFTER text nearly finishes (0.6s delay → text 75% done)
+      // Phase 1b: Image box flips out AFTER text nearly finishes (0.8s delay → text 80% done)
       gsap.to(imgEl, {
         rotateY: 90,
         opacity: 0,
         scale: 0.92,
-        duration: 0.8,
-        delay: 0.6,
+        duration: 1.0,
+        delay: 0.8,
         ease: 'power3.in',
         overwrite: 'auto',
         onComplete: () => {
@@ -126,7 +126,7 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
           gsap.set(textEl, { rotateY: -90, scale: 0.92 });
           gsap.set(imgEl, { rotateY: -90, scale: 0.92 });
 
-          // Phase 2a: Text box flips IN first (1.0s) — arrives and settles completely
+          // Phase 2a: Text box flips IN first (1.0s)
           gsap.to(textEl, {
             rotateY: 0,
             opacity: 1,
@@ -136,13 +136,13 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
             overwrite: 'auto',
           });
 
-          // Phase 2b: Image box follows after text is visibly settled (0.7s delay)
+          // Phase 2b: Image box follows after text is 90% settled (0.8s delay)
           gsap.to(imgEl, {
             rotateY: 0,
             opacity: 1,
             scale: 1,
             duration: 1.0,
-            delay: 0.7,
+            delay: 0.8,
             ease: 'back.out(1.2)',
             overwrite: 'auto',
             onComplete: () => {
