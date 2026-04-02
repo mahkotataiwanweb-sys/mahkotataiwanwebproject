@@ -155,13 +155,21 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
     }),
     enterView: () => new Promise<void>((resolve) => {
       if (!textBoxRef.current || !imageBoxRef.current) { resolve(); return; }
+      flippingRef.current = true;
       gsap.killTweensOf(textBoxRef.current);
       gsap.killTweensOf(imageBoxRef.current);
-      // Text flips in first (1.0s), then image follows after 0.8s delay — matches continuous flip style
+      // Matches continuous Phase 2: text first (1.0s), image follows (0.4s delay)
       gsap.set(textBoxRef.current, { opacity: 0, rotateY: -90, scale: 0.92 });
       gsap.set(imageBoxRef.current, { opacity: 0, rotateY: -90, scale: 0.92 });
-      gsap.to(textBoxRef.current, { opacity: 1, rotateY: 0, scale: 1, duration: 1.0, ease: 'back.out(1.2)', overwrite: true });
-      gsap.to(imageBoxRef.current, { opacity: 1, rotateY: 0, scale: 1, duration: 1.0, delay: 0.4, ease: 'back.out(1.2)', overwrite: true, onComplete: resolve });
+      gsap.to(textBoxRef.current, {
+        rotateY: 0, opacity: 1, scale: 1,
+        duration: 1.0, ease: 'back.out(1.2)', overwrite: 'auto',
+      });
+      gsap.to(imageBoxRef.current, {
+        rotateY: 0, opacity: 1, scale: 1,
+        duration: 1.0, delay: 0.4, ease: 'back.out(1.2)', overwrite: 'auto',
+        onComplete: () => { flippingRef.current = false; resolve(); },
+      });
     }),
   }), [count]);
 
