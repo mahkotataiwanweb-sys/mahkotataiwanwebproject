@@ -486,7 +486,19 @@ export default function AboutPage() {
           }
         );
 
-        // No bouncing — clean and minimal
+        // Elegant staggered reveal
+        bubbleItems.forEach((item, i) => {
+          gsap.fromTo(item, 
+            { opacity: 0, y: 30 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.8,
+              delay: i * 0.12,
+              ease: 'power2.out',
+            }
+          );
+        });
       }
 
       // Counter animation with dramatic counting
@@ -829,30 +841,26 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Stats Section — Navy Strip
       ═══════════════════════════════════════════════════════════════ */}
-      <section ref={statsSectionRef} className="py-16 sm:py-20 relative overflow-hidden">
-        <div className="max-w-5xl mx-auto px-6 relative z-10">
-          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+      <section ref={statsSectionRef} className="py-10 sm:py-14 relative">
+        <div className="max-w-4xl mx-auto px-6">
+          <div ref={statsRef} className="flex flex-wrap justify-center">
             {stats.map((stat, i) => {
               const Icon = stat.icon;
+              const isLast = i === stats.length - 1;
               return (
-                <div key={stat.key} className="stat-bubble-item text-center group">
-                  {/* Clean card */}
-                  <div className="bg-white border border-navy/[0.06] rounded-2xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
-                    {/* Minimal icon */}
-                    <div className="w-10 h-10 rounded-xl bg-navy/[0.06] flex items-center justify-center mx-auto mb-4 group-hover:bg-red/10 transition-colors duration-300">
-                      <Icon className="w-5 h-5 text-navy/50 group-hover:text-red transition-colors duration-300" />
-                    </div>
-
-                    {/* Number */}
-                    <div className="text-3xl sm:text-4xl font-heading font-bold text-navy mb-1">
+                <div key={stat.key} className="stat-bubble-item flex items-center">
+                  {/* Stat item — minimal inline */}
+                  <div className="flex flex-col items-center px-6 sm:px-10 py-4">
+                    <Icon className="w-4 h-4 text-red/60 mb-2" />
+                    <div className="text-2xl sm:text-3xl font-heading font-bold text-navy mb-0.5">
                       {stat.prefix}
                       <span ref={(el) => { counterRefs.current[i] = el; }}>0</span>
                       {stat.suffix}
                     </div>
-
-                    {/* Label */}
-                    <p className="text-navy/40 text-xs sm:text-sm font-medium tracking-[0.12em] uppercase">{t(`stats.${stat.key}`)}</p>
+                    <p className="text-navy/35 text-[11px] sm:text-xs font-medium tracking-[0.15em] uppercase">{t(`stats.${stat.key}`)}</p>
                   </div>
+                  {/* Vertical divider between items */}
+                  {!isLast && <div className="hidden sm:block w-px h-12 bg-navy/[0.08]" />}
                 </div>
               );
             })}
