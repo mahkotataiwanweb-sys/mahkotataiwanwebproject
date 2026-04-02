@@ -422,45 +422,82 @@ export default function AboutPage() {
   // GSAP scroll-triggered animations
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Description section — all elements reveal together, slow & dramatic
+      // Mission section — elegant staggered reveal at top 20%
       if (textRef.current) {
-        const textChildren = textRef.current.children;
-        gsap.fromTo(
-          textChildren,
-          { opacity: 0, y: 60, scale: 0.95 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 2.5,
-            stagger: 0,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: textRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
-      }
+        const headingBlock = textRef.current.querySelector('.text-center');
+        const descBlock = textRef.current.querySelector('.mb-12:last-of-type');
+        const pillsBlock = textRef.current.querySelector('.flex-wrap');
 
-      // Red decorative line draw on scroll — dramatic
-      if (redLineRef.current) {
-        gsap.fromTo(
-          redLineRef.current,
-          { scaleX: 0, opacity: 0 },
-          {
-            scaleX: 1,
-            opacity: 1,
-            duration: 2.0,
-            ease: 'power2.inOut',
-            scrollTrigger: {
-              trigger: redLineRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
+        // 1. Heading block: label, title, subtitle — each child staggers
+        if (headingBlock) {
+          const headingChildren = Array.from(headingBlock.children).filter(
+            (el) => el !== redLineRef.current
+          );
+          gsap.fromTo(
+            headingChildren,
+            { opacity: 0, y: 80, scale: 0.85, rotateX: -25, filter: 'blur(8px)' },
+            {
+              opacity: 1, y: 0, scale: 1, rotateX: 0, filter: 'blur(0px)',
+              duration: 1.8, stagger: 0.2, ease: 'expo.out',
+              scrollTrigger: {
+                trigger: textRef.current,
+                start: 'top 20%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          );
+        }
+
+        // 2. Red line — draws in after heading
+        if (redLineRef.current) {
+          gsap.fromTo(
+            redLineRef.current,
+            { scaleX: 0, opacity: 0 },
+            {
+              scaleX: 1, opacity: 1,
+              duration: 1.4, ease: 'expo.inOut', delay: 0.4,
+              scrollTrigger: {
+                trigger: textRef.current,
+                start: 'top 20%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          );
+        }
+
+        // 3. Description paragraph — sweeps up with blur
+        if (descBlock) {
+          gsap.fromTo(
+            descBlock,
+            { opacity: 0, y: 60, filter: 'blur(6px)' },
+            {
+              opacity: 1, y: 0, filter: 'blur(0px)',
+              duration: 1.6, ease: 'expo.out', delay: 0.6,
+              scrollTrigger: {
+                trigger: textRef.current,
+                start: 'top 20%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          );
+        }
+
+        // 4. Highlight pills — pop in one by one
+        if (pillsBlock) {
+          gsap.fromTo(
+            pillsBlock.children,
+            { opacity: 0, y: 40, scale: 0.8 },
+            {
+              opacity: 1, y: 0, scale: 1,
+              duration: 1.2, stagger: 0.15, ease: 'back.out(1.4)', delay: 1.0,
+              scrollTrigger: {
+                trigger: textRef.current,
+                start: 'top 20%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          );
+        }
       }
 
       // Stats — dramatic pop-up reveal, repeating continuously
