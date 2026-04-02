@@ -282,11 +282,14 @@ export default function HeroSlider() {
     }),
   };
 
-  // Text entrance variants - staggered and premium
+  // Text entrance variants - staggered and premium, with clean exit
   const textContainerVariants = {
     hidden: {},
     visible: {
-      transition: { staggerChildren: 0.2, delayChildren: 0.5 },
+      transition: { staggerChildren: 0.18, delayChildren: 0.3 },
+    },
+    exit: {
+      transition: { staggerChildren: 0.05, staggerDirection: -1 },
     },
   };
 
@@ -298,6 +301,12 @@ export default function HeroSlider() {
       filter: 'blur(0px)',
       transition: { duration: 1.0, ease: [0.25, 0.46, 0.45, 0.94] },
     },
+    exit: {
+      opacity: 0,
+      y: -20,
+      filter: 'blur(4px)',
+      transition: { duration: 0.4, ease: 'easeIn' },
+    },
   };
 
   const lineVariants = {
@@ -306,6 +315,11 @@ export default function HeroSlider() {
       scaleX: 1,
       opacity: 1,
       transition: { duration: 1.0, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.15 },
+    },
+    exit: {
+      scaleX: 0,
+      opacity: 0,
+      transition: { duration: 0.3, ease: 'easeIn' },
     },
   };
 
@@ -403,7 +417,7 @@ export default function HeroSlider() {
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Slides */}
-      <AnimatePresence initial={false} custom={direction} mode="sync">
+      <AnimatePresence initial={false} custom={direction} mode="popLayout">
         <motion.div
           key={currentSlide.id}
           custom={direction}
@@ -427,6 +441,7 @@ export default function HeroSlider() {
               variants={textContainerVariants}
               initial="hidden"
               animate="visible"
+              exit="exit"
             >
               <motion.div variants={textItemVariants}>
                 <Image
