@@ -581,17 +581,19 @@ export default function ContactPage() {
         });
       }
 
-      /* ── FAQ Header ── */
+      /* ── FAQ Header — Dramatic Reveal ── */
       if (faqHeaderRef.current) {
         gsap.fromTo(
           faqHeaderRef.current.children,
-          { opacity: 0, y: 30 },
+          { opacity: 0, y: 60, scale: 0.8, filter: 'blur(8px)' },
           {
             opacity: 1,
             y: 0,
-            duration: 0.7,
-            stagger: 0.1,
-            ease: 'power3.out',
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 2.2,
+            stagger: 0.2,
+            ease: 'expo.out',
             scrollTrigger: {
               trigger: faqHeaderRef.current,
               start: 'top 85%',
@@ -601,17 +603,19 @@ export default function ContactPage() {
         );
       }
 
-      /* ── FAQ Items Stagger ── */
+      /* ── FAQ Items Stagger — Dramatic Reveal ── */
       if (faqRef.current) {
         gsap.fromTo(
           faqRef.current.querySelectorAll('.faq-item'),
-          { opacity: 0, y: 40 },
+          { opacity: 0, y: 70, scale: 0.85, filter: 'blur(6px)' },
           {
             opacity: 1,
             y: 0,
-            duration: 0.6,
-            stagger: 0.1,
-            ease: 'power3.out',
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 2.1,
+            stagger: 0.15,
+            ease: 'expo.out',
             scrollTrigger: {
               trigger: faqRef.current,
               start: 'top 80%',
