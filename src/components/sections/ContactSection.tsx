@@ -25,9 +25,9 @@ export default function ContactSection() {
       const header = contentRef.current?.querySelector('.text-center.mb-12');
       if (header) {
         gsap.fromTo(header.children,
-          { opacity: 0, y: 60, filter: 'blur(6px)' },
+          { opacity: 0, y: 60 },
           {
-            opacity: 1, y: 0, filter: 'blur(0px)',
+            opacity: 1, y: 0,
             duration: 2.2,
             stagger: 0,
             ease: 'power2.out',

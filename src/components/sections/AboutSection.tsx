@@ -46,9 +46,9 @@ export default function AboutSection() {
       // All text lines reveal together — slow & dramatic
       if (textRef.current) {
         gsap.fromTo(textRef.current.children,
-          { opacity: 0, y: 60, filter: 'blur(6px)' },
+          { opacity: 0, y: 60 },
           {
-            opacity: 1, y: 0, filter: 'blur(0px)',
+            opacity: 1, y: 0,
             duration: 2.2,
             stagger: 0,
             ease: 'power2.out',

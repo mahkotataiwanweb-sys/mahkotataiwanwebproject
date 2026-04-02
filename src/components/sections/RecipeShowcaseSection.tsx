@@ -91,11 +91,11 @@ function CylinderCarousel({
       const z = Math.cos(cardAngle) * radius;
       const scale = 0.55 + (z + radius) / (2 * radius) * 0.45;
       const opacity = 0.3 + (z + radius) / (2 * radius) * 0.7;
-      const blur = z < -radius * 0.3 ? Math.abs(z + radius * 0.3) / radius * 3 : 0;
+      const blur = 0;
 
       el.style.transform = `translateX(${x}px) translateZ(${z}px) scale(${scale})`;
       el.style.opacity = `${opacity}`;
-      el.style.filter = `blur(${blur}px)`;
+      el.style.filter = 'none';
       el.style.zIndex = `${Math.round(z + radius)}`;
     });
 
@@ -317,9 +317,8 @@ export default function RecipeShowcaseSection() {
     >
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full bg-red/5 blur-[150px]" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full bg-cream/3 blur-[120px]" />
-        <div
+
+<div
           className="absolute inset-0 opacity-[0.015]"
           style={{
             backgroundImage: 'radial-gradient(rgba(250,237,211,0.5) 1px, transparent 1px)',

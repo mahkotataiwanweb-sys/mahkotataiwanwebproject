@@ -45,9 +45,8 @@ export default function HeroSection() {
     <section id="hero" ref={sectionRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-cream">
       {/* Decorative Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 rounded-full bg-red/5 blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-navy/5 blur-3xl" />
-        <div className="absolute top-1/3 right-1/4 w-2 h-2 rounded-full bg-red/30" />
+
+<div className="absolute top-1/3 right-1/4 w-2 h-2 rounded-full bg-red/30" />
         <div className="absolute top-2/3 left-1/4 w-3 h-3 rounded-full bg-navy/20" />
         <div className="absolute top-1/2 left-[60%] w-1.5 h-1.5 rounded-full bg-red/20" />
         {/* Subtle grid pattern */}

@@ -156,9 +156,9 @@ export default function RecipesPage() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         headerRef.current!.children,
-        { opacity: 0, y: 40, filter: 'blur(4px)' },
+        { opacity: 0, y: 40 },
         {
-          opacity: 1, y: 0, filter: 'blur(0px)',
+          opacity: 1, y: 0,
           duration: 1, stagger: 0.1, ease: 'power4.out',
         }
       );

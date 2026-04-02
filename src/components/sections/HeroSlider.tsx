@@ -318,9 +318,8 @@ export default function HeroSlider() {
         >
           {/* Decorative elements for non-image slides */}
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-20 left-10 w-72 h-72 rounded-full bg-white/5 blur-3xl" />
-            <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-red/10 blur-3xl" />
-            <div
+
+<div
               className="absolute inset-0 opacity-[0.03]"
               style={{
                 backgroundImage:

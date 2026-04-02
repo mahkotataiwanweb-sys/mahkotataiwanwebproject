@@ -97,11 +97,10 @@ function LineReveal({ text, className }: { text: string; className?: string }) {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         lineEls,
-        { opacity: 0, y: 28, filter: 'blur(6px)' },
+        { opacity: 0, y: 28 },
         {
           opacity: 1,
           y: 0,
-          filter: 'blur(0px)',
           duration: 0.8,
           stagger: 0.12,
           ease: 'power3.out',
@@ -335,7 +334,6 @@ export default function ContactPage() {
       gsap.from('.hero-text', {
         opacity: 0,
         y: 60,
-        filter: 'blur(16px)',
         scale: 0.9,
         duration: 1.6,
         stagger: 0.25,
@@ -346,11 +344,10 @@ export default function ContactPage() {
       if (contactLeftRef.current) {
         gsap.fromTo(
           contactLeftRef.current.children,
-          { opacity: 0, x: -40, filter: 'blur(8px)' },
+          { opacity: 0, x: -40 },
           {
             opacity: 1,
             x: 0,
-            filter: 'blur(0px)',
             duration: 2.2,
             stagger: 0,
             ease: 'power2.out',
@@ -404,11 +401,10 @@ export default function ContactPage() {
       if (hoursCardRef.current) {
         gsap.fromTo(
           hoursCardRef.current,
-          { opacity: 0, y: 50, filter: 'blur(8px)' },
+          { opacity: 0, y: 50 },
           {
             opacity: 1,
             y: 0,
-            filter: 'blur(0px)',
             duration: 0.9,
             ease: 'power3.out',
             scrollTrigger: {
@@ -479,11 +475,10 @@ export default function ContactPage() {
       if (faqHeaderRef.current) {
         gsap.fromTo(
           faqHeaderRef.current.children,
-          { opacity: 0, y: 30, filter: 'blur(8px)' },
+          { opacity: 0, y: 30 },
           {
             opacity: 1,
             y: 0,
-            filter: 'blur(0px)',
             duration: 0.7,
             stagger: 0.1,
             ease: 'power3.out',
@@ -500,11 +495,10 @@ export default function ContactPage() {
       if (faqRef.current) {
         gsap.fromTo(
           faqRef.current.querySelectorAll('.faq-item'),
-          { opacity: 0, y: 40, filter: 'blur(8px)' },
+          { opacity: 0, y: 40 },
           {
             opacity: 1,
             y: 0,
-            filter: 'blur(0px)',
             duration: 0.6,
             stagger: 0.1,
             ease: 'power3.out',
@@ -521,12 +515,11 @@ export default function ContactPage() {
       if (mapRef.current) {
         gsap.fromTo(
           mapRef.current,
-          { opacity: 0, y: 60, scale: 0.94, filter: 'blur(10px)' },
+          { opacity: 0, y: 60, scale: 0.94 },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            filter: 'blur(0px)',
             duration: 2.3,
             ease: 'power2.out',
             scrollTrigger: {
@@ -652,9 +645,7 @@ export default function ContactPage() {
           ║  2. CONTACT CARDS — Premium 2-Col Layout  ║
           ╚═══════════════════════════════════════════╝ */}
       <section ref={contactSectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
-        <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
-
-        <div className="max-w-7xl mx-auto px-6">
+<div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             {/* Left — Heading + Socials */}
             <div ref={contactLeftRef} className="lg:sticky lg:top-32">
@@ -733,8 +724,8 @@ export default function ContactPage() {
           {/* Section Header — Premium Reveal */}
           <motion.div
             className="text-center mb-14"
-            initial={{ opacity: 0, y: 50, filter: 'blur(14px)' }}
-            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 1.6, ease: [0.22, 0.68, 0, 1] }}
           >
@@ -914,9 +905,7 @@ export default function ContactPage() {
           ║  4. FAQ — Premium Accordion               ║
           ╚═══════════════════════════════════════════╝ */}
       <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
-        <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
-
-        <div className="max-w-3xl mx-auto px-6">
+<div className="max-w-3xl mx-auto px-6">
           {/* Section Header */}
           <div ref={faqHeaderRef} className="text-center mb-14">
             <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Got Questions?</p>
@@ -942,14 +931,12 @@ export default function ContactPage() {
           ║  5. GOOGLE MAPS                            ║
           ╚═══════════════════════════════════════════╝ */}
       <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
-        <div className="absolute bottom-20 left-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
-
-        <div className="max-w-6xl mx-auto px-6">
+<div className="max-w-6xl mx-auto px-6">
           {/* Section Header — Premium Reveal */}
           <motion.div
             className="text-center mb-14"
-            initial={{ opacity: 0, y: 50, filter: 'blur(14px)' }}
-            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 1.6, ease: [0.22, 0.68, 0, 1] }}
           >
@@ -1007,12 +994,10 @@ export default function ContactPage() {
           ║  6. CTA — Premium Floating Box             ║
           ╚═══════════════════════════════════════════╝ */}
       <section className="py-20 sm:py-28 bg-cream relative overflow-hidden">
-        <div className="absolute bottom-20 left-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
-
-        <motion.div
+<motion.div
           ref={ctaRef}
-          initial={{ opacity: 0, y: 80, scale: 0.92, filter: 'blur(12px)' }}
-          whileInView={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+          initial={{ opacity: 0, y: 80, scale: 0.92 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 2.3, ease: [0.22, 0.68, 0, 1] }}
           className="max-w-4xl mx-auto px-6 sm:px-8"
@@ -1028,11 +1013,9 @@ export default function ContactPage() {
             <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
             
             {/* Animated gradient orbs */}
-            <div className="absolute top-0 right-0 w-72 h-72 bg-red/15 rounded-full blur-[80px] animate-pulse" />
-            <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/[0.06] rounded-full blur-[60px]" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-32 bg-red/5 rounded-full blur-[100px] rotate-12" />
-            
-            {/* Moving shimmer effect */}
+
+
+{/* Moving shimmer effect */}
             <div className="absolute inset-0 rounded-[2rem] overflow-hidden pointer-events-none">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" style={{ animation: 'shimmerSlide 4s ease-in-out infinite' }} />
             </div>

@@ -48,9 +48,9 @@ export default function RecipesSection() {
     const ctx = gsap.context(() => {
       if (headerRef.current) {
         gsap.fromTo(headerRef.current.children,
-          { opacity: 0, y: 50, filter: 'blur(4px)' },
+          { opacity: 0, y: 50 },
           {
-            opacity: 1, y: 0, filter: 'blur(0px)',
+            opacity: 1, y: 0,
             duration: 1, stagger: 0.12, ease: 'power4.out',
             scrollTrigger: { trigger: headerRef.current, start: 'top 85%', toggleActions: 'play none none reverse' },
           }
@@ -91,9 +91,7 @@ export default function RecipesSection() {
   return (
     <section ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
       <div className="absolute top-0 right-0 w-1/3 h-full bg-navy/[0.02] -skew-x-12 translate-x-1/4" />
-      <div className="absolute bottom-20 left-10 w-72 h-72 rounded-full bg-red/5 blur-3xl" />
-
-      <div className="max-w-7xl mx-auto px-6">
+<div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-14">
           <div>

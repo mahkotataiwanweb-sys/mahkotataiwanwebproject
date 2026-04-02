@@ -389,8 +389,7 @@ function SmartSearch({
         <div className={`absolute -inset-1.5 rounded-2xl transition-all duration-700 ${
           focused ? 'opacity-100' : 'opacity-0'
         }`}>
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-red/20 via-red/10 to-cream/30 blur-xl animate-pulse" />
-        </div>
+</div>
 
         <div className={`relative flex items-center rounded-2xl transition-all duration-500 overflow-hidden ${
           focused
@@ -488,9 +487,9 @@ function ProductModal({
       {/* Card */}
       <motion.div
         className="relative bg-cream rounded-[2.5rem] overflow-hidden max-w-lg w-full max-h-[90vh] overflow-y-auto overscroll-contain"
-        initial={{ scale: 0.85, y: 80, opacity: 0, filter: 'blur(16px)' }}
-        animate={{ scale: 1, y: 0, opacity: 1, filter: 'blur(0px)' }}
-        exit={{ scale: 0.9, y: 50, opacity: 0, filter: 'blur(8px)' }}
+        initial={{ scale: 0.85, y: 80, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        exit={{ scale: 0.9, y: 50, opacity: 0 }}
         transition={{ duration: 1.0, ease: [0.22, 0.68, 0, 1] }}
         onClick={(e) => e.stopPropagation()}
         style={{
@@ -544,8 +543,8 @@ function ProductModal({
 
           {/* Category pill — frosted glass */}
           <motion.span
-            initial={{ opacity: 0, y: 12, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35, duration: 0.6 }}
             className="absolute top-5 left-5 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.18em] uppercase text-white/90 bg-white/10 backdrop-blur-xl px-4 py-2 rounded-full border border-white/10 shadow-lg"
           >
@@ -556,8 +555,8 @@ function ProductModal({
         {/* Content */}
         <div className="relative -mt-10 px-8 sm:px-10 pb-10">
           <motion.h3
-            initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, duration: 0.8, ease: [0.22, 0.68, 0, 1] }}
             className="font-heading text-2xl sm:text-3xl font-bold text-navy mb-4 leading-tight"
           >
@@ -572,8 +571,8 @@ function ProductModal({
           />
 
           <motion.p
-            initial={{ opacity: 0, y: 15, filter: 'blur(6px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.7, ease: [0.22, 0.68, 0, 1] }}
             className="text-navy/55 text-sm sm:text-base leading-[1.85] whitespace-pre-line"
           >

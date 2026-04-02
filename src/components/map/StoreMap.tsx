@@ -1600,13 +1600,13 @@ export default function StoreMap({ stores }: StoreMapProps) {
       // Stop Leaflet from swallowing click/touch events on the popup
       L.DomEvent.disableClickPropagation(popupRef.current);
       L.DomEvent.disableScrollPropagation(popupRef.current);
-      gsap.fromTo(popupRef.current, { opacity: 0, y: 30, scale: 0.92, filter: 'blur(8px)' }, { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 0.6, ease: 'power3.out' });
+      gsap.fromTo(popupRef.current, { opacity: 0, y: 30, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'power3.out' });
     }
   }, [selectedStore]);
 
   const handleClosePopup = () => {
     if (popupRef.current) {
-      gsap.to(popupRef.current, { opacity: 0, y: 20, scale: 0.95, filter: 'blur(6px)', duration: 0.3, ease: 'power2.in', onComplete: () => setSelectedStore(null) });
+      gsap.to(popupRef.current, { opacity: 0, y: 20, scale: 0.95, duration: 0.3, ease: 'power2.in', onComplete: () => setSelectedStore(null) });
     } else setSelectedStore(null);
   };
 
