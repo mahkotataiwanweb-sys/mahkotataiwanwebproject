@@ -841,26 +841,22 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Stats Section — Navy Strip
       ═══════════════════════════════════════════════════════════════ */}
-      <section ref={statsSectionRef} className="py-10 sm:py-14 relative">
-        <div className="max-w-4xl mx-auto px-6">
-          <div ref={statsRef} className="flex flex-wrap justify-center">
+      <section ref={statsSectionRef} className="py-12 sm:py-16 relative">
+        <div className="max-w-3xl mx-auto px-6">
+          <div ref={statsRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {stats.map((stat, i) => {
               const Icon = stat.icon;
-              const isLast = i === stats.length - 1;
               return (
-                <div key={stat.key} className="stat-bubble-item flex items-center">
-                  {/* Stat item — minimal inline */}
-                  <div className="flex flex-col items-center px-6 sm:px-10 py-4">
-                    <Icon className="w-4 h-4 text-red/60 mb-2" />
-                    <div className="text-2xl sm:text-3xl font-heading font-bold text-navy mb-0.5">
-                      {stat.prefix}
-                      <span ref={(el) => { counterRefs.current[i] = el; }}>0</span>
-                      {stat.suffix}
-                    </div>
-                    <p className="text-navy/35 text-[11px] sm:text-xs font-medium tracking-[0.15em] uppercase">{t(`stats.${stat.key}`)}</p>
+                <div key={stat.key} className="stat-bubble-item bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-navy/[0.05] text-center hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
+                  <div className="w-9 h-9 rounded-lg bg-red/10 flex items-center justify-center mx-auto mb-2.5">
+                    <Icon className="w-4.5 h-4.5 text-red" />
                   </div>
-                  {/* Vertical divider between items */}
-                  {!isLast && <div className="hidden sm:block w-px h-12 bg-navy/[0.08]" />}
+                  <div className="text-xl sm:text-2xl font-heading font-bold text-navy mb-0.5">
+                    {stat.prefix}
+                    <span ref={(el) => { counterRefs.current[i] = el; }}>0</span>
+                    {stat.suffix}
+                  </div>
+                  <p className="text-navy/40 text-[10px] sm:text-[11px] font-medium tracking-[0.15em] uppercase">{t(`stats.${stat.key}`)}</p>
                 </div>
               );
             })}

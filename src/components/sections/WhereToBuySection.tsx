@@ -55,47 +55,50 @@ export default function WhereToBuySection() {
     if (!sectionRef.current || !mapRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Elegant fade + rise entrance
+      // Section entrance — gentle fade at top 50%
       gsap.from(sectionRef.current, {
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 85%',
+          start: 'top 50%',
           toggleActions: 'play none none reverse',
         },
         opacity: 0,
-        y: 50,
-        duration: 1,
-        ease: 'power3.out',
+        y: 40,
+        duration: 2.0,
+        ease: 'power2.out',
       });
 
-      // ✨ Map clip-path reveal — dramatic bottom-to-top wipe
+      // ✨ Map reveal — dramatic bottom-to-top wipe, slow & cinematic
       if (mapRef.current) {
         gsap.fromTo(mapRef.current,
-          { clipPath: 'inset(100% 0 0 0)' },
+          { clipPath: 'inset(100% 0 0 0)', opacity: 0 },
           {
             clipPath: 'inset(0% 0 0 0)',
+            opacity: 1,
+            duration: 2.5,
             ease: 'power2.out',
             scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top 75%',
-              end: 'top 35%',
-              scrub: 1.2,
+              trigger: mapRef.current,
+              start: 'top 50%',
+              toggleActions: 'play none none reverse',
             },
           }
         );
       }
 
-      // Map scale entrance with perspective
+      // Map scale entrance — slow dramatic zoom-in reveal
       gsap.from('.taiwan-map-group', {
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 75%',
-          toggleActions: 'play none none none',
+          start: 'top 50%',
+          toggleActions: 'play none none reverse',
         },
         opacity: 0,
-        scale: 0.85,
-        duration: 1.2,
+        scale: 0.8,
+        y: 40,
+        duration: 2.8,
         ease: 'power3.out',
+        delay: 0.3,
       });
 
       // ✨ SVG boundary lines draw themselves on scroll
@@ -113,7 +116,7 @@ export default function WhereToBuySection() {
               ease: 'power2.inOut',
               scrollTrigger: {
                 trigger: sectionRef.current,
-                start: 'top 55%',
+                start: 'top 50%',
                 toggleActions: 'play none none reverse',
               },
             });
@@ -140,7 +143,7 @@ export default function WhereToBuySection() {
         repeatDelay: 1,
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 65%',
+          start: 'top 50%',
           toggleActions: 'play none none none',
         },
       });
@@ -173,27 +176,49 @@ export default function WhereToBuySection() {
     return () => ctx.revert();
   }, []);
 
-  /* GSAP header reveal animation */
+  /* GSAP header reveal animation — slow, elegant, dramatic */
   useEffect(() => {
     if (!headerRef.current) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headerRef.current!.children,
-        { opacity: 0, y: 50, scale: 0.92 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 1.6,
-          stagger: 0.2,
-          ease: 'power4.out',
-          scrollTrigger: {
-            trigger: headerRef.current,
-            start: 'top 85%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
+      const children = headerRef.current!.children;
+      
+      // Set initial state
+      gsap.set(children, { opacity: 0, y: 60, scale: 0.88 });
+      
+      // Elegant staggered reveal with slow timing
+      gsap.to(children, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 2.4,
+        stagger: 0.35,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: headerRef.current,
+          start: 'top 50%',
+          toggleActions: 'play none none reverse',
+        },
+      });
+
+      // Red line draws from center — extra delayed
+      const redLine = headerRef.current!.querySelector('.red-line-reveal');
+      if (redLine) {
+        gsap.fromTo(redLine,
+          { scaleX: 0, opacity: 0 },
+          {
+            scaleX: 1,
+            opacity: 1,
+            duration: 1.8,
+            ease: 'power2.inOut',
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: 'top 50%',
+              toggleActions: 'play none none reverse',
+            },
+            delay: 0.8,
+          }
+        );
+      }
     }, sectionRef);
     return () => ctx.revert();
   }, []);
@@ -226,7 +251,7 @@ export default function WhereToBuySection() {
         repeatDelay: 2.5,
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 65%',
+          start: 'top 50%',
           toggleActions: 'play none none none',
         },
       });
@@ -297,7 +322,7 @@ export default function WhereToBuySection() {
               Where to Buy
             </h2>
           </Link>
-          <div className="w-16 h-1 bg-red mx-auto mt-4 rounded-full" />
+          <div className="red-line-reveal w-16 h-1 bg-red mx-auto mt-4 rounded-full origin-center" />
         </div>
 
         {/* Map Container */}
