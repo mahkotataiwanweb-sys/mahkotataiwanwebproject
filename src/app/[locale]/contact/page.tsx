@@ -305,7 +305,10 @@ export default function ContactPage() {
   const contactLeftRef = useRef<HTMLDivElement>(null);
   const contactCardsRef = useRef<HTMLDivElement>(null);
   const hoursSectionRef = useRef<HTMLDivElement>(null);
+  const hoursHeaderRef = useRef<HTMLDivElement>(null);
   const hoursCardRef = useRef<HTMLDivElement>(null);
+  const hoursLegendRef = useRef<HTMLDivElement>(null);
+  const hoursFootnoteRef = useRef<HTMLDivElement>(null);
   const faqHeaderRef = useRef<HTMLDivElement>(null);
   const faqRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
@@ -397,19 +400,125 @@ export default function ContactPage() {
         });
       }
 
+      /* ── Business Hours — Premium Text Reveal at top 60% ── */
+      if (hoursHeaderRef.current) {
+        // Character-by-character reveal for "Business Hours"
+        const chars = hoursHeaderRef.current.querySelectorAll('.bh-char');
+        if (chars.length > 0) {
+          gsap.fromTo(
+            chars,
+            { opacity: 0, y: 50, rotateX: -90 },
+            {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              duration: 0.6,
+              stagger: 0.03,
+              ease: 'back.out(1.7)',
+              scrollTrigger: {
+                trigger: hoursHeaderRef.current,
+                start: 'top 60%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          );
+        }
+
+        // "Availability" label — slide up + fade
+        const availLabel = hoursHeaderRef.current.querySelector('.bh-reveal-item');
+        if (availLabel) {
+          gsap.fromTo(
+            availLabel,
+            { opacity: 0, y: 20, letterSpacing: '0.5em' },
+            {
+              opacity: 1,
+              y: 0,
+              letterSpacing: '0.3em',
+              duration: 0.8,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: hoursHeaderRef.current,
+                start: 'top 60%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          );
+        }
+
+        // Red line — scale from center
+        const redLine = hoursHeaderRef.current.querySelectorAll('.bh-reveal-item')[1];
+        if (redLine) {
+          gsap.fromTo(
+            redLine,
+            { opacity: 0, scaleX: 0 },
+            {
+              opacity: 1,
+              scaleX: 1,
+              duration: 0.8,
+              delay: 0.4,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: hoursHeaderRef.current,
+                start: 'top 60%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          );
+        }
+      }
+
       /* ── Business Hours Clock ── */
       if (hoursCardRef.current) {
         gsap.fromTo(
           hoursCardRef.current,
-          { opacity: 0, y: 50 },
+          { opacity: 0, y: 50, scale: 0.95 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.9,
+            scale: 1,
+            duration: 1.2,
             ease: 'power3.out',
             scrollTrigger: {
               trigger: hoursSectionRef.current,
-              start: 'top 40%',
+              start: 'top 60%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
+
+      /* ── Business Hours Legend — stagger items ── */
+      if (hoursLegendRef.current) {
+        gsap.fromTo(
+          hoursLegendRef.current.children,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.15,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: hoursLegendRef.current,
+              start: 'top 60%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
+
+      /* ── Business Hours Footnote — gentle reveal ── */
+      if (hoursFootnoteRef.current) {
+        gsap.fromTo(
+          hoursFootnoteRef.current,
+          { opacity: 0 },
+          {
+            opacity: 1,
+            duration: 1.0,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: hoursFootnoteRef.current,
+              start: 'top 60%',
               toggleActions: 'play none none reverse',
             },
           }
@@ -466,7 +575,7 @@ export default function ContactPage() {
         // Play when section scrolls into view
         ScrollTrigger.create({
           trigger: hoursSectionRef.current,
-          start: 'top 40%',
+          start: 'top 60%',
           onEnter: () => arcTl.restart(),
         });
       }
@@ -721,18 +830,16 @@ export default function ContactPage() {
           ╚═══════════════════════════════════════════╝ */}
       <section ref={hoursSectionRef} className="py-24 sm:py-32 relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-6">
-          {/* Section Header — Premium Reveal */}
-          <motion.div
-            className="text-center mb-14"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1.6, ease: [0.22, 0.68, 0, 1] }}
-          >
-            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Availability</p>
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">Business Hours</h2>
-            <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
-          </motion.div>
+          {/* Section Header — Premium Scroll-Triggered Text Reveal */}
+          <div ref={hoursHeaderRef} className="text-center mb-14">
+            <p className="bh-reveal-item text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3" style={{ opacity: 0 }}>Availability</p>
+            <h2 className="bh-reveal-title font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3 overflow-hidden">
+              {"Business Hours".split("").map((ch, i) => (
+                <span key={i} className="bh-char" style={{ display: 'inline-block', opacity: 0, whiteSpace: ch === ' ' ? 'pre' : undefined }}>{ch}</span>
+              ))}
+            </h2>
+            <div className="bh-reveal-item w-16 h-[2px] bg-red mx-auto mb-4" style={{ opacity: 0, transform: 'scaleX(0)' }} />
+          </div>
 
           {/* Clock with animated arcs — moon clock face image + SVG arcs */}
           <div ref={hoursCardRef} className="flex justify-center">
@@ -873,7 +980,7 @@ export default function ContactPage() {
           </div>
 
           {/* Business-hours legend */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-10 mt-10">
+          <div ref={hoursLegendRef} className="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-10 mt-10">
             <div className="flex items-center gap-3">
               <span className="w-8 h-[3px] rounded-full bg-navy" />
               <span className="text-navy text-sm font-semibold">Mon &ndash; Fri</span>
@@ -892,7 +999,7 @@ export default function ContactPage() {
           </div>
 
           {/* Footnote */}
-          <div className="text-center mt-8">
+          <div ref={hoursFootnoteRef} className="text-center mt-8">
             <p className="text-navy/40 text-xs">
               * Taiwan Standard Time (GMT+8) &middot; Closed on Sundays &amp; national holidays
             </p>
