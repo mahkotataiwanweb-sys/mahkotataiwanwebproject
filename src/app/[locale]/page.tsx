@@ -158,16 +158,16 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
       flippingRef.current = true;
       gsap.killTweensOf(textBoxRef.current);
       gsap.killTweensOf(imageBoxRef.current);
-      // Matches continuous Phase 2: text first (1.0s), image follows (0.4s delay)
-      gsap.set(textBoxRef.current, { opacity: 0, rotateY: -90, scale: 0.92 });
-      gsap.set(imageBoxRef.current, { opacity: 0, rotateY: -90, scale: 0.92 });
+      // Entrance: more dramatic & slower — text 1.4s, image follows 0.8s later (1.4s)
+      gsap.set(textBoxRef.current, { opacity: 0, rotateY: -120, scale: 0.85 });
+      gsap.set(imageBoxRef.current, { opacity: 0, rotateY: -120, scale: 0.85 });
       gsap.to(textBoxRef.current, {
         rotateY: 0, opacity: 1, scale: 1,
-        duration: 1.0, ease: 'back.out(1.2)', overwrite: 'auto',
+        duration: 1.4, ease: 'back.out(1.4)', overwrite: 'auto',
       });
       gsap.to(imageBoxRef.current, {
         rotateY: 0, opacity: 1, scale: 1,
-        duration: 1.0, delay: 0.4, ease: 'back.out(1.2)', overwrite: 'auto',
+        duration: 1.4, delay: 0.8, ease: 'back.out(1.4)', overwrite: 'auto',
         onComplete: () => { flippingRef.current = false; resolve(); },
       });
     }),
