@@ -222,11 +222,10 @@ function LineReveal({ text, className }: { text: string; className?: string }) {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         lineEls,
-        { opacity: 0, y: 28, filter: 'blur(6px)' },
+        { opacity: 0, y: 28 },
         {
           opacity: 1,
           y: 0,
-          filter: 'blur(0px)',
           duration: 0.8,
           stagger: 0.12,
           ease: 'power3.out',
@@ -404,13 +403,12 @@ export default function AboutPage() {
     velocityRef.current = -PARTNER_MARQUEE_SPEED;
   }, []);
 
-  // GSAP hero entrance animation — Premium staggered blur reveal
+  // GSAP hero entrance animation — Premium staggered reveal
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.from('.hero-text', {
         opacity: 0,
         y: 60,
-        filter: 'blur(16px)',
         scale: 0.9,
         duration: 1.6,
         stagger: 0.25,
@@ -428,11 +426,10 @@ export default function AboutPage() {
         const textChildren = textRef.current.children;
         gsap.fromTo(
           textChildren,
-          { opacity: 0, y: 60, filter: 'blur(14px)', scale: 0.95 },
+          { opacity: 0, y: 60, scale: 0.95 },
           {
             opacity: 1,
             y: 0,
-            filter: 'blur(0px)',
             scale: 1,
             duration: 2.5,
             stagger: 0,
@@ -577,7 +574,7 @@ export default function AboutPage() {
             transformPerspective: 1200,
             transformOrigin: 'center center',
             scale: 0.8,
-            filter: 'blur(8px) brightness(0.5)',
+            filter: 'brightness(0.5)',
             y: 30,
           });
 
@@ -595,7 +592,7 @@ export default function AboutPage() {
               opacity: 1,
               rotationX: 0,
               scale: 1,
-              filter: 'blur(0px) brightness(1)',
+              filter: 'brightness(1)',
               y: 0,
               duration: 2.9,
               ease: 'back.out(1.2)',
@@ -622,11 +619,10 @@ export default function AboutPage() {
       if (partnersRef.current) {
         gsap.fromTo(
           partnersRef.current,
-          { opacity: 0, y: 60, filter: 'blur(12px)', scale: 0.95 },
+          { opacity: 0, y: 60, scale: 0.95 },
           {
             opacity: 1,
             y: 0,
-            filter: 'blur(0px)',
             scale: 1,
             duration: 1.6,
             ease: 'power3.out',
@@ -684,12 +680,11 @@ export default function AboutPage() {
           const fromLeft = i % 2 === 0;
           gsap.fromTo(
             chapter,
-            { opacity: 0, x: fromLeft ? -80 : 80, y: 30, filter: 'blur(12px)', scale: 0.92 },
+            { opacity: 0, x: fromLeft ? -80 : 80, y: 30, scale: 0.92 },
             {
               opacity: 1,
               x: 0,
               y: 0,
-              filter: 'blur(0px)',
               scale: 1,
               duration: 2.2,
               ease: 'power3.out',
@@ -804,9 +799,7 @@ export default function AboutPage() {
           Mission / Description Section
       ═══════════════════════════════════════════════════════════════ */}
       <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
-        <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
-
-        <div className="max-w-7xl mx-auto px-6">
+<div className="max-w-7xl mx-auto px-6">
           <div ref={textRef}>
             {/* 2-Column layout on desktop */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-12">
@@ -855,9 +848,8 @@ export default function AboutPage() {
       <section ref={statsSectionRef} className="py-10 sm:py-14 relative overflow-hidden">
         {/* Subtle ambient glow on cream background */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/3 left-[15%] w-72 h-72 bg-navy/[0.04] rounded-full blur-[120px]" />
-          <div className="absolute bottom-1/3 right-[15%] w-72 h-72 bg-red/[0.03] rounded-full blur-[120px]" />
-        </div>
+
+</div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-16">
@@ -868,9 +860,7 @@ export default function AboutPage() {
                   {/* ── Floating Navy Bubble ── */}
                   <div className="relative mb-6">
                     {/* Soft warm glow */}
-                    <div className="absolute -inset-4 rounded-full bg-navy/10 blur-2xl group-hover:bg-navy/15 transition-all duration-700" />
-                    
-                    {/* Main sphere */}
+{/* Main sphere */}
                     <div className="relative w-16 h-16 sm:w-[4.5rem] sm:h-[4.5rem] rounded-full overflow-hidden shadow-[0_8px_28px_rgba(0,48,72,0.4),0_2px_10px_rgba(0,48,72,0.25),inset_0_-4px_12px_rgba(0,0,0,0.3),inset_0_2px_3px_rgba(255,255,255,0.08)]">
                       {/* Base gradient — deep navy spectrum */}
                       <div className="absolute inset-0 rounded-full" style={{ background: 'linear-gradient(135deg, #004A6E 0%, #003048 40%, #001E2E 100%)' }} />
@@ -879,9 +869,7 @@ export default function AboutPage() {
                       <div className="absolute top-0 left-[12%] right-[12%] h-[38%] rounded-t-full bg-gradient-to-b from-white/18 via-white/6 to-transparent" />
                       
                       {/* Tiny specular dot */}
-                      <div className="absolute top-[12%] left-[22%] w-[16%] h-[12%] bg-white/15 rounded-full blur-[4px]" />
-                      
-                      {/* Red accent ring — subtle brand warmth */}
+{/* Red accent ring — subtle brand warmth */}
                       <div className="absolute inset-[2px] rounded-full ring-1 ring-red/15" />
                       
                       {/* White icon — clean contrast */}
@@ -891,8 +879,7 @@ export default function AboutPage() {
                     </div>
                     
                     {/* Floor shadow — navy tint */}
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-3 bg-navy/20 rounded-full blur-md" />
-                  </div>
+</div>
 
                   {/* ── Number — dark text on cream ── */}
                   <div className="text-4xl sm:text-5xl font-heading font-bold text-navy mb-1.5 relative">
@@ -916,13 +903,11 @@ export default function AboutPage() {
           Values Section
       ═══════════════════════════════════════════════════════════════ */}
       <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
-        <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
-
-        <div ref={valuesRef} className="max-w-7xl mx-auto px-6">
+<div ref={valuesRef} className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <motion.div
-              initial={{ opacity: 0, y: 50, filter: 'blur(16px)', scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
             >
@@ -941,13 +926,9 @@ export default function AboutPage() {
                   className="value-card relative bg-navy rounded-3xl p-8 sm:p-10 text-center group cursor-default overflow-hidden ring-1 ring-white/[0.06]"
                 >
                   {/* Ambient glow underneath card */}
-                  <div className="absolute -inset-1 bg-gradient-to-b from-navy/40 via-red/[0.07] to-navy/40 rounded-[1.6rem] blur-xl -z-10 opacity-70 group-hover:opacity-100 transition-opacity duration-700" />
-
-                  {/* Top-right decorative glow */}
-                  <div className="absolute top-0 right-0 w-48 h-48 bg-red/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                  {/* Bottom-left soft light */}
-                  <div className="absolute bottom-0 left-0 w-36 h-36 bg-white/5 rounded-full blur-2xl" />
-                  {/* Top-edge highlight line */}
+{/* Top-right decorative glow */}
+{/* Bottom-left soft light */}
+{/* Top-edge highlight line */}
                   <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
                   <div className="relative z-10" style={{ transform: 'translateZ(40px)' }}>
@@ -961,8 +942,7 @@ export default function AboutPage() {
 
                   {/* Bottom accent glow bar */}
                   <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-red/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="absolute bottom-0 left-1/4 right-1/4 h-8 bg-red/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                </TiltCard>
+</TiltCard>
               );
             })}
           </div>
@@ -973,13 +953,11 @@ export default function AboutPage() {
           Our Partners Section — Physics-Based Interactive Marquee
       ═══════════════════════════════════════════════════════════════ */}
       <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
-        <div className="absolute bottom-20 left-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
-
-        <div ref={partnersRef} className="max-w-7xl mx-auto px-6">
+<div ref={partnersRef} className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <motion.div
-              initial={{ opacity: 0, y: 50, filter: 'blur(16px)', scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
             >
@@ -1071,14 +1049,12 @@ export default function AboutPage() {
           Our Story Section — Timeline
       ═══════════════════════════════════════════════════════════════ */}
       <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
-        <div className="absolute top-20 right-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
-
-        <div ref={storyRef} className="max-w-5xl mx-auto px-6">
+<div ref={storyRef} className="max-w-5xl mx-auto px-6">
           {/* Header */}
           <div className="text-center mb-14">
             <motion.div
-              initial={{ opacity: 0, y: 50, filter: 'blur(16px)', scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
             >
@@ -1137,12 +1113,10 @@ export default function AboutPage() {
           Bottom CTA — Premium Floating Box
       ═══════════════════════════════════════════════════════════════ */}
       <section className="py-20 sm:py-28 bg-cream relative overflow-hidden">
-        <div className="absolute bottom-20 left-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
-
-        <motion.div
+<motion.div
           ref={ctaRef}
-          initial={{ opacity: 0, y: 80, scale: 0.92, filter: 'blur(12px)' }}
-          whileInView={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+          initial={{ opacity: 0, y: 80, scale: 0.92 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 2.3, ease: [0.22, 0.68, 0, 1] }}
           className="max-w-4xl mx-auto px-6 sm:px-8"
@@ -1159,11 +1133,9 @@ export default function AboutPage() {
             <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
 
             {/* Animated gradient orbs */}
-            <div className="absolute top-0 right-0 w-72 h-72 bg-red/15 rounded-full blur-[80px] animate-pulse" />
-            <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/[0.06] rounded-full blur-[60px]" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-32 bg-red/5 rounded-full blur-[100px] rotate-12" />
 
-            {/* Moving shimmer */}
+
+{/* Moving shimmer */}
             <div className="absolute inset-0 rounded-[2rem] overflow-hidden pointer-events-none">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" style={{ animation: 'shimmerSlide 4s ease-in-out infinite' }} />
             </div>

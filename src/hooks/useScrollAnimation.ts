@@ -39,7 +39,7 @@ export function useScrollAnimation<T extends HTMLElement>(
       scaleUp: { scale: 0.85, opacity: 0 },
       slideLeft: { x: -80, opacity: 0 },
       slideRight: { x: 80, opacity: 0 },
-      blurUp: { y: 50, opacity: 0, filter: 'blur(10px)' },
+      blurUp: { y: 50, opacity: 0 },
       splitReveal: { y: 80, opacity: 0, rotationX: -15 },
     };
 
@@ -50,7 +50,6 @@ export function useScrollAnimation<T extends HTMLElement>(
       x: 0,
       opacity: 1,
       scale: 1,
-      filter: 'blur(0px)',
       rotationX: 0,
       duration,
       delay,

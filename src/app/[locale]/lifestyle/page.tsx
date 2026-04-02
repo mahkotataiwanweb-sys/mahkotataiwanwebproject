@@ -230,13 +230,11 @@ export default function LifestylePage() {
         opacity: 0,
         y: 50,
         clipPath: 'inset(100% 0 0 0)',
-        filter: 'blur(12px)',
         scale: 0.95,
       }, {
         opacity: 1,
         y: 0,
         clipPath: 'inset(0% 0 0 0)',
-        filter: 'blur(0px)',
         scale: 1,
         duration: 2.0,
         ease: 'power4.out',
@@ -256,11 +254,10 @@ export default function LifestylePage() {
         const isEven = card.getAttribute('data-card') === 'even';
         gsap.fromTo(
           card,
-          { opacity: 0, x: isEven ? 80 : -80, filter: 'blur(8px)', scale: 0.92 },
+          { opacity: 0, x: isEven ? 80 : -80, scale: 0.92 },
           {
             opacity: 1,
             x: 0,
-            filter: 'blur(0px)',
             scale: 1,
             duration: 1.8,
             ease: 'power3.out',

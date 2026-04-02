@@ -27,7 +27,6 @@ export default function LoadingScreen() {
           >
             {/* Pulsing glow effect */}
             <motion.div
-              className="absolute inset-0 rounded-full bg-red/20 blur-2xl"
               animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.3, 0.6, 0.3] }}
               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             />

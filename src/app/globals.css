@@ -218,17 +218,14 @@
   0% {
     opacity: 0;
     transform: translateY(20px) rotateX(90deg);
-    filter: blur(8px);
-  }
+}
   60% {
     opacity: 0.7;
     transform: translateY(-3px) rotateX(-5deg);
-    filter: blur(1px);
-  }
+}
   100% {
     opacity: 1;
     transform: translateY(0) rotateX(0deg);
-    filter: blur(0);
   }
 }
 

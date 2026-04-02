@@ -51,11 +51,10 @@ export default function MomentsSection() {
       if (headerRef.current) {
         gsap.fromTo(
           headerRef.current.children,
-          { opacity: 0, y: 50, filter: 'blur(4px)' },
+          { opacity: 0, y: 50 },
           {
             opacity: 1,
             y: 0,
-            filter: 'blur(0px)',
             duration: 1,
             stagger: 0.12,
             ease: 'power4.out',
@@ -111,9 +110,7 @@ export default function MomentsSection() {
     >
       {/* Decorative */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-navy/10 to-transparent" />
-      <div className="absolute top-20 left-0 w-80 h-80 rounded-full bg-red/5 blur-3xl" />
-
-      <div className="max-w-7xl mx-auto px-6">
+<div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div ref={headerRef} className="text-center mb-14">
           <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">

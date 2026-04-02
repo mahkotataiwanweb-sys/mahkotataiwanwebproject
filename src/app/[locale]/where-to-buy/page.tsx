@@ -159,18 +159,17 @@ export default function WhereToBuyPage() {
     if (!containerRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Hero text entrance — premium staggered blur reveal
+      // Hero text entrance — premium staggered reveal
       gsap.from('.hero-text', {
         opacity: 0,
         y: 60,
-        filter: 'blur(16px)',
         scale: 0.9,
         duration: 1.6,
         stagger: 0.25,
         ease: 'power4.out',
       });
 
-      // Stats cards — clean, stable reveal (no heavy blur/scale)
+      // Stats cards — clean, stable reveal
       const statCards = gsap.utils.toArray('.stat-card') as HTMLElement[];
       statCards.forEach((card, i) => {
         gsap.fromTo(card,
@@ -199,13 +198,11 @@ export default function WhereToBuyPage() {
           opacity: 0,
           y: 100,
           scale: 0.95,
-          filter: 'blur(14px)',
         },
         {
           opacity: 1,
           y: 0,
           scale: 1,
-          filter: 'blur(0px)',
           duration: 1.8,
           ease: 'power4.out',
           scrollTrigger: {
@@ -220,7 +217,6 @@ export default function WhereToBuyPage() {
       gsap.from('.map-header-text', {
         opacity: 0,
         y: 40,
-        filter: 'blur(10px)',
         duration: 1.2,
         stagger: 0.15,
         ease: 'power3.out',
@@ -344,10 +340,9 @@ export default function WhereToBuyPage() {
     <div ref={containerRef} className="min-h-screen bg-cream relative">
       {/* ─── Parallax Glow Orbs ─── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="parallax-orb-1 absolute top-[20%] left-[10%] w-[500px] h-[500px] rounded-full bg-red/[0.04] blur-[120px]" />
-        <div className="parallax-orb-2 absolute top-[50%] right-[5%] w-[400px] h-[400px] rounded-full bg-navy/[0.04] blur-[100px]" />
-        <div className="absolute bottom-[10%] left-[30%] w-[350px] h-[350px] rounded-full bg-red/[0.03] blur-[100px]" />
-      </div>
+
+
+</div>
 
       {/* ─── Dark Navy Hero ─── */}
       <section className="relative bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] pt-32 pb-24 overflow-hidden">
@@ -482,9 +477,7 @@ export default function WhereToBuyPage() {
           {/* Map with premium frame */}
           <div className="relative">
             {/* Outer glow */}
-            <div className="absolute -inset-1 bg-gradient-to-br from-red/10 via-transparent to-navy/10 rounded-[2.5rem] blur-xl opacity-60" />
-
-            {/* Map wrapper */}
+{/* Map wrapper */}
             <div className="relative rounded-[2rem] overflow-hidden border border-cream-dark/20 shadow-[0_25px_80px_-15px_rgba(0,48,72,0.12)]">
               {!loading && <StoreMap stores={stores} />}
               {loading && (

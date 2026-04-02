@@ -5,7 +5,7 @@ import { Sparkles } from 'lucide-react';
 
 /**
  * HeroBackground — shared animated background for all page hero sections.
- * Renders: grid overlay, decorative blurred circles, floating sparkles, vertical accent line.
+ * Renders: grid overlay, decorative circles, floating sparkles, vertical accent line.
  * Place inside a `position: relative; overflow: hidden` parent with a navy/dark background.
  */
 export default function HeroBackground() {
@@ -21,12 +21,10 @@ export default function HeroBackground() {
         }}
       />
 
-      {/* Decorative blurred circles */}
-      <div className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[#C12126]/15 blur-[120px]" />
-      <div className="pointer-events-none absolute bottom-0 left-0 h-80 w-80 rounded-full bg-[#FAEDD3]/10 blur-[100px]" />
-      <div className="pointer-events-none absolute top-1/2 left-1/3 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#C12126]/8 blur-[80px]" />
+      {/* Decorative circles */}
 
-      {/* Floating sparkle elements */}
+
+{/* Floating sparkle elements */}
       <motion.div
         className="pointer-events-none absolute top-20 right-[15%] text-[#FAEDD3]/10"
         animate={{ y: [0, -15, 0], rotate: [0, 180, 360] }}

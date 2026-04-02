@@ -51,11 +51,10 @@ export default function EventsSection() {
       if (headerRef.current) {
         gsap.fromTo(
           headerRef.current.children,
-          { opacity: 0, y: 50, filter: 'blur(4px)' },
+          { opacity: 0, y: 50 },
           {
             opacity: 1,
             y: 0,
-            filter: 'blur(0px)',
             duration: 1,
             stagger: 0.12,
             ease: 'power4.out',
@@ -127,10 +126,8 @@ export default function EventsSection() {
     >
       {/* Decorative */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cream/10 to-transparent" />
-      <div className="absolute top-20 right-0 w-96 h-96 rounded-full bg-red/5 blur-3xl" />
-      <div className="absolute bottom-10 left-10 w-72 h-72 rounded-full bg-cream/5 blur-3xl" />
 
-      <div className="max-w-7xl mx-auto px-6">
+<div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-14">
           <div>

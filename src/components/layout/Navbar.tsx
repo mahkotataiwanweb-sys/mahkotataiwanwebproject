@@ -508,7 +508,7 @@ export default function Navbar() {
                 className="relative"
                 style={{ marginTop: isScrolled ? '-8px' : '-16px' }}
               >
-                <motion.div className="absolute inset-0 rounded-full blur-xl"
+                <motion.div className="absolute inset-0 rounded-full"
                   animate={{ opacity: [0.15, 0.3, 0.15], scale: [1, 1.2, 1] }}
                   transition={{ duration: 3, ease: 'easeInOut', repeat: Infinity }}
                   style={{

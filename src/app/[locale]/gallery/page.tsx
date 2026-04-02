@@ -330,12 +330,10 @@ export default function GalleryPage() {
       gsap.fromTo('.hero-anim', {
         y: 60,
         opacity: 0,
-        filter: 'blur(12px)',
         scale: 0.95,
       }, {
         y: 0,
         opacity: 1,
-        filter: 'blur(0px)',
         scale: 1,
         stagger: 0.25,
         duration: 2.0,
@@ -362,11 +360,10 @@ export default function GalleryPage() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         cards,
-        { y: 50, opacity: 0, filter: 'blur(8px)', scale: 0.92 },
+        { y: 50, opacity: 0, scale: 0.92 },
         {
           y: 0,
           opacity: 1,
-          filter: 'blur(0px)',
           scale: 1,
           stagger: 0.06,
           duration: 1.7,
@@ -583,8 +580,8 @@ export default function GalleryPage() {
               <div key={eventName} className="mb-16 last:mb-0">
                 {/* Section Header */}
                 <motion.div
-                  initial={{ opacity: 0, x: -20, filter: 'blur(8px)', scale: 0.95 }}
-                  whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)', scale: 1 }}
+                  initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                  whileInView={{ opacity: 1, x: 0, scale: 1 }}
                   viewport={{ once: true, margin: '-50px' }}
                   transition={{ duration: 1.8 }}
                   className="flex items-end gap-4 mb-6 pb-4 border-b border-[#003048]/10"
