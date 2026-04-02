@@ -56,19 +56,6 @@ export default function WhereToBuySection() {
 
     const mapStart = window.innerWidth < 768 ? 'top 30%' : 'top 10%';
     const ctx = gsap.context(() => {
-      // Section entrance — gentle fade (applies to whole section, not just map)
-      gsap.from(sectionRef.current, {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: mapStart,
-          toggleActions: 'play none none reverse',
-        },
-        opacity: 0,
-        y: 40,
-        duration: 3.8,
-        ease: 'power2.out',
-      });
-
       // Looping pin bounce sequence:
       // 1. Pins bounce in one-by-one slowly
       // 2. All hold for a moment
