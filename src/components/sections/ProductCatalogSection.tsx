@@ -116,6 +116,8 @@ function InfiniteSlider({
   const containerRef = useRef<HTMLDivElement>(null);
   const isVisibleRef = useRef(true);
   const needsSnapRef = useRef(true); /* snap lerp on first frame & after wraps */
+  const pressedIndexRef = useRef<number>(-1);
+  const pressScaleRef = useRef<number[]>([]);
 
   /* ---- Lerp state for each slot ---- */
   const lerpStateRef = useRef<{
@@ -123,8 +125,8 @@ function InfiniteSlider({
     shadowOpacity: number[]; nameOpacity: number[]; nameScale: number[];
   }>({ scale: [], opacity: [], yLift: [], shadowOpacity: [], nameOpacity: [], nameScale: [] });
 
-  const DEFAULT_SPEED = 0.65;
-  const FRICTION = 0.94;
+  const DEFAULT_SPEED = 0.72;
+  const FRICTION = 0.975;
   const RETURN_RATE = 0.015;
   const LERP_FACTOR = 0.12; /* faster response — was 0.08 */
   const ITEM_WIDTH_MOBILE = 160;
@@ -159,6 +161,7 @@ function InfiniteSlider({
       s.shadowOpacity = Array(count).fill(0.08);
       s.nameOpacity = Array(count).fill(0.25);
       s.nameScale = Array(count).fill(0.88);
+      pressScaleRef.current = Array(count).fill(1.0);
       needsSnapRef.current = true;
     }
   }, [items.length]);
@@ -193,9 +196,9 @@ function InfiniteSlider({
       const ep = easeOutSine(proximity);
 
       /* Target values */
-      const tScale = 0.65 + ep * 0.55;
+      const tScale = 0.65 + ep * 0.45;
       const tOpacity = 0.35 + ep * 0.65;
-      const tYLift = -Math.pow(ep, 1.5) * 28; /* smoother curve than ep*ep */
+      const tYLift = -Math.pow(ep, 1.5) * 22; /* smoother curve than ep*ep */
       const tShadow = 0.08 + ep * 0.42;
       const tNameOp = 0.25 + ep * 0.75;
       const tNameSc = 0.88 + ep * 0.14;
@@ -209,7 +212,17 @@ function InfiniteSlider({
       s.nameScale[i] += (tNameSc - s.nameScale[i]) * lf;
 
       /* Apply transforms */
-      imgContainer.style.transform = `translateY(${s.yLift[i]}px) scale(${s.scale[i]})`;
+      /* Lerp press scale toward 1.0 (springs back after push) */
+      const ps = pressScaleRef.current;
+      if (ps[i] !== undefined) {
+        if (i === pressedIndexRef.current) {
+          ps[i] += (0.88 - ps[i]) * 0.3; /* push down fast */
+        } else {
+          ps[i] += (1.0 - ps[i]) * 0.12; /* spring back */
+        }
+      }
+      const finalScale = s.scale[i] * (ps[i] ?? 1.0);
+      imgContainer.style.transform = `translateY(${s.yLift[i]}px) scale(${finalScale})`;
       imgContainer.style.opacity = `${s.opacity[i]}`;
       imgContainer.style.filter = `drop-shadow(0 ${12 + s.shadowOpacity[i] * 30}px ${20 + s.shadowOpacity[i] * 40}px rgba(0,0,0,${s.shadowOpacity[i]}))`;
 
@@ -299,6 +312,19 @@ function InfiniteSlider({
     lastMoveTimeRef.current = performance.now();
     dragVelocityRef.current = 0;
     (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+    /* Immediate push effect on the pressed item */
+    const track = trackRef.current;
+    if (track) {
+      let closestIdx = -1, closestDist = Infinity;
+      const children = track.children;
+      for (let i = 0; i < children.length; i++) {
+        const rect = (children[i] as HTMLElement).getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const d = Math.abs(cx - e.clientX);
+        if (d < closestDist) { closestDist = d; closestIdx = i; }
+      }
+      if (closestIdx >= 0) pressedIndexRef.current = closestIdx;
+    }
   }, []);
 
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
@@ -326,17 +352,36 @@ function InfiniteSlider({
   const handlePointerUp = useCallback(() => {
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
-    if (Math.abs(dragVelocityRef.current) > 0.5) {
-      velocityRef.current = dragVelocityRef.current * 0.7;
-      baseDirectionRef.current = dragVelocityRef.current > 0 ? 1 : -1;
+    pressedIndexRef.current = -1; /* release push effect */
+    if (Math.abs(dragVelocityRef.current) > 0.3) {
+      /* Amplify flick velocity for fun momentum — cap at ±12 */
+      const flick = dragVelocityRef.current * 1.5;
+      velocityRef.current = Math.max(-12, Math.min(12, flick));
     }
     isPausedRef.current = false;
   }, []);
 
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (dragDistRef.current > 5) return;
-    isPausedRef.current = !isPausedRef.current;
-  }, []);
+    /* Find the closest item to the click and trigger push effect */
+    const track = trackRef.current;
+    if (!track) return;
+    const clickX = e.clientX;
+    let closestIdx = -1;
+    let closestDist = Infinity;
+    const children = track.children;
+    for (let i = 0; i < children.length; i++) {
+      const rect = (children[i] as HTMLElement).getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const d = Math.abs(cx - clickX);
+      if (d < closestDist) { closestDist = d; closestIdx = i; }
+    }
+    if (closestIdx >= 0 && closestDist < itemWidth) {
+      pressedIndexRef.current = closestIdx;
+      /* Release after 200ms for bounce-back */
+      setTimeout(() => { pressedIndexRef.current = -1; }, 200);
+    }
+  }, [itemWidth]);
 
   if (products.length === 0) {
     return (
@@ -382,8 +427,9 @@ function InfiniteSlider({
             <div
               className="product-img-wrap relative cursor-pointer will-change-transform"
               style={{
-                width: itemWidth < 200 ? '132px' : '220px',
-                height: itemWidth < 200 ? '132px' : '220px',
+                width: itemWidth < 200 ? '132px' : '200px',
+                height: itemWidth < 200 ? '132px' : '200px',
+                padding: itemWidth < 200 ? '6px' : '10px',
                 transformOrigin: 'center center',
               }}
             >
@@ -393,7 +439,7 @@ function InfiniteSlider({
                   alt={getProductName(product, locale)}
                   fill
                   className="object-contain pointer-events-none"
-                  sizes="220px"
+                  sizes="200px"
                 />
               ) : (
                 <div className="w-full h-full rounded-full bg-navy/10 flex items-center justify-center backdrop-blur-sm">
