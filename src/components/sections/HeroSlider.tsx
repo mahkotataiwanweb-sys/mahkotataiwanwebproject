@@ -263,11 +263,12 @@ export default function HeroSlider() {
   const subtitle = getLocalizedField(currentSlide, 'subtitle', locale);
   const mediaType = currentSlide.media_type;
 
-  // Premium crossfade with subtle zoom — no x-translation, no glitches
+  // Ultra-smooth crossfade — exit stays opaque underneath, enter fades on top
+  // No brightness dip, no ghosting, no double-exposure
   const slideVariants = {
     enter: () => ({
       opacity: 0,
-      scale: 1.06,
+      scale: 1.15,
       zIndex: 2,
     }),
     center: {
@@ -277,7 +278,7 @@ export default function HeroSlider() {
     },
     exit: () => ({
       opacity: 0,
-      scale: 0.97,
+      scale: 0.96,
       zIndex: 1,
     }),
   };
@@ -286,16 +287,17 @@ export default function HeroSlider() {
   const textContainerVariants = {
     hidden: {},
     visible: {
-      transition: { staggerChildren: 0.2, delayChildren: 0.4 },
+      transition: { staggerChildren: 0.25, delayChildren: 0.7 },
     },
   };
 
   const textItemVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 40, filter: 'blur(4px)' },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 1.0, ease: [0.22, 1, 0.36, 1] },
+      filter: 'blur(0px)',
+      transition: { duration: 1.3, ease: [0.16, 1, 0.3, 1] },
     },
   };
 
@@ -304,7 +306,7 @@ export default function HeroSlider() {
     visible: {
       scaleX: 1,
       opacity: 1,
-      transition: { duration: 1.0, ease: [0.22, 1, 0.36, 1], delay: 0.1 },
+      transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.15 },
     },
   };
 
@@ -377,9 +379,9 @@ export default function HeroSlider() {
       <motion.div
         ref={imageRef}
         className="absolute inset-0"
-        initial={{ scale: 1.15 }}
+        initial={{ scale: 1.05 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 6, ease: 'linear' }}
+        transition={{ duration: 10, ease: 'linear' }}
       >
         <Image
           src={currentSlide.image_url}
@@ -410,7 +412,7 @@ export default function HeroSlider() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
           className="absolute inset-0"
         >
           {renderSlideMedia()}
