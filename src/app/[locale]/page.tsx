@@ -58,7 +58,8 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
   btnLabel: string;
   locale: string;
 }>(function AutoFlipCardInner({ articles, fallbackTitle, fallbackExcerpt, fallbackHref, btnLabel, locale }, ref) {
-  const cardRef = useRef<HTMLDivElement>(null);
+  const textBoxRef = useRef<HTMLDivElement>(null);
+  const imageBoxRef = useRef<HTMLDivElement>(null);
   const indexRef = useRef(0);
   const [displayIndex, setDisplayIndex] = useState(0);
   const count = articles.length;
@@ -78,49 +79,70 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
 
   useImperativeHandle(ref, () => ({
     triggerFlip: () => new Promise<void>((resolve) => {
-      // Guard 1: Not enough content to flip
       if (count <= 1) { resolve(); return; }
-      // Guard 2: No DOM element
-      if (!cardRef.current) { resolve(); return; }
-      // Guard 3: Already mid-flip — wait for it to finish, don't skip
+      if (!textBoxRef.current || !imageBoxRef.current) { resolve(); return; }
       if (flippingRef.current) {
-        // Poll until the current flip finishes, then resolve (don't start new flip)
         const checkDone = setInterval(() => {
           if (!flippingRef.current) { clearInterval(checkDone); resolve(); }
         }, 50);
-        // Safety timeout — resolve after 3s max
         setTimeout(() => { clearInterval(checkDone); resolve(); }, 3000);
         return;
       }
 
-      const el = cardRef.current;
+      const textEl = textBoxRef.current;
+      const imgEl = imageBoxRef.current;
       flippingRef.current = true;
 
-      // Kill any lingering tweens to prevent stacking
-      gsap.killTweensOf(el);
+      gsap.killTweensOf(textEl);
+      gsap.killTweensOf(imgEl);
 
       const nextIdx = (indexRef.current + 1) % count;
 
-      // Phase 1: flip out (0.6s)
-      gsap.to(el, {
+      // Phase 1a: Text box flips out FIRST (0.5s)
+      gsap.to(textEl, {
         rotateY: 90,
         opacity: 0,
-        scale: 0.97,
-        duration: 0.6,
+        scale: 0.95,
+        duration: 0.5,
+        ease: 'power2.in',
+        overwrite: 'auto',
+      });
+
+      // Phase 1b: Image box flips out AFTER 0.15s delay (0.5s)
+      gsap.to(imgEl, {
+        rotateY: 90,
+        opacity: 0,
+        scale: 0.95,
+        duration: 0.5,
+        delay: 0.15,
         ease: 'power2.in',
         overwrite: 'auto',
         onComplete: () => {
-          if (!cardRef.current) { flippingRef.current = false; resolve(); return; }
+          if (!textBoxRef.current || !imageBoxRef.current) { flippingRef.current = false; resolve(); return; }
           indexRef.current = nextIdx;
           setDisplayIndex(nextIdx);
-          gsap.set(el, { rotateY: -90, scale: 0.97 });
 
-          // Phase 2: flip in (0.8s)
-          gsap.to(el, {
+          // Reset both to flipped-in position
+          gsap.set(textEl, { rotateY: -90, scale: 0.95 });
+          gsap.set(imgEl, { rotateY: -90, scale: 0.95 });
+
+          // Phase 2a: Text box flips IN first (0.7s)
+          gsap.to(textEl, {
             rotateY: 0,
             opacity: 1,
             scale: 1,
-            duration: 0.8,
+            duration: 0.7,
+            ease: 'power2.out',
+            overwrite: 'auto',
+          });
+
+          // Phase 2b: Image box follows after 0.15s delay (0.7s)
+          gsap.to(imgEl, {
+            rotateY: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 0.7,
+            delay: 0.15,
             ease: 'power2.out',
             overwrite: 'auto',
             onComplete: () => {
@@ -132,10 +154,14 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
       });
     }),
     enterView: () => new Promise<void>((resolve) => {
-      if (!cardRef.current) { resolve(); return; }
-      gsap.killTweensOf(cardRef.current);
-      gsap.set(cardRef.current, { opacity: 0, rotateY: -100 });
-      gsap.to(cardRef.current, { opacity: 1, rotateY: 0, duration: 2, ease: 'power2.out', overwrite: true, onComplete: resolve });
+      if (!textBoxRef.current || !imageBoxRef.current) { resolve(); return; }
+      gsap.killTweensOf(textBoxRef.current);
+      gsap.killTweensOf(imageBoxRef.current);
+      // Text enters first
+      gsap.set(textBoxRef.current, { opacity: 0, rotateY: -100 });
+      gsap.set(imageBoxRef.current, { opacity: 0, rotateY: -100 });
+      gsap.to(textBoxRef.current, { opacity: 1, rotateY: 0, duration: 2, ease: 'power2.out', overwrite: true });
+      gsap.to(imageBoxRef.current, { opacity: 1, rotateY: 0, duration: 2, delay: 0.2, ease: 'power2.out', overwrite: true, onComplete: resolve });
     }),
   }), [count]);
 
@@ -150,30 +176,34 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
 
   return (
     <div>
-      <div style={{ perspective: '2500px' }}>
-        <div ref={cardRef} style={{ opacity: 0, transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}>
-          <Link href={data.href} className="group block">
-          <div className="relative overflow-hidden">
-            <div className="relative aspect-[4/3]">
-              {data.imageUrl ? (
-                <Image src={data.imageUrl} alt={data.title} fill className="object-cover transition-transform duration-[2s] ease-out group-hover:scale-105" sizes="(max-width: 768px) 100vw, 720px" />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#003048] to-[#001a2c]" />
-              )}
-            </div>
-          </div>
-          <div className="relative bg-white mx-6 sm:mx-10 -mt-10 sm:-mt-14 px-8 sm:px-10 py-8 sm:py-10 shadow-[0_4px_30px_rgba(0,0,0,0.08)]">
-            <div className="text-center">
-              <h3 className="font-heading text-xl sm:text-2xl font-bold text-navy mb-3 leading-tight">{data.title}</h3>
-              <p className="text-navy/50 text-sm leading-relaxed mb-6 max-w-md mx-auto">{data.excerpt}</p>
-              <div className="inline-flex items-center gap-2 px-7 py-3 bg-[#003048] text-white text-sm font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300">
-                <span>{btnLabel}</span>
+      <Link href={data.href} className="group block">
+        <div style={{ perspective: '2500px' }}>
+          <div ref={imageBoxRef} style={{ opacity: 0, transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}>
+            <div className="relative overflow-hidden">
+              <div className="relative aspect-[4/3]">
+                {data.imageUrl ? (
+                  <Image src={data.imageUrl} alt={data.title} fill className="object-cover transition-transform duration-[2s] ease-out group-hover:scale-105" sizes="(max-width: 768px) 100vw, 720px" />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#003048] to-[#001a2c]" />
+                )}
               </div>
             </div>
           </div>
-          </Link>
         </div>
-      </div>
+        <div style={{ perspective: '2500px' }}>
+          <div ref={textBoxRef} style={{ opacity: 0, transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}>
+            <div className="relative bg-white mx-6 sm:mx-10 -mt-10 sm:-mt-14 px-8 sm:px-10 py-8 sm:py-10 shadow-[0_4px_30px_rgba(0,0,0,0.08)]">
+              <div className="text-center">
+                <h3 className="font-heading text-xl sm:text-2xl font-bold text-navy mb-3 leading-tight">{data.title}</h3>
+                <p className="text-navy/50 text-sm leading-relaxed mb-6 max-w-md mx-auto">{data.excerpt}</p>
+                <div className="inline-flex items-center gap-2 px-7 py-3 bg-[#003048] text-white text-sm font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300">
+                  <span>{btnLabel}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Link>
       {dots}
     </div>
   );
