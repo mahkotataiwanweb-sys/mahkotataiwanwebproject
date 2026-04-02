@@ -178,7 +178,6 @@ function ProductPopup({
                   fill
                   className={hasDetailImage ? 'object-contain p-6' : 'object-contain p-4'}
                   sizes="(max-width: 512px) 100vw, 512px"
-                  unoptimized
                 />
               </motion.div>
               {/* Subtle vignette */}
@@ -261,6 +260,7 @@ function InfiniteSlider({
   const rafRef = useRef<number>(0);
   const singleSetWidthRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isVisibleRef = useRef(true);
   const prevCenterIdxRef = useRef(-1);
   const centerDwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const floatReadyRef = useRef(false);
@@ -277,6 +277,14 @@ function InfiniteSlider({
     update();
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
+  }, []);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { isVisibleRef.current = e.isIntersecting; }, { rootMargin: '200px' });
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
 
   const items = [...products, ...products, ...products];
@@ -349,6 +357,7 @@ function InfiniteSlider({
   const animate = useCallback(() => {
     const track = trackRef.current;
     if (!track) return;
+    if (!isVisibleRef.current) { rafRef.current = requestAnimationFrame(animate); return; }
 
     const setWidth = singleSetWidthRef.current;
     const targetSpeed = DEFAULT_SPEED * baseDirectionRef.current;
@@ -501,7 +510,6 @@ function InfiniteSlider({
                   fill
                   className="object-contain pointer-events-none"
                   sizes="220px"
-                  unoptimized
                 />
               ) : (
                 <div className="w-full h-full rounded-full bg-navy/10 flex items-center justify-center backdrop-blur-sm">
@@ -576,19 +584,22 @@ export default function ProductCatalogSection() {
     setProducts(allProducts.filter((p) => p.category === selectedCategory));
   }, [selectedCategory, allProducts]);
 
-  /* Preload ALL product images upfront so category switching is instant */
+  /* Preload product images after initial page load for instant category switching */
   useEffect(() => {
     if (allProducts.length === 0) return;
-    allProducts.forEach((p) => {
-      if (p.image_url) {
-        const img = new window.Image();
-        img.src = p.image_url;
-      }
-      if (p.detail_image_url) {
-        const img = new window.Image();
-        img.src = p.detail_image_url;
-      }
-    });
+    const timer = setTimeout(() => {
+      allProducts.forEach((p) => {
+        if (p.image_url) {
+          const img = new window.Image();
+          img.src = p.image_url;
+        }
+        if (p.detail_image_url) {
+          const img = new window.Image();
+          img.src = p.detail_image_url;
+        }
+      });
+    }, 3000);
+    return () => clearTimeout(timer);
   }, [allProducts]);
 
   useEffect(() => {
@@ -618,11 +629,10 @@ export default function ProductCatalogSection() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         headerRef.current!.children,
-        { opacity: 0, y: 50, filter: 'blur(14px)', scale: 0.92 },
+        { opacity: 0, y: 50, scale: 0.92 },
         {
           opacity: 1,
           y: 0,
-          filter: 'blur(0px)',
           scale: 1,
           duration: 1.6,
           stagger: 0.2,

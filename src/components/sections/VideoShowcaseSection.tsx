@@ -360,11 +360,10 @@ export default function VideoShowcaseSection() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         headerRef.current!.children,
-        { opacity: 0, y: 50, filter: 'blur(14px)', scale: 0.92 },
+        { opacity: 0, y: 50, scale: 0.92 },
         {
           opacity: 1,
           y: 0,
-          filter: 'blur(0px)',
           scale: 1,
           duration: 1.6,
           stagger: 0.2,

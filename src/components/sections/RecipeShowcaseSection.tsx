@@ -40,6 +40,8 @@ function CylinderCarousel({
   locale: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const isVisibleRef = useRef(true);
   const angleRef = useRef(0);
   const velocityRef = useRef(0.15);
   const targetVelocityRef = useRef(0.15);
@@ -59,10 +61,19 @@ function CylinderCarousel({
     return () => window.removeEventListener('resize', check);
   }, []);
 
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { isVisibleRef.current = e.isIntersecting; }, { rootMargin: '200px' });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   // Radius: bigger on desktop for cinematic feel
   const radius = isMobile ? 220 : 380;
 
   const animate = useCallback(() => {
+    if (!isVisibleRef.current) { rafRef.current = requestAnimationFrame(animate); return; }
     // Smooth velocity interpolation
     velocityRef.current += (targetVelocityRef.current - velocityRef.current) * 0.03;
     angleRef.current += velocityRef.current;
@@ -127,6 +138,7 @@ function CylinderCarousel({
 
   return (
     <div
+      ref={wrapperRef}
       className="relative w-full overflow-hidden cursor-grab active:cursor-grabbing"
       style={{ height: isMobile ? '380px' : '480px', perspective: '1200px' }}
       onPointerDown={handlePointerDown}
@@ -171,7 +183,6 @@ function CylinderCarousel({
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                     sizes="280px"
-                    unoptimized
                   />
                 ) : (
                   <div className="absolute inset-0 bg-gradient-to-br from-red/80 to-navy" />
@@ -269,11 +280,10 @@ export default function RecipeShowcaseSection() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         headingRef.current!.children,
-        { opacity: 0, y: 50, filter: 'blur(14px)', scale: 0.92, rotateX: -15 },
+        { opacity: 0, y: 50, scale: 0.92, rotateX: -15 },
         {
           opacity: 1,
           y: 0,
-          filter: 'blur(0px)',
           scale: 1,
           rotateX: 0,
           duration: 1.6,

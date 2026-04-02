@@ -19,6 +19,8 @@ const RETURN_RATE = 0.05;  // how fast velocity returns to default after release
 
 export default function MarqueeSection() {
   const trackRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isVisibleRef = useRef(true);
   const offsetRef = useRef(0);
   const velocityRef = useRef(-DEFAULT_SPEED);
   const isDraggingRef = useRef(false);
@@ -34,6 +36,14 @@ export default function MarqueeSection() {
   // Tripled items for seamless infinite loop
   const items = [...marqueeItems, ...marqueeItems, ...marqueeItems];
 
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { isVisibleRef.current = e.isIntersecting; }, { rootMargin: '200px' });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   const measureSetWidth = useCallback(() => {
     const track = trackRef.current;
     if (!track) return;
@@ -43,6 +53,7 @@ export default function MarqueeSection() {
   const animate = useCallback(() => {
     const track = trackRef.current;
     if (!track) return;
+    if (!isVisibleRef.current) { rafRef.current = requestAnimationFrame(animate); return; }
 
     const setWidth = singleSetWidthRef.current;
 
@@ -143,7 +154,7 @@ export default function MarqueeSection() {
   }, []);
 
   return (
-    <section className="py-6 bg-navy overflow-hidden relative">
+    <section ref={sectionRef} className="py-6 bg-navy overflow-hidden relative">
       {/* Gradient overlay at left edge */}
       <div className="absolute top-0 left-0 w-24 h-full bg-gradient-to-r from-navy to-transparent z-10 pointer-events-none" />
       {/* Gradient overlay at right edge */}
