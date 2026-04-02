@@ -84,8 +84,7 @@ export default function Navbar() {
     readBrightness();
     const observer = new MutationObserver(readBrightness);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['style', 'class'] });
-    const interval = setInterval(readBrightness, 500);
-    return () => { observer.disconnect(); clearInterval(interval); };
+    return () => { observer.disconnect(); };
   }, [isHomePage]);
 
   // Fetch menus

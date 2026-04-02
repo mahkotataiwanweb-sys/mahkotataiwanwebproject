@@ -156,7 +156,7 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
           <div className="relative overflow-hidden">
             <div className="relative aspect-[4/3]">
               {data.imageUrl ? (
-                <Image src={data.imageUrl} alt={data.title} fill className="object-cover transition-transform duration-[2s] ease-out group-hover:scale-105" sizes="(max-width: 768px) 100vw, 720px" unoptimized />
+                <Image src={data.imageUrl} alt={data.title} fill className="object-cover transition-transform duration-[2s] ease-out group-hover:scale-105" sizes="(max-width: 768px) 100vw, 720px" />
               ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-[#003048] to-[#001a2c]" />
               )}
@@ -223,11 +223,10 @@ export default function HomePage() {
       if (headerRef.current) {
         gsap.fromTo(
           headerRef.current.children,
-          { opacity: 0, y: 50, filter: 'blur(14px)', scale: 0.92 },
+          { opacity: 0, y: 50, scale: 0.92 },
           {
             opacity: 1,
             y: 0,
-            filter: 'blur(0px)',
             scale: 1,
             duration: 1.6,
             stagger: 0.2,
