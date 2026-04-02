@@ -616,85 +616,79 @@ function CategoryDropdown({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const categoryLabel = locale === 'id' ? 'Kategori' : locale === 'zh-TW' ? '類別' : 'Category';
-  const itemsLabel = locale === 'id' ? 'produk' : locale === 'zh-TW' ? '項' : 'items';
+  const categoryLabel = locale === 'id' ? 'Kategori' : locale === 'zh-TW' ? '\u985e\u5225' : 'Category';
+  const itemsLabel = locale === 'id' ? 'produk' : locale === 'zh-TW' ? '\u9805' : 'items';
 
   return (
     <div ref={dropdownRef} className="relative inline-block">
-      {/* Trigger button — larger and more prominent */}
+      {/* Compact trigger button */}
       <button
         onClick={() => setOpen(!open)}
-        className="group flex items-center gap-4 px-7 py-4.5 rounded-2xl bg-white/90 backdrop-blur-sm border border-navy/10 shadow-lg shadow-navy/8 hover:shadow-xl hover:bg-white transition-all duration-300 min-w-[280px] sm:min-w-[320px]"
+        className="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white/90 backdrop-blur-sm border border-navy/10 shadow-md shadow-navy/5 hover:shadow-lg hover:bg-white hover:border-navy/15 transition-all duration-300"
       >
         {activeCat && (
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-red/10 to-red/5 flex items-center justify-center text-red">
-            <CategoryIcon slug={activeCat.slug} size={22} />
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red/10 to-red/5 flex items-center justify-center text-red">
+            <CategoryIcon slug={activeCat.slug} size={16} />
           </div>
         )}
-        <div className="text-left flex-1">
-          <span className="text-[11px] text-navy/35 font-semibold uppercase tracking-[0.15em] block leading-none mb-1">{categoryLabel}</span>
-          <span className="text-base font-bold text-navy block leading-tight">{activeName}</span>
+        <div className="text-left">
+          <span className="text-[9px] text-navy/30 font-semibold uppercase tracking-[0.15em] block leading-none mb-0.5">{categoryLabel}</span>
+          <span className="text-sm font-bold text-navy block leading-tight">{activeName}</span>
         </div>
-        <ChevronDown className={`w-5 h-5 text-navy/30 ml-2 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-navy/25 ml-1 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
       </button>
 
-      {/* Dropdown menu — bigger, taller items */}
+      {/* Compact dropdown menu */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.96 }}
+            initial={{ opacity: 0, y: -6, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.96 }}
+            exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-            className="absolute top-full left-0 mt-2 w-80 sm:w-96 bg-white/[0.99] backdrop-blur-2xl rounded-2xl shadow-2xl shadow-navy/15 border border-navy/8 overflow-hidden z-50 max-h-[480px] overflow-y-auto"
+            className="absolute top-full left-0 mt-1.5 w-64 sm:w-72 bg-white/[0.99] backdrop-blur-2xl rounded-xl shadow-xl shadow-navy/12 border border-navy/8 overflow-hidden z-50 max-h-[360px] overflow-y-auto"
             style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(0,48,72,0.12) transparent' }}
           >
-            <div className="p-3">
+            <div className="p-1.5">
               {categories.map((cat, i) => {
                 const name = getLocalizedField(cat, 'name', locale);
-                const desc = getLocalizedField(cat, 'description', locale);
                 const isActive = cat.id === activeCategory;
                 const count = productCounts[cat.id] || 0;
 
                 return (
                   <motion.button
                     key={cat.id}
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.03 }}
+                    transition={{ delay: i * 0.025 }}
                     onClick={() => {
                       onSelect(cat.id);
                       setOpen(false);
                     }}
-                    className={`w-full flex items-center gap-4 px-5 py-4.5 rounded-xl transition-all duration-200 group text-left ${
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group text-left ${
                       isActive
-                        ? 'bg-red/8 ring-1 ring-red/15'
-                        : 'hover:bg-cream/70'
+                        ? 'bg-red/8 ring-1 ring-red/12'
+                        : 'hover:bg-cream/60'
                     }`}
                   >
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 ${
-                      isActive
-                        ? 'bg-red/15 text-red shadow-sm shadow-red/10'
-                        : 'bg-navy/5 text-navy/40 group-hover:bg-red/10 group-hover:text-red'
-                    }`}>
-                      <CategoryIcon slug={cat.slug} size={24} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-base font-semibold truncate transition-colors duration-200 ${
-                        isActive ? 'text-red' : 'text-navy group-hover:text-navy'
-                      }`}>
-                        {name}
-                      </p>
-                      {desc && (
-                        <p className="text-navy/30 text-xs mt-1 truncate">{desc}</p>
-                      )}
-                    </div>
-                    <span className={`text-xs font-bold px-3 py-1 rounded-full shrink-0 ${
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 ${
                       isActive
                         ? 'bg-red/15 text-red'
-                        : 'bg-navy/5 text-navy/30 group-hover:bg-red/10 group-hover:text-red/60'
+                        : 'bg-navy/5 text-navy/35 group-hover:bg-red/10 group-hover:text-red'
                     }`}>
-                      {count} {itemsLabel}
+                      <CategoryIcon slug={cat.slug} size={16} />
+                    </div>
+                    <span className={`text-sm font-semibold truncate flex-1 transition-colors duration-200 ${
+                      isActive ? 'text-red' : 'text-navy/70 group-hover:text-navy'
+                    }`}>
+                      {name}
+                    </span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                      isActive
+                        ? 'bg-red/12 text-red'
+                        : 'bg-navy/5 text-navy/25 group-hover:bg-red/8 group-hover:text-red/50'
+                    }`}>
+                      {count}
                     </span>
                   </motion.button>
                 );
@@ -1066,7 +1060,7 @@ function ProductsContent() {
         </div>
         {/* Subtle grain overlay */}
         <div className="absolute inset-0 z-[1] pointer-events-none opacity-30"><SandTexture /></div>
-      <div ref={contentRef} className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20 scroll-mt-8">
+      <div ref={contentRef} className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20 scroll-mt-8 min-h-[60vh]">
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
             {Array.from({ length: 8 }).map((_, i) => (
