@@ -416,10 +416,10 @@ export default function HeroSlider() {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Slides */}
-      <AnimatePresence initial={false} custom={direction} mode="popLayout">
+      {/* Background slides — only media + overlay, no text */}
+      <AnimatePresence initial={false} custom={direction} mode="sync">
         <motion.div
-          key={currentSlide.id}
+          key={`bg-${currentSlide.id}`}
           custom={direction}
           variants={slideVariants}
           initial="enter"
@@ -430,62 +430,64 @@ export default function HeroSlider() {
           style={{ willChange: 'transform, opacity' }}
         >
           {renderSlideMedia()}
-
           {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-black/40" />
-
-          {/* Slide content */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <motion.div
-              className="max-w-4xl mx-auto px-6 pb-16 sm:pb-8 text-center hero-text-content"
-              variants={textContainerVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-            >
-              <motion.div variants={textItemVariants}>
-                <Image
-                  src="/images/logo.png"
-                  alt="Mahkota Taiwan"
-                  width={70}
-                  height={70}
-                  className="mx-auto mb-6 drop-shadow-lg brightness-0 invert"
-                  priority
-                />
-              </motion.div>
-
-              <motion.h1
-                variants={textItemVariants}
-                className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg"
-              >
-                {title}
-              </motion.h1>
-
-              <motion.div
-                variants={lineVariants}
-                className="w-20 h-[3px] bg-red mx-auto mb-6 origin-center"
-              />
-
-              <motion.p
-                variants={textItemVariants}
-                className="text-base sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow"
-              >
-                {subtitle}
-              </motion.p>
-
-              {currentSlide.link_url && (
-                <motion.a
-                  href={currentSlide.link_url}
-                  variants={textItemVariants}
-                  className="inline-block mt-8 px-8 py-4 bg-red text-white rounded-full text-sm font-semibold tracking-wide uppercase hover:bg-red-dark transition-colors duration-300 premium-shadow"
-                >
-                  <span>Learn More</span>
-                </motion.a>
-              )}
-            </motion.div>
-          </div>
         </motion.div>
       </AnimatePresence>
+
+      {/* Text layer — completely separate from background crossfade */}
+      <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`text-${currentSlide.id}`}
+            className="max-w-4xl mx-auto px-6 pb-16 sm:pb-8 text-center hero-text-content pointer-events-auto"
+            variants={textContainerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            <motion.div variants={textItemVariants}>
+              <Image
+                src="/images/logo.png"
+                alt="Mahkota Taiwan"
+                width={70}
+                height={70}
+                className="mx-auto mb-6 drop-shadow-lg brightness-0 invert"
+                priority
+              />
+            </motion.div>
+
+            <motion.h1
+              variants={textItemVariants}
+              className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg"
+            >
+              {title}
+            </motion.h1>
+
+            <motion.div
+              variants={lineVariants}
+              className="w-20 h-[3px] bg-red mx-auto mb-6 origin-center"
+            />
+
+            <motion.p
+              variants={textItemVariants}
+              className="text-base sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow"
+            >
+              {subtitle}
+            </motion.p>
+
+            {currentSlide.link_url && (
+              <motion.a
+                href={currentSlide.link_url}
+                variants={textItemVariants}
+                className="inline-block mt-8 px-8 py-4 bg-red text-white rounded-full text-sm font-semibold tracking-wide uppercase hover:bg-red-dark transition-colors duration-300 premium-shadow"
+              >
+                <span>Learn More</span>
+              </motion.a>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       {/* Navigation Arrows — hidden on mobile, visible on sm+ */}
       {slides.length > 1 && (
