@@ -349,7 +349,7 @@ export default function WhereToBuySection() {
 
             {/* Text overlay — bottom right: letter-by-letter reveal */}
             <div ref={bottomTextRef} className="absolute -bottom-2 -right-4 sm:right-0 z-10 text-right pointer-events-none">
-              <p className="letter-line-a font-heading text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-red leading-tight">
+              <p className="letter-line-a font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-red leading-tight">
                 {'300+ Store'.split('').map((char, i) => (
                   <span
                     key={`a-${i}`}
@@ -359,7 +359,7 @@ export default function WhereToBuySection() {
                   </span>
                 ))}
               </p>
-              <p className="letter-line-b font-heading text-xs sm:text-sm md:text-base text-navy/60 font-medium tracking-wide">
+              <p className="letter-line-b font-heading text-sm sm:text-base md:text-lg lg:text-xl text-navy/60 font-medium tracking-wide">
                 {'all over Taiwan'.split('').map((char, i) => (
                   <span
                     key={`b-${i}`}

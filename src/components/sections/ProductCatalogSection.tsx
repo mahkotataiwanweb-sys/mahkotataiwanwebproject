@@ -125,7 +125,7 @@ function InfiniteSlider({
     shadowOpacity: number[]; nameOpacity: number[]; nameScale: number[];
   }>({ scale: [], opacity: [], yLift: [], shadowOpacity: [], nameOpacity: [], nameScale: [] });
 
-  const DEFAULT_SPEED = 0.72;
+  const DEFAULT_SPEED = 0.864;
   const FRICTION = 0.975;
   const RETURN_RATE = 0.015;
   const LERP_FACTOR = 0.12; /* faster response — was 0.08 */
