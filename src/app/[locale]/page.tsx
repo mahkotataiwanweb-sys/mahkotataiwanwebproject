@@ -158,16 +158,16 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
       flippingRef.current = true;
       gsap.killTweensOf(textBoxRef.current);
       gsap.killTweensOf(imageBoxRef.current);
-      // Entrance: more dramatic & slower — text 1.4s, image follows 0.8s later (1.4s)
-      gsap.set(textBoxRef.current, { opacity: 0, rotateY: -120, scale: 0.85 });
-      gsap.set(imageBoxRef.current, { opacity: 0, rotateY: -120, scale: 0.85 });
+      // Entrance: slow & gradual reveal — text 2.2s, image follows 1.0s later
+      gsap.set(textBoxRef.current, { opacity: 0, rotateY: -90, scale: 0.92 });
+      gsap.set(imageBoxRef.current, { opacity: 0, rotateY: -90, scale: 0.92 });
       gsap.to(textBoxRef.current, {
         rotateY: 0, opacity: 1, scale: 1,
-        duration: 1.4, ease: 'back.out(1.4)', overwrite: 'auto',
+        duration: 2.2, ease: 'expo.out', overwrite: 'auto',
       });
       gsap.to(imageBoxRef.current, {
         rotateY: 0, opacity: 1, scale: 1,
-        duration: 1.4, delay: 0.8, ease: 'back.out(1.4)', overwrite: 'auto',
+        duration: 2.2, delay: 1.0, ease: 'expo.out', overwrite: 'auto',
         onComplete: () => { flippingRef.current = false; resolve(); },
       });
     }),
@@ -200,7 +200,7 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
         </div>
         <div style={{ perspective: '2500px' }}>
           <div ref={textBoxRef} style={{ opacity: 0, transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}>
-            <div className="relative bg-white mx-8 sm:mx-14 -mt-8 sm:-mt-12 px-5 sm:px-7 py-5 sm:py-6 shadow-[0_4px_30px_rgba(0,0,0,0.08)]">
+            <div className="relative bg-white mx-8 sm:mx-14 -mt-8 sm:-mt-12 px-5 sm:px-7 py-5 sm:py-6 shadow-[0_4px_30px_rgba(0,0,0,0.08)]" style={{ clipPath: 'polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px)' }}>
               <div className="text-center">
                 <h3 className="font-heading text-base sm:text-lg font-bold text-navy mb-2 leading-tight">{data.title}</h3>
                 <p className="text-navy/50 text-xs sm:text-sm leading-relaxed mb-4 max-w-sm mx-auto">{data.excerpt}</p>
