@@ -422,7 +422,7 @@ export default function AboutPage() {
   // GSAP scroll-triggered animations
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Mission section — elegant staggered reveal at top 20%
+      // Mission section — elegant staggered reveal at top 40%
       if (textRef.current) {
         const headingBlock = textRef.current.querySelector('.text-center');
         const descBlock = textRef.current.querySelector('.mb-12:last-of-type');
@@ -441,7 +441,7 @@ export default function AboutPage() {
               duration: 1.8, stagger: 0.2, ease: 'expo.out',
               scrollTrigger: {
                 trigger: textRef.current,
-                start: 'top 20%',
+                start: 'top 40%',
                 toggleActions: 'play none none reverse',
               },
             }
@@ -458,7 +458,7 @@ export default function AboutPage() {
               duration: 1.4, ease: 'expo.inOut', delay: 0.4,
               scrollTrigger: {
                 trigger: textRef.current,
-                start: 'top 20%',
+                start: 'top 40%',
                 toggleActions: 'play none none reverse',
               },
             }
@@ -475,7 +475,7 @@ export default function AboutPage() {
               duration: 1.6, ease: 'expo.out', delay: 0.6,
               scrollTrigger: {
                 trigger: textRef.current,
-                start: 'top 20%',
+                start: 'top 40%',
                 toggleActions: 'play none none reverse',
               },
             }
@@ -492,7 +492,7 @@ export default function AboutPage() {
               duration: 1.2, stagger: 0.15, ease: 'back.out(1.4)', delay: 1.0,
               scrollTrigger: {
                 trigger: textRef.current,
-                start: 'top 20%',
+                start: 'top 40%',
                 toggleActions: 'play none none reverse',
               },
             }
