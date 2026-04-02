@@ -98,24 +98,24 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
 
       const nextIdx = (indexRef.current + 1) % count;
 
-      // Phase 1a: Text box flips out FIRST (0.5s)
+      // Phase 1a: Text box flips out FIRST (0.8s)
       gsap.to(textEl, {
         rotateY: 90,
         opacity: 0,
-        scale: 0.95,
-        duration: 0.5,
-        ease: 'power2.in',
+        scale: 0.92,
+        duration: 0.8,
+        ease: 'power3.in',
         overwrite: 'auto',
       });
 
-      // Phase 1b: Image box flips out AFTER 0.15s delay (0.5s)
+      // Phase 1b: Image box flips out AFTER 0.35s delay (0.8s) — text clearly exits first
       gsap.to(imgEl, {
         rotateY: 90,
         opacity: 0,
-        scale: 0.95,
-        duration: 0.5,
-        delay: 0.15,
-        ease: 'power2.in',
+        scale: 0.92,
+        duration: 0.8,
+        delay: 0.35,
+        ease: 'power3.in',
         overwrite: 'auto',
         onComplete: () => {
           if (!textBoxRef.current || !imageBoxRef.current) { flippingRef.current = false; resolve(); return; }
@@ -123,27 +123,27 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
           setDisplayIndex(nextIdx);
 
           // Reset both to flipped-in position
-          gsap.set(textEl, { rotateY: -90, scale: 0.95 });
-          gsap.set(imgEl, { rotateY: -90, scale: 0.95 });
+          gsap.set(textEl, { rotateY: -90, scale: 0.92 });
+          gsap.set(imgEl, { rotateY: -90, scale: 0.92 });
 
-          // Phase 2a: Text box flips IN first (0.7s)
+          // Phase 2a: Text box flips IN first (1.0s) — arrives and settles visibly
           gsap.to(textEl, {
             rotateY: 0,
             opacity: 1,
             scale: 1,
-            duration: 0.7,
-            ease: 'power2.out',
+            duration: 1.0,
+            ease: 'back.out(1.2)',
             overwrite: 'auto',
           });
 
-          // Phase 2b: Image box follows after 0.15s delay (0.7s)
+          // Phase 2b: Image box follows after 0.35s delay (1.0s) — precise cascade
           gsap.to(imgEl, {
             rotateY: 0,
             opacity: 1,
             scale: 1,
-            duration: 0.7,
-            delay: 0.15,
-            ease: 'power2.out',
+            duration: 1.0,
+            delay: 0.35,
+            ease: 'back.out(1.2)',
             overwrite: 'auto',
             onComplete: () => {
               flippingRef.current = false;
