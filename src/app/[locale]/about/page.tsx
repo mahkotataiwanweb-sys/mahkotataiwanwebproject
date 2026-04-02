@@ -842,15 +842,15 @@ export default function AboutPage() {
           Stats Section — Navy Strip
       ═══════════════════════════════════════════════════════════════ */}
       <section ref={statsSectionRef} className="py-14 sm:py-18 relative overflow-hidden">
-        <div className="max-w-4xl mx-auto px-6 relative z-10">
-          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
+        <div className="max-w-5xl mx-auto px-6 relative z-10">
+          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-6">
             {stats.map((stat, i) => {
               const Icon = stat.icon;
               return (
                 <div key={stat.key} className="stat-bubble-item text-center group">
-                  <div className="bg-white border border-navy/[0.06] rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
-                    <div className="w-9 h-9 rounded-xl bg-navy/[0.06] flex items-center justify-center mx-auto mb-3 group-hover:bg-red/10 transition-colors duration-300">
-                      <Icon className="w-[18px] h-[18px] text-navy/50 group-hover:text-red transition-colors duration-300" />
+                  <div className="bg-white border border-navy/[0.06] rounded-2xl p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+                    <div className="w-10 h-10 rounded-xl bg-navy/[0.06] flex items-center justify-center mx-auto mb-3 group-hover:bg-red/10 transition-colors duration-300">
+                      <Icon className="w-5 h-5 text-navy/50 group-hover:text-red transition-colors duration-300" />
                     </div>
                     <div className="text-2xl sm:text-3xl font-heading font-bold text-navy mb-1">
                       {stat.prefix}
@@ -869,9 +869,9 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Values Section
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-16 sm:py-20 bg-cream relative overflow-hidden">
+      <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
 <div ref={valuesRef} className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-10">
+          <div className="text-center mb-14">
             <motion.div
               initial={{ opacity: 0, y: 50, scale: 0.9 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -884,13 +884,13 @@ export default function AboutPage() {
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
             {values.map((val) => {
               const Icon = val.icon;
               return (
                 <TiltCard
                   key={val.title}
-                  className="value-card relative bg-navy rounded-2xl p-5 sm:p-6 text-center group cursor-default overflow-hidden ring-1 ring-white/[0.06]"
+                  className="value-card relative bg-navy rounded-3xl p-8 sm:p-10 text-center group cursor-default overflow-hidden ring-1 ring-white/[0.06]"
                 >
                   {/* Ambient glow underneath card */}
 {/* Top-right decorative glow */}
@@ -898,13 +898,13 @@ export default function AboutPage() {
 {/* Top-edge highlight line */}
                   <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
-                  <div className="relative z-10" style={{ transform: 'translateZ(25px)' }}>
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-red/20 flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-red/30 transition-all duration-500 shadow-[0_0_20px_rgba(193,33,38,0.15)] group-hover:shadow-[0_0_30px_rgba(193,33,38,0.25)]">
-                      <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-red group-hover:scale-110 transition-transform duration-500" />
+                  <div className="relative z-10" style={{ transform: 'translateZ(40px)' }}>
+                    <div className="w-[72px] h-[72px] sm:w-20 sm:h-20 rounded-3xl bg-red/20 flex items-center justify-center mx-auto mb-5 sm:mb-6 group-hover:bg-red/30 transition-all duration-500 shadow-[0_0_40px_rgba(193,33,38,0.2)] group-hover:shadow-[0_0_50px_rgba(193,33,38,0.35)]">
+                      <Icon className="w-8 h-8 sm:w-9 sm:h-9 text-red group-hover:scale-110 transition-transform duration-500" />
                     </div>
-                    <h3 className="font-heading text-base sm:text-lg font-bold text-white mb-2">{val.title}</h3>
-                    <div className="w-8 h-[2px] bg-red/50 mx-auto mb-3 group-hover:w-12 transition-all duration-500" />
-                    <p className="text-cream/60 text-xs sm:text-sm leading-relaxed">{val.description}</p>
+                    <h3 className="font-heading text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">{val.title}</h3>
+                    <div className="w-10 h-[2px] bg-red/50 mx-auto mb-4 sm:mb-5 group-hover:w-16 transition-all duration-500" />
+                    <p className="text-cream/60 text-sm sm:text-base leading-relaxed">{val.description}</p>
                   </div>
 
                   {/* Bottom accent glow bar */}
@@ -921,7 +921,7 @@ export default function AboutPage() {
       ═══════════════════════════════════════════════════════════════ */}
       <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
 <div ref={partnersRef} className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-10">
+          <div className="text-center mb-14">
             <motion.div
               initial={{ opacity: 0, y: 50, scale: 0.9 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -1018,7 +1018,7 @@ export default function AboutPage() {
       <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
 <div ref={storyRef} className="max-w-5xl mx-auto px-6">
           {/* Header */}
-          <div className="text-center mb-10">
+          <div className="text-center mb-14">
             <motion.div
               initial={{ opacity: 0, y: 50, scale: 0.9 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
