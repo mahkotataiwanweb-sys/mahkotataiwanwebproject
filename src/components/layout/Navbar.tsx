@@ -531,7 +531,7 @@ export default function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-4">
-            <LanguageSwitcher />
+            <LanguageSwitcher light={useLightText && !isHomePage} />
             <button className="md:hidden relative z-10 p-2" onClick={() => setIsMobileOpen(!isMobileOpen)} aria-label="Toggle menu">
               {isMobileOpen ? <X className="w-6 h-6 text-navy" /> : <Menu className={cn('w-6 h-6 transition-colors duration-300', hamburgerColor)} />}
             </button>
