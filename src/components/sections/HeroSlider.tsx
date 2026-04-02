@@ -263,22 +263,24 @@ export default function HeroSlider() {
   const subtitle = getLocalizedField(currentSlide, 'subtitle', locale);
   const mediaType = currentSlide.media_type;
 
-  // Ultra-smooth crossfade — exit stays opaque underneath, enter fades on top
-  // No brightness dip, no ghosting, no double-exposure
+  // Cinematic crossfade — dramatic zoom + brightness shift
   const slideVariants = {
     enter: () => ({
       opacity: 0,
-      scale: 1.15,
+      scale: 1.2,
+      filter: 'brightness(1.3)',
       zIndex: 2,
     }),
     center: {
       opacity: 1,
       scale: 1,
+      filter: 'brightness(1)',
       zIndex: 2,
     },
     exit: () => ({
       opacity: 0,
-      scale: 0.96,
+      scale: 0.92,
+      filter: 'brightness(0.7)',
       zIndex: 1,
     }),
   };
@@ -287,17 +289,17 @@ export default function HeroSlider() {
   const textContainerVariants = {
     hidden: {},
     visible: {
-      transition: { staggerChildren: 0.25, delayChildren: 0.7 },
+      transition: { staggerChildren: 0.3, delayChildren: 0.9 },
     },
   };
 
   const textItemVariants = {
-    hidden: { opacity: 0, y: 40, filter: 'blur(4px)' },
+    hidden: { opacity: 0, y: 60, filter: 'blur(8px)' },
     visible: {
       opacity: 1,
       y: 0,
       filter: 'blur(0px)',
-      transition: { duration: 1.3, ease: [0.16, 1, 0.3, 1] },
+      transition: { duration: 1.6, ease: [0.12, 0.8, 0.2, 1] },
     },
   };
 
@@ -306,7 +308,7 @@ export default function HeroSlider() {
     visible: {
       scaleX: 1,
       opacity: 1,
-      transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.15 },
+      transition: { duration: 1.5, ease: [0.12, 0.8, 0.2, 1], delay: 0.2 },
     },
   };
 
@@ -412,7 +414,7 @@ export default function HeroSlider() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 2.2, ease: [0.12, 0.8, 0.2, 1] }}
           className="absolute inset-0"
         >
           {renderSlideMedia()}
