@@ -59,12 +59,12 @@ export default function WhereToBuySection() {
       gsap.from(sectionRef.current, {
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 20%',
+          start: 'top 10%',
           toggleActions: 'play none none reverse',
         },
         opacity: 0,
         y: 40,
-        duration: 2.0,
+        duration: 3.8,
         ease: 'power2.out',
       });
 
@@ -75,11 +75,11 @@ export default function WhereToBuySection() {
           {
             clipPath: 'inset(0% 0 0 0)',
             opacity: 1,
-            duration: 2.5,
+            duration: 3.5,
             ease: 'power2.out',
             scrollTrigger: {
               trigger: mapRef.current,
-              start: 'top 20%',
+              start: 'top 10%',
               toggleActions: 'play none none reverse',
             },
           }
@@ -90,13 +90,13 @@ export default function WhereToBuySection() {
       gsap.from('.taiwan-map-group', {
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 20%',
+          start: 'top 10%',
           toggleActions: 'play none none reverse',
         },
         opacity: 0,
         scale: 0.8,
         y: 40,
-        duration: 2.8,
+        duration: 3.8,
         ease: 'power3.out',
         delay: 0.3,
       });
@@ -116,7 +116,7 @@ export default function WhereToBuySection() {
               ease: 'power2.inOut',
               scrollTrigger: {
                 trigger: sectionRef.current,
-                start: 'top 20%',
+                start: 'top 10%',
                 toggleActions: 'play none none reverse',
               },
             });
@@ -143,7 +143,7 @@ export default function WhereToBuySection() {
         repeatDelay: 1,
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 20%',
+          start: 'top 10%',
           toggleActions: 'play none none none',
         },
       });
@@ -154,20 +154,20 @@ export default function WhereToBuySection() {
           scale: 1,
           opacity: 1,
           y: 0,
-          duration: 0.9,
+          duration: 1.3,
           ease: 'bounce.out',
         }, 0.3 + i * 0.7); // staggered with 0.7s gap between each
       });
 
       // Hold all visible for 2.5 seconds
-      pinTl.to({}, { duration: 2.5 });
+      pinTl.to({}, { duration: 3.5 });
 
       // All disappear simultaneously with a soft fade
       pinTl.to(validPins, {
         scale: 0,
         opacity: 0,
         y: -8,
-        duration: 0.6,
+        duration: 0.9,
         ease: 'power2.in',
         stagger: 0, // all at once
       });
@@ -190,12 +190,12 @@ export default function WhereToBuySection() {
         opacity: 1,
         y: 0,
         scale: 1,
-        duration: 2.4,
-        stagger: 0.35,
+        duration: 3.4,
+        stagger: 0.55,
         ease: 'power3.out',
         scrollTrigger: {
           trigger: headerRef.current,
-          start: 'top 20%',
+          start: 'top 10%',
           toggleActions: 'play none none reverse',
         },
       });
@@ -208,11 +208,11 @@ export default function WhereToBuySection() {
           {
             scaleX: 1,
             opacity: 1,
-            duration: 1.8,
+            duration: 2.5,
             ease: 'power2.inOut',
             scrollTrigger: {
               trigger: headerRef.current,
-              start: 'top 20%',
+              start: 'top 10%',
               toggleActions: 'play none none reverse',
             },
             delay: 0.8,
@@ -251,7 +251,7 @@ export default function WhereToBuySection() {
         repeatDelay: 2.5,
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 20%',
+          start: 'top 10%',
           toggleActions: 'play none none none',
         },
       });
@@ -265,7 +265,7 @@ export default function WhereToBuySection() {
           y: 0,
           scale: 1,
           rotateX: 0,
-          duration: 0.6,
+          duration: 0.9,
           stagger: stagger,
           ease: 'bounce.out',
         }, offset);
@@ -283,7 +283,7 @@ export default function WhereToBuySection() {
           y: -20,
           scale: 0.5,
           rotateX: -40,
-          duration: 0.4,
+          duration: 0.6,
           stagger: { each: stagger * 0.5, from: 'end' },
           ease: 'power2.in',
         }, '>-0.1');
