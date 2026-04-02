@@ -263,22 +263,22 @@ export default function HeroSlider() {
   const subtitle = getLocalizedField(currentSlide, 'subtitle', locale);
   const mediaType = currentSlide.media_type;
 
-  // Smoother slide variants with scale for parallax feel
+  // Premium crossfade with subtle zoom — no x-translation, no glitches
   const slideVariants = {
-    enter: (dir: number) => ({
-      x: dir > 0 ? '60%' : '-60%',
+    enter: () => ({
       opacity: 0,
-      scale: 1.1,
+      scale: 1.06,
+      zIndex: 2,
     }),
     center: {
-      x: 0,
       opacity: 1,
       scale: 1,
+      zIndex: 2,
     },
-    exit: (dir: number) => ({
-      x: dir > 0 ? '-40%' : '40%',
+    exit: () => ({
       opacity: 0,
-      scale: 1.05,
+      scale: 0.97,
+      zIndex: 1,
     }),
   };
 
@@ -286,16 +286,16 @@ export default function HeroSlider() {
   const textContainerVariants = {
     hidden: {},
     visible: {
-      transition: { staggerChildren: 0.15, delayChildren: 0.3 },
+      transition: { staggerChildren: 0.2, delayChildren: 0.4 },
     },
   };
 
   const textItemVariants = {
-    hidden: { opacity: 0, y: 40 },
+    hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
+      transition: { duration: 1.0, ease: [0.22, 1, 0.36, 1] },
     },
   };
 
@@ -304,7 +304,7 @@ export default function HeroSlider() {
     visible: {
       scaleX: 1,
       opacity: 1,
-      transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
+      transition: { duration: 1.0, ease: [0.22, 1, 0.36, 1], delay: 0.1 },
     },
   };
 
@@ -337,9 +337,9 @@ export default function HeroSlider() {
         <motion.div
           ref={imageRef}
           className="absolute inset-0"
-          initial={{ scale: 1.15 }}
+          initial={{ scale: 1.08 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 6, ease: 'linear' }}
+          transition={{ duration: 8, ease: 'linear' }}
         >
           <video
             src={currentSlide.image_url}
@@ -358,9 +358,9 @@ export default function HeroSlider() {
         <motion.div
           ref={imageRef}
           className="absolute inset-0"
-          initial={{ scale: 1.15 }}
+          initial={{ scale: 1.08 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 6, ease: 'linear' }}
+          transition={{ duration: 8, ease: 'linear' }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -402,7 +402,7 @@ export default function HeroSlider() {
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Slides */}
-      <AnimatePresence initial={false} custom={direction} mode="popLayout">
+      <AnimatePresence initial={false} custom={direction} mode="sync">
         <motion.div
           key={currentSlide.id}
           custom={direction}
@@ -410,7 +410,7 @@ export default function HeroSlider() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: 0.9, ease: [0.43, 0.13, 0.23, 0.96] }}
+          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-0"
         >
           {renderSlideMedia()}
