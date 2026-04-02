@@ -425,7 +425,7 @@ export default function AboutPage() {
       // Mission section — elegant staggered reveal at top 40%
       if (textRef.current) {
         const headingBlock = textRef.current.querySelector('.text-center');
-        const descBlock = textRef.current.querySelector('.mb-12:last-of-type');
+        const descBlock = textRef.current.children[1]; // description paragraph div
         const pillsBlock = textRef.current.querySelector('.flex-wrap');
 
         // 1. Heading block: label, title, subtitle — each child staggers
