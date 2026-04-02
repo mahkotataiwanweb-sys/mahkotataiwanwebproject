@@ -12,7 +12,7 @@ const locales = [
   { code: 'zh-TW', label: '繁體中文', flag: '🇹🇼' },
 ];
 
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ light = false }: { light?: boolean }) {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
@@ -38,7 +38,7 @@ export default function LanguageSwitcher() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium text-navy/80 hover:text-navy hover:bg-navy/5 transition-colors"
+        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${light ? "text-white/90 hover:text-white hover:bg-white/10" : "text-navy/80 hover:text-navy hover:bg-navy/5"}`}
       >
         <Globe className="w-4 h-4" />
         <span className="hidden sm:inline">{currentLocale.flag} {currentLocale.code.toUpperCase()}</span>
