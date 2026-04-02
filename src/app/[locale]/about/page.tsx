@@ -483,21 +483,29 @@ export default function AboutPage() {
           );
         }
 
-        // 4. Highlight pills — pop in one by one
-        if (pillsBlock) {
-          gsap.fromTo(
-            pillsBlock.children,
-            { opacity: 0, y: 40, scale: 0.8 },
-            {
-              opacity: 1, y: 0, scale: 1,
-              duration: 1.2, stagger: 0.15, ease: 'back.out(1.4)', delay: 1.0,
-              scrollTrigger: {
-                trigger: textRef.current,
-                start: 'top 40%',
-                toggleActions: 'play none none reverse',
-              },
-            }
-          );
+        // 4. Highlight pills — each from different direction, staggered
+        if (pillsBlock && pillsBlock.children.length >= 3) {
+          const directions = [
+            { x: -120, y: 0 },   // pill 1: from left
+            { x: 120, y: 0 },    // pill 2: from right
+            { x: 0, y: 80 },     // pill 3: from bottom
+          ];
+          Array.from(pillsBlock.children).forEach((pill, i) => {
+            const dir = directions[i] || directions[2];
+            gsap.fromTo(
+              pill,
+              { opacity: 0, x: dir.x, y: dir.y, scale: 0.8, filter: 'blur(6px)' },
+              {
+                opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)',
+                duration: 1.4, ease: 'expo.out', delay: 1.0 + i * 0.35,
+                scrollTrigger: {
+                  trigger: textRef.current,
+                  start: 'top 40%',
+                  toggleActions: 'play none none reverse',
+                },
+              }
+            );
+          });
         }
       }
 
