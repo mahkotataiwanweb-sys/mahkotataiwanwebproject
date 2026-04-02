@@ -192,11 +192,11 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
         </div>
         <div style={{ perspective: '2500px' }}>
           <div ref={textBoxRef} style={{ opacity: 0, transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}>
-            <div className="relative bg-white mx-6 sm:mx-10 -mt-10 sm:-mt-14 px-8 sm:px-10 py-8 sm:py-10 shadow-[0_4px_30px_rgba(0,0,0,0.08)]">
+            <div className="relative bg-white mx-8 sm:mx-14 -mt-8 sm:-mt-12 px-5 sm:px-7 py-5 sm:py-6 shadow-[0_4px_30px_rgba(0,0,0,0.08)]">
               <div className="text-center">
-                <h3 className="font-heading text-xl sm:text-2xl font-bold text-navy mb-3 leading-tight">{data.title}</h3>
-                <p className="text-navy/50 text-sm leading-relaxed mb-6 max-w-md mx-auto">{data.excerpt}</p>
-                <div className="inline-flex items-center gap-2 px-7 py-3 bg-[#003048] text-white text-sm font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300">
+                <h3 className="font-heading text-base sm:text-lg font-bold text-navy mb-2 leading-tight">{data.title}</h3>
+                <p className="text-navy/50 text-xs sm:text-sm leading-relaxed mb-4 max-w-sm mx-auto">{data.excerpt}</p>
+                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#003048] text-white text-xs sm:text-sm font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300">
                   <span>{btnLabel}</span>
                 </div>
               </div>
