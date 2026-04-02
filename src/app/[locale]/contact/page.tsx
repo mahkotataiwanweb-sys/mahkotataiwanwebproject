@@ -407,14 +407,14 @@ export default function ContactPage() {
         if (chars.length > 0) {
           gsap.fromTo(
             chars,
-            { opacity: 0, y: 50, rotateX: -90 },
+            { opacity: 0, y: 80, rotateX: -90 },
             {
               opacity: 1,
               y: 0,
               rotateX: 0,
-              duration: 0.6,
-              stagger: 0.03,
-              ease: 'back.out(1.7)',
+              duration: 1.2,
+              stagger: 0.06,
+              ease: 'back.out(1.4)',
               scrollTrigger: {
                 trigger: hoursHeaderRef.current,
                 start: 'top 60%',
@@ -429,13 +429,13 @@ export default function ContactPage() {
         if (availLabel) {
           gsap.fromTo(
             availLabel,
-            { opacity: 0, y: 20, letterSpacing: '0.5em' },
+            { opacity: 0, y: 30, letterSpacing: '0.8em' },
             {
               opacity: 1,
               y: 0,
               letterSpacing: '0.3em',
-              duration: 0.8,
-              ease: 'power3.out',
+              duration: 1.4,
+              ease: 'power2.out',
               scrollTrigger: {
                 trigger: hoursHeaderRef.current,
                 start: 'top 60%',
@@ -454,9 +454,9 @@ export default function ContactPage() {
             {
               opacity: 1,
               scaleX: 1,
-              duration: 0.8,
-              delay: 0.4,
-              ease: 'power3.out',
+              duration: 1.2,
+              delay: 0.8,
+              ease: 'power2.inOut',
               scrollTrigger: {
                 trigger: hoursHeaderRef.current,
                 start: 'top 60%',
@@ -471,13 +471,13 @@ export default function ContactPage() {
       if (hoursCardRef.current) {
         gsap.fromTo(
           hoursCardRef.current,
-          { opacity: 0, y: 50, scale: 0.95 },
+          { opacity: 0, y: 60, scale: 0.92 },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 1.2,
-            ease: 'power3.out',
+            duration: 1.8,
+            ease: 'power2.out',
             scrollTrigger: {
               trigger: hoursSectionRef.current,
               start: 'top 60%',
@@ -491,13 +491,13 @@ export default function ContactPage() {
       if (hoursLegendRef.current) {
         gsap.fromTo(
           hoursLegendRef.current.children,
-          { opacity: 0, y: 20 },
+          { opacity: 0, y: 30 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.6,
-            stagger: 0.15,
-            ease: 'power3.out',
+            duration: 1.0,
+            stagger: 0.25,
+            ease: 'power2.out',
             scrollTrigger: {
               trigger: hoursLegendRef.current,
               start: 'top 60%',
@@ -511,10 +511,11 @@ export default function ContactPage() {
       if (hoursFootnoteRef.current) {
         gsap.fromTo(
           hoursFootnoteRef.current,
-          { opacity: 0 },
+          { opacity: 0, y: 15 },
           {
             opacity: 1,
-            duration: 1.0,
+            y: 0,
+            duration: 1.6,
             ease: 'power2.out',
             scrollTrigger: {
               trigger: hoursFootnoteRef.current,
