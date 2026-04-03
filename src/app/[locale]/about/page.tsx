@@ -435,9 +435,9 @@ export default function AboutPage() {
           );
           gsap.fromTo(
             headingChildren,
-            { opacity: 0, y: 80, scale: 0.85, rotateX: -25, filter: 'blur(8px)' },
+            { opacity: 0, y: 80, scale: 0.85, rotateX: -25 },
             {
-              opacity: 1, y: 0, scale: 1, rotateX: 0, filter: 'blur(0px)',
+              opacity: 1, y: 0, scale: 1, rotateX: 0,
               duration: 1.8, stagger: 0.2, ease: 'expo.out',
               scrollTrigger: {
                 trigger: textRef.current,
@@ -494,9 +494,9 @@ export default function AboutPage() {
             const dir = directions[i] || directions[2];
             gsap.fromTo(
               pill,
-              { opacity: 0, x: dir.x, y: dir.y, scale: 0.8, filter: 'blur(6px)' },
+              { opacity: 0, x: dir.x, y: dir.y, scale: 0.8 },
               {
-                opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)',
+                opacity: 1, x: 0, y: 0, scale: 1,
                 duration: 1.4, ease: 'expo.out', delay: 1.0 + i * 0.35,
                 scrollTrigger: {
                   trigger: textRef.current,
@@ -570,7 +570,7 @@ export default function AboutPage() {
           scale: 0.7,
           rotationX: -40,
           transformPerspective: 800,
-          filter: 'blur(10px)',
+
         });
 
         gsap.to(titleChildren, {
@@ -578,7 +578,7 @@ export default function AboutPage() {
           y: 0,
           scale: 1,
           rotationX: 0,
-          filter: 'blur(0px)',
+
           duration: 1.4,
           stagger: 0.15,
           ease: 'expo.out',
