@@ -109,6 +109,7 @@ export default function WhereToBuySection() {
   /* GSAP header reveal animation — slow, elegant, dramatic */
   useEffect(() => {
     if (!headerRef.current) return;
+    const mapStart = window.innerWidth < 768 ? 'top 30%' : 'top 10%';
     const ctx = gsap.context(() => {
       const children = headerRef.current!.children;
       
