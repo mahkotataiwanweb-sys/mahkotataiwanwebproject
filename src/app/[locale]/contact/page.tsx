@@ -585,11 +585,12 @@ export default function ContactPage() {
       if (faqHeaderRef.current) {
         gsap.fromTo(
           faqHeaderRef.current.children,
-          { opacity: 0, y: 60, scale: 0.8 },
+          { opacity: 0, y: 60, scale: 0.8, filter: 'blur(2px)' },
           {
             opacity: 1,
             y: 0,
             scale: 1,
+            filter: 'blur(0px)',
             duration: 2.2,
             stagger: 0.2,
             ease: 'expo.out',
@@ -606,11 +607,12 @@ export default function ContactPage() {
       if (faqRef.current) {
         gsap.fromTo(
           faqRef.current.querySelectorAll('.faq-item'),
-          { opacity: 0, y: 70, scale: 0.85 },
+          { opacity: 0, y: 70, scale: 0.85, filter: 'blur(2px)' },
           {
             opacity: 1,
             y: 0,
             scale: 1,
+            filter: 'blur(0px)',
             duration: 4,
             stagger: 0.4,
             ease: 'expo.out',
