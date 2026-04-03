@@ -43,7 +43,7 @@ const fallbackNavItems: FallbackNavItem[] = [
     key: 'products',
     href: '/products',
     children: [
-      
+      { key: 'ourCollection', href: '/products' },
       { key: 'recipes', href: '/recipes' },
     ],
   },
@@ -126,6 +126,9 @@ export default function Footer() {
 
   const useDbMenus = menuTree && menuTree.length > 0;
 
+  /* Products dropdown label */
+  const ourCollectionLabel = locale === 'id' ? 'Koleksi Kami' : locale === 'zh-TW' ? '我們的系列' : 'Our Collection';
+
   const officeAddress = settings?.office_address || 'No. 83, Liyuan 2nd Street, Linkou District, New Taipei City';
   const warehouseAddress = settings?.warehouse_address || 'No. 53, Lane 216, Nanshi 4th Street, Linkou District, New Taipei City';
   const phone = settings?.phone || '+886-2-26099118';
@@ -186,6 +189,14 @@ export default function Footer() {
               }`}
             >
               <div className="space-y-1">
+                {item.url === '/products' && (
+                  <Link
+                    href={buildHref('/products')}
+                    className="block text-cream/50 hover:text-white text-xs transition-colors duration-200"
+                  >
+                    {ourCollectionLabel}
+                  </Link>
+                )}
                 {item.children.map((child) => (
                   <Link
                     key={child.id}
