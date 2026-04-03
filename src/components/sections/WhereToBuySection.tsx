@@ -157,6 +157,7 @@ export default function WhereToBuySection() {
   /* Looping bounce-in per letter animation */
   useEffect(() => {
     if (!sectionRef.current) return;
+    const mapStart = window.innerWidth < 768 ? 'top 30%' : 'top 10%';
 
     const ctx = gsap.context(() => {
       const topLetters = topTextRef.current?.querySelectorAll('.letter-char');
