@@ -280,13 +280,13 @@ export default function RecipeShowcaseSection() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         headingRef.current!.children,
-        { opacity: 0, y: 80, scale: 0.7, rotateX: -40 },
+        { opacity: 0, y: 80, scale: 0.7, rotateX: -40, filter: 'blur(2px)' },
         {
           opacity: 1,
           y: 0,
           scale: 1,
           rotateX: 0,
-
+          filter: 'blur(0px)',
           duration: 1.8,
           stagger: 0.15,
           ease: 'expo.out',
