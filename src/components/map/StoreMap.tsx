@@ -1238,7 +1238,33 @@ function PremiumDropdown({
           {/* Thin top accent */}
           <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(193,33,38,0.2), transparent)' }} />
 
-          <div ref={listRef} className="premium-dropdown-list overflow-y-auto max-h-[320px] py-1.5 px-1.5">
+          <div
+            ref={listRef}
+            className="premium-dropdown-list overflow-y-auto max-h-[320px] py-1.5 px-1.5"
+            onWheel={(e) => {
+              const element = listRef.current;
+              if (!element) return;
+              const isScrollable = element.scrollHeight > element.clientHeight;
+              if (!isScrollable) {
+                e.preventDefault();
+                return;
+              }
+              const atTop = element.scrollTop === 0;
+              const atBottom = element.scrollTop + element.clientHeight >= element.scrollHeight;
+              if ((atTop && e.deltaY < 0) || (atBottom && e.deltaY > 0)) {
+                e.preventDefault();
+              }
+            }}
+            onTouchMove={(e) => {
+              const element = listRef.current;
+              if (!element) return;
+              const isScrollable = element.scrollHeight > element.clientHeight;
+              if (!isScrollable) {
+                e.preventDefault();
+              }
+            }}
+            style={{ touchAction: 'pan-y' }}
+          >
             {options.map((city, i) => {
               const isActive = value === city;
               const label = city === 'All' ? 'All Cities' : city;
