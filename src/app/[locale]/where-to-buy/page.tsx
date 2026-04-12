@@ -475,20 +475,16 @@ export default function WhereToBuyPage() {
           </div>
 
           {/* Map with premium frame */}
-          <div className="relative">
-            {/* Outer glow */}
-{/* Map wrapper */}
-            <div className="relative rounded-[2rem] overflow-hidden border border-cream-dark/20 shadow-[0_25px_80px_-15px_rgba(0,48,72,0.12)]">
-              {!loading && <StoreMap stores={stores} />}
-              {loading && (
-                <div className="w-full h-[600px] sm:h-[750px] lg:h-[900px] bg-cream-light flex items-center justify-center">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-10 h-10 border-2 border-red border-t-transparent rounded-full animate-spin" />
-                    <p className="text-navy/40 text-sm">Loading stores...</p>
-                  </div>
+          <div className="relative rounded-[2rem] overflow-hidden border border-cream-dark/20">
+            {!loading && <StoreMap stores={stores} />}
+            {loading && (
+              <div className="w-full h-[600px] sm:h-[750px] lg:h-[450px] bg-cream-light flex items-center justify-center">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-10 h-10 border-2 border-red border-t-transparent rounded-full animate-spin" />
+                  <p className="text-navy/40 text-sm">Loading stores...</p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
