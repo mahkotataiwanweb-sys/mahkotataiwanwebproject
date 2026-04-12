@@ -1072,29 +1072,6 @@ export default function ContactPage() {
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Mahkota Taiwan Office Location"
               />
-              {/* Custom Zoom Buttons */}
-              <div className="absolute bottom-4 right-4 z-[1000] flex flex-col gap-1.5">
-                <button
-                  onClick={() => {
-                    const iframe = document.querySelector('iframe[title="Mahkota Taiwan Office Location"]') as HTMLIFrameElement;
-                    if (iframe) iframe.style.transform = 'scale(1.2)';
-                  }}
-                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-navy/80 backdrop-blur-md text-cream/90 hover:bg-navy hover:text-white border border-white/10 shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
-                  aria-label="Zoom in"
-                >
-                  <span className="text-lg font-bold">+</span>
-                </button>
-                <button
-                  onClick={() => {
-                    const iframe = document.querySelector('iframe[title="Mahkota Taiwan Office Location"]') as HTMLIFrameElement;
-                    if (iframe) iframe.style.transform = 'scale(0.8)';
-                  }}
-                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-navy/80 backdrop-blur-md text-cream/90 hover:bg-navy hover:text-white border border-white/10 shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
-                  aria-label="Zoom out"
-                >
-                  <span className="text-lg font-bold">−</span>
-                </button>
-              </div>
             </div>
 
             {/* Location Info Bar */}

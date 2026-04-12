@@ -387,7 +387,7 @@ export default function HomePage() {
           </div>
 
           {/* ── Cards — sequenced: top flips, then bottom, never together ── */}
-          <div className="flex flex-col gap-6 sm:gap-8 lg:gap-8 max-w-sm mx-auto">
+          <div className="flex flex-col gap-10 sm:gap-14 lg:gap-12 max-w-lg mx-auto">
             <div ref={topWrapRef}>
               <AutoFlipCard
                 ref={topCardRef}

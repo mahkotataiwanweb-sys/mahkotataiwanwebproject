@@ -258,50 +258,27 @@ export default function WhereToBuySection() {
         </div>
 
         {/* Map Container */}
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-8">
+          {/* Text — top left: letter-by-letter reveal */}
+          <div className="text-left w-full max-w-sm">
+            <p ref={topTextRef} className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-navy italic leading-tight">
+              {'Taste so good!'.split('').map((char, i) => (
+                <span
+                  key={i}
+                  className="letter-char inline-block"
+                >
+                  {char === ' ' ? '\u00A0' : char}
+                </span>
+              ))}
+            </p>
+          </div>
+
           <Link
             href={`/${locale}/where-to-buy`}
             className="relative group block"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            {/* Text overlay — top left: letter-by-letter reveal */}
-            <div className="absolute -top-2 -left-4 sm:left-0 z-10 pointer-events-none">
-              <p ref={topTextRef} className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-navy italic leading-tight">
-                {'Taste so good!'.split('').map((char, i) => (
-                  <span
-                    key={i}
-                    className="letter-char inline-block"
-                  >
-                    {char === ' ' ? '\u00A0' : char}
-                  </span>
-                ))}
-              </p>
-            </div>
-
-            {/* Text overlay — bottom right: letter-by-letter reveal */}
-            <div ref={bottomTextRef} className="absolute -bottom-2 -right-4 sm:right-0 z-10 text-right pointer-events-none">
-              <p className="letter-line-a font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-red leading-tight">
-                {'300+ Store'.split('').map((char, i) => (
-                  <span
-                    key={`a-${i}`}
-                    className="letter-char inline-block"
-                  >
-                    {char === ' ' ? '\u00A0' : char}
-                  </span>
-                ))}
-              </p>
-              <p className="letter-line-b font-heading text-sm sm:text-base md:text-lg lg:text-xl text-navy/60 font-medium tracking-wide">
-                {'all over Taiwan'.split('').map((char, i) => (
-                  <span
-                    key={`b-${i}`}
-                    className="letter-char inline-block"
-                  >
-                    {char === ' ' ? '\u00A0' : char}
-                  </span>
-                ))}
-              </p>
-            </div>
             <svg
               ref={mapRef}
               viewBox="0 0 200 450"
@@ -438,6 +415,30 @@ export default function WhereToBuySection() {
               </span>
             </div>
           </Link>
+
+          {/* Text — bottom right: letter-by-letter reveal */}
+          <div ref={bottomTextRef} className="text-right w-full max-w-sm">
+            <p className="letter-line-a font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-red leading-tight">
+              {'300+ Store'.split('').map((char, i) => (
+                <span
+                  key={`a-${i}`}
+                  className="letter-char inline-block"
+                >
+                  {char === ' ' ? '\u00A0' : char}
+                </span>
+              ))}
+            </p>
+            <p className="letter-line-b font-heading text-sm sm:text-base md:text-lg lg:text-xl text-navy/60 font-medium tracking-wide">
+              {'all over Taiwan'.split('').map((char, i) => (
+                <span
+                  key={`b-${i}`}
+                  className="letter-char inline-block"
+                >
+                  {char === ' ' ? '\u00A0' : char}
+                </span>
+              ))}
+            </p>
+          </div>
         </div>
       </div>
     </section>
