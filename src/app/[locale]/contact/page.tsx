@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,20 +27,6 @@ import {
 } from 'lucide-react';
 import SandTexture from '@/components/effects/SandTexture';
 import HeroBackground from '@/components/effects/HeroBackground';
-import type { StoreLocation } from '@/types/database';
-
-// Dynamic import to avoid SSR issues with Leaflet
-const StoreMap = dynamic(() => import('@/components/map/StoreMap'), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full max-w-4xl mx-auto h-[600px] sm:h-[750px] lg:h-[450px] rounded-[2rem] bg-cream-light border border-cream-dark/30 flex items-center justify-center">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 border-2 border-red border-t-transparent rounded-full animate-spin" />
-        <p className="text-navy/40 text-sm">Loading map...</p>
-      </div>
-    </div>
-  ),
-});
 
 function LineIcon({ className }: { className?: string }) {
   return (
@@ -335,8 +320,6 @@ export default function ContactPage() {
 
   /* ── Live Taiwan clock state ── */
   const [clockTime, setClockTime] = useState<{ h: number; m: number; s: number } | null>(null);
-  const [stores, setStores] = useState<StoreLocation[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const hours12 = clockTime ? clockTime.h % 12 : 0;
   const mins = clockTime?.m ?? 0;
@@ -344,24 +327,6 @@ export default function ContactPage() {
   const secondAngle = secs * 6;
   const minuteAngle = mins * 6 + secs * 0.1;
   const hourAngle = hours12 * 30 + mins * 0.5;
-
-  /* ─── Fetch stores for map ─── */
-  useEffect(() => {
-    async function fetchStores() {
-      try {
-        const response = await fetch('/api/store-locations');
-        if (response.ok) {
-          const data = await response.json();
-          setStores(data);
-        }
-      } catch (error) {
-        console.error('Error fetching stores:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchStores();
-  }, []);
 
   /* ═══════════════════════════════════════════
      GSAP — All animations in a single effect
@@ -1096,15 +1061,65 @@ export default function ContactPage() {
           </motion.div>
 
           <div ref={mapRef} className="relative rounded-[2rem] overflow-hidden border border-cream-dark/20">
-            {!loading && <StoreMap stores={stores} />}
-            {loading && (
-              <div className="w-full max-w-4xl mx-auto h-[600px] sm:h-[750px] lg:h-[450px] bg-cream-light flex items-center justify-center">
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-10 h-10 border-2 border-red border-t-transparent rounded-full animate-spin" />
-                  <p className="text-navy/40 text-sm">Loading map...</p>
+            <div className="relative w-full max-w-4xl mx-auto" style={{ aspectRatio: '16/9', maxHeight: '450px' }}>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.5!2d121.37!3d25.07!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjXCsDA0JzEyLjAiTiAxMjHCsDIyJzEyLjAiRQ!5e0!3m2!1sen!2stw!4v1"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Mahkota Taiwan Office Location"
+              />
+              {/* Custom Zoom Buttons */}
+              <div className="absolute bottom-4 right-4 z-[1000] flex flex-col gap-1.5">
+                <button
+                  onClick={() => {
+                    const iframe = document.querySelector('iframe[title="Mahkota Taiwan Office Location"]') as HTMLIFrameElement;
+                    if (iframe) iframe.style.transform = 'scale(1.2)';
+                  }}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-navy/80 backdrop-blur-md text-cream/90 hover:bg-navy hover:text-white border border-white/10 shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                  aria-label="Zoom in"
+                >
+                  <span className="text-lg font-bold">+</span>
+                </button>
+                <button
+                  onClick={() => {
+                    const iframe = document.querySelector('iframe[title="Mahkota Taiwan Office Location"]') as HTMLIFrameElement;
+                    if (iframe) iframe.style.transform = 'scale(0.8)';
+                  }}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-navy/80 backdrop-blur-md text-cream/90 hover:bg-navy hover:text-white border border-white/10 shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                  aria-label="Zoom out"
+                >
+                  <span className="text-lg font-bold">−</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Location Info Bar */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 mt-4">
+              <div className="flex items-center gap-4 flex-1">
+                <div className="w-12 h-12 rounded-2xl bg-red/10 flex items-center justify-center shrink-0">
+                  <MapPin className="w-5 h-5 text-red" />
+                </div>
+                <div>
+                  <p className="font-semibold text-navy text-base">Mahkota Taiwan Office</p>
+                  <p className="text-navy/50 text-sm">
+                    No. 83, Liyuan 2nd Street, Linkou District, New Taipei City
+                  </p>
                 </div>
               </div>
-            )}
+              <a
+                href={OFFICE_MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-red hover:text-red/80 text-sm font-semibold transition-colors duration-300 whitespace-nowrap bg-red/5 hover:bg-red/10 px-5 py-2.5 rounded-full"
+              >
+                Get Directions
+                <ChevronRight className="w-4 h-4" />
+              </a>
+            </div>
           </div>
         </div>
       </section>
