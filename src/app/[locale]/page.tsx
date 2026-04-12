@@ -200,11 +200,11 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
         </div>
         <div style={{ perspective: '2500px' }}>
           <div ref={textBoxRef} style={{ opacity: 0, transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}>
-            <div className="relative bg-white mx-8 sm:mx-14 -mt-8 sm:-mt-12 px-5 sm:px-7 py-5 sm:py-6 shadow-[0_4px_30px_rgba(0,0,0,0.08)]" style={{ clipPath: 'polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px)' }}>
+            <div className="relative bg-white mx-4 sm:mx-8 -mt-5 sm:-mt-6 px-3 sm:px-4 py-3 sm:py-4 shadow-[0_4px_30px_rgba(0,0,0,0.08)]" style={{ clipPath: 'polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px)' }}>
               <div className="text-center">
-                <h3 className="font-heading text-base sm:text-lg font-bold text-navy mb-2 leading-tight">{data.title}</h3>
-                <p className="text-navy/50 text-xs sm:text-sm leading-relaxed mb-4 max-w-sm mx-auto">{data.excerpt}</p>
-                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#003048] text-white text-xs sm:text-sm font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300">
+                <h3 className="font-heading text-xs sm:text-sm font-bold text-navy mb-2 leading-tight">{data.title}</h3>
+                <p className="text-navy/50 text-[11px] leading-relaxed mb-2 max-w-sm mx-auto">{data.excerpt}</p>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#003048] text-white text-[11px] font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300">
                   <span>{btnLabel}</span>
                 </div>
               </div>
@@ -387,7 +387,7 @@ export default function HomePage() {
           </div>
 
           {/* ── Cards — sequenced: top flips, then bottom, never together ── */}
-          <div className="flex flex-col gap-20 sm:gap-28">
+          <div className="flex flex-col gap-8 sm:gap-12 lg:gap-10 max-w-xl mx-auto">
             <div ref={topWrapRef}>
               <AutoFlipCard
                 ref={topCardRef}
