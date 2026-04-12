@@ -26,8 +26,6 @@
 
   html {
     scroll-behavior: auto; /* Lenis handles smooth scroll */
-    height: 100%;
-    overflow-x: hidden;
   }
   
   body {
