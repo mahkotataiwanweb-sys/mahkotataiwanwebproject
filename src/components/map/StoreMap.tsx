@@ -159,26 +159,20 @@ function injectPinStyles() {
     }
 
     /* Custom scrollbar for dropdown */
-    .premium-dropdown-list {
-      scroll-behavior: smooth;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(193,33,38,0.35) rgba(0,48,72,0.05);
-    }
     .premium-dropdown-list::-webkit-scrollbar {
-      width: 8px;
+      width: 5px;
     }
     .premium-dropdown-list::-webkit-scrollbar-track {
-      background: rgba(0,48,72,0.04);
+      background: rgba(0,48,72,0.03);
       border-radius: 10px;
-      margin: 6px 0;
+      margin: 8px 0;
     }
     .premium-dropdown-list::-webkit-scrollbar-thumb {
-      background: rgba(193,33,38,0.4);
+      background: rgba(193,33,38,0.2);
       border-radius: 10px;
-      min-height: 40px;
     }
     .premium-dropdown-list::-webkit-scrollbar-thumb:hover {
-      background: rgba(193,33,38,0.55);
+      background: rgba(193,33,38,0.35);
     }
 
     /* Dropdown item hover glow */
@@ -1244,7 +1238,7 @@ function PremiumDropdown({
           {/* Thin top accent */}
           <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(193,33,38,0.2), transparent)' }} />
 
-          <div ref={listRef} className="premium-dropdown-list overflow-y-scroll max-h-[340px] py-1.5 px-1.5" style={{ scrollbarGutter: 'stable' }}>
+          <div ref={listRef} className="premium-dropdown-list overflow-y-auto max-h-[320px] py-1.5 px-1.5">
             {options.map((city, i) => {
               const isActive = value === city;
               const label = city === 'All' ? 'All Cities' : city;
