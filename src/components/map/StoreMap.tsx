@@ -1795,7 +1795,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
         <OceanWaterEffects />
         <div
           ref={mapContainerRef}
-          className="illustrated-map w-full h-[600px] sm:h-[750px] lg:h-[700px] overflow-hidden"
+          className="illustrated-map w-full h-[600px] sm:h-[750px] lg:h-[600px] overflow-hidden"
           style={{ background: '#2E8BC9' }}
         />
         {/* Custom Zoom Buttons */}
