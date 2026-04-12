@@ -1392,13 +1392,22 @@ export default function StoreMap({ stores }: StoreMapProps) {
       center: [23.69, 120.96],
       zoom: 8,
       zoomControl: false,
-      scrollWheelZoom: !isMobile,
+      scrollWheelZoom: false,
       dragging: !isMobile,
       touchZoom: true,
       attributionControl: false,
       maxBounds: L.latLngBounds([20.5, 118.0], [26.5, 123.0]),
       maxBoundsViscosity: 0.9,
       minZoom: 7,
+    });
+
+    // Enable scroll zoom only after clicking on the map
+    map.on('click', () => {
+      map.scrollWheelZoom.enable();
+    });
+    // Disable scroll zoom when mouse leaves the map
+    map.getContainer().addEventListener('mouseleave', () => {
+      map.scrollWheelZoom.disable();
     });
 
     // Fit to Taiwan main island — automatically calculates optimal zoom for any screen size
@@ -1770,7 +1779,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
         <OceanWaterEffects />
         <div
           ref={mapContainerRef}
-          className="illustrated-map w-full h-[600px] sm:h-[750px] lg:h-[900px] overflow-hidden"
+          className="illustrated-map w-full h-[450px] sm:h-[500px] lg:h-[600px] overflow-hidden"
           style={{ background: '#2E8BC9' }}
         />
       </div>
