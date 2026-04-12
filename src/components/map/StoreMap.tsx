@@ -1242,28 +1242,17 @@ function PremiumDropdown({
             ref={listRef}
             className="premium-dropdown-list overflow-y-auto max-h-[320px] py-1.5 px-1.5"
             onWheel={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               const element = listRef.current;
               if (!element) return;
-              const isScrollable = element.scrollHeight > element.clientHeight;
-              if (!isScrollable) {
-                e.preventDefault();
-                return;
-              }
-              const atTop = element.scrollTop === 0;
-              const atBottom = element.scrollTop + element.clientHeight >= element.scrollHeight;
-              if ((atTop && e.deltaY < 0) || (atBottom && e.deltaY > 0)) {
-                e.preventDefault();
-              }
+              element.scrollTop += e.deltaY;
             }}
             onTouchMove={(e) => {
-              const element = listRef.current;
-              if (!element) return;
-              const isScrollable = element.scrollHeight > element.clientHeight;
-              if (!isScrollable) {
-                e.preventDefault();
-              }
+              e.preventDefault();
+              e.stopPropagation();
             }}
-            style={{ touchAction: 'pan-y' }}
+            style={{ touchAction: 'none', pointerEvents: 'auto' }}
           >
             {options.map((city, i) => {
               const isActive = value === city;
