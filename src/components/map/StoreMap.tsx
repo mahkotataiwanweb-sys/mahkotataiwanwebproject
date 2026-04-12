@@ -1652,7 +1652,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
   };
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full max-w-4xl mx-auto">
       {/* ─── Top bar ─── */}
       <div className="absolute top-4 left-3 right-3 sm:left-4 sm:right-4 z-[1000] flex items-center gap-2 sm:gap-3">
         {/* Premium dropdown */}

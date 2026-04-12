@@ -432,7 +432,7 @@ export default function VideoShowcaseSection() {
 
   return (
     <section ref={sectionRef} className="bg-navy py-20 md:py-28 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-4xl mx-auto px-6">
         {/* Header */}
         <div ref={headerRef} className="text-center mb-12">
           <span className="inline-block text-red/80 text-sm font-semibold tracking-widest uppercase mb-3">

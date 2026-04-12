@@ -305,7 +305,7 @@ export default function WhereToBuySection() {
             <svg
               ref={mapRef}
               viewBox="0 0 200 450"
-              className="w-80 md:w-[28rem] lg:w-[36rem] h-auto transition-transform duration-500 group-hover:scale-[1.02]"
+              className="w-64 md:w-[22rem] lg:w-[28rem] h-auto"
               xmlns="http://www.w3.org/2000/svg"
             >
               <defs>

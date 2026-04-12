@@ -18,7 +18,7 @@ gsap.registerPlugin(ScrollTrigger);
 const StoreMap = dynamic(() => import('@/components/map/StoreMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[600px] sm:h-[750px] lg:h-[900px] rounded-[2rem] bg-cream-light border border-cream-dark/30 flex items-center justify-center">
+    <div className="w-full max-w-4xl mx-auto h-[600px] sm:h-[750px] lg:h-[450px] rounded-[2rem] bg-cream-light border border-cream-dark/30 flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <div className="w-10 h-10 border-2 border-red border-t-transparent rounded-full animate-spin" />
         <p className="text-navy/40 text-sm">Loading map...</p>
