@@ -412,8 +412,11 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full h-[55vh] md:h-[75vh] min-h-[400px] max-h-[900px] overflow-hidden"
-      style={{ transformOrigin: 'center center' }}
+      className="relative w-full overflow-hidden"
+      style={{
+        height: 'clamp(400px, 100dvh, 900px)',
+        transformOrigin: 'center center'
+      }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
