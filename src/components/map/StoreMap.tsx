@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { MapPin, Phone, Navigation, X, ChevronDown, Locate } from 'lucide-react';
+import { MapPin, Phone, Navigation, X, ChevronDown, Locate, Plus, Minus } from 'lucide-react';
 import gsap from 'gsap';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -1401,15 +1401,6 @@ export default function StoreMap({ stores }: StoreMapProps) {
       minZoom: 7,
     });
 
-    // Enable scroll zoom only after clicking on the map
-    map.on('click', () => {
-      map.scrollWheelZoom.enable();
-    });
-    // Disable scroll zoom when mouse leaves the map
-    map.getContainer().addEventListener('mouseleave', () => {
-      map.scrollWheelZoom.disable();
-    });
-
     // Fit to Taiwan main island — automatically calculates optimal zoom for any screen size
     map.fitBounds(taiwanMainBounds, {
       paddingTopLeft: L.point(isMobile ? 10 : 20, isMobile ? 50 : 60),
@@ -1421,7 +1412,6 @@ export default function StoreMap({ stores }: StoreMapProps) {
     const handleResize = () => { map.invalidateSize(); };
     window.addEventListener('resize', handleResize);
 
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
     L.control.attribution({ position: 'bottomleft', prefix: false }).addAttribution('© OpenStreetMap').addTo(map);
 
     mapRef.current = map;
@@ -1782,6 +1772,23 @@ export default function StoreMap({ stores }: StoreMapProps) {
           className="illustrated-map w-full h-[600px] sm:h-[750px] lg:h-[450px] overflow-hidden"
           style={{ background: '#2E8BC9' }}
         />
+        {/* Custom Zoom Buttons */}
+        <div className="absolute bottom-4 right-4 z-[1000] flex flex-col gap-1.5">
+          <button
+            onClick={() => mapRef.current?.zoomIn()}
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-navy/80 backdrop-blur-md text-cream/90 hover:bg-navy hover:text-white border border-white/10 shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
+            aria-label="Zoom in"
+          >
+            <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
+          </button>
+          <button
+            onClick={() => mapRef.current?.zoomOut()}
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-navy/80 backdrop-blur-md text-cream/90 hover:bg-navy hover:text-white border border-white/10 shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
+            aria-label="Zoom out"
+          >
+            <Minus className="w-3.5 h-3.5" strokeWidth={2.5} />
+          </button>
+        </div>
       </div>
 
       {/* ─── Store popup ─── */}
