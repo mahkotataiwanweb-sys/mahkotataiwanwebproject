@@ -400,9 +400,10 @@ export default function HeroSlider() {
           src={currentSlide.image_url}
           alt={title}
           fill
-          className="object-cover"
+          className="object-cover w-full h-full"
           priority={currentIndex === 0}
           sizes="100vw"
+          quality={90}
         />
       </motion.div>
     );

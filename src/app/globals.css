@@ -18,6 +18,12 @@
 
 /* ===== Custom Base Styles ===== */
 @layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
   html {
     scroll-behavior: auto; /* Lenis handles smooth scroll */
   }
