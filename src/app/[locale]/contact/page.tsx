@@ -1060,22 +1060,45 @@ export default function ContactPage() {
             </p>
           </motion.div>
 
-          <div ref={mapRef}>
-            <div className="bg-white rounded-3xl p-3 sm:p-4 shadow-[0_4px_30px_rgba(0,48,72,0.08)] border border-navy/[0.04] overflow-hidden">
+          <div ref={mapRef} className="relative rounded-[2rem] overflow-hidden border border-cream-dark/20">
+            <div className="relative w-full max-w-4xl mx-auto" style={{ aspectRatio: '16/9', maxHeight: '450px' }}>
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.5!2d121.37!3d25.07!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjXCsDA0JzEyLjAiTiAxMjHCsDIyJzEyLjAiRQ!5e0!3m2!1sen!2stw!4v1"
                 width="100%"
-                height="480"
-                style={{ border: 0, borderRadius: '1.25rem' }}
+                height="100%"
+                style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Mahkota Taiwan Office Location"
-                className="w-full"
               />
+              {/* Custom Zoom Buttons */}
+              <div className="absolute bottom-4 right-4 z-[1000] flex flex-col gap-1.5">
+                <button
+                  onClick={() => {
+                    const iframe = document.querySelector('iframe[title="Mahkota Taiwan Office Location"]') as HTMLIFrameElement;
+                    if (iframe) iframe.style.transform = 'scale(1.2)';
+                  }}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-navy/80 backdrop-blur-md text-cream/90 hover:bg-navy hover:text-white border border-white/10 shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                  aria-label="Zoom in"
+                >
+                  <span className="text-lg font-bold">+</span>
+                </button>
+                <button
+                  onClick={() => {
+                    const iframe = document.querySelector('iframe[title="Mahkota Taiwan Office Location"]') as HTMLIFrameElement;
+                    if (iframe) iframe.style.transform = 'scale(0.8)';
+                  }}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-navy/80 backdrop-blur-md text-cream/90 hover:bg-navy hover:text-white border border-white/10 shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                  aria-label="Zoom out"
+                >
+                  <span className="text-lg font-bold">−</span>
+                </button>
+              </div>
+            </div>
 
-              {/* Location Info Bar */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 mt-2">
+            {/* Location Info Bar */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 mt-4">
               <div className="flex items-center gap-4 flex-1">
                 <div className="w-12 h-12 rounded-2xl bg-red/10 flex items-center justify-center shrink-0">
                   <MapPin className="w-5 h-5 text-red" />
@@ -1087,68 +1110,6 @@ export default function ContactPage() {
                   </p>
                 </div>
               </div>
-              <a
-                href={OFFICE_MAPS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-red hover:text-red/80 text-sm font-semibold transition-colors duration-300 whitespace-nowrap bg-red/5 hover:bg-red/10 px-5 py-2.5 rounded-full"
-              >
-                Get Directions
-                <ChevronRight className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ╔═══════════════════════════════════════════╗
-          ║  6. CTA — Premium Floating Box             ║
-          ╚═══════════════════════════════════════════╝ */}
-      <section className="py-20 sm:py-28 bg-cream relative overflow-hidden">
-        <motion.div
-          ref={ctaRef}
-          initial={{ opacity: 0, y: 80, scale: 0.92 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 2.3, ease: [0.22, 0.68, 0, 1] }}
-          className="max-w-4xl mx-auto px-6 sm:px-8"
-        >
-          <div className="relative bg-navy rounded-[2rem] p-10 sm:p-14 lg:p-16 text-center overflow-hidden shadow-[0_40px_100px_-25px_rgba(0,48,72,0.5),0_0_0_1px_rgba(255,255,255,0.05)_inset]"
-            style={{ animation: 'floatSubtle 6s ease-in-out infinite' }}
-          >
-            {/* Glossy shine overlays */}
-            <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white/[0.1] via-transparent to-white/[0.02] pointer-events-none" />
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-            <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
-            <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
-
-            {/* Animated gradient orbs */}
-            <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-gradient-to-br from-white/[0.08] to-transparent blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-32 -left-32 w-64 h-64 rounded-full bg-gradient-to-tr from-red/[0.06] to-transparent blur-2xl pointer-events-none" />
-
-            {/* Moving shimmer effect */}
-            <div className="absolute inset-0 rounded-[2rem] overflow-hidden pointer-events-none">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" style={{ animation: 'shimmerSlide 4s ease-in-out infinite' }} />
-            </div>
-
-            {/* Content */}
-            <div className="relative z-10">
-              <motion.div
-                initial={{ scale: 0, opacity: 0 }}
-                whileInView={{ scale: 1, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.3, type: 'spring', stiffness: 200 }}
-                className="w-[72px] h-[72px] rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-8 backdrop-blur-sm border border-white/[0.08]"
-              >
-                <Handshake className="w-9 h-9 text-red/80" />
-              </motion.div>
-
-              <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-5 leading-tight">
-                Interested in Becoming a Partner?
-              </h2>
-              <p className="text-cream/70 text-sm tracking-wide mb-10 max-w-lg mx-auto">
-                Join 300+ stores across Taiwan selling Mahkota Taiwan products
               <a
                 href={OFFICE_MAPS_URL}
                 target="_blank"
