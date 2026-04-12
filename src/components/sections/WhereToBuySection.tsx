@@ -305,8 +305,9 @@ export default function WhereToBuySection() {
             <svg
               ref={mapRef}
               viewBox="0 0 200 450"
-              className="w-64 md:w-[22rem] lg:w-[28rem] h-auto"
+              className="w-32 md:w-40 lg:w-48 h-auto"
               xmlns="http://www.w3.org/2000/svg"
+              style={{ filter: 'none' }}
             >
               <defs>
                 <linearGradient id="taiwanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -314,7 +315,7 @@ export default function WhereToBuySection() {
                   <stop offset="100%" stopColor="#2980b9" />
                 </linearGradient>
                 <filter id="mapShadow" x="-10%" y="-5%" width="120%" height="110%">
-                  <feDropShadow dx="2" dy="4" stdDeviation="6" floodColor="#1a5276" floodOpacity="0.25" />
+                  <feDropShadow dx="2" dy="4" stdDeviation="6" floodColor="#1a5276" floodOpacity="0.1" />
                 </filter>
                 <filter id="pinGlow">
                   <feGaussianBlur stdDeviation="2" result="blur" />
