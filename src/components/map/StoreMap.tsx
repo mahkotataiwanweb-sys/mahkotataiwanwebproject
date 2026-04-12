@@ -19,6 +19,14 @@ function injectPinStyles() {
     .illustrated-map.leaflet-container {
       background: #2E8BC9 !important;
     }
+    /* Remove Leaflet hover darkening effect */
+    .leaflet-tile:hover {
+      filter: none !important;
+      opacity: 1 !important;
+    }
+    .leaflet-container:hover .leaflet-tile {
+      filter: none !important;
+    }
     /* Force ocean pane above tiles — absolute safeguard */
     .leaflet-oceanPane-pane {
       z-index: 350 !important;
@@ -1784,7 +1792,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
         <OceanWaterEffects />
         <div
           ref={mapContainerRef}
-          className="illustrated-map w-full h-[600px] sm:h-[750px] lg:h-[600px] overflow-hidden"
+          className="illustrated-map w-full h-[320px] sm:h-[380px] lg:h-[320px] overflow-hidden"
           style={{ background: '#2E8BC9' }}
         />
         {/* Custom Zoom Buttons */}
