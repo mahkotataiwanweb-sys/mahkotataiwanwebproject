@@ -1043,7 +1043,7 @@ export default function ContactPage() {
           ║  5. GOOGLE MAPS                            ║
           ╚═══════════════════════════════════════════╝ */}
       <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
-<div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-6">
           {/* Section Header — Premium Reveal */}
           <motion.div
             className="text-center mb-14"
@@ -1076,26 +1076,27 @@ export default function ContactPage() {
 
               {/* Location Info Bar */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 mt-2">
-              <div className="flex items-center gap-4 flex-1">
-                <div className="w-12 h-12 rounded-2xl bg-red/10 flex items-center justify-center shrink-0">
-                  <MapPin className="w-5 h-5 text-red" />
+                <div className="flex items-center gap-4 flex-1">
+                  <div className="w-12 h-12 rounded-2xl bg-red/10 flex items-center justify-center shrink-0">
+                    <MapPin className="w-5 h-5 text-red" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-navy text-base">Mahkota Taiwan Office</p>
+                    <p className="text-navy/50 text-sm">
+                      No. 83, Liyuan 2nd Street, Linkou District, New Taipei City
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-navy text-base">Mahkota Taiwan Office</p>
-                  <p className="text-navy/50 text-sm">
-                    No. 83, Liyuan 2nd Street, Linkou District, New Taipei City
-                  </p>
-                </div>
+                <a
+                  href={OFFICE_MAPS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-red hover:text-red/80 text-sm font-semibold transition-colors duration-300 whitespace-nowrap bg-red/5 hover:bg-red/10 px-5 py-2.5 rounded-full"
+                >
+                  Get Directions
+                  <ChevronRight className="w-4 h-4" />
+                </a>
               </div>
-              <a
-                href={OFFICE_MAPS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-red hover:text-red/80 text-sm font-semibold transition-colors duration-300 whitespace-nowrap bg-red/5 hover:bg-red/10 px-5 py-2.5 rounded-full"
-              >
-                Get Directions
-                <ChevronRight className="w-4 h-4" />
-              </a>
             </div>
           </div>
         </div>
@@ -1105,7 +1106,7 @@ export default function ContactPage() {
           ║  6. CTA — Premium Floating Box             ║
           ╚═══════════════════════════════════════════╝ */}
       <section className="py-20 sm:py-28 bg-cream relative overflow-hidden">
-<motion.div
+        <motion.div
           ref={ctaRef}
           initial={{ opacity: 0, y: 80, scale: 0.92 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
