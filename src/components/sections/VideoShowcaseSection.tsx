@@ -129,12 +129,6 @@ function VideoCard({
   category: VideoCategory;
   onClick: (video: VideoShowcase) => void;
 }) {
-  const handleWheel = (e: React.WheelEvent) => {
-    if (category === 'reels') {
-      e.stopPropagation();
-    }
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -142,12 +136,11 @@ function VideoCard({
       transition={{ duration: 0.3 }}
       className={`w-full rounded-xl shadow-lg bg-gray-900 transition-shadow ${
         category === 'reels'
-          ? 'overflow-y-scroll overflow-x-hidden'
+          ? 'overflow-hidden'
           : 'aspect-[9/16] overflow-hidden cursor-pointer hover:shadow-xl'
       }`}
-      style={category === 'reels' ? { height: '600px' } : {}}
+      style={category === 'reels' ? { height: '550px' } : {}}
       onClick={() => category !== 'reels' && onClick(video)}
-      onWheel={handleWheel}
     >
       {category === 'shorts' && extractYouTubeId(video.video_url) && (
         <iframe
