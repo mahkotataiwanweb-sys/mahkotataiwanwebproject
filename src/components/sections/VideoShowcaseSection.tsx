@@ -249,20 +249,13 @@ function VideoCard({
           }}
         >
           {!tiktokPlaying ? (
-            <iframe
-              src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
-              width="100%"
-              frameBorder="0"
-              sandbox="allow-same-origin allow-presentation"
-              style={{
-                width: '100%',
-                height: '100%',
-                border: 'none',
-                pointerEvents: 'none'
-              }}
-            />
+            <div className="flex flex-col items-center justify-center gap-3">
+              <Play className="w-12 h-12 text-white/60" />
+              <p className="text-white/50 text-sm">Click to play</p>
+            </div>
           ) : (
             <iframe
+              key={`tiktok-${extractTikTokId(video.video_url)}`}
               src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
               width="100%"
               frameBorder="0"
