@@ -60,9 +60,8 @@ function TikTokLogo() {
 function ShortsLogo() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      {/* YouTube Shorts - vertical play symbol */}
-      <rect x="5" y="2" width="14" height="20" rx="2" fill="none" stroke="currentColor" strokeWidth="1.5"/>
-      <polygon points="10,8 10,16 16,12" fill="currentColor"/>
+      {/* YouTube Shorts - red play button */}
+      <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15V7l6 5-6 5z"/>
     </svg>
   );
 }
@@ -70,16 +69,17 @@ function ShortsLogo() {
 function ReelsLogo() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      {/* Instagram Reels - film strip */}
-      <rect x="2" y="3" width="20" height="18" rx="2" fill="none" stroke="currentColor" strokeWidth="1.5"/>
-      <line x1="2" y1="9" x2="22" y2="9" stroke="currentColor" strokeWidth="1.5"/>
-      <line x1="2" y1="15" x2="22" y2="15" stroke="currentColor" strokeWidth="1.5"/>
-      <circle cx="6" cy="6" r="1" fill="currentColor"/>
-      <circle cx="18" cy="6" r="1" fill="currentColor"/>
-      <circle cx="6" cy="12" r="1" fill="currentColor"/>
-      <circle cx="18" cy="12" r="1" fill="currentColor"/>
-      <circle cx="6" cy="18" r="1" fill="currentColor"/>
-      <circle cx="18" cy="18" r="1" fill="currentColor"/>
+      {/* Instagram Reels - gradient with play */}
+      <defs>
+        <linearGradient id="reelsGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" style={{stopColor: '#FFA500', stopOpacity: 1}} />
+          <stop offset="50%" style={{stopColor: '#FF1493', stopOpacity: 1}} />
+          <stop offset="100%" style={{stopColor: '#C924A5', stopOpacity: 1}} />
+        </linearGradient>
+      </defs>
+      <rect x="2" y="3" width="20" height="18" rx="2" fill="url(#reelsGradient)"/>
+      <rect x="2" y="3" width="20" height="4" fill="currentColor" opacity="0.3"/>
+      <polygon points="12,10 9,14 15,14" fill="white"/>
     </svg>
   );
 }
@@ -249,35 +249,27 @@ function VideoCard({
       )}
       {category === 'tiktok' && extractTikTokId(video.video_url) && (
         <div
-          className="w-full h-full overflow-hidden cursor-pointer relative"
+          className="w-full h-full bg-black overflow-hidden cursor-pointer"
           style={{ clipPath: 'inset(0)' }}
           onClick={(e) => {
             e.stopPropagation();
             setTiktokPlaying(true);
           }}
         >
-          <iframe
-            key={`tiktok-preview-${extractTikTokId(video.video_url)}`}
-            src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
-            width="100%"
-            frameBorder="0"
-            sandbox={!tiktokPlaying ? "allow-same-origin allow-presentation" : "allow-same-origin allow-scripts allow-popups"}
-            allow={tiktokPlaying ? "autoplay; encrypted-media" : ""}
-            style={{
-              width: '100%',
-              height: '100%',
-              border: 'none',
-              pointerEvents: tiktokPlaying ? 'auto' : 'none',
-              filter: !tiktokPlaying ? 'brightness(0.7)' : 'none'
-            }}
-          />
-          {!tiktokPlaying && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 pointer-events-auto">
-              <div className="bg-red/40 rounded-full p-4 backdrop-blur">
-                <Play className="w-8 h-8 text-white fill-white" />
-              </div>
-              <p className="text-white text-xs font-medium">Click to play</p>
-            </div>
+          {tiktokPlaying && (
+            <iframe
+              key={`tiktok-${extractTikTokId(video.video_url)}`}
+              src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
+              width="100%"
+              frameBorder="0"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none'
+              }}
+            />
           )}
         </div>
       )}
