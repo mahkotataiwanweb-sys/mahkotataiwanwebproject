@@ -134,9 +134,12 @@ function VideoCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`w-full aspect-[9/16] rounded-xl shadow-lg bg-gray-900 transition-shadow ${
-        category === 'reels' ? 'overflow-auto' : 'overflow-hidden cursor-pointer hover:shadow-xl'
+      className={`w-full rounded-xl shadow-lg bg-gray-900 transition-shadow ${
+        category === 'reels'
+          ? 'overflow-y-scroll overflow-x-hidden'
+          : 'aspect-[9/16] overflow-hidden cursor-pointer hover:shadow-xl'
       }`}
+      style={category === 'reels' ? { height: '600px' } : {}}
       onClick={() => category !== 'reels' && onClick(video)}
     >
       {category === 'shorts' && extractYouTubeId(video.video_url) && (
