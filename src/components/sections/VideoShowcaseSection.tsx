@@ -240,14 +240,27 @@ function VideoCard({
       )}
       {category === 'tiktok' && extractTikTokId(video.video_url) && (
         <div
-          className="w-full h-full bg-black flex items-center justify-center overflow-hidden cursor-pointer"
+          className="w-full h-full bg-black flex items-center justify-center overflow-hidden cursor-pointer relative"
           style={{ clipPath: 'inset(0)' }}
           onClick={(e) => {
             e.stopPropagation();
             setTiktokPlaying(true);
           }}
         >
-          {tiktokPlaying && (
+          {!tiktokPlaying ? (
+            <iframe
+              src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
+              width="100%"
+              frameBorder="0"
+              sandbox="allow-same-origin allow-presentation"
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                pointerEvents: 'none'
+              }}
+            />
+          ) : (
             <iframe
               src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
               width="100%"
