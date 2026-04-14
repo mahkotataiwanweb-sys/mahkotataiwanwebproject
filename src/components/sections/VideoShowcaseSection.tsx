@@ -150,22 +150,25 @@ function VideoCard({
         />
       )}
       {category === 'tiktok' && extractTikTokId(video.video_url) && (
-        <div className="w-full h-full flex items-center justify-center overflow-hidden">
-          <iframe
-            src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
-            width="100%"
-            height="800"
-            frameBorder="0"
-            allow="autoplay; encrypted-media"
-            allowFullScreen
-            style={{ maxWidth: '100%' }}
-          />
-          <style>{`
-            iframe[src*="tiktok.com"] {
-              transform: scale(1.2);
-              transform-origin: top center;
-            }
-          `}</style>
+        <div className="w-full h-full flex items-center justify-center bg-black overflow-hidden relative">
+          <div style={{ width: '320px', height: '100%', overflow: 'hidden', position: 'relative' }}>
+            <iframe
+              src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
+              width="540"
+              height="700"
+              frameBorder="0"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+              style={{
+                position: 'absolute',
+                left: '-110px',
+                top: '-50px',
+                width: '540px',
+                height: '700px',
+                border: 'none'
+              }}
+            />
+          </div>
         </div>
       )}
       {category === 'reels' && video.video_url && (
@@ -512,23 +515,26 @@ export default function VideoShowcaseSection() {
                   />
                 )}
                 {activeCategory === 'tiktok' && extractTikTokId(selectedVideo.video_url) && (
-                  <>
-                    <iframe
-                      src={`https://www.tiktok.com/embed/v2/${extractTikTokId(selectedVideo.video_url)}`}
-                      width="100%"
-                      height="800"
-                      frameBorder="0"
-                      allow="autoplay; encrypted-media"
-                      allowFullScreen
-                      style={{ maxWidth: '100%', transform: 'scale(1.1)', transformOrigin: 'top center' }}
-                    />
-                    <style>{`
-                      iframe[src*="tiktok.com"] {
-                        transform: scale(1.1);
-                        transform-origin: top center;
-                      }
-                    `}</style>
-                  </>
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000', overflow: 'hidden', position: 'relative' }}>
+                    <div style={{ width: '320px', height: '100%', overflow: 'hidden', position: 'relative' }}>
+                      <iframe
+                        src={`https://www.tiktok.com/embed/v2/${extractTikTokId(selectedVideo.video_url)}`}
+                        width="540"
+                        height="700"
+                        frameBorder="0"
+                        allow="autoplay; encrypted-media"
+                        allowFullScreen
+                        style={{
+                          position: 'absolute',
+                          left: '-110px',
+                          top: '-50px',
+                          width: '540px',
+                          height: '700px',
+                          border: 'none'
+                        }}
+                      />
+                    </div>
+                  </div>
                 )}
                 {activeCategory === 'reels' && selectedVideo.video_url && (
                   <>
