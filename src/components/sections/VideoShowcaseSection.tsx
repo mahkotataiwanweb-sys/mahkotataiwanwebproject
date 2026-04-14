@@ -145,7 +145,7 @@ function VideoCard({
       {category === 'shorts' && extractYouTubeId(video.video_url) && (
         <iframe
           width="100%"
-          height="350"
+          height="300"
           src={`https://www.youtube.com/embed/${extractYouTubeId(video.video_url)}`}
           title={video.title_en}
           frameBorder="0"
@@ -158,15 +158,15 @@ function VideoCard({
         <div className="w-full h-full bg-black flex items-center justify-center overflow-hidden" style={{ clipPath: 'inset(0)' }}>
           <iframe
             src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
-            width="320"
+            width="280"
             frameBorder="0"
             allow="autoplay; encrypted-media"
             allowFullScreen
             style={{
-              width: '320px',
-              height: '580px',
+              width: '280px',
+              height: '520px',
               border: 'none',
-              marginTop: '-20px'
+              marginTop: '-15px'
             }}
           />
         </div>
@@ -184,7 +184,7 @@ function VideoCard({
             data-instgrm-version="14"
             style={{
               maxWidth: '100%',
-              width: '320px',
+              width: '300px',
               margin: '8px auto',
               padding: '0'
             }}
@@ -230,8 +230,10 @@ export default function VideoShowcaseSection() {
     fetchVideos();
   }, []);
 
-  /* Get videos for active category */
-  const categoryVideos = videos.filter((v) => v.video_category === activeCategory);
+  /* Get videos for active category - max 3 videos */
+  const categoryVideos = videos
+    .filter((v) => v.video_category === activeCategory)
+    .slice(0, 3);
   const activeVideo = categoryVideos[activeVideoIndex] || null;
 
   /* Navigate to next video in category */
@@ -266,6 +268,15 @@ export default function VideoShowcaseSection() {
       scrollContainerRef.current.scrollBy({ left: 220, behavior: 'smooth' });
     }
   };
+
+  /* Process Instagram embeds on category change */
+  useEffect(() => {
+    if (activeCategory === 'reels' && window.instgrm) {
+      setTimeout(() => {
+        window.instgrm.Embeds.process();
+      }, 100);
+    }
+  }, [activeCategory]);
 
   /* Animation setup */
   useEffect(() => {
@@ -512,7 +523,7 @@ export default function VideoShowcaseSection() {
                 {activeCategory === 'shorts' && extractYouTubeId(selectedVideo.video_url) && (
                   <iframe
                     width="100%"
-                    height="600"
+                    height="500"
                     src={`https://www.youtube.com/embed/${extractYouTubeId(selectedVideo.video_url)}`}
                     title={selectedVideo.title_en}
                     frameBorder="0"
@@ -525,15 +536,15 @@ export default function VideoShowcaseSection() {
                   <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000', overflow: 'hidden', clipPath: 'inset(0)' }}>
                     <iframe
                       src={`https://www.tiktok.com/embed/v2/${extractTikTokId(selectedVideo.video_url)}`}
-                      width="320"
+                      width="280"
                       frameBorder="0"
                       allow="autoplay; encrypted-media"
                       allowFullScreen
                       style={{
-                        width: '320px',
-                        height: '580px',
+                        width: '280px',
+                        height: '520px',
                         border: 'none',
-                        marginTop: '-20px'
+                        marginTop: '-15px'
                       }}
                     />
                   </div>
