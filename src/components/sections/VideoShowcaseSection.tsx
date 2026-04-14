@@ -281,9 +281,12 @@ export default function VideoShowcaseSection() {
 
   /* Process Instagram embeds on category change */
   useEffect(() => {
-    if (activeCategory === 'reels' && window.instgrm?.Embeds?.process) {
+    if (activeCategory === 'reels') {
       setTimeout(() => {
-        window.instgrm?.Embeds?.process();
+        const instgrm = (window as any).instgrm;
+        if (instgrm?.Embeds?.process) {
+          instgrm.Embeds.process();
+        }
       }, 100);
     }
   }, [activeCategory]);
