@@ -505,7 +505,7 @@ export default function VideoShowcaseSection() {
                 <Play className="w-5 h-5 rotate-90" />
               </button>
 
-              <div className="relative w-full h-full bg-black">
+              <div className={`relative w-full h-full bg-black ${activeCategory === 'reels' ? 'overflow-auto' : 'overflow-hidden'}`}>
                 {activeCategory === 'shorts' && extractYouTubeId(selectedVideo.video_url) && (
                   <iframe
                     width="100%"
@@ -538,15 +538,9 @@ export default function VideoShowcaseSection() {
                 {activeCategory === 'reels' && selectedVideo.video_url && (
                   <div style={{
                     width: '100%',
-                    height: '100%',
                     display: 'flex',
-                    alignItems: 'flex-start',
                     justifyContent: 'center',
-                    backgroundColor: '#000',
-                    overflow: 'auto',
-                    position: 'relative',
-                    padding: '8px',
-                    paddingTop: '16px'
+                    padding: '16px 8px'
                   }}>
                     <div style={{ width: '100%', maxWidth: '320px' }}>
                       <blockquote
