@@ -60,9 +60,9 @@ function TikTokLogo() {
 function ShortsLogo() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <rect x="4" y="2" width="16" height="20" rx="2" fill="none" stroke="currentColor" strokeWidth="2"/>
-      <line x1="12" y1="8" x2="12" y2="16" stroke="currentColor" strokeWidth="2"/>
-      <circle cx="12" cy="12" r="3" fill="currentColor"/>
+      {/* YouTube Shorts - vertical play symbol */}
+      <rect x="5" y="2" width="14" height="20" rx="2" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+      <polygon points="10,8 10,16 16,12" fill="currentColor"/>
     </svg>
   );
 }
@@ -70,8 +70,16 @@ function ShortsLogo() {
 function ReelsLogo() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2"/>
-      <polygon points="10,8 10,16 16,12" fill="currentColor"/>
+      {/* Instagram Reels - film strip */}
+      <rect x="2" y="3" width="20" height="18" rx="2" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="2" y1="9" x2="22" y2="9" stroke="currentColor" strokeWidth="1.5"/>
+      <line x1="2" y1="15" x2="22" y2="15" stroke="currentColor" strokeWidth="1.5"/>
+      <circle cx="6" cy="6" r="1" fill="currentColor"/>
+      <circle cx="18" cy="6" r="1" fill="currentColor"/>
+      <circle cx="6" cy="12" r="1" fill="currentColor"/>
+      <circle cx="18" cy="12" r="1" fill="currentColor"/>
+      <circle cx="6" cy="18" r="1" fill="currentColor"/>
+      <circle cx="18" cy="18" r="1" fill="currentColor"/>
     </svg>
   );
 }
@@ -241,34 +249,35 @@ function VideoCard({
       )}
       {category === 'tiktok' && extractTikTokId(video.video_url) && (
         <div
-          className="w-full h-full bg-black flex items-center justify-center overflow-hidden cursor-pointer relative"
+          className="w-full h-full overflow-hidden cursor-pointer relative"
           style={{ clipPath: 'inset(0)' }}
           onClick={(e) => {
             e.stopPropagation();
             setTiktokPlaying(true);
           }}
         >
-          {!tiktokPlaying ? (
-            <div className="flex flex-col items-center justify-center gap-3 z-10">
-              <div className="bg-red/30 rounded-full p-4">
+          <iframe
+            key={`tiktok-preview-${extractTikTokId(video.video_url)}`}
+            src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
+            width="100%"
+            frameBorder="0"
+            sandbox={!tiktokPlaying ? "allow-same-origin allow-presentation" : "allow-same-origin allow-scripts allow-popups"}
+            allow={tiktokPlaying ? "autoplay; encrypted-media" : ""}
+            style={{
+              width: '100%',
+              height: '100%',
+              border: 'none',
+              pointerEvents: tiktokPlaying ? 'auto' : 'none',
+              filter: !tiktokPlaying ? 'brightness(0.7)' : 'none'
+            }}
+          />
+          {!tiktokPlaying && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 pointer-events-auto">
+              <div className="bg-red/40 rounded-full p-4 backdrop-blur">
                 <Play className="w-8 h-8 text-white fill-white" />
               </div>
               <p className="text-white text-xs font-medium">Click to play</p>
             </div>
-          ) : (
-            <iframe
-              key={`tiktok-${extractTikTokId(video.video_url)}`}
-              src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
-              width="100%"
-              frameBorder="0"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-              style={{
-                width: '100%',
-                height: '100%',
-                border: 'none'
-              }}
-            />
           )}
         </div>
       )}
