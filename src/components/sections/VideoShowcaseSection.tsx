@@ -134,8 +134,10 @@ function VideoCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="w-full aspect-[9/16] rounded-xl overflow-hidden shadow-lg bg-gray-900 cursor-pointer hover:shadow-xl transition-shadow"
-      onClick={() => onClick(video)}
+      className={`w-full aspect-[9/16] rounded-xl overflow-hidden shadow-lg bg-gray-900 transition-shadow ${
+        category === 'reels' ? '' : 'cursor-pointer hover:shadow-xl'
+      }`}
+      onClick={() => category !== 'reels' && onClick(video)}
     >
       {category === 'shorts' && extractYouTubeId(video.video_url) && (
         <iframe
@@ -533,29 +535,6 @@ export default function VideoShowcaseSection() {
                         marginTop: '-20px'
                       }}
                     />
-                  </div>
-                )}
-                {activeCategory === 'reels' && selectedVideo.video_url && (
-                  <div style={{
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    padding: '16px 8px'
-                  }}>
-                    <div style={{ width: '100%', maxWidth: '320px' }}>
-                      <blockquote
-                        className="instagram-media"
-                        data-instgrm-permalink={selectedVideo.video_url}
-                        data-instgrm-version="14"
-                        style={{
-                          maxWidth: '100%',
-                          width: '100%',
-                          margin: '0 auto',
-                          padding: '0'
-                        }}
-                      />
-                      <script async src="//www.instagram.com/embed.js" />
-                    </div>
                   </div>
                 )}
               </div>
