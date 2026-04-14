@@ -139,6 +139,8 @@ function VideoCard({
   category: VideoCategory;
   onClick: (video: VideoShowcase) => void;
 }) {
+  const [tiktokPlaying, setTiktokPlaying] = useState(false);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -158,7 +160,13 @@ function VideoCard({
           ? { height: '420px' }
           : {}
       }
-      onClick={() => category !== 'reels' && onClick(video)}
+      onClick={() => {
+        if (category === 'tiktok') {
+          setTiktokPlaying(true);
+        } else if (category !== 'reels') {
+          onClick(video);
+        }
+      }}
     >
       {category === 'shorts' && extractYouTubeId(video.video_url) && (
         <iframe
@@ -173,20 +181,33 @@ function VideoCard({
         />
       )}
       {category === 'tiktok' && extractTikTokId(video.video_url) && (
-        <div className="w-full h-full bg-black flex items-center justify-center overflow-hidden" style={{ clipPath: 'inset(0)' }}>
-          <iframe
-            src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
-            width="100%"
-            frameBorder="0"
-            allow="encrypted-media"
-            allowFullScreen
-            loading="lazy"
-            style={{
-              width: '100%',
-              height: '100%',
-              border: 'none'
-            }}
-          />
+        <div className="w-full h-full bg-black flex items-center justify-center overflow-hidden relative" style={{ clipPath: 'inset(0)' }}>
+          {!tiktokPlaying ? (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setTiktokPlaying(true);
+              }}
+              className="absolute inset-0 flex items-center justify-center bg-black/60 hover:bg-black/40 transition-colors z-10"
+            >
+              <Play className="w-16 h-16 text-white" />
+            </button>
+          ) : null}
+          {tiktokPlaying && (
+            <iframe
+              src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
+              width="100%"
+              frameBorder="0"
+              allow="encrypted-media"
+              allowFullScreen
+              loading="lazy"
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none'
+              }}
+            />
+          )}
         </div>
       )}
       {category === 'reels' && video.video_url && (
