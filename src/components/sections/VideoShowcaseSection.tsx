@@ -254,8 +254,7 @@ function VideoCard({
           src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
           title={video.title_en}
           frameBorder="0"
-          allow="autoplay; encrypted-media"
-          allowFullScreen
+          allow="encrypted-media"
           className="w-full h-full"
         />
       )}
