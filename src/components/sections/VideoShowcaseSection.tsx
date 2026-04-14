@@ -129,6 +129,12 @@ function VideoCard({
   category: VideoCategory;
   onClick: (video: VideoShowcase) => void;
 }) {
+  const handleWheel = (e: React.WheelEvent) => {
+    if (category === 'reels') {
+      e.stopPropagation();
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -141,6 +147,7 @@ function VideoCard({
       }`}
       style={category === 'reels' ? { height: '600px' } : {}}
       onClick={() => category !== 'reels' && onClick(video)}
+      onWheel={handleWheel}
     >
       {category === 'shorts' && extractYouTubeId(video.video_url) && (
         <iframe
