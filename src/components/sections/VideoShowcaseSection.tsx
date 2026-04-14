@@ -14,6 +14,16 @@ gsap.registerPlugin(ScrollTrigger);
 
 type VideoCategory = 'youtube' | 'shorts' | 'tiktok' | 'reels';
 
+declare global {
+  interface Window {
+    instgrm?: {
+      Embeds?: {
+        process?: () => void;
+      };
+    };
+  }
+}
+
 /* Extract YouTube Video ID */
 function extractYouTubeId(url: string): string | null {
   const patterns = [
@@ -557,4 +567,3 @@ export default function VideoShowcaseSection() {
     </section>
   );
 }
-/* Deploy trigger 1776156698 */
