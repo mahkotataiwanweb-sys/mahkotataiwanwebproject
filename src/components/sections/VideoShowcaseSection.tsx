@@ -248,30 +248,16 @@ function VideoCard({
         />
       )}
       {category === 'tiktok' && extractTikTokId(video.video_url) && (
-        <div
-          className="w-full h-full bg-black overflow-hidden cursor-pointer"
-          style={{ clipPath: 'inset(0)' }}
-          onClick={(e) => {
-            e.stopPropagation();
-            setTiktokPlaying(true);
-          }}
-        >
-          {tiktokPlaying && (
-            <iframe
-              key={`tiktok-${extractTikTokId(video.video_url)}`}
-              src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
-              width="100%"
-              frameBorder="0"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-              style={{
-                width: '100%',
-                height: '100%',
-                border: 'none'
-              }}
-            />
-          )}
-        </div>
+        <iframe
+          width="100%"
+          height="100%"
+          src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
+          title={video.title_en}
+          frameBorder="0"
+          allow="autoplay; encrypted-media"
+          allowFullScreen
+          className="w-full h-full"
+        />
       )}
       {category === 'reels' && video.video_url && (
         <div
