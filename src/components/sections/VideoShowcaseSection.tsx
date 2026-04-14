@@ -150,39 +150,37 @@ function VideoCard({
         />
       )}
       {category === 'tiktok' && extractTikTokId(video.video_url) && (
-        <div className="w-full h-full bg-black flex items-center justify-center" style={{ clipPath: 'inset(0)' }}>
+        <div className="w-full h-full bg-black flex items-center justify-center overflow-hidden" style={{ clipPath: 'inset(0)' }}>
           <iframe
             src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
-            width="100%"
+            width="320"
             frameBorder="0"
             allow="autoplay; encrypted-media"
             allowFullScreen
             style={{
-              width: '100%',
-              height: '900px',
+              width: '320px',
+              height: '580px',
               border: 'none',
-              clipPath: 'polygon(0 0, 100% 0, 100% 70%, 0 70%)'
+              marginTop: '-20px'
             }}
           />
         </div>
       )}
       {category === 'reels' && video.video_url && (
-        <div className="w-full h-full flex items-center justify-center bg-black" style={{ clipPath: 'inset(0)' }}>
-          <div style={{ width: '320px', height: '100%', overflow: 'hidden' }}>
-            <blockquote
-              className="instagram-media"
-              data-instgrm-permalink={video.video_url}
-              data-instgrm-version="14"
+        <div className="w-full h-full flex items-center justify-center bg-black overflow-hidden" style={{ clipPath: 'inset(0)' }}>
+          <div style={{ width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}>
+            <iframe
+              src={`https://www.instagram.com/p/${video.video_url.split('/').filter(Boolean).pop()}/embed/`}
+              width="100%"
+              frameBorder="0"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
               style={{
-                maxWidth: '100%',
-                width: '320px',
-                margin: '0',
-                clipPath: 'polygon(0 0, 100% 0, 100% 85%, 0 85%)'
+                width: '100%',
+                height: '800px',
+                border: 'none',
+                marginTop: '-80px'
               }}
-            />
-            <script
-              async
-              src="//www.instagram.com/embed.js"
             />
           </div>
         </div>
@@ -520,32 +518,37 @@ export default function VideoShowcaseSection() {
                   <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000', overflow: 'hidden', clipPath: 'inset(0)' }}>
                     <iframe
                       src={`https://www.tiktok.com/embed/v2/${extractTikTokId(selectedVideo.video_url)}`}
-                      width="100%"
+                      width="320"
                       frameBorder="0"
                       allow="autoplay; encrypted-media"
                       allowFullScreen
                       style={{
-                        width: '100%',
-                        height: '1000px',
+                        width: '320px',
+                        height: '580px',
                         border: 'none',
-                        clipPath: 'polygon(0 0, 100% 0, 100% 70%, 0 70%)'
+                        marginTop: '-20px'
                       }}
                     />
                   </div>
                 )}
                 {activeCategory === 'reels' && selectedVideo.video_url && (
-                  <>
-                    <blockquote
-                      className="instagram-media"
-                      data-instgrm-permalink={selectedVideo.video_url}
-                      data-instgrm-version="14"
-                      style={{ maxWidth: '100%' }}
-                    />
-                    <script
-                      async
-                      src="//www.instagram.com/embed.js"
-                    />
-                  </>
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000', overflow: 'hidden' }}>
+                    <div style={{ width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}>
+                      <iframe
+                        src={`https://www.instagram.com/p/${selectedVideo.video_url.split('/').filter(Boolean).pop()}/embed/`}
+                        width="100%"
+                        frameBorder="0"
+                        allow="autoplay; encrypted-media"
+                        allowFullScreen
+                        style={{
+                          width: '100%',
+                          height: '800px',
+                          border: 'none',
+                          marginTop: '-80px'
+                        }}
+                      />
+                    </div>
+                  </div>
                 )}
               </div>
             </motion.div>
