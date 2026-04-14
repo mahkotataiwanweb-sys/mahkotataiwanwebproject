@@ -492,7 +492,7 @@ export interface VideoShowcase {
   description_en: string | null;
   description_id: string | null;
   description_zh: string | null;
-  video_type: 'youtube' | 'upload';
+  video_category: 'youtube' | 'shorts' | 'tiktok' | 'reels';
   video_url: string;
   thumbnail_url: string | null;
   sort_order: number;
@@ -509,7 +509,7 @@ export interface VideoShowcaseInsert {
   description_en?: string | null;
   description_id?: string | null;
   description_zh?: string | null;
-  video_type: 'youtube' | 'upload';
+  video_category: 'youtube' | 'shorts' | 'tiktok' | 'reels';
   video_url: string;
   thumbnail_url?: string | null;
   sort_order?: number;
@@ -524,7 +524,7 @@ export interface VideoShowcaseUpdate {
   description_en?: string | null;
   description_id?: string | null;
   description_zh?: string | null;
-  video_type?: 'youtube' | 'upload';
+  video_category?: 'youtube' | 'shorts' | 'tiktok' | 'reels';
   video_url?: string;
   thumbnail_url?: string | null;
   sort_order?: number;

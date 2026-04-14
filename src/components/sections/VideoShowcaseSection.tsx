@@ -5,15 +5,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { VideoShowcase } from '@/types/database';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ------------------------------------------------------------------ */
-/*  YouTube helpers                                                     */
-/* ------------------------------------------------------------------ */
+type VideoCategory = 'youtube' | 'shorts' | 'tiktok' | 'reels';
+
+/* Extract YouTube Video ID */
 function extractYouTubeId(url: string): string | null {
   const patterns = [
     /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
@@ -28,575 +29,410 @@ function extractYouTubeId(url: string): string | null {
   return null;
 }
 
-/* Declare the YT global */
-declare global {
-  interface Window {
-    YT: {
-      Player: new (
-        el: string | HTMLElement,
-        config: Record<string, unknown>
-      ) => YTPlayer;
-      PlayerState: {
-        ENDED: number;
-        PLAYING: number;
-        PAUSED: number;
-        BUFFERING: number;
-        CUED: number;
-      };
-    };
-    onYouTubeIframeAPIReady: (() => void) | undefined;
-  }
-}
-
-interface YTPlayer {
-  playVideo: () => void;
-  pauseVideo: () => void;
-  mute: () => void;
-  unMute: () => void;
-  isMuted: () => boolean;
-  getPlayerState: () => number;
-  getDuration: () => number;
-  getCurrentTime: () => number;
-  seekTo: (seconds: number, allowSeekAhead: boolean) => void;
-  loadVideoById: (videoId: string) => void;
-  destroy: () => void;
-}
-
-/* ------------------------------------------------------------------ */
-/*  Load YT IFrame API once                                            */
-/* ------------------------------------------------------------------ */
-let ytApiLoaded = false;
-let ytApiReady = false;
-const ytReadyCallbacks: (() => void)[] = [];
-
-function loadYouTubeAPI(cb: () => void) {
-  if (ytApiReady) { cb(); return; }
-  ytReadyCallbacks.push(cb);
-  if (ytApiLoaded) return;
-  ytApiLoaded = true;
-
-  const tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  document.head.appendChild(tag);
-
-  window.onYouTubeIframeAPIReady = () => {
-    ytApiReady = true;
-    ytReadyCallbacks.forEach((fn) => fn());
-    ytReadyCallbacks.length = 0;
-  };
-}
-
-/* ------------------------------------------------------------------ */
-/*  Glass Control Button                                                */
-/* ------------------------------------------------------------------ */
-function GlassButton({
-  onClick,
-  children,
+/* Category Tab Button */
+function CategoryTab({
+  category,
   label,
-  disabled,
-  size = 'md',
+  isActive,
+  onClick,
 }: {
-  onClick: () => void;
-  children: React.ReactNode;
+  category: VideoCategory;
   label: string;
-  disabled?: boolean;
-  size?: 'sm' | 'md' | 'lg';
+  isActive: boolean;
+  onClick: () => void;
 }) {
-  const sizeClasses = {
-    sm: 'w-10 h-10 sm:w-11 sm:h-11',
-    md: 'w-12 h-12 sm:w-14 sm:h-14',
-    lg: 'w-14 h-14 sm:w-16 sm:h-16',
-  };
-
   return (
     <button
       onClick={onClick}
-      disabled={disabled}
-      aria-label={label}
-      className={`${sizeClasses[size]} relative group flex items-center justify-center rounded-full
-        transition-all duration-300 ease-out
-        ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:scale-110 active:scale-95'}
-      `}
-      style={{
-        background: 'linear-gradient(145deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255,255,255,0.15)',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12), 0 0 0 1px rgba(0,0,0,0.08)',
-      }}
+      className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
+        isActive
+          ? 'bg-red text-white shadow-lg'
+          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+      }`}
     >
-      {/* Hover glow */}
-      <div
-        className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
-        }}
-      />
-      {/* Top highlight arc */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-3/5 h-[1px] rounded-full pointer-events-none"
-        style={{
-          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-        }}
-      />
-      <span className="relative z-10 text-white/90">{children}</span>
+      {label}
     </button>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Progress Bar                                                        */
-/* ------------------------------------------------------------------ */
-function VideoProgressBar({
-  progress,
-  onSeek,
-}: {
-  progress: number;
-  onSeek: (fraction: number) => void;
-}) {
-  const barRef = useRef<HTMLDivElement>(null);
-
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!barRef.current) return;
-    const rect = barRef.current.getBoundingClientRect();
-    const fraction = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    onSeek(fraction);
-  };
-
+/* YouTube Player Component */
+function YouTubePlayer({ videoId }: { videoId: string }) {
   return (
-    <div
-      ref={barRef}
-      onClick={handleClick}
-      className="w-full h-1.5 rounded-full cursor-pointer group relative"
-      style={{
-        background: 'rgba(255,255,255,0.12)',
-      }}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.4 }}
+      className="w-full aspect-video rounded-2xl overflow-hidden shadow-2xl"
     >
-      {/* Filled portion */}
-      <div
-        className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-200"
-        style={{
-          width: `${progress * 100}%`,
-          background: 'linear-gradient(90deg, #c12126, #e63946)',
-          boxShadow: '0 0 8px rgba(193,33,38,0.4)',
-        }}
+      <iframe
+        width="100%"
+        height="100%"
+        src={`https://www.youtube.com/embed/${videoId}?controls=1&modestbranding=1`}
+        title="YouTube Video"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className="w-full h-full"
       />
-      {/* Scrubber dot */}
-      <div
-        className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{
-          left: `calc(${progress * 100}% - 6px)`,
-          background: '#fff',
-          boxShadow: '0 0 6px rgba(193,33,38,0.5), 0 2px 4px rgba(0,0,0,0.3)',
-        }}
-      />
-    </div>
+    </motion.div>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Main Component                                                      */
-/* ------------------------------------------------------------------ */
+/* Video Card for Shorts/TikTok/Reels */
+function VideoCard({
+  video,
+  category,
+  onClick,
+}: {
+  video: VideoShowcase;
+  category: VideoCategory;
+  onClick: () => void;
+}) {
+  const getEmbedUrl = () => {
+    if (category === 'shorts') {
+      const videoId = extractYouTubeId(video.video_url);
+      return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
+    } else if (category === 'tiktok') {
+      // TikTok embed
+      return video.video_url;
+    } else if (category === 'reels') {
+      // Instagram Reels embed
+      return video.video_url;
+    }
+    return '';
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="flex-shrink-0 w-48 h-96 rounded-xl overflow-hidden shadow-lg bg-gray-900 cursor-pointer group"
+      onClick={onClick}
+    >
+      {video.thumbnail_url ? (
+        <img
+          src={video.thumbnail_url}
+          alt={video.title_en}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+      ) : (
+        <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+          <Play className="w-12 h-12 text-white/60" />
+        </div>
+      )}
+      {/* Play overlay */}
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
+        <div className="w-16 h-16 rounded-full bg-red/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <Play className="w-8 h-8 text-white fill-white" />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* Main Component */
 export default function VideoShowcaseSection() {
   const locale = useLocale();
   const sectionRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const playerContainerRef = useRef<HTMLDivElement>(null);
-  const ytPlayerRef = useRef<YTPlayer | null>(null);
-  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [videos, setVideos] = useState<VideoShowcase[]>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(true);
-  const [progress, setProgress] = useState(0);
-  const [isReady, setIsReady] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<VideoCategory>('youtube');
+  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
-  /* ---------- Fetch videos ---------- */
+  /* Fetch videos */
   useEffect(() => {
     async function fetchVideos() {
-      const { data } = await supabase
-        .from('video_showcases')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
-      if (data && data.length > 0) {
-        setVideos(data as VideoShowcase[]);
+      try {
+        const { data, error } = await supabase
+          .from('video_showcases')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true });
+
+        if (error) throw error;
+        setVideos((data || []) as VideoShowcase[]);
+      } catch (err) {
+        console.error('Failed to fetch videos:', err);
+      } finally {
+        setIsLoading(false);
       }
     }
+
     fetchVideos();
   }, []);
 
-  /* ---------- Start progress tracker ---------- */
-  const startProgressTracker = useCallback(() => {
-    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-    progressIntervalRef.current = setInterval(() => {
-      const p = ytPlayerRef.current;
-      if (!p) return;
-      try {
-        const dur = p.getDuration();
-        const cur = p.getCurrentTime();
-        if (dur > 0) setProgress(cur / dur);
-      } catch {
-        /* player not ready yet */
-      }
-    }, 250);
-  }, []);
+  /* Get videos for active category */
+  const categoryVideos = videos.filter((v) => v.video_category === activeCategory);
+  const activeVideo = categoryVideos[activeVideoIndex] || null;
 
-  /* ---------- Initialize / switch video ---------- */
+  /* Navigate to next video in category */
+  const goToNextVideo = useCallback(() => {
+    if (categoryVideos.length > 1) {
+      setActiveVideoIndex((prev) => (prev + 1) % categoryVideos.length);
+    }
+  }, [categoryVideos.length]);
+
+  /* Navigate to previous video in category */
+  const goToPrevVideo = useCallback(() => {
+    if (categoryVideos.length > 1) {
+      setActiveVideoIndex((prev) => (prev - 1 + categoryVideos.length) % categoryVideos.length);
+    }
+  }, [categoryVideos.length]);
+
+  /* Handle category change */
+  const handleCategoryChange = (category: VideoCategory) => {
+    setActiveCategory(category);
+    setActiveVideoIndex(0);
+  };
+
+  /* Scroll container for grid */
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -220, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 220, behavior: 'smooth' });
+    }
+  };
+
+  /* Animation setup */
   useEffect(() => {
-    if (videos.length === 0) return;
+    const sectionEl = sectionRef.current;
+    if (!sectionEl) return;
 
-    const current = videos[activeIndex];
-    if (current.video_type !== 'youtube') return;
-
-    const videoId = extractYouTubeId(current.video_url);
-    if (!videoId) return;
-
-    const initPlayer = () => {
-      // If player already exists, just load new video
-      if (ytPlayerRef.current) {
-        try {
-          ytPlayerRef.current.loadVideoById(videoId);
-          setProgress(0);
-          setIsPlaying(true);
-          setIsMuted(true);
-          ytPlayerRef.current.mute();
-          return;
-        } catch {
-          /* destroy & recreate */
-          ytPlayerRef.current.destroy();
-          ytPlayerRef.current = null;
-        }
-      }
-
-      // Create the container div for the player
-      if (!playerContainerRef.current) return;
-      playerContainerRef.current.innerHTML = '';
-      const playerDiv = document.createElement('div');
-      playerDiv.id = 'yt-showcase-player';
-      playerContainerRef.current.appendChild(playerDiv);
-
-      ytPlayerRef.current = new window.YT.Player('yt-showcase-player', {
-        videoId,
-        playerVars: {
-          autoplay: 1,
-          mute: 1,
-          controls: 0,
-          showinfo: 0,
-          rel: 0,
-          modestbranding: 1,
-          iv_load_policy: 3,
-          fs: 0,
-          disablekb: 1,
-          playsinline: 1,
-          cc_load_policy: 0,
-          origin: window.location.origin,
-        },
-        events: {
-          onReady: () => {
-            setIsReady(true);
-            setIsPlaying(true);
-            setIsMuted(true);
-            startProgressTracker();
-          },
-          onStateChange: (event: { data: number }) => {
-            // YT.PlayerState.ENDED = 0
-            if (event.data === 0) {
-              // Video naturally ended → auto-advance to next
-              setActiveIndex((prev) => {
-                const next = (prev + 1) % videos.length;
-                return next;
-              });
-            }
-            // Update play state
-            if (event.data === 1) setIsPlaying(true);
-            if (event.data === 2) setIsPlaying(false);
-          },
-        },
-      } as unknown as Record<string, unknown>);
-    };
-
-    loadYouTubeAPI(initPlayer);
-
-    return () => {
-      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-    };
-  }, [videos, activeIndex, startProgressTracker]);
-
-  /* ---------- Cleanup on unmount ---------- */
-  useEffect(() => {
-    return () => {
-      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-      if (ytPlayerRef.current) {
-        try { ytPlayerRef.current.destroy(); } catch { /* */ }
-      }
-    };
-  }, []);
-
-  /* ---------- GSAP entrance ---------- */
-  useEffect(() => {
-    if (!sectionRef.current) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        sectionRef.current,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1, y: 0, duration: 1, ease: 'power3.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 85%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
+      gsap.to(sectionEl, {
+        scrollTrigger: {
+          trigger: sectionEl,
+          start: 'top center',
+          toggleActions: 'play none none reverse',
+        },
+      });
     }, sectionRef);
+
     return () => ctx.revert();
   }, []);
 
-  /* ---------- GSAP header reveal ---------- */
-  useEffect(() => {
-    if (!headerRef.current) return;
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headerRef.current!.children,
-        { opacity: 0, y: 80, scale: 0.7, rotateX: -40, filter: 'blur(2px)' },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          rotateX: 0,
-          filter: 'blur(0px)',
-          duration: 1.8,
-          stagger: 0.15,
-          ease: 'expo.out',
-          scrollTrigger: {
-            trigger: headerRef.current,
-            start: 'top 85%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
-    }, sectionRef);
-    return () => ctx.revert();
-  }, []);
-
-  /* ---------- Controls ---------- */
-  const handlePlayPause = useCallback(() => {
-    const p = ytPlayerRef.current;
-    if (!p) return;
-    try {
-      const state = p.getPlayerState();
-      if (state === 1) { p.pauseVideo(); setIsPlaying(false); }
-      else { p.playVideo(); setIsPlaying(true); }
-    } catch { /* */ }
-  }, []);
-
-  const handleMuteToggle = useCallback(() => {
-    const p = ytPlayerRef.current;
-    if (!p) return;
-    try {
-      if (p.isMuted()) { p.unMute(); setIsMuted(false); }
-      else { p.mute(); setIsMuted(true); }
-    } catch { /* */ }
-  }, []);
-
-  const handlePrev = useCallback(() => {
-    setActiveIndex((prev) => (prev - 1 + videos.length) % videos.length);
-    setProgress(0);
-    setIsMuted(true);
-  }, [videos.length]);
-
-  const handleNext = useCallback(() => {
-    setActiveIndex((prev) => (prev + 1) % videos.length);
-    setProgress(0);
-    setIsMuted(true);
-  }, [videos.length]);
-
-  const handleSeek = useCallback((fraction: number) => {
-    const p = ytPlayerRef.current;
-    if (!p) return;
-    try {
-      const dur = p.getDuration();
-      p.seekTo(fraction * dur, true);
-      setProgress(fraction);
-    } catch { /* */ }
-  }, []);
-
-  /* ---------- Don't render if no videos ---------- */
-  if (videos.length === 0) return null;
-
-  const current = videos[activeIndex];
-  const title = getLocalizedField(current, 'title', locale);
-  const description = getLocalizedField(current, 'description', locale);
+  if (isLoading) {
+    return (
+      <section className="py-24 sm:py-32 bg-white">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <div className="h-10 bg-gray-200 rounded w-48 mx-auto mb-4 animate-pulse" />
+          <div className="h-6 bg-gray-100 rounded w-96 mx-auto animate-pulse" />
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section ref={sectionRef} className="bg-navy py-20 md:py-28 overflow-hidden">
-      <div className="max-w-4xl mx-auto px-6">
-        {/* Header */}
-        <div ref={headerRef} className="text-center mb-12">
-          <span className="inline-block text-red/80 text-sm font-semibold tracking-widest uppercase mb-3">
-            Featured
-          </span>
-          <h2 className="text-4xl md:text-5xl font-heading font-bold text-white mb-3">
-            Video Showcase
+    <section
+      ref={sectionRef}
+      className="py-24 sm:py-32 bg-white relative overflow-hidden"
+    >
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Section Header */}
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
+            Visual Content
+          </p>
+          <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-navy tracking-tight mb-4">
+            Watch Our Stories
           </h2>
-          <div className="w-16 h-1 bg-red mx-auto mt-4 rounded-full" />
-        </div>
+          <div className="w-16 h-[2px] bg-red mx-auto mb-6" />
+          <p className="text-navy/60 max-w-2xl mx-auto text-base sm:text-lg">
+            Discover Mahkota Taiwan through our video content across YouTube,
+            Shorts, TikTok, and Instagram Reels.
+          </p>
+        </motion.div>
 
-        {/* Video Container — cinematic widescreen */}
-        <div className="relative w-full rounded-2xl overflow-hidden" style={{ aspectRatio: '16/9' }}>
-          {/* Premium outer glow frame */}
-          <div
-            className="absolute -inset-[1px] rounded-2xl pointer-events-none z-30"
-            style={{
-              border: '1px solid rgba(255,255,255,0.08)',
-              boxShadow: '0 0 60px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.3)',
-            }}
+        {/* Category Tabs */}
+        <motion.div
+          className="flex justify-center gap-3 mb-14 flex-wrap"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          <CategoryTab
+            category="youtube"
+            label="YouTube"
+            isActive={activeCategory === 'youtube'}
+            onClick={() => handleCategoryChange('youtube')}
           />
-
-          {/* YouTube Player — fills container, no YouTube UI */}
-          <div
-            ref={playerContainerRef}
-            className="absolute inset-0 w-full h-full"
-            style={{ pointerEvents: 'none' }}
+          <CategoryTab
+            category="shorts"
+            label="YouTube Shorts"
+            isActive={activeCategory === 'shorts'}
+            onClick={() => handleCategoryChange('shorts')}
           />
-
-          {/* Invisible overlay to block YouTube logo clicks + show custom cursor */}
-          <div className="absolute inset-0 z-20" onClick={handlePlayPause} style={{ cursor: 'pointer' }} />
-
-          {/* Cinematic vignette edges */}
-          <div
-            className="absolute inset-0 z-10 pointer-events-none"
-            style={{
-              boxShadow: 'inset 0 0 100px rgba(0,0,0,0.3)',
-            }}
+          <CategoryTab
+            category="tiktok"
+            label="TikTok"
+            isActive={activeCategory === 'tiktok'}
+            onClick={() => handleCategoryChange('tiktok')}
           />
+          <CategoryTab
+            category="reels"
+            label="Instagram Reels"
+            isActive={activeCategory === 'reels'}
+            onClick={() => handleCategoryChange('reels')}
+          />
+        </motion.div>
 
-          {/* Loading state */}
-          {!isReady && (
-            <div className="absolute inset-0 z-30 flex items-center justify-center bg-navy/80">
-              <div className="w-10 h-10 border-2 border-white/20 border-t-red rounded-full animate-spin" />
-            </div>
-          )}
-        </div>
-
-        {/* ── Glass Premium Controls ── */}
-        <div className="mt-6">
-          {/* Progress bar */}
-          <VideoProgressBar progress={progress} onSeek={handleSeek} />
-
-          {/* Control buttons */}
-          <div className="flex items-center justify-center gap-3 sm:gap-4 mt-5">
-            {/* Previous */}
-            <GlassButton
-              onClick={handlePrev}
-              label="Previous video"
-              disabled={videos.length <= 1}
-              size="sm"
-            >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
-              </svg>
-            </GlassButton>
-
-            {/* Play / Pause — larger center button */}
-            <GlassButton onClick={handlePlayPause} label={isPlaying ? 'Pause' : 'Play'} size="lg">
-              {isPlaying ? (
-                <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                </svg>
-              ) : (
-                <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              )}
-            </GlassButton>
-
-            {/* Next */}
-            <GlassButton
-              onClick={handleNext}
-              label="Next video"
-              disabled={videos.length <= 1}
-              size="sm"
-            >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
-              </svg>
-            </GlassButton>
-
-            {/* Divider */}
-            <div className="w-[1px] h-8 bg-white/10 mx-1 sm:mx-2" />
-
-            {/* Mute / Unmute */}
-            <GlassButton onClick={handleMuteToggle} label={isMuted ? 'Unmute' : 'Mute'} size="sm">
-              {isMuted ? (
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707A1 1 0 0112 5v14a1 1 0 01-1.707.707L5.586 15z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-                </svg>
-              ) : (
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707A1 1 0 0112 5v14a1 1 0 01-1.707.707L5.586 15z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728" />
-                </svg>
-              )}
-            </GlassButton>
-          </div>
-        </div>
-
-        {/* Title + Description below controls */}
-        <AnimatePresence mode="wait">
+        {/* Video Display Area */}
+        {categoryVideos.length === 0 ? (
           <motion.div
-            key={`info-${activeIndex}`}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.4 }}
-            className="mt-8 text-center"
+            className="text-center py-20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
           >
-            {title && (
-              <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
-                {title}
-              </h3>
-            )}
-            {description && (
-              <p className="text-cream/60 max-w-2xl mx-auto">
-                {description}
-              </p>
+            <p className="text-gray-400 text-lg">No videos available for this category yet.</p>
+          </motion.div>
+        ) : activeCategory === 'youtube' ? (
+          // YouTube: Single large video
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+          >
+            {activeVideo && (
+              <>
+                {/* Video Title */}
+                <motion.h3
+                  key={`title-${activeVideoIndex}`}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-2xl sm:text-3xl font-bold text-navy mb-6 text-center"
+                >
+                  {getLocalizedField(activeVideo, 'title', locale)}
+                </motion.h3>
+
+                {/* Video Player */}
+                <AnimatePresence mode="wait">
+                  {extractYouTubeId(activeVideo.video_url) && (
+                    <YouTubePlayer
+                      key={activeVideo.id}
+                      videoId={extractYouTubeId(activeVideo.video_url)!}
+                    />
+                  )}
+                </AnimatePresence>
+
+                {/* Navigation */}
+                <div className="flex items-center justify-between mt-10">
+                  <button
+                    onClick={goToPrevVideo}
+                    disabled={categoryVideos.length <= 1}
+                    className="p-3 rounded-full bg-red/10 hover:bg-red/20 disabled:opacity-30 disabled:cursor-not-allowed text-red transition-colors"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <div className="flex gap-2">
+                    {categoryVideos.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveVideoIndex(idx)}
+                        className={`h-2 rounded-full transition-all ${
+                          idx === activeVideoIndex
+                            ? 'w-8 bg-red'
+                            : 'w-2 bg-gray-300 hover:bg-gray-400'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    onClick={goToNextVideo}
+                    disabled={categoryVideos.length <= 1}
+                    className="p-3 rounded-full bg-red/10 hover:bg-red/20 disabled:opacity-30 disabled:cursor-not-allowed text-red transition-colors"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                </div>
+              </>
             )}
           </motion.div>
-        </AnimatePresence>
+        ) : (
+          // Shorts/TikTok/Reels: Grid with horizontal scroll
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+          >
+            {/* Title */}
+            <h3 className="text-xl sm:text-2xl font-bold text-navy mb-8 text-center">
+              {activeCategory === 'shorts'
+                ? 'YouTube Shorts'
+                : activeCategory === 'tiktok'
+                ? 'TikTok Videos'
+                : 'Instagram Reels'}
+            </h3>
 
-        {/* Video indicator dots */}
-        {videos.length > 1 && (
-          <div className="flex justify-center gap-2 mt-6">
-            {videos.map((v, i) => {
-              const t = getLocalizedField(v, 'title', locale);
-              return (
-                <button
-                  key={v.id}
-                  onClick={() => {
-                    setActiveIndex(i);
-                    setProgress(0);
-                    setIsMuted(true);
-                  }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-500 text-sm ${
-                    i === activeIndex
-                      ? 'bg-white/10 text-white border border-white/20'
-                      : 'bg-transparent text-white/40 hover:text-white/70 border border-transparent'
-                  }`}
-                >
-                  <span
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      i === activeIndex ? 'bg-red' : 'bg-white/30'
-                    }`}
+            {/* Horizontal Scroll Container */}
+            <div className="relative">
+              {/* Scroll Buttons */}
+              {categoryVideos.length > 2 && (
+                <>
+                  <button
+                    onClick={scrollLeft}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 -ml-6 z-20 p-3 rounded-full bg-red/10 hover:bg-red/20 text-red transition-colors hidden sm:flex items-center justify-center"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button
+                    onClick={scrollRight}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 -mr-6 z-20 p-3 rounded-full bg-red/10 hover:bg-red/20 text-red transition-colors hidden sm:flex items-center justify-center"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                </>
+              )}
+
+              {/* Videos Grid */}
+              <div
+                ref={scrollContainerRef}
+                className="flex gap-4 overflow-x-auto scroll-smooth pb-4 px-2 -mx-2"
+              >
+                {categoryVideos.map((video) => (
+                  <VideoCard
+                    key={video.id}
+                    video={video}
+                    category={activeCategory}
+                    onClick={() => {
+                      // Play video (could open modal or navigate)
+                      window.open(video.video_url, '_blank');
+                    }}
                   />
-                  {t || `Video ${i + 1}`}
-                </button>
-              );
-            })}
-          </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Video Info */}
+            {categoryVideos.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6 }}
+                className="text-center mt-12"
+              >
+                <p className="text-sm text-gray-500">
+                  Showing {categoryVideos.length} video{categoryVideos.length !== 1 ? 's' : ''}
+                </p>
+              </motion.div>
+            )}
+          </motion.div>
         )}
       </div>
     </section>

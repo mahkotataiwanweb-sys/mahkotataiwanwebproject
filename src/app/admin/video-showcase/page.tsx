@@ -4,8 +4,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 import {
-  Plus, Pencil, Trash2, X, Play, Upload, Youtube, Eye, EyeOff,
-  ArrowUpDown, Loader2, Video,
+  Plus, Pencil, Trash2, X, Eye, EyeOff,
+  ArrowUpDown, Loader2, Video, Youtube, Smartphone,
 } from 'lucide-react';
 import type { VideoShowcase, VideoShowcaseInsert, VideoShowcaseUpdate } from '@/types/database';
 
@@ -16,7 +16,7 @@ const emptyForm: VideoShowcaseInsert = {
   description_en: '',
   description_id: '',
   description_zh: '',
-  video_type: 'youtube',
+  video_category: 'youtube',
   video_url: '',
   thumbnail_url: '',
   sort_order: 0,
@@ -70,7 +70,7 @@ export default function AdminVideoShowcasePage() {
       description_en: video.description_en || '',
       description_id: video.description_id || '',
       description_zh: video.description_zh || '',
-      video_type: video.video_type,
+      video_category: video.video_category,
       video_url: video.video_url,
       thumbnail_url: video.thumbnail_url || '',
       sort_order: video.sort_order,
@@ -242,12 +242,17 @@ export default function AdminVideoShowcasePage() {
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${
-                      video.video_type === 'youtube'
+                      video.video_category === 'youtube'
                         ? 'bg-red-50 text-red-600'
-                        : 'bg-blue-50 text-blue-600'
+                        : video.video_category === 'shorts'
+                        ? 'bg-blue-50 text-blue-600'
+                        : video.video_category === 'tiktok'
+                        ? 'bg-black/10 text-black'
+                        : 'bg-pink-50 text-pink-600'
                     }`}>
-                      {video.video_type === 'youtube' ? <Youtube className="w-3 h-3" /> : <Upload className="w-3 h-3" />}
-                      {video.video_type === 'youtube' ? 'YouTube' : 'Upload'}
+                      {video.video_category === 'youtube' && <Youtube className="w-3 h-3" />}
+                      {(video.video_category === 'shorts' || video.video_category === 'tiktok' || video.video_category === 'reels') && <Smartphone className="w-3 h-3" />}
+                      {video.video_category.charAt(0).toUpperCase() + video.video_category.slice(1)}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-center">
@@ -374,72 +379,40 @@ export default function AdminVideoShowcasePage() {
                 </div>
               </div>
 
-              {/* Video Type */}
+              {/* Video Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Video Type</label>
-                <div className="flex gap-4">
-                  <label className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border cursor-pointer transition-colors ${
-                    form.video_type === 'youtube' ? 'border-red-500 bg-red-50 text-red-700' : 'border-gray-200 hover:bg-gray-50'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="video_type"
-                      value="youtube"
-                      checked={form.video_type === 'youtube'}
-                      onChange={() => setForm({ ...form, video_type: 'youtube', video_url: '' })}
-                      className="sr-only"
-                    />
-                    <Youtube className="w-4 h-4" />
-                    <span className="text-sm font-medium">YouTube</span>
-                  </label>
-                  <label className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border cursor-pointer transition-colors ${
-                    form.video_type === 'upload' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 hover:bg-gray-50'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="video_type"
-                      value="upload"
-                      checked={form.video_type === 'upload'}
-                      onChange={() => setForm({ ...form, video_type: 'upload', video_url: '' })}
-                      className="sr-only"
-                    />
-                    <Upload className="w-4 h-4" />
-                    <span className="text-sm font-medium">Upload</span>
-                  </label>
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Video Category *</label>
+                <select
+                  value={form.video_category}
+                  onChange={(e) => setForm({ ...form, video_category: e.target.value as 'youtube' | 'shorts' | 'tiktok' | 'reels' })}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none"
+                >
+                  <option value="youtube">YouTube</option>
+                  <option value="shorts">YouTube Shorts</option>
+                  <option value="tiktok">TikTok</option>
+                  <option value="reels">Instagram Reels</option>
+                </select>
               </div>
 
               {/* Video URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {form.video_type === 'youtube' ? 'YouTube URL *' : 'Video File *'}
-                </label>
-                {form.video_type === 'youtube' ? (
-                  <input
-                    type="text"
-                    value={form.video_url}
-                    onChange={(e) => setForm({ ...form, video_url: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none"
-                    placeholder="https://www.youtube.com/watch?v=..."
-                  />
-                ) : (
-                  <div className="space-y-2">
-                    {form.video_url && (
-                      <p className="text-sm text-gray-500 truncate">{form.video_url}</p>
-                    )}
-                    <label className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors text-sm">
-                      {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                      {uploading ? 'Uploading...' : 'Choose Video File'}
-                      <input
-                        type="file"
-                        accept="video/*"
-                        onChange={(e) => handleFileUpload(e, 'video_url')}
-                        className="sr-only"
-                        disabled={uploading}
-                      />
-                    </label>
-                  </div>
-                )}
+                <label className="block text-sm font-medium text-gray-700 mb-1">Video URL *</label>
+                <input
+                  type="text"
+                  value={form.video_url}
+                  onChange={(e) => setForm({ ...form, video_url: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none"
+                  placeholder={
+                    form.video_category === 'youtube'
+                      ? 'https://www.youtube.com/watch?v=...'
+                      : form.video_category === 'shorts'
+                      ? 'https://www.youtube.com/shorts/...'
+                      : form.video_category === 'tiktok'
+                      ? 'https://www.tiktok.com/@.../video/...'
+                      : 'https://www.instagram.com/reels/...'
+                  }
+                />
+                <p className="text-xs text-gray-500 mt-1">Paste the video URL/link from the platform</p>
               </div>
 
               {/* Thumbnail */}
