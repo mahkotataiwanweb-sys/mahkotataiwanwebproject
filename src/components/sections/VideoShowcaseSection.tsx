@@ -147,9 +147,17 @@ function VideoCard({
       className={`w-full rounded-xl shadow-lg bg-gray-900 transition-shadow ${
         category === 'reels'
           ? 'overflow-hidden'
+          : category === 'shorts'
+          ? 'overflow-hidden cursor-pointer hover:shadow-xl'
           : 'aspect-[9/16] overflow-hidden cursor-pointer hover:shadow-xl'
       }`}
-      style={category === 'reels' ? { height: '485px' } : {}}
+      style={
+        category === 'reels'
+          ? { height: '485px' }
+          : category === 'shorts'
+          ? { height: '420px' }
+          : {}
+      }
       onClick={() => category !== 'reels' && onClick(video)}
     >
       {category === 'shorts' && extractYouTubeId(video.video_url) && (
