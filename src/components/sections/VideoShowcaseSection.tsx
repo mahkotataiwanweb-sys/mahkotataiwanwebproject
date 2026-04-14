@@ -119,55 +119,61 @@ function TikTokPlayer({ videoId }: { videoId: string }) {
   );
 }
 
-/* Video Card for Shorts/TikTok/Reels */
+/* Video Card - Embedded Player for Shorts/TikTok/Reels */
 function VideoCard({
   video,
   category,
-  onClick,
 }: {
   video: VideoShowcase;
   category: VideoCategory;
-  onClick: () => void;
 }) {
-  const getEmbedUrl = () => {
-    if (category === 'shorts') {
-      const videoId = extractYouTubeId(video.video_url);
-      return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
-    } else if (category === 'tiktok') {
-      // TikTok embed
-      return video.video_url;
-    } else if (category === 'reels') {
-      // Instagram Reels embed
-      return video.video_url;
-    }
-    return '';
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="flex-shrink-0 w-36 h-64 rounded-xl overflow-hidden shadow-lg bg-gray-900 cursor-pointer group"
-      onClick={onClick}
+      className="w-full rounded-xl overflow-hidden shadow-lg bg-gray-900"
     >
-      {video.thumbnail_url ? (
-        <img
-          src={video.thumbnail_url}
-          alt={video.title_en}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+      {category === 'shorts' && extractYouTubeId(video.video_url) && (
+        <iframe
+          width="100%"
+          height="400"
+          src={`https://www.youtube.com/embed/${extractYouTubeId(video.video_url)}`}
+          title={video.title_en}
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full"
         />
-      ) : (
-        <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-          <Play className="w-12 h-12 text-white/60" />
+      )}
+      {category === 'tiktok' && extractTikTokId(video.video_url) && (
+        <div className="flex items-center justify-center h-96">
+          <iframe
+            src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
+            width="100%"
+            height="600"
+            frameBorder="0"
+            allow="autoplay; encrypted-media"
+            allowFullScreen
+          />
         </div>
       )}
-      {/* Play overlay */}
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-        <div className="w-16 h-16 rounded-full bg-red/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <Play className="w-8 h-8 text-white fill-white" />
+      {category === 'reels' && video.video_url && (
+        <div className="flex items-center justify-center h-96 bg-gradient-to-br from-gray-700 to-gray-900">
+          <div className="text-center">
+            <p className="text-white text-sm mb-3">Instagram Reels</p>
+            <a
+              href={video.video_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-red text-white rounded-lg hover:bg-red/80 transition-colors"
+            >
+              <Play className="w-4 h-4" />
+              Watch on Instagram
+            </a>
+          </div>
         </div>
-      </div>
+      )}
     </motion.div>
   );
 }
@@ -262,7 +268,7 @@ export default function VideoShowcaseSection() {
 
   if (isLoading) {
     return (
-      <section className="py-6 sm:py-12" style={{ backgroundColor: 'rgba(0, 48, 72, 0.08)' }}>
+      <section className="py-6 sm:py-12" style={{ backgroundColor: '#e8f2f7' }}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           <div className="h-10 bg-gray-200 rounded w-48 mx-auto mb-4 animate-pulse" />
           <div className="h-6 bg-gray-100 rounded w-96 mx-auto animate-pulse" />
@@ -275,7 +281,7 @@ export default function VideoShowcaseSection() {
     <section
       ref={sectionRef}
       className="py-6 sm:py-12 relative overflow-hidden"
-      style={{ backgroundColor: 'rgba(0, 48, 72, 0.08)' }}
+      style={{ backgroundColor: '#e8f2f7' }}
     >
       <div className="max-w-6xl mx-auto px-6">
         {/* Section Header */}
@@ -346,8 +352,8 @@ export default function VideoShowcaseSection() {
           >
             <p className="text-gray-400 text-lg">No videos available for this category yet.</p>
           </motion.div>
-        ) : activeCategory === 'youtube' || activeCategory === 'tiktok' ? (
-          // YouTube/TikTok: Single large video
+        ) : activeCategory === 'youtube' ? (
+          // YouTube: Single large video
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -369,16 +375,10 @@ export default function VideoShowcaseSection() {
                 {/* Video Player */}
                 <div className="max-w-2xl mx-auto">
                   <AnimatePresence mode="wait">
-                    {activeCategory === 'youtube' && extractYouTubeId(activeVideo.video_url) && (
+                    {extractYouTubeId(activeVideo.video_url) && (
                       <YouTubePlayer
                         key={activeVideo.id}
                         videoId={extractYouTubeId(activeVideo.video_url)!}
-                      />
-                    )}
-                    {activeCategory === 'tiktok' && extractTikTokId(activeVideo.video_url) && (
-                      <TikTokPlayer
-                        key={activeVideo.id}
-                        videoId={extractTikTokId(activeVideo.video_url)!}
                       />
                     )}
                   </AnimatePresence>
@@ -433,43 +433,18 @@ export default function VideoShowcaseSection() {
                 : 'Reels'}
             </h3>
 
-            {/* Horizontal Scroll Container */}
-            <div className="relative">
-              {/* Scroll Buttons */}
-              {categoryVideos.length > 2 && (
-                <>
-                  <button
-                    onClick={scrollLeft}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 -ml-6 z-20 p-3 rounded-full bg-red/10 hover:bg-red/20 text-red transition-colors hidden sm:flex items-center justify-center"
-                  >
-                    <ChevronLeft className="w-6 h-6" />
-                  </button>
-                  <button
-                    onClick={scrollRight}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 -mr-6 z-20 p-3 rounded-full bg-red/10 hover:bg-red/20 text-red transition-colors hidden sm:flex items-center justify-center"
-                  >
-                    <ChevronRight className="w-6 h-6" />
-                  </button>
-                </>
-              )}
-
-              {/* Videos Grid */}
-              <div
-                ref={scrollContainerRef}
-                className="flex gap-4 overflow-x-auto scroll-smooth pb-4 px-2 -mx-2"
-              >
-                {categoryVideos.map((video) => (
-                  <VideoCard
-                    key={video.id}
-                    video={video}
-                    category={activeCategory}
-                    onClick={() => {
-                      // Play video (could open modal or navigate)
-                      window.open(video.video_url, '_blank');
-                    }}
-                  />
-                ))}
-              </div>
+            {/* Videos Grid */}
+            <div
+              ref={scrollContainerRef}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
+              {categoryVideos.map((video) => (
+                <VideoCard
+                  key={video.id}
+                  video={video}
+                  category={activeCategory}
+                />
+              ))}
             </div>
 
             {/* Video Info */}
