@@ -150,31 +150,36 @@ function VideoCard({
         />
       )}
       {category === 'tiktok' && extractTikTokId(video.video_url) && (
-        <div className="flex items-center justify-center h-96">
+        <div className="w-full h-full flex items-center justify-center overflow-hidden">
           <iframe
             src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
             width="100%"
-            height="600"
+            height="800"
             frameBorder="0"
             allow="autoplay; encrypted-media"
             allowFullScreen
+            style={{ maxWidth: '100%' }}
           />
+          <style>{`
+            iframe[src*="tiktok.com"] {
+              transform: scale(1.2);
+              transform-origin: top center;
+            }
+          `}</style>
         </div>
       )}
       {category === 'reels' && video.video_url && (
-        <div className="flex items-center justify-center h-96 bg-gradient-to-br from-gray-700 to-gray-900">
-          <div className="text-center">
-            <p className="text-white text-sm mb-3">Instagram Reels</p>
-            <a
-              href={video.video_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-red text-white rounded-lg hover:bg-red/80 transition-colors"
-            >
-              <Play className="w-4 h-4" />
-              Watch on Instagram
-            </a>
-          </div>
+        <div className="w-full h-full flex items-center justify-center bg-black">
+          <blockquote
+            className="instagram-media"
+            data-instgrm-permalink={video.video_url}
+            data-instgrm-version="14"
+            style={{ maxWidth: '100%' }}
+          />
+          <script
+            async
+            src="//www.instagram.com/embed.js"
+          />
         </div>
       )}
     </motion.div>
@@ -507,26 +512,37 @@ export default function VideoShowcaseSection() {
                   />
                 )}
                 {activeCategory === 'tiktok' && extractTikTokId(selectedVideo.video_url) && (
-                  <iframe
-                    src={`https://www.tiktok.com/embed/v2/${extractTikTokId(selectedVideo.video_url)}`}
-                    width="100%"
-                    height="600"
-                    frameBorder="0"
-                    allow="autoplay; encrypted-media"
-                    allowFullScreen
-                    className="w-full h-full"
-                  />
+                  <>
+                    <iframe
+                      src={`https://www.tiktok.com/embed/v2/${extractTikTokId(selectedVideo.video_url)}`}
+                      width="100%"
+                      height="800"
+                      frameBorder="0"
+                      allow="autoplay; encrypted-media"
+                      allowFullScreen
+                      style={{ maxWidth: '100%', transform: 'scale(1.1)', transformOrigin: 'top center' }}
+                    />
+                    <style>{`
+                      iframe[src*="tiktok.com"] {
+                        transform: scale(1.1);
+                        transform-origin: top center;
+                      }
+                    `}</style>
+                  </>
                 )}
                 {activeCategory === 'reels' && selectedVideo.video_url && (
-                  <iframe
-                    src={`https://www.instagram.com/reel/${selectedVideo.video_url.split('/').pop()?.replace(/\D/g, '')}/embed`}
-                    width="100%"
-                    height="600"
-                    frameBorder="0"
-                    allow="autoplay"
-                    allowFullScreen
-                    className="w-full h-full"
-                  />
+                  <>
+                    <blockquote
+                      className="instagram-media"
+                      data-instgrm-permalink={selectedVideo.video_url}
+                      data-instgrm-version="14"
+                      style={{ maxWidth: '100%' }}
+                    />
+                    <script
+                      async
+                      src="//www.instagram.com/embed.js"
+                    />
+                  </>
                 )}
               </div>
             </motion.div>
