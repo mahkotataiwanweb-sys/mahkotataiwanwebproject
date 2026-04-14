@@ -441,7 +441,7 @@ export default function HeroSlider() {
         <AnimatePresence mode="wait">
           <motion.div
             key={`text-${currentSlide.id}`}
-            className="max-w-4xl mx-auto px-4 sm:px-6 pb-8 sm:pb-8 text-center hero-text-content pointer-events-auto"
+            className="max-w-4xl mx-auto px-6 pb-16 sm:pb-8 text-center hero-text-content pointer-events-auto"
             variants={textContainerVariants}
             initial="hidden"
             animate="visible"
@@ -451,28 +451,28 @@ export default function HeroSlider() {
               <Image
                 src="/images/logo.png"
                 alt="Mahkota Taiwan"
-                width={50}
-                height={50}
-                className="mx-auto mb-4 sm:mb-6 drop-shadow-lg brightness-0 invert"
+                width={70}
+                height={70}
+                className="mx-auto mb-6 drop-shadow-lg brightness-0 invert"
                 priority
               />
             </motion.div>
 
             <motion.h1
               variants={textItemVariants}
-              className="font-heading text-2xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight drop-shadow-lg"
+              className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg"
             >
               {title}
             </motion.h1>
 
             <motion.div
               variants={lineVariants}
-              className="w-12 sm:w-20 h-[3px] bg-red mx-auto mb-4 sm:mb-6 origin-center"
+              className="w-20 h-[3px] bg-red mx-auto mb-6 origin-center"
             />
 
             <motion.p
               variants={textItemVariants}
-              className="text-sm sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow"
+              className="text-base sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow"
             >
               {subtitle}
             </motion.p>
@@ -481,7 +481,7 @@ export default function HeroSlider() {
               <motion.a
                 href={currentSlide.link_url}
                 variants={textItemVariants}
-                className="inline-block mt-6 sm:mt-8 px-6 sm:px-8 py-3 sm:py-4 bg-red text-white rounded-full text-xs sm:text-sm font-semibold tracking-wide uppercase hover:bg-red-dark transition-colors duration-300 premium-shadow"
+                className="inline-block mt-8 px-8 py-4 bg-red text-white rounded-full text-sm font-semibold tracking-wide uppercase hover:bg-red-dark transition-colors duration-300 premium-shadow"
               >
                 <span>Learn More</span>
               </motion.a>
