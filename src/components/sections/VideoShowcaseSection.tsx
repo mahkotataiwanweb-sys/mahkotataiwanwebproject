@@ -252,9 +252,7 @@ function VideoCard({
           width="100%"
           height="100%"
           src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
-          title={video.title_en}
           frameBorder="0"
-          sandbox="allow-same-origin allow-presentation"
           className="w-full h-full"
         />
       )}
