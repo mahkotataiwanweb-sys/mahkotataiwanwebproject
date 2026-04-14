@@ -139,7 +139,7 @@ function VideoCard({
           ? 'overflow-hidden'
           : 'aspect-[9/16] overflow-hidden cursor-pointer hover:shadow-xl'
       }`}
-      style={category === 'reels' ? { height: '550px' } : {}}
+      style={category === 'reels' ? { height: '620px' } : {}}
       onClick={() => category !== 'reels' && onClick(video)}
     >
       {category === 'shorts' && extractYouTubeId(video.video_url) && (
