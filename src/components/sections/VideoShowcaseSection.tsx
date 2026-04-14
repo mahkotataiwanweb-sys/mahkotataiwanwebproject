@@ -170,8 +170,9 @@ function VideoCard({
             src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
             width="100%"
             frameBorder="0"
-            allow="autoplay; encrypted-media"
+            allow="encrypted-media"
             allowFullScreen
+            loading="lazy"
             style={{
               width: '100%',
               height: '100%',
@@ -551,8 +552,9 @@ export default function VideoShowcaseSection() {
                       src={`https://www.tiktok.com/embed/v2/${extractTikTokId(selectedVideo.video_url)}`}
                       width="100%"
                       frameBorder="0"
-                      allow="autoplay; encrypted-media"
+                      allow="encrypted-media"
                       allowFullScreen
+                      loading="lazy"
                       style={{
                         width: '100%',
                         height: '100%',
