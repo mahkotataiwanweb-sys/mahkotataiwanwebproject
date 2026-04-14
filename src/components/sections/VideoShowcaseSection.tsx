@@ -182,20 +182,21 @@ function VideoCard({
   useEffect(() => {
     if (tiktokPlaying && category === 'tiktok') {
       setTimeout(() => {
-        const iframes = document.querySelectorAll('iframe[src*="tiktok.com/embed"]');
-        iframes.forEach((iframe) => {
-          try {
-            const doc = (iframe as HTMLIFrameElement).contentDocument;
-            const audioElements = doc?.querySelectorAll('audio');
-            audioElements?.forEach((audio) => {
-              audio.muted = false;
-              audio.volume = 1;
-            });
-          } catch (e) {
-            console.log('Cannot access iframe audio due to CORS');
-          }
-        });
-      }, 500);
+        try {
+          const iframes = document.querySelectorAll('iframe[src*="tiktok.com/embed"]');
+          iframes.forEach((iframe: any) => {
+            // Try to unmute via iframe postMessage
+            iframe.style.opacity = '1';
+            // Signal to TikTok that audio should be enabled
+            if (iframe.contentWindow) {
+              iframe.contentWindow.postMessage({ type: 'unmute' }, '*');
+            }
+          });
+        } catch (e) {
+          // CORS will prevent this, but worth trying
+          console.log('TikTok audio control attempted');
+        }
+      }, 1000);
     }
   }, [tiktokPlaying, category]);
 
@@ -265,7 +266,7 @@ function VideoCard({
               src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
               width="100%"
               frameBorder="0"
-              allow="encrypted-media"
+              allow="autoplay; encrypted-media"
               allowFullScreen
               style={{
                 width: '100%',
