@@ -168,23 +168,25 @@ function VideoCard({
       )}
       {category === 'reels' && video.video_url && (
         <div
-          className="w-full h-full bg-black overflow-hidden relative flex items-center justify-center p-2"
+          className="w-full h-full bg-black overflow-auto relative flex justify-center p-2"
           style={{
             backgroundColor: '#000'
           }}
         >
-          <blockquote
-            className="instagram-media"
-            data-instgrm-permalink={video.video_url}
-            data-instgrm-version="14"
-            style={{
-              maxWidth: '100%',
-              width: '100%',
-              margin: '0 auto',
-              padding: '0'
-            }}
-          />
-          <script async src="//www.instagram.com/embed.js" />
+          <div style={{ width: '100%', maxWidth: '320px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <blockquote
+              className="instagram-media"
+              data-instgrm-permalink={video.video_url}
+              data-instgrm-version="14"
+              style={{
+                maxWidth: '100%',
+                width: '100%',
+                margin: '0 auto',
+                padding: '0'
+              }}
+            />
+            <script async src="//www.instagram.com/embed.js" />
+          </div>
         </div>
       )}
     </motion.div>
@@ -538,25 +540,28 @@ export default function VideoShowcaseSection() {
                     width: '100%',
                     height: '100%',
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                     justifyContent: 'center',
                     backgroundColor: '#000',
                     overflow: 'auto',
                     position: 'relative',
-                    padding: '8px'
+                    padding: '8px',
+                    paddingTop: '16px'
                   }}>
-                    <blockquote
-                      className="instagram-media"
-                      data-instgrm-permalink={selectedVideo.video_url}
-                      data-instgrm-version="14"
-                      style={{
-                        maxWidth: '100%',
-                        width: '100%',
-                        margin: '0 auto',
-                        padding: '0'
-                      }}
-                    />
-                    <script async src="//www.instagram.com/embed.js" />
+                    <div style={{ width: '100%', maxWidth: '320px' }}>
+                      <blockquote
+                        className="instagram-media"
+                        data-instgrm-permalink={selectedVideo.video_url}
+                        data-instgrm-version="14"
+                        style={{
+                          maxWidth: '100%',
+                          width: '100%',
+                          margin: '0 auto',
+                          padding: '0'
+                        }}
+                      />
+                      <script async src="//www.instagram.com/embed.js" />
+                    </div>
                   </div>
                 )}
               </div>
