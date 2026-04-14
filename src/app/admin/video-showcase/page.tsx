@@ -351,7 +351,7 @@ export default function AdminVideoShowcasePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Video Category *</label>
                 <select
                   value={form.video_category || 'youtube'}
-                  onChange={(e) => setForm({ ...form, video_category: e.target.value })}
+                  onChange={(e) => setForm({ ...form, video_category: e.target.value as 'youtube' | 'shorts' | 'tiktok' | 'reels' })}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none"
                 >
                   <option value="youtube">YouTube</option>
