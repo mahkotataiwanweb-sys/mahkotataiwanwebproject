@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChevronLeft, ChevronRight, Play, Youtube, Music, Square, Film } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { VideoShowcase } from '@/types/database';
@@ -39,19 +39,56 @@ function extractYouTubeId(url: string): string | null {
   return null;
 }
 
+/* SVG Logo Components */
+function YouTubeLogo() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <rect x="32" y="96" width="448" height="320" rx="80" fill="currentColor"/>
+      <polygon points="220,180 220,332 340,256" fill="white"/>
+    </svg>
+  );
+}
+
+function TikTokLogo() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+      <path fill="currentColor" d="M160 24 C160 70, 200 90, 224 94 V130 C200 126, 176 116, 160 100 V172 C160 208, 130 232, 96 232 C62 232, 32 206, 32 172 C32 140, 60 112, 96 112 C104 112, 112 114, 120 118 V152 C112 146, 104 144, 96 144 C78 144, 64 158, 64 172 C64 186, 78 200, 96 200 C114 200, 128 186, 128 172 V24 Z"/>
+    </svg>
+  );
+}
+
+function ShortsLogo() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="2" width="16" height="20" rx="2" fill="none" stroke="currentColor" strokeWidth="2"/>
+      <line x1="12" y1="8" x2="12" y2="16" stroke="currentColor" strokeWidth="2"/>
+      <circle cx="12" cy="12" r="3" fill="currentColor"/>
+    </svg>
+  );
+}
+
+function ReelsLogo() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2"/>
+      <polygon points="10,8 10,16 16,12" fill="currentColor"/>
+    </svg>
+  );
+}
+
 /* Category Tab Button */
 function CategoryTab({
   category,
   label,
   isActive,
   onClick,
-  icon: Icon,
+  logo: Logo,
 }: {
   category: VideoCategory;
   label: string;
   isActive: boolean;
   onClick: () => void;
-  icon: React.ElementType;
+  logo: React.ComponentType;
 }) {
   return (
     <button
@@ -62,7 +99,7 @@ function CategoryTab({
           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
       }`}
     >
-      <Icon className="w-4 h-4" />
+      <Logo />
       {label}
     </button>
   );
@@ -409,28 +446,28 @@ export default function VideoShowcaseSection() {
           <CategoryTab
             category="youtube"
             label="YouTube"
-            icon={Youtube}
+            logo={YouTubeLogo}
             isActive={activeCategory === 'youtube'}
             onClick={() => handleCategoryChange('youtube')}
           />
           <CategoryTab
             category="shorts"
             label="Shorts"
-            icon={Square}
+            logo={ShortsLogo}
             isActive={activeCategory === 'shorts'}
             onClick={() => handleCategoryChange('shorts')}
           />
           <CategoryTab
             category="tiktok"
             label="TikTok"
-            icon={Music}
+            logo={TikTokLogo}
             isActive={activeCategory === 'tiktok'}
             onClick={() => handleCategoryChange('tiktok')}
           />
           <CategoryTab
             category="reels"
             label="Reels"
-            icon={Film}
+            logo={ReelsLogo}
             isActive={activeCategory === 'reels'}
             onClick={() => handleCategoryChange('reels')}
           />
