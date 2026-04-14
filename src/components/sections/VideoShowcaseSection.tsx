@@ -251,7 +251,7 @@ function VideoCard({
         <iframe
           width="100%"
           height="100%"
-          src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
+          src={tiktokPlaying ? `https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}` : ''}
           frameBorder="0"
           className="w-full h-full"
         />
