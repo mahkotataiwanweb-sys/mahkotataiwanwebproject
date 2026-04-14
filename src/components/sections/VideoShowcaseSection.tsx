@@ -254,7 +254,7 @@ function VideoCard({
           src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
           title={video.title_en}
           frameBorder="0"
-          allow="encrypted-media"
+          sandbox="allow-same-origin allow-presentation"
           className="w-full h-full"
         />
       )}
@@ -624,21 +624,19 @@ export default function VideoShowcaseSection() {
                   />
                 )}
                 {activeCategory === 'tiktok' && extractTikTokId(selectedVideo.video_url) && (
-                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000', overflow: 'hidden', clipPath: 'inset(0)' }}>
-                    <iframe
-                      src={`https://www.tiktok.com/embed/v2/${extractTikTokId(selectedVideo.video_url)}`}
-                      width="100%"
-                      frameBorder="0"
-                      allow="encrypted-media"
-                      allowFullScreen
-                      loading="lazy"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        border: 'none'
-                      }}
-                    />
-                  </div>
+                  <iframe
+                    src={`https://www.tiktok.com/embed/v2/${extractTikTokId(selectedVideo.video_url)}`}
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      border: 'none'
+                    }}
+                  />
                 )}
               </div>
             </motion.div>
