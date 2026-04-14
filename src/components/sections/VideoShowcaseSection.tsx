@@ -134,7 +134,7 @@ function VideoCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="w-full rounded-xl overflow-hidden shadow-lg bg-gray-900 cursor-pointer hover:shadow-xl transition-shadow"
+      className="w-full aspect-[9/16] rounded-xl overflow-hidden shadow-lg bg-gray-900 cursor-pointer hover:shadow-xl transition-shadow"
       onClick={() => onClick(video)}
     >
       {category === 'shorts' && extractYouTubeId(video.video_url) && (
@@ -299,11 +299,11 @@ export default function VideoShowcaseSection() {
           <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
             Visual Content
           </p>
-          <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-navy tracking-tight mb-4">
+          <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight mb-4">
             Watch Our Stories
           </h2>
           <div className="w-16 h-[2px] bg-red mx-auto mb-6" />
-          <p className="text-navy/60 max-w-2xl mx-auto text-base sm:text-lg">
+          <p className="text-gray-100 max-w-2xl mx-auto text-base sm:text-lg">
             Discover Mahkota Taiwan through our video content across YouTube,
             Shorts, TikTok, and Reels.
           </p>
@@ -429,7 +429,7 @@ export default function VideoShowcaseSection() {
             transition={{ duration: 0.4 }}
           >
             {/* Title */}
-            <h3 className="text-xl sm:text-2xl font-bold text-navy mb-8 text-center">
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-8 text-center">
               {activeCategory === 'shorts'
                 ? 'Shorts'
                 : activeCategory === 'tiktok'
@@ -460,7 +460,7 @@ export default function VideoShowcaseSection() {
                 transition={{ duration: 0.6 }}
                 className="text-center mt-12"
               >
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-300">
                   Showing {categoryVideos.length} video{categoryVideos.length !== 1 ? 's' : ''}
                 </p>
               </motion.div>
@@ -484,7 +484,7 @@ export default function VideoShowcaseSection() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-4xl max-h-[90vh] rounded-2xl overflow-hidden shadow-2xl"
+              className="relative w-full max-w-md aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl"
             >
               <button
                 onClick={() => setSelectedVideo(null)}
