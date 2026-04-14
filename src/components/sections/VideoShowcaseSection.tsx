@@ -149,43 +149,33 @@ function VideoCard({
           ? 'overflow-hidden'
           : 'aspect-[9/16] overflow-hidden cursor-pointer hover:shadow-xl'
       }`}
-      style={category === 'reels' ? { height: '575px' } : {}}
+      style={category === 'reels' ? { height: '485px' } : {}}
       onClick={() => category !== 'reels' && onClick(video)}
     >
       {category === 'shorts' && extractYouTubeId(video.video_url) && (
-        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-          <iframe
-            width="100%"
-            height="400"
-            src={`https://www.youtube.com/embed/${extractYouTubeId(video.video_url)}`}
-            title={video.title_en}
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            style={{
-              width: '100%',
-              height: '100%',
-              transform: 'scale(0.85)',
-              transformOrigin: 'center'
-            }}
-          />
-        </div>
+        <iframe
+          width="100%"
+          height="100%"
+          src={`https://www.youtube.com/embed/${extractYouTubeId(video.video_url)}`}
+          title={video.title_en}
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full"
+        />
       )}
       {category === 'tiktok' && extractTikTokId(video.video_url) && (
         <div className="w-full h-full bg-black flex items-center justify-center overflow-hidden" style={{ clipPath: 'inset(0)' }}>
           <iframe
             src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
-            width="320"
+            width="100%"
             frameBorder="0"
             allow="autoplay; encrypted-media"
             allowFullScreen
             style={{
-              width: '320px',
-              height: '580px',
-              border: 'none',
-              marginTop: '-20px',
-              transform: 'scale(0.85)',
-              transformOrigin: 'center'
+              width: '100%',
+              height: '100%',
+              border: 'none'
             }}
           />
         </div>
@@ -198,20 +188,18 @@ function VideoCard({
             overflow: 'hidden'
           }}
         >
-          <div style={{ transform: 'scale(0.85)', transformOrigin: 'top center' }}>
-            <blockquote
-              className="instagram-media"
-              data-instgrm-permalink={video.video_url}
-              data-instgrm-version="14"
-              style={{
-                maxWidth: '100%',
-                width: '320px',
-                margin: '8px auto',
-                padding: '0'
-              }}
-            />
-            <script async src="//www.instagram.com/embed.js" />
-          </div>
+          <blockquote
+            className="instagram-media"
+            data-instgrm-permalink={video.video_url}
+            data-instgrm-version="14"
+            style={{
+              maxWidth: '100%',
+              width: '270px',
+              margin: '0 auto',
+              padding: '0'
+            }}
+          />
+          <script async src="//www.instagram.com/embed.js" />
         </div>
       )}
     </motion.div>
@@ -546,39 +534,29 @@ export default function VideoShowcaseSection() {
 
               <div className={`relative w-full h-full bg-black ${activeCategory === 'reels' ? 'overflow-auto' : 'overflow-hidden'}`}>
                 {activeCategory === 'shorts' && extractYouTubeId(selectedVideo.video_url) && (
-                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                    <iframe
-                      width="100%"
-                      height="600"
-                      src={`https://www.youtube.com/embed/${extractYouTubeId(selectedVideo.video_url)}`}
-                      title={selectedVideo.title_en}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        transform: 'scale(0.85)',
-                        transformOrigin: 'center'
-                      }}
-                    />
-                  </div>
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    src={`https://www.youtube.com/embed/${extractYouTubeId(selectedVideo.video_url)}`}
+                    title={selectedVideo.title_en}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full"
+                  />
                 )}
                 {activeCategory === 'tiktok' && extractTikTokId(selectedVideo.video_url) && (
                   <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000', overflow: 'hidden', clipPath: 'inset(0)' }}>
                     <iframe
                       src={`https://www.tiktok.com/embed/v2/${extractTikTokId(selectedVideo.video_url)}`}
-                      width="320"
+                      width="100%"
                       frameBorder="0"
                       allow="autoplay; encrypted-media"
                       allowFullScreen
                       style={{
-                        width: '320px',
-                        height: '580px',
-                        border: 'none',
-                        marginTop: '-20px',
-                        transform: 'scale(0.85)',
-                        transformOrigin: 'center'
+                        width: '100%',
+                        height: '100%',
+                        border: 'none'
                       }}
                     />
                   </div>
