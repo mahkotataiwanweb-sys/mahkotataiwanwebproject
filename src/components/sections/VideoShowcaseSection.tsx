@@ -210,20 +210,7 @@ function VideoCard({
             setTiktokPlaying(true);
           }}
         >
-          {!tiktokPlaying ? (
-            <iframe
-              src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
-              width="100%"
-              frameBorder="0"
-              sandbox="allow-same-origin allow-scripts allow-popups"
-              style={{
-                width: '100%',
-                height: '100%',
-                border: 'none',
-                pointerEvents: 'none'
-              }}
-            />
-          ) : (
+          {tiktokPlaying && (
             <iframe
               src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
               width="100%"
