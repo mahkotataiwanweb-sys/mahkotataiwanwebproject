@@ -108,7 +108,7 @@ function VideoCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="flex-shrink-0 w-48 h-96 rounded-xl overflow-hidden shadow-lg bg-gray-900 cursor-pointer group"
+      className="flex-shrink-0 w-36 h-64 rounded-xl overflow-hidden shadow-lg bg-gray-900 cursor-pointer group"
       onClick={onClick}
     >
       {video.thumbnail_url ? (
@@ -222,7 +222,7 @@ export default function VideoShowcaseSection() {
 
   if (isLoading) {
     return (
-      <section className="py-24 sm:py-32 bg-blue-50">
+      <section className="py-12 sm:py-20 bg-navy/5">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <div className="h-10 bg-gray-200 rounded w-48 mx-auto mb-4 animate-pulse" />
           <div className="h-6 bg-gray-100 rounded w-96 mx-auto animate-pulse" />
@@ -234,12 +234,12 @@ export default function VideoShowcaseSection() {
   return (
     <section
       ref={sectionRef}
-      className="py-24 sm:py-32 bg-blue-50 relative overflow-hidden"
+      className="py-12 sm:py-20 bg-navy/5 relative overflow-hidden"
     >
       <div className="max-w-6xl mx-auto px-6">
         {/* Section Header */}
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-10"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -322,14 +322,16 @@ export default function VideoShowcaseSection() {
                 </motion.h3>
 
                 {/* Video Player */}
-                <AnimatePresence mode="wait">
-                  {extractYouTubeId(activeVideo.video_url) && (
-                    <YouTubePlayer
-                      key={activeVideo.id}
-                      videoId={extractYouTubeId(activeVideo.video_url)!}
-                    />
-                  )}
-                </AnimatePresence>
+                <div className="max-w-2xl mx-auto">
+                  <AnimatePresence mode="wait">
+                    {extractYouTubeId(activeVideo.video_url) && (
+                      <YouTubePlayer
+                        key={activeVideo.id}
+                        videoId={extractYouTubeId(activeVideo.video_url)!}
+                      />
+                    )}
+                  </AnimatePresence>
+                </div>
 
                 {/* Navigation */}
                 <div className="flex items-center justify-between mt-10">
