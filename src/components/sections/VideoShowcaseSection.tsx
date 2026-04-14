@@ -249,12 +249,12 @@ function VideoCard({
       )}
       {category === 'tiktok' && extractTikTokId(video.video_url) && (
         <iframe
-          src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
           width="100%"
           height="100%"
+          src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
+          title={video.title_en}
           frameBorder="0"
           allow="encrypted-media"
-          loading="lazy"
           className="w-full h-full"
         />
       )}
