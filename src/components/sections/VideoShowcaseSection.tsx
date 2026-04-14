@@ -58,6 +58,20 @@ function CategoryTab({
   );
 }
 
+/* Extract TikTok Video ID */
+function extractTikTokId(url: string): string | null {
+  const patterns = [
+    /tiktok\.com\/@[\w.-]+\/video\/(\d+)/,
+    /vm\.tiktok\.com\/(\w+)/,
+    /vt\.tiktok\.com\/(\w+)/,
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
+}
+
 /* YouTube Player Component */
 function YouTubePlayer({ videoId }: { videoId: string }) {
   return (
@@ -77,6 +91,29 @@ function YouTubePlayer({ videoId }: { videoId: string }) {
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
         className="w-full h-full"
+      />
+    </motion.div>
+  );
+}
+
+/* TikTok Player Component */
+function TikTokPlayer({ videoId }: { videoId: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.4 }}
+      className="w-full flex justify-center rounded-2xl overflow-hidden shadow-2xl"
+    >
+      <iframe
+        src={`https://www.tiktok.com/embed/v2/${videoId}`}
+        width="100%"
+        height="600"
+        frameBorder="0"
+        allow="autoplay; encrypted-media"
+        allowFullScreen
+        className="w-full"
       />
     </motion.div>
   );
@@ -225,7 +262,7 @@ export default function VideoShowcaseSection() {
 
   if (isLoading) {
     return (
-      <section className="py-6 sm:py-12 bg-[#f0f7fb]" style={{ backgroundColor: 'rgba(0, 48, 72, 0.05)' }}>
+      <section className="py-6 sm:py-12" style={{ backgroundColor: 'rgba(0, 48, 72, 0.08)' }}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           <div className="h-10 bg-gray-200 rounded w-48 mx-auto mb-4 animate-pulse" />
           <div className="h-6 bg-gray-100 rounded w-96 mx-auto animate-pulse" />
@@ -237,8 +274,8 @@ export default function VideoShowcaseSection() {
   return (
     <section
       ref={sectionRef}
-      className="py-6 sm:py-12 bg-[#f0f7fb] relative overflow-hidden"
-      style={{ backgroundColor: 'rgba(0, 48, 72, 0.05)' }}
+      className="py-6 sm:py-12 relative overflow-hidden"
+      style={{ backgroundColor: 'rgba(0, 48, 72, 0.08)' }}
     >
       <div className="max-w-6xl mx-auto px-6">
         {/* Section Header */}
@@ -309,8 +346,8 @@ export default function VideoShowcaseSection() {
           >
             <p className="text-gray-400 text-lg">No videos available for this category yet.</p>
           </motion.div>
-        ) : activeCategory === 'youtube' ? (
-          // YouTube: Single large video
+        ) : activeCategory === 'youtube' || activeCategory === 'tiktok' ? (
+          // YouTube/TikTok: Single large video
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -332,10 +369,16 @@ export default function VideoShowcaseSection() {
                 {/* Video Player */}
                 <div className="max-w-2xl mx-auto">
                   <AnimatePresence mode="wait">
-                    {extractYouTubeId(activeVideo.video_url) && (
+                    {activeCategory === 'youtube' && extractYouTubeId(activeVideo.video_url) && (
                       <YouTubePlayer
                         key={activeVideo.id}
                         videoId={extractYouTubeId(activeVideo.video_url)!}
+                      />
+                    )}
+                    {activeCategory === 'tiktok' && extractTikTokId(activeVideo.video_url) && (
+                      <TikTokPlayer
+                        key={activeVideo.id}
+                        videoId={extractTikTokId(activeVideo.video_url)!}
                       />
                     )}
                   </AnimatePresence>
