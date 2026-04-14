@@ -145,7 +145,7 @@ function VideoCard({
       {category === 'shorts' && extractYouTubeId(video.video_url) && (
         <iframe
           width="100%"
-          height="400"
+          height="350"
           src={`https://www.youtube.com/embed/${extractYouTubeId(video.video_url)}`}
           title={video.title_en}
           frameBorder="0"
