@@ -249,9 +249,11 @@ function VideoCard({
           }}
         >
           {!tiktokPlaying ? (
-            <div className="flex flex-col items-center justify-center gap-3">
-              <Play className="w-12 h-12 text-white/60" />
-              <p className="text-white/50 text-sm">Click to play</p>
+            <div className="flex flex-col items-center justify-center gap-3 z-10">
+              <div className="bg-red/30 rounded-full p-4">
+                <Play className="w-8 h-8 text-white fill-white" />
+              </div>
+              <p className="text-white text-xs font-medium">Click to play</p>
             </div>
           ) : (
             <iframe
