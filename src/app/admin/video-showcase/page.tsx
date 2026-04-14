@@ -355,7 +355,7 @@ export default function AdminVideoShowcasePage() {
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none"
                 >
                   <option value="youtube">YouTube</option>
-                  <option value="shorts">YouTube Shorts</option>
+                  <option value="shorts">Shorts</option>
                   <option value="tiktok">TikTok</option>
                   <option value="reels">Instagram Reels</option>
                 </select>

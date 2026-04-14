@@ -222,7 +222,7 @@ export default function VideoShowcaseSection() {
 
   if (isLoading) {
     return (
-      <section className="py-24 sm:py-32 bg-white">
+      <section className="py-24 sm:py-32 bg-blue-50">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <div className="h-10 bg-gray-200 rounded w-48 mx-auto mb-4 animate-pulse" />
           <div className="h-6 bg-gray-100 rounded w-96 mx-auto animate-pulse" />
@@ -234,7 +234,7 @@ export default function VideoShowcaseSection() {
   return (
     <section
       ref={sectionRef}
-      className="py-24 sm:py-32 bg-white relative overflow-hidden"
+      className="py-24 sm:py-32 bg-blue-50 relative overflow-hidden"
     >
       <div className="max-w-6xl mx-auto px-6">
         {/* Section Header */}
@@ -274,7 +274,7 @@ export default function VideoShowcaseSection() {
           />
           <CategoryTab
             category="shorts"
-            label="YouTube Shorts"
+            label="Shorts"
             isActive={activeCategory === 'shorts'}
             onClick={() => handleCategoryChange('shorts')}
           />
@@ -374,7 +374,7 @@ export default function VideoShowcaseSection() {
             {/* Title */}
             <h3 className="text-xl sm:text-2xl font-bold text-navy mb-8 text-center">
               {activeCategory === 'shorts'
-                ? 'YouTube Shorts'
+                ? 'Shorts'
                 : activeCategory === 'tiktok'
                 ? 'TikTok Videos'
                 : 'Instagram Reels'}
