@@ -43,8 +43,8 @@ function extractYouTubeId(url: string): string | null {
 function YouTubeLogo() {
   return (
     <svg width="24" height="24" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-      <rect x="32" y="96" width="448" height="320" rx="80" fill="currentColor"/>
-      <polygon points="220,180 220,332 340,256" fill="white"/>
+      <rect x="32" y="96" width="448" height="320" rx="80" fill="none" stroke="currentColor" strokeWidth="40"/>
+      <polygon points="220,180 220,332 340,256" fill="currentColor"/>
     </svg>
   );
 }
