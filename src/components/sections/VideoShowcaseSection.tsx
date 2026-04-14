@@ -167,22 +167,23 @@ function VideoCard({
         </div>
       )}
       {category === 'reels' && video.video_url && (
-        <div className="w-full h-full flex items-center justify-center bg-black overflow-hidden" style={{ clipPath: 'inset(0)' }}>
-          <div style={{ width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}>
-            <iframe
-              src={`https://www.instagram.com/p/${video.video_url.split('/').filter(Boolean).pop()}/embed/`}
-              width="100%"
-              frameBorder="0"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-              style={{
-                width: '100%',
-                height: '800px',
-                border: 'none',
-                marginTop: '-80px'
-              }}
-            />
-          </div>
+        <div className="w-full h-full flex items-center justify-center bg-black overflow-hidden relative" style={{ clipPath: 'inset(0)' }}>
+          <blockquote
+            className="instagram-media"
+            data-instgrm-permalink={video.video_url}
+            data-instgrm-version="14"
+            style={{
+              maxWidth: '100%',
+              width: '320px',
+              margin: '0',
+              transform: 'scale(1.2)',
+              transformOrigin: 'top center'
+            }}
+          />
+          <script
+            async
+            src="//www.instagram.com/embed.js"
+          />
         </div>
       )}
     </motion.div>
@@ -492,7 +493,7 @@ export default function VideoShowcaseSection() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-md aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl"
+              className="relative w-full max-w-xs aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl"
             >
               <button
                 onClick={() => setSelectedVideo(null)}
@@ -533,21 +534,22 @@ export default function VideoShowcaseSection() {
                 )}
                 {activeCategory === 'reels' && selectedVideo.video_url && (
                   <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000', overflow: 'hidden' }}>
-                    <div style={{ width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}>
-                      <iframe
-                        src={`https://www.instagram.com/p/${selectedVideo.video_url.split('/').filter(Boolean).pop()}/embed/`}
-                        width="100%"
-                        frameBorder="0"
-                        allow="autoplay; encrypted-media"
-                        allowFullScreen
-                        style={{
-                          width: '100%',
-                          height: '800px',
-                          border: 'none',
-                          marginTop: '-80px'
-                        }}
-                      />
-                    </div>
+                    <blockquote
+                      className="instagram-media"
+                      data-instgrm-permalink={selectedVideo.video_url}
+                      data-instgrm-version="14"
+                      style={{
+                        maxWidth: '100%',
+                        width: '320px',
+                        margin: '0',
+                        transform: 'scale(1.2)',
+                        transformOrigin: 'top center'
+                      }}
+                    />
+                    <script
+                      async
+                      src="//www.instagram.com/embed.js"
+                    />
                   </div>
                 )}
               </div>
