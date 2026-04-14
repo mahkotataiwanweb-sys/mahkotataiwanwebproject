@@ -141,6 +141,27 @@ function VideoCard({
 }) {
   const [tiktokPlaying, setTiktokPlaying] = useState(false);
 
+  /* Unmute TikTok when playing */
+  useEffect(() => {
+    if (tiktokPlaying && category === 'tiktok') {
+      setTimeout(() => {
+        const iframes = document.querySelectorAll('iframe[src*="tiktok.com/embed"]');
+        iframes.forEach((iframe) => {
+          try {
+            const doc = (iframe as HTMLIFrameElement).contentDocument;
+            const audioElements = doc?.querySelectorAll('audio');
+            audioElements?.forEach((audio) => {
+              audio.muted = false;
+              audio.volume = 1;
+            });
+          } catch (e) {
+            console.log('Cannot access iframe audio due to CORS');
+          }
+        });
+      }, 500);
+    }
+  }, [tiktokPlaying, category]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -181,18 +202,17 @@ function VideoCard({
         />
       )}
       {category === 'tiktok' && extractTikTokId(video.video_url) && (
-        <div className="w-full h-full bg-black flex items-center justify-center overflow-hidden relative" style={{ clipPath: 'inset(0)' }}>
-          {!tiktokPlaying ? (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setTiktokPlaying(true);
-              }}
-              className="absolute inset-0 flex items-center justify-center bg-black/60 hover:bg-black/40 transition-colors z-10"
-            >
-              <Play className="w-16 h-16 text-white" />
-            </button>
-          ) : null}
+        <div
+          className="w-full h-full bg-black flex items-center justify-center overflow-hidden cursor-pointer group"
+          style={{ clipPath: 'inset(0)' }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setTiktokPlaying(true);
+          }}
+        >
+          {!tiktokPlaying && (
+            <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
+          )}
           {tiktokPlaying && (
             <iframe
               src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
@@ -200,7 +220,6 @@ function VideoCard({
               frameBorder="0"
               allow="encrypted-media"
               allowFullScreen
-              loading="lazy"
               style={{
                 width: '100%',
                 height: '100%',
