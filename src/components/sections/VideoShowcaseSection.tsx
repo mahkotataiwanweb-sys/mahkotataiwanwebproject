@@ -167,23 +167,38 @@ function VideoCard({
         </div>
       )}
       {category === 'reels' && video.video_url && (
-        <div className="w-full h-full flex items-center justify-center bg-black overflow-hidden relative" style={{ clipPath: 'inset(0)' }}>
-          <blockquote
-            className="instagram-media"
-            data-instgrm-permalink={video.video_url}
-            data-instgrm-version="14"
-            style={{
-              maxWidth: '100%',
-              width: '320px',
-              margin: '0',
-              transform: 'scale(1.2)',
-              transformOrigin: 'top center'
-            }}
-          />
-          <script
-            async
-            src="//www.instagram.com/embed.js"
-          />
+        <div
+          className="w-full h-full bg-black overflow-hidden relative flex items-center justify-center"
+          style={{
+            clipPath: 'inset(0)',
+            backgroundColor: '#000'
+          }}
+        >
+          <div style={{
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <blockquote
+              className="instagram-media"
+              data-instgrm-permalink={video.video_url}
+              data-instgrm-version="14"
+              style={{
+                width: '400px',
+                height: '600px',
+                margin: '0',
+                padding: '0',
+                border: 'none',
+                overflow: 'hidden',
+                clipPath: 'polygon(0 0, 100% 0, 100% 65%, 0 65%)'
+              }}
+            />
+          </div>
+          <script async src="//www.instagram.com/embed.js" />
         </div>
       )}
     </motion.div>
@@ -533,23 +548,31 @@ export default function VideoShowcaseSection() {
                   </div>
                 )}
                 {activeCategory === 'reels' && selectedVideo.video_url && (
-                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000', overflow: 'hidden' }}>
+                  <div style={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#000',
+                    overflow: 'hidden',
+                    position: 'relative'
+                  }}>
                     <blockquote
                       className="instagram-media"
                       data-instgrm-permalink={selectedVideo.video_url}
                       data-instgrm-version="14"
                       style={{
-                        maxWidth: '100%',
-                        width: '320px',
+                        width: '400px',
+                        height: '600px',
                         margin: '0',
-                        transform: 'scale(1.2)',
-                        transformOrigin: 'top center'
+                        padding: '0',
+                        border: 'none',
+                        overflow: 'hidden',
+                        clipPath: 'polygon(0 0, 100% 0, 100% 65%, 0 65%)'
                       }}
                     />
-                    <script
-                      async
-                      src="//www.instagram.com/embed.js"
-                    />
+                    <script async src="//www.instagram.com/embed.js" />
                   </div>
                 )}
               </div>
