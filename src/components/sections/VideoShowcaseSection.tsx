@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, Youtube, Music, Square, Film } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { VideoShowcase } from '@/types/database';
@@ -35,21 +35,24 @@ function CategoryTab({
   label,
   isActive,
   onClick,
+  icon: Icon,
 }: {
   category: VideoCategory;
   label: string;
   isActive: boolean;
   onClick: () => void;
+  icon: React.ElementType;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
+      className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${
         isActive
           ? 'bg-red text-white shadow-lg'
           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
       }`}
     >
+      <Icon className="w-4 h-4" />
       {label}
     </button>
   );
@@ -222,7 +225,7 @@ export default function VideoShowcaseSection() {
 
   if (isLoading) {
     return (
-      <section className="py-12 sm:py-20 bg-navy/5">
+      <section className="py-6 sm:py-12 bg-sky-100">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <div className="h-10 bg-gray-200 rounded w-48 mx-auto mb-4 animate-pulse" />
           <div className="h-6 bg-gray-100 rounded w-96 mx-auto animate-pulse" />
@@ -234,7 +237,7 @@ export default function VideoShowcaseSection() {
   return (
     <section
       ref={sectionRef}
-      className="py-12 sm:py-20 bg-navy/5 relative overflow-hidden"
+      className="py-6 sm:py-12 bg-sky-100 relative overflow-hidden"
     >
       <div className="max-w-6xl mx-auto px-6">
         {/* Section Header */}
@@ -254,7 +257,7 @@ export default function VideoShowcaseSection() {
           <div className="w-16 h-[2px] bg-red mx-auto mb-6" />
           <p className="text-navy/60 max-w-2xl mx-auto text-base sm:text-lg">
             Discover Mahkota Taiwan through our video content across YouTube,
-            Shorts, TikTok, and Instagram Reels.
+            Shorts, TikTok, and Reels.
           </p>
         </motion.div>
 
@@ -269,24 +272,28 @@ export default function VideoShowcaseSection() {
           <CategoryTab
             category="youtube"
             label="YouTube"
+            icon={Youtube}
             isActive={activeCategory === 'youtube'}
             onClick={() => handleCategoryChange('youtube')}
           />
           <CategoryTab
             category="shorts"
             label="Shorts"
+            icon={Square}
             isActive={activeCategory === 'shorts'}
             onClick={() => handleCategoryChange('shorts')}
           />
           <CategoryTab
             category="tiktok"
             label="TikTok"
+            icon={Music}
             isActive={activeCategory === 'tiktok'}
             onClick={() => handleCategoryChange('tiktok')}
           />
           <CategoryTab
             category="reels"
-            label="Instagram Reels"
+            label="Reels"
+            icon={Film}
             isActive={activeCategory === 'reels'}
             onClick={() => handleCategoryChange('reels')}
           />
@@ -379,7 +386,7 @@ export default function VideoShowcaseSection() {
                 ? 'Shorts'
                 : activeCategory === 'tiktok'
                 ? 'TikTok Videos'
-                : 'Instagram Reels'}
+                : 'Reels'}
             </h3>
 
             {/* Horizontal Scroll Container */}
