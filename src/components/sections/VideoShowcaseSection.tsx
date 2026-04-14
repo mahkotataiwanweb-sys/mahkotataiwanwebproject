@@ -123,16 +123,19 @@ function TikTokPlayer({ videoId }: { videoId: string }) {
 function VideoCard({
   video,
   category,
+  onClick,
 }: {
   video: VideoShowcase;
   category: VideoCategory;
+  onClick: (video: VideoShowcase) => void;
 }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="w-full rounded-xl overflow-hidden shadow-lg bg-gray-900"
+      className="w-full rounded-xl overflow-hidden shadow-lg bg-gray-900 cursor-pointer hover:shadow-xl transition-shadow"
+      onClick={() => onClick(video)}
     >
       {category === 'shorts' && extractYouTubeId(video.video_url) && (
         <iframe
@@ -188,6 +191,7 @@ export default function VideoShowcaseSection() {
   const [activeCategory, setActiveCategory] = useState<VideoCategory>('youtube');
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedVideo, setSelectedVideo] = useState<VideoShowcase | null>(null);
 
   /* Fetch videos */
   useEffect(() => {
@@ -268,7 +272,7 @@ export default function VideoShowcaseSection() {
 
   if (isLoading) {
     return (
-      <section className="py-6 sm:py-12" style={{ backgroundColor: '#e8f2f7' }}>
+      <section className="py-6 sm:py-12" style={{ backgroundColor: '#004a6e' }}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           <div className="h-10 bg-gray-200 rounded w-48 mx-auto mb-4 animate-pulse" />
           <div className="h-6 bg-gray-100 rounded w-96 mx-auto animate-pulse" />
@@ -281,7 +285,7 @@ export default function VideoShowcaseSection() {
     <section
       ref={sectionRef}
       className="py-6 sm:py-12 relative overflow-hidden"
-      style={{ backgroundColor: '#e8f2f7' }}
+      style={{ backgroundColor: '#004a6e' }}
     >
       <div className="max-w-6xl mx-auto px-6">
         {/* Section Header */}
@@ -443,6 +447,7 @@ export default function VideoShowcaseSection() {
                   key={video.id}
                   video={video}
                   category={activeCategory}
+                  onClick={setSelectedVideo}
                 />
               ))}
             </div>
@@ -463,6 +468,71 @@ export default function VideoShowcaseSection() {
           </motion.div>
         )}
       </div>
+
+      {/* Video Modal */}
+      <AnimatePresence>
+        {selectedVideo && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedVideo(null)}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-4xl max-h-[90vh] rounded-2xl overflow-hidden shadow-2xl"
+            >
+              <button
+                onClick={() => setSelectedVideo(null)}
+                className="absolute top-4 right-4 z-10 p-2 bg-red text-white rounded-full hover:bg-red/80 transition-colors"
+              >
+                <Play className="w-5 h-5 rotate-90" />
+              </button>
+
+              <div className="relative w-full h-full bg-black">
+                {activeCategory === 'shorts' && extractYouTubeId(selectedVideo.video_url) && (
+                  <iframe
+                    width="100%"
+                    height="600"
+                    src={`https://www.youtube.com/embed/${extractYouTubeId(selectedVideo.video_url)}`}
+                    title={selectedVideo.title_en}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full"
+                  />
+                )}
+                {activeCategory === 'tiktok' && extractTikTokId(selectedVideo.video_url) && (
+                  <iframe
+                    src={`https://www.tiktok.com/embed/v2/${extractTikTokId(selectedVideo.video_url)}`}
+                    width="100%"
+                    height="600"
+                    frameBorder="0"
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                    className="w-full h-full"
+                  />
+                )}
+                {activeCategory === 'reels' && selectedVideo.video_url && (
+                  <iframe
+                    src={`https://www.instagram.com/reel/${selectedVideo.video_url.split('/').pop()?.replace(/\D/g, '')}/embed`}
+                    width="100%"
+                    height="600"
+                    frameBorder="0"
+                    allow="autoplay"
+                    allowFullScreen
+                    className="w-full h-full"
+                  />
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
