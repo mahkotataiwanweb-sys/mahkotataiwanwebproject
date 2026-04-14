@@ -4,8 +4,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 import {
-  Plus, Pencil, Trash2, X, Eye, EyeOff,
-  ArrowUpDown, Loader2, Video, Youtube, Smartphone,
+  Plus, Pencil, Trash2, X, Play, Youtube, Eye, EyeOff,
+  ArrowUpDown, Loader2, Video,
 } from 'lucide-react';
 import type { VideoShowcase, VideoShowcaseInsert, VideoShowcaseUpdate } from '@/types/database';
 
@@ -32,7 +32,6 @@ export default function AdminVideoShowcasePage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form, setForm] = useState<VideoShowcaseInsert>({ ...emptyForm });
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
 
   /* ---------- Fetch ---------- */
   const fetchVideos = useCallback(async () => {
@@ -155,37 +154,6 @@ export default function AdminVideoShowcasePage() {
     }
   };
 
-  /* ---------- File upload ---------- */
-  const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    field: 'video_url' | 'thumbnail_url'
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('folder', 'videos');
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error('Upload failed');
-      const data = await res.json();
-      setForm((prev) => ({ ...prev, [field]: data.url }));
-      toast.success('File uploaded');
-    } catch (err) {
-      console.error(err);
-      toast.error('Upload failed');
-    } finally {
-      setUploading(false);
-    }
-  };
-
   /* ---------- Render ---------- */
   return (
     <div>
@@ -245,14 +213,13 @@ export default function AdminVideoShowcasePage() {
                       video.video_category === 'youtube'
                         ? 'bg-red-50 text-red-600'
                         : video.video_category === 'shorts'
-                        ? 'bg-blue-50 text-blue-600'
+                        ? 'bg-yellow-50 text-yellow-600'
                         : video.video_category === 'tiktok'
-                        ? 'bg-black/10 text-black'
+                        ? 'bg-black/5 text-gray-700'
                         : 'bg-pink-50 text-pink-600'
                     }`}>
-                      {video.video_category === 'youtube' && <Youtube className="w-3 h-3" />}
-                      {(video.video_category === 'shorts' || video.video_category === 'tiktok' || video.video_category === 'reels') && <Smartphone className="w-3 h-3" />}
-                      {video.video_category.charAt(0).toUpperCase() + video.video_category.slice(1)}
+                      <Youtube className="w-3 h-3" />
+                      {video.video_category === 'youtube' ? 'YouTube' : video.video_category === 'shorts' ? 'Shorts' : video.video_category === 'tiktok' ? 'TikTok' : 'Reels'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-center">
@@ -383,8 +350,8 @@ export default function AdminVideoShowcasePage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Video Category *</label>
                 <select
-                  value={form.video_category}
-                  onChange={(e) => setForm({ ...form, video_category: e.target.value as 'youtube' | 'shorts' | 'tiktok' | 'reels' })}
+                  value={form.video_category || 'youtube'}
+                  onChange={(e) => setForm({ ...form, video_category: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none"
                 >
                   <option value="youtube">YouTube</option>
@@ -396,44 +363,28 @@ export default function AdminVideoShowcasePage() {
 
               {/* Video URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Video URL *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Video URL *
+                </label>
                 <input
                   type="text"
                   value={form.video_url}
                   onChange={(e) => setForm({ ...form, video_url: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none"
-                  placeholder={
-                    form.video_category === 'youtube'
-                      ? 'https://www.youtube.com/watch?v=...'
-                      : form.video_category === 'shorts'
-                      ? 'https://www.youtube.com/shorts/...'
-                      : form.video_category === 'tiktok'
-                      ? 'https://www.tiktok.com/@.../video/...'
-                      : 'https://www.instagram.com/reels/...'
-                  }
+                  placeholder="https://www.youtube.com/watch?v=..."
                 />
-                <p className="text-xs text-gray-500 mt-1">Paste the video URL/link from the platform</p>
               </div>
 
               {/* Thumbnail */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Thumbnail (optional)</label>
-                <div className="space-y-2">
-                  {form.thumbnail_url && (
-                    <p className="text-sm text-gray-500 truncate">{form.thumbnail_url}</p>
-                  )}
-                  <label className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors text-sm">
-                    {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                    Choose Thumbnail
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleFileUpload(e, 'thumbnail_url')}
-                      className="sr-only"
-                      disabled={uploading}
-                    />
-                  </label>
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Thumbnail URL (optional)</label>
+                <input
+                  type="text"
+                  value={form.thumbnail_url || ''}
+                  onChange={(e) => setForm({ ...form, thumbnail_url: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none"
+                  placeholder="https://example.com/thumbnail.jpg"
+                />
               </div>
 
               {/* Sort Order + Active */}
