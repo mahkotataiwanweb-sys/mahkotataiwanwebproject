@@ -247,21 +247,34 @@ function VideoCard({
             setTiktokPlaying(true);
           }}
         >
-          <iframe
-            src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
-            width="100%"
-            frameBorder="0"
-            sandbox={!tiktokPlaying ? "allow-same-origin allow-scripts" : "allow-same-origin allow-scripts allow-popups"}
-            allow={tiktokPlaying ? "encrypted-media" : ""}
-            allowFullScreen={tiktokPlaying}
-            style={{
-              width: '100%',
-              height: '100%',
-              border: 'none',
-              pointerEvents: tiktokPlaying ? 'auto' : 'none',
-              opacity: 1
-            }}
-          />
+          {!tiktokPlaying ? (
+            <iframe
+              src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
+              width="100%"
+              frameBorder="0"
+              sandbox="allow-same-origin"
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                pointerEvents: 'none',
+                opacity: 0.8
+              }}
+            />
+          ) : (
+            <iframe
+              src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
+              width="100%"
+              frameBorder="0"
+              allow="encrypted-media"
+              allowFullScreen
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none'
+              }}
+            />
+          )}
           {!tiktokPlaying && (
             <div className="absolute inset-0 group-hover:bg-black/10 transition-colors" />
           )}
