@@ -249,11 +249,10 @@ function VideoCard({
       )}
       {category === 'tiktok' && extractTikTokId(video.video_url) && (
         <iframe
+          src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
           width="100%"
           height="100%"
-          src={tiktokPlaying ? `https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}` : ''}
-          frameBorder="0"
-          className="w-full h-full"
+          style={{ border: 'none' }}
         />
       )}
       {category === 'reels' && video.video_url && (
