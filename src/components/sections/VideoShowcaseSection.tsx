@@ -225,7 +225,7 @@ export default function VideoShowcaseSection() {
 
   if (isLoading) {
     return (
-      <section className="py-6 sm:py-12 bg-sky-100">
+      <section className="py-6 sm:py-12 bg-[#f0f7fb]" style={{ backgroundColor: 'rgba(0, 48, 72, 0.05)' }}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           <div className="h-10 bg-gray-200 rounded w-48 mx-auto mb-4 animate-pulse" />
           <div className="h-6 bg-gray-100 rounded w-96 mx-auto animate-pulse" />
@@ -237,7 +237,8 @@ export default function VideoShowcaseSection() {
   return (
     <section
       ref={sectionRef}
-      className="py-6 sm:py-12 bg-sky-100 relative overflow-hidden"
+      className="py-6 sm:py-12 bg-[#f0f7fb] relative overflow-hidden"
+      style={{ backgroundColor: 'rgba(0, 48, 72, 0.05)' }}
     >
       <div className="max-w-6xl mx-auto px-6">
         {/* Section Header */}
