@@ -69,17 +69,10 @@ function ShortsLogo() {
 function ReelsLogo() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      {/* Instagram Reels - gradient with play */}
-      <defs>
-        <linearGradient id="reelsGradient" x1="0%" y1="100%" x2="100%" y2="0%">
-          <stop offset="0%" style={{stopColor: '#FFA500', stopOpacity: 1}} />
-          <stop offset="50%" style={{stopColor: '#FF1493', stopOpacity: 1}} />
-          <stop offset="100%" style={{stopColor: '#C924A5', stopOpacity: 1}} />
-        </linearGradient>
-      </defs>
-      <rect x="2" y="3" width="20" height="18" rx="2" fill="url(#reelsGradient)"/>
-      <rect x="2" y="3" width="20" height="4" fill="currentColor" opacity="0.3"/>
-      <polygon points="12,10 9,14 15,14" fill="white"/>
+      {/* Instagram logo - camera icon */}
+      <rect x="2" y="3" width="20" height="18" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+      <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+      <circle cx="18" cy="6" r="1.5" fill="currentColor"/>
     </svg>
   );
 }
@@ -248,15 +241,21 @@ function VideoCard({
         />
       )}
       {category === 'tiktok' && extractTikTokId(video.video_url) && (
-        <iframe
-          width="100%"
-          height="100%"
-          src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
-          title={video.title_en}
-          frameBorder="0"
-          allow="encrypted-media"
-          className="w-full h-full"
-        />
+        <>
+          {tiktokPlaying ? (
+            <iframe
+              width="100%"
+              height="100%"
+              src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
+              title={video.title_en}
+              frameBorder="0"
+              allow="autoplay; encrypted-media"
+              className="w-full h-full"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-900" />
+          )}
+        </>
       )}
       {category === 'reels' && video.video_url && (
         <div
