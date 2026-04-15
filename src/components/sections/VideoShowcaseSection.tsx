@@ -244,11 +244,11 @@ function VideoCard({
         <iframe
           width="100%"
           height="100%"
-          src={tiktokPlaying ? `https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}` : ''}
+          src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
           title={video.title_en}
           frameBorder="0"
-          allow="autoplay; encrypted-media"
-          className="w-full h-full bg-gray-900"
+          allow="encrypted-media"
+          className="w-full h-full"
         />
       )}
       {category === 'reels' && video.video_url && (
