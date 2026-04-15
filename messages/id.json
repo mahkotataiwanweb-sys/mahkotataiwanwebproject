@@ -25,13 +25,13 @@
     "mission": "Misi kami adalah menjembatani budaya melalui makanan, menyediakan produk Indonesia berkualitas tinggi dengan distribusi yang andal di seluruh Taiwan.",
     "stats": {
       "since": "Didirikan",
-      "sinceValue": "2019",
+      "sinceValue": "2021",
       "stores": "Toko Mitra",
-      "storesValue": "500+",
-      "products": "Produk",
-      "productsValue": "1000+",
+      "storesValue": "300+",
+      "products": "Lini Produk",
+      "productsValue": "26+",
       "customers": "Pelanggan Puas",
-      "customersValue": "50.000+"
+      "customersValue": "1.000.000+"
     },
     "label": "Siapa Kami",
     "highlight1": "Produk bersertifikat Halal menjamin kualitas dan kepercayaan",
@@ -75,7 +75,7 @@
       "phoneValue": "+886-XXX-XXX-XXX"
     },
     "success": "Pesan berhasil dikirim!",
-    "error": "Gagal mengirim pesan.",
+    "error": "Gagal mengirim pesan. Silakan coba lagi.",
     "label": "Hubungi Kami",
     "warehouse": "Alamat Gudang",
     "office": "Alamat Kantor",

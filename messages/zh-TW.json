@@ -25,13 +25,13 @@
     "mission": "我們的使命是透過食物連結文化，以可靠的配送網絡在全台灣提供高品質的印尼產品。",
     "stats": {
       "since": "成立於",
-      "sinceValue": "2019",
+      "sinceValue": "2021",
       "stores": "合作店家",
-      "storesValue": "500+",
-      "products": "產品種類",
-      "productsValue": "1000+",
+      "storesValue": "300+",
+      "products": "產品線",
+      "productsValue": "26+",
       "customers": "滿意客戶",
-      "customersValue": "50,000+"
+      "customersValue": "1,000,000+"
     },
     "label": "關於我們",
     "highlight1": "清真認證產品，保證品質與信任",
@@ -106,7 +106,7 @@
       "events": "活動",
       "lifestyle": "活動花絮",
       "contact": "聯絡我們",
-      "whereToBuy": "哪裡買",
+      "whereToBuy": "哪裡購買",
       "gallery": "相簿"
     },
     "contactUs": "聯絡我們",
@@ -159,8 +159,8 @@
     "showLess": "收起"
   },
   "whereToBuy": {
-    "title": "哪裡買",
-    "subtitle": "在台灣各地值得信賴的零售合作夥伴找到皇冠台灣產品。",
+    "title": "哪裡購買",
+    "subtitle": "在台灣各地值得信賴的零售合作夥伴找到 Mahkota Taiwan 產品。",
     "findUs": "找到我們"
   },
   "gallery": {
