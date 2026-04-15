@@ -241,21 +241,15 @@ function VideoCard({
         />
       )}
       {category === 'tiktok' && extractTikTokId(video.video_url) && (
-        <>
-          {tiktokPlaying ? (
-            <iframe
-              width="100%"
-              height="100%"
-              src={`https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}`}
-              title={video.title_en}
-              frameBorder="0"
-              allow="autoplay; encrypted-media"
-              className="w-full h-full"
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-900" />
-          )}
-        </>
+        <iframe
+          width="100%"
+          height="100%"
+          src={tiktokPlaying ? `https://www.tiktok.com/embed/v2/${extractTikTokId(video.video_url)}` : ''}
+          title={video.title_en}
+          frameBorder="0"
+          allow="autoplay; encrypted-media"
+          className="w-full h-full bg-gray-900"
+        />
       )}
       {category === 'reels' && video.video_url && (
         <div
