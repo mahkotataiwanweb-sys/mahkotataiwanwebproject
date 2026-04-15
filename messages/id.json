@@ -45,7 +45,7 @@
     "categories": "Kategori",
     "searchPlaceholder": "Cari produk...",
     "noProducts": "Produk tidak ditemukan",
-    "addToInquiry": "Tambah ke Pertanyaan",
+    "addToInquiry": "Tambah ke Daftar Permintaan",
     "details": "Lihat Detail"
   },
   "contact": {
@@ -81,7 +81,7 @@
     "office": "Alamat Kantor",
     "phone": "Telepon",
     "followUs": "Ikuti Kami di Media Sosial",
-    "formTitle": "Kirim Pesan",
+    "formTitle": "Kirimkan Pesan kepada Kami",
     "name": "Nama Lengkap",
     "email": "Alamat Email",
     "message": "Pesan",
