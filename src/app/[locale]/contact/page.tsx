@@ -192,8 +192,8 @@ const faqIcons = [ShoppingBag, Truck, Handshake, Package, Users];
 function useFaqs(t: (key: string) => string) {
   return faqIcons.map((icon, i) => ({
     icon,
-    question: t(\`faq\${i + 1}Question\`),
-    answer: t(\`faq\${i + 1}Answer\`),
+    question: t(`faq${i + 1}Question`),
+    answer: t(`faq${i + 1}Answer`),
   }));
 }
 
