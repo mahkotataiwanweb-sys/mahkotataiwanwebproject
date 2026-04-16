@@ -711,7 +711,7 @@ export default function ContactPage() {
               className="inline-flex items-center gap-2 text-cream/60 hover:text-cream transition-colors text-sm group"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              Back to Home
+              {t('backToHome')}
             </Link>
           </div>
 
@@ -988,25 +988,25 @@ export default function ContactPage() {
           <div ref={hoursLegendRef} className="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-10 mt-10">
             <div className="flex items-center gap-3">
               <span className="w-8 h-[3px] rounded-full bg-navy" />
-              <span className="text-navy text-sm font-semibold">Mon &ndash; Fri</span>
-              <span className="text-navy/50 text-sm">9:00 AM &ndash; 6:00 PM</span>
+              <span className="text-navy text-sm font-semibold">{t('mondayToFriday')}</span>
+              <span className="text-navy/50 text-sm">{t('weekdayHours')}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="w-8 h-[3px] rounded-full bg-red" />
-              <span className="text-navy text-sm font-semibold">Saturday</span>
-              <span className="text-navy/50 text-sm">9:00 AM &ndash; 1:00 PM</span>
+              <span className="text-navy text-sm font-semibold">{t('saturday')}</span>
+              <span className="text-navy/50 text-sm">{t('saturdayHours')}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="w-8 h-[3px] rounded-full bg-red/40" />
-              <span className="text-navy text-sm font-semibold">Sunday</span>
-              <span className="text-navy/50 text-sm">Closed</span>
+              <span className="text-navy text-sm font-semibold">{t('sunday')}</span>
+              <span className="text-navy/50 text-sm">{t('sundayStatus')}</span>
             </div>
           </div>
 
           {/* Footnote */}
           <div ref={hoursFootnoteRef} className="text-center mt-8">
             <p className="text-navy/40 text-xs">
-              * Taiwan Standard Time (GMT+8) &middot; Closed on Sundays &amp; national holidays
+              {t('timezoneNote')}
             </p>
           </div>
         </div>
@@ -1081,7 +1081,7 @@ export default function ContactPage() {
                     <MapPin className="w-5 h-5 text-red" />
                   </div>
                   <div>
-                    <p className="font-semibold text-navy text-base">Mahkota Taiwan Office</p>
+                    <p className="font-semibold text-navy text-base">{t('officeTitle')}</p>
                     <p className="text-navy/50 text-sm">
                       No. 83, Liyuan 2nd Street, Linkou District, New Taipei City
                     </p>
@@ -1093,7 +1093,7 @@ export default function ContactPage() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-red hover:text-red/80 text-sm font-semibold transition-colors duration-300 whitespace-nowrap bg-red/5 hover:bg-red/10 px-5 py-2.5 rounded-full"
                 >
-                  Get Directions
+                  {t('getDirections')}
                   <ChevronRight className="w-4 h-4" />
                 </a>
               </div>
@@ -1145,10 +1145,10 @@ export default function ContactPage() {
               </motion.div>
 
               <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-5 leading-tight">
-                Interested in Becoming a Partner?
+                {t('ctaTitle')}
               </h2>
               <p className="text-cream/70 text-sm tracking-wide mb-10 max-w-lg mx-auto">
-                Join 300+ stores across Taiwan selling Mahkota Taiwan products
+                {t('ctaDescription')}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -1156,7 +1156,7 @@ export default function ContactPage() {
                   href="mailto:mahkotataiwan@gmail.com?subject=Partnership%20Inquiry"
                   className="inline-flex items-center justify-center gap-2 bg-red hover:bg-red/90 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-red/20 text-base"
                 >
-                  Contact Our Team
+                  {t('ctaButtonEmail')}
                   <ChevronRight className="w-5 h-5" />
                 </a>
                 <a
@@ -1164,12 +1164,12 @@ export default function ContactPage() {
                   className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 border border-white/20 hover:border-white/30 text-base backdrop-blur-sm"
                 >
                   <Phone className="w-4 h-4" />
-                  Call Us Now
+                  {t('ctaButtonPhone')}
                 </a>
               </div>
 
               <p className="text-cream/25 text-xs mt-10">
-                We typically respond to partnership inquiries within 2 business days
+                {t('ctaFootnote')}
               </p>
             </div>
           </div>
