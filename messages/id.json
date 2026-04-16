@@ -17,7 +17,9 @@
   "hero": {
     "tagline": "Rasa Indonesia, Hadir di Taiwan",
     "subtitle": "Sumber terpercaya untuk produk makanan Indonesia asli di Taiwan. Dari camilan favorit hingga bumbu masak esensial, kami membawa cita rasa rumah untuk Anda.",
-    "cta": "Jelajahi Produk"
+    "cta": "Jelajahi Produk",
+    "scroll": "Gulir",
+    "learnMore": "Pelajari Lebih Lanjut"
   },
   "about": {
     "title": "Mahkota Taiwan",
@@ -36,17 +38,145 @@
     "label": "Siapa Kami",
     "highlight1": "Produk bersertifikat Halal menjamin kualitas dan kepercayaan",
     "highlight2": "Jaringan distribusi langsung di seluruh Taiwan",
-    "highlight3": "Cita rasa Indonesia otentik, dipilih dengan cermat"
+    "highlight3": "Cita rasa Indonesia otentik, dipilih dengan cermat",
+    "values": {
+      "title": "Nilai-Nilai Kami",
+      "qualityFirst": "Kualitas Utama",
+      "qualityFirstDesc": "Setiap produk dipilih dengan cermat dan diuji untuk memenuhi standar kualitas tertinggi sebelum sampai ke rak kami.",
+      "culturalBridge": "Jembatan Budaya",
+      "culturalBridgeDesc": "Kami menjembatani celah antara warisan Indonesia dan kehidupan sehari-hari Taiwan, menghadirkan cita rasa otentik ke setiap rumah.",
+      "community": "Komunitas",
+      "communityDesc": "Membangun komunitas kuat lebih dari 1 juta pelanggan yang mempercayai kami untuk menghadirkan cita rasa rumah.",
+      "integrity": "Integritas",
+      "integrityDesc": "Beroperasi dengan transparansi dan kepercayaan dalam setiap kemitraan dan transaksi, memastikan hubungan jangka panjang yang dibangun atas dasar saling menghormati."
+    },
+    "milestones": {
+      "title": "Perjalanan Kami",
+      "2021": { "title": "Didirikan", "description": "Mahkota Taiwan didirikan dengan visi menghadirkan produk Indonesia asli ke Taiwan." },
+      "2022": { "title": "100+ Toko", "description": "Memperluas jaringan ke lebih dari 100 toko mitra ritel di Taiwan utara." },
+      "2023": { "title": "300+ Toko", "description": "Mencapai 300+ toko mitra di seluruh Taiwan, menjadi distributor produk Indonesia terkemuka." },
+      "2024": { "title": "Lini Produk Diperluas", "description": "Memperkenalkan kategori produk baru termasuk minuman, camilan, dan kebutuhan rumah tangga." },
+      "2025": { "title": "1 Juta+ Pelanggan", "description": "Dengan bangga melayani lebih dari 1 juta pelanggan, bukti nyata dari kualitas dan kepercayaan komunitas kami." }
+    },
+    "partners": "Mitra Kami",
+    "backToHome": "Kembali ke Beranda"
   },
   "products": {
     "title": "Produk Kami",
     "subtitle": "Temukan beragam pilihan produk makanan Indonesia asli kami",
+    "label": "Koleksi Kami",
     "viewAll": "Lihat Semua Produk",
     "categories": "Kategori",
     "searchPlaceholder": "Cari produk...",
     "noProducts": "Produk tidak ditemukan",
+    "noProductsInCategory": "Produk tidak ditemukan dalam kategori ini.",
     "addToInquiry": "Tambah ke Daftar Permintaan",
-    "details": "Lihat Detail"
+    "details": "Lihat Detail",
+    "all": "Semua",
+    "productImage": "Gambar Produk",
+    "searchAllCategories": "Cari produk di semua kategori...",
+    "searchHint": "Ketik nama produk, deskripsi, atau kategori",
+    "results": "hasil",
+    "noProductsFound": "Produk tidak ditemukan",
+    "tryDifferentKeywords": "Coba kata kunci lain",
+    "tagline": "Cita Rasa Indonesia, di Taiwan.",
+    "backToHome": "Kembali ke Beranda",
+    "halal": "Bersertifikat Halal",
+    "select": "pilih"
+  },
+  "recipes": {
+    "title": "Resep",
+    "label": "Ide Lezat",
+    "subtitle": "Dapatkan inspirasi dengan resep lezat menggunakan produk Mahkota Taiwan.",
+    "viewAll": "Lihat Semua Resep",
+    "noRecipes": "Belum ada resep",
+    "recipe": "Resep",
+    "viewRecipe": "Lihat Resep",
+    "heading": "Resep Kami",
+    "headingSub": "Inspirasi memasak lezat dengan produk Mahkota Taiwan",
+    "fromOurKitchen": "Dari Dapur Kami",
+    "recipeInspirations": "Inspirasi Resep",
+    "discoverRecipes": "Temukan resep lezat yang dibuat dengan produk Mahkota Taiwan",
+    "backToHome": "Beranda"
+  },
+  "events": {
+    "title": "Acara",
+    "label": "Ada Apa",
+    "subtitle": "Tetap terupdate dengan acara, promosi, dan aktivitas komunitas terbaru kami.",
+    "viewAll": "Lihat Semua Acara",
+    "comingSoon": "Acara segera hadir!",
+    "stayTuned": "Tetap pantau untuk pembaruan menarik.",
+    "noEventsFound": "Acara tidak ditemukan",
+    "noEventsMessage": "Kunjungi kembali nanti untuk acara dan pertemuan komunitas mendatang.",
+    "readMore": "Baca Selengkapnya",
+    "backToHome": "Kembali ke Beranda",
+    "pageSubtitle": "Temukan acara, perayaan budaya, dan pertemuan komunitas terbaru kami.",
+    "sortBy": "Urutkan berdasarkan:",
+    "newest": "Terbaru",
+    "oldest": "Tertua",
+    "calendar": "Kalender",
+    "filtered": "Disaring:",
+    "upcomingEvents": "Acara Mendatang",
+    "upcomingEventsDesc": "Temukan acara komunitas, perayaan, dan pertemuan terbaru kami di seluruh Taiwan"
+  },
+  "lifestyle": {
+    "title": "Aktivitas",
+    "label": "Pameran",
+    "labelSuffix": "Gaya Hidup",
+    "subtitle": "Lihat bagaimana komunitas kami menikmati produk Mahkota Taiwan dalam kehidupan sehari-hari.",
+    "noActivities": "Aktivitas tidak ditemukan",
+    "noActivitiesMessage": "Kunjungi kembali nanti untuk aktivitas dan sorotan komunitas baru.",
+    "readMore": "Baca Selengkapnya",
+    "backToHome": "Kembali ke Beranda",
+    "sortBy": "Urutkan berdasarkan:",
+    "newest": "Terbaru",
+    "oldest": "Tertua",
+    "calendar": "Kalender",
+    "filtered": "Disaring:",
+    "communityActivities": "Aktivitas Komunitas",
+    "communityActivitiesDesc": "Lihat bagaimana komunitas kami menikmati produk Mahkota Taiwan dalam kehidupan sehari-hari",
+    "viewActivities": "Lihat Aktivitas"
+  },
+  "moments": {
+    "label": "Komunitas",
+    "title": "Momen Mahkota",
+    "subtitle": "Lihat bagaimana komunitas kami menikmati produk Mahkota Taiwan dalam kehidupan sehari-hari."
+  },
+  "discover": {
+    "label": "Jelajahi",
+    "title": "Eksplorasi Mahkota Taiwan",
+    "subtitle": "Tetap terhubung dengan acara dan aktivitas komunitas terbaru kami",
+    "viewEvents": "Lihat Acara",
+    "viewActivities": "Lihat Aktivitas"
+  },
+  "videoShowcase": {
+    "label": "Konten Visual",
+    "title": "Tonton Kisah Kami",
+    "subtitle": "Temukan Mahkota Taiwan melalui konten video kami di YouTube, Shorts, TikTok, dan Reels.",
+    "noVideos": "Belum ada video untuk kategori ini.",
+    "showing": "Menampilkan",
+    "video": "video",
+    "videos": "video",
+    "tiktokVideos": "Video TikTok"
+  },
+  "whereToBuy": {
+    "title": "Tempat Membeli",
+    "subtitle": "Temukan produk Mahkota Taiwan di mitra ritel terpercaya di seluruh Taiwan.",
+    "findUs": "Temukan Kami",
+    "viewAllLocations": "Lihat Semua Lokasi",
+    "tasteSoGood": "Rasanya sangat enak!",
+    "store": "Toko",
+    "allOverTaiwan": "di seluruh Taiwan",
+    "backToHome": "Kembali ke Beranda",
+    "partnerStores": "Toko Mitra",
+    "citiesCovered": "Kota yang Dilayani",
+    "islandCoverage": "Jangkauan Pulau",
+    "alwaysOnline": "Selalu Online",
+    "interactiveMap": "Peta Interaktif",
+    "findStoreNearYou": "Cari Toko Terdekat",
+    "mapDescription": "Klik pin mana pun untuk melihat detail toko, informasi kontak, dan arah",
+    "loadingMap": "Peta sedang dimuat...",
+    "loadingStores": "Toko sedang dimuat..."
   },
   "contact": {
     "title": "Mari Terhubung",
@@ -88,7 +218,29 @@
     "send": "Kirim Pesan",
     "namePlaceholder": "Masukkan nama lengkap",
     "emailPlaceholder": "Masukkan email",
-    "messagePlaceholder": "Tulis pesan Anda..."
+    "messagePlaceholder": "Tulis pesan Anda...",
+    "backToHome": "Kembali ke Beranda",
+    "businessHours": "Jam Kerja",
+    "mondayFriday": "Senin - Jumat",
+    "saturday": "Sabtu",
+    "sunday": "Minggu",
+    "closed": "Tutup",
+    "openInMaps": "Buka di Peta",
+    "callNow": "Hubungi sekarang",
+    "sendEmail": "Kirim email",
+    "faq": {
+      "title": "Pertanyaan yang Sering Diajukan",
+      "q1": "Bagaimana cara memesan produk Mahkota Taiwan?",
+      "a1": "Anda dapat memesan produk kami melalui salah satu dari 300+ toko mitra kami di seluruh Taiwan. Periksa pencari toko kami untuk menemukan lokasi terdekat, atau hubungi kami langsung untuk pesanan dalam jumlah besar.",
+      "q2": "Apakah Anda menawarkan layanan pengiriman?",
+      "a2": "Ya! Kami menawarkan layanan pengiriman untuk pesanan dalam jumlah besar dan grosir. Untuk pembelian individual, silakan kunjungi salah satu toko mitra kami. Hubungi tim kami untuk jadwal pengiriman dan jumlah pesanan minimum.",
+      "q3": "Bagaimana cara menjadi mitra ritel?",
+      "a3": "Kami selalu mencari mitra ritel baru! Silakan kirimkan email ke mahkotataiwan@gmail.com atau hubungi kami di +886-2-26099118 dengan detail toko Anda, dan tim kemitraan kami akan menghubungi Anda dalam 2 hari kerja.",
+      "q4": "Jenis produk apa yang Anda distribusikan?",
+      "a4": "Kami mendistribusikan berbagai produk Indonesia asli termasuk mie instan, bumbu, saus, minuman, camilan, bahan masak esensial, dan barang rumah tangga. Kami membawa 26+ lini produk yang dipilih dengan hati-hati.",
+      "q5": "Bisakah saya meminta produk Indonesia tertentu?",
+      "a5": "Tentu! Kami menyambut saran produk dari komunitas kami. Silakan hubungi kami melalui email atau saluran media sosial kami dengan detail produk, dan kami akan melakukan yang terbaik untuk mendapatkannya untuk Anda."
+    }
   },
   "footer": {
     "description": "Sumber terpercaya untuk produk makanan Indonesia asli di Taiwan. Menjembatani budaya melalui cita rasa Indonesia.",
@@ -156,12 +308,15 @@
     "previous": "Sebelumnya",
     "close": "Tutup",
     "readMore": "Baca Selengkapnya",
-    "showLess": "Tampilkan Lebih Sedikit"
-  },
-  "whereToBuy": {
-    "title": "Tempat Membeli",
-    "subtitle": "Temukan produk Mahkota Taiwan di mitra ritel terpercaya di seluruh Taiwan.",
-    "findUs": "Temukan Kami"
+    "showLess": "Tampilkan Lebih Sedikit",
+    "backToHome": "Kembali ke Beranda",
+    "filters": "Filter",
+    "clearAll": "Hapus semua",
+    "noPhotosFound": "Foto tidak ditemukan",
+    "noPhotosMessage": "Coba sesuaikan filter Anda untuk menemukan lebih banyak kenangan.",
+    "resetFilters": "Atur Ulang Filter",
+    "photos": "foto",
+    "allEvents": "Semua Acara"
   },
   "gallery": {
     "title": "Galeri",
@@ -170,6 +325,18 @@
     "allEvents": "Semua Acara",
     "filterByDate": "Filter berdasarkan Tanggal",
     "clearFilter": "Hapus Filter",
-    "photos": "foto"
+    "photos": "foto",
+    "backToHome": "Kembali ke Beranda",
+    "noPhotosFound": "Foto tidak ditemukan",
+    "noPhotosMessage": "Coba sesuaikan filter Anda untuk menemukan lebih banyak kenangan.",
+    "resetFilters": "Atur Ulang Filter"
+  },
+  "marquee": {
+    "mahkotaTaiwan": "Mahkota Taiwan",
+    "rasaIndonesia": "Cita Rasa Indonesia",
+    "hadirDiTaiwan": "Hadir di Taiwan",
+    "halalCertified": "Bersertifikat Halal",
+    "premiumQuality": "Kualitas Premium",
+    "stores": "300+ Toko"
   }
 }
