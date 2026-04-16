@@ -274,7 +274,17 @@
     "getDirections": "Dapatkan Petunjuk Arah",
     "businessHours": "Jam Bisnis",
     "availability": "Ketersediaan",
-    "backToHome": "Kembali ke Beranda"
+    "backToHome": "Kembali ke Beranda",
+    "faq1Question": "Bagaimana cara memesan produk Mahkota Taiwan?",
+    "faq1Answer": "Anda dapat memesan produk kami melalui 300+ toko mitra kami di seluruh Taiwan. Cek pencari toko kami untuk menemukan lokasi terdekat, atau hubungi kami langsung untuk pesanan dalam jumlah besar.",
+    "faq2Question": "Apakah Anda menyediakan layanan pengiriman?",
+    "faq2Answer": "Ya! Kami menyediakan layanan pengiriman untuk pesanan grosir dan dalam jumlah besar. Untuk pembelian satuan, silakan kunjungi salah satu toko mitra kami. Hubungi tim kami untuk jadwal pengiriman dan jumlah pesanan minimum.",
+    "faq3Question": "Bagaimana cara menjadi mitra ritel?",
+    "faq3Answer": "Kami selalu mencari mitra ritel baru! Silakan kirim email ke mahkotataiwan@gmail.com atau hubungi kami di +886-2-26099118 dengan detail toko Anda, dan tim kemitraan kami akan menghubungi Anda dalam 2 hari kerja.",
+    "faq4Question": "Jenis produk apa saja yang Anda distribusikan?",
+    "faq4Answer": "Kami mendistribusikan berbagai macam produk asli Indonesia termasuk mie instan, bumbu masak, saus, minuman, camilan, kebutuhan memasak, dan barang rumah tangga. Kami memiliki 26+ lini produk yang dipilih dengan cermat.",
+    "faq5Question": "Bisakah saya meminta produk Indonesia tertentu?",
+    "faq5Answer": "Tentu saja! Kami menerima saran produk dari komunitas kami. Silakan hubungi kami melalui email atau media sosial kami dengan detail produk, dan kami akan berusaha sebaik mungkin untuk menyediakannya untuk Anda."
   },
   "footer": {
     "description": "Sumber terpercaya untuk produk makanan Indonesia asli di Taiwan. Menjembatani budaya melalui cita rasa Indonesia.",

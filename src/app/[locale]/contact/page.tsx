@@ -187,35 +187,17 @@ const greenMid = pol(hToA(3.5), GREEN_ARC_R);
 const yellowMid = pol(hToA(11), YELLOW_ARC_R);
 
 
-const faqs = [
-  {
-    icon: ShoppingBag,
-    question: 'How can I order Mahkota Taiwan products?',
-    answer: 'You can order our products through any of our 300+ partner stores across Taiwan. Check our store locator to find the nearest location, or contact us directly for bulk orders.',
-  },
-  {
-    icon: Truck,
-    question: 'Do you offer delivery services?',
-    answer: 'Yes! We offer delivery services for bulk and wholesale orders. For individual purchases, please visit any of our partner stores. Contact our team for delivery schedules and minimum order quantities.',
-  },
-  {
-    icon: Handshake,
-    question: 'How can I become a retail partner?',
-    answer: 'We\'re always looking for new retail partners! Please send us an email at mahkotataiwan@gmail.com or call us at +886-2-26099118 with your store details, and our partnership team will get back to you within 2 business days.',
-  },
-  {
-    icon: Package,
-    question: 'What types of products do you distribute?',
-    answer: 'We distribute a wide range of authentic Indonesian products including instant noodles, seasonings, sauces, beverages, snacks, cooking essentials, and household items. We carry 26+ carefully selected product lines.',
-  },
-  {
-    icon: Users,
-    question: 'Can I request a specific Indonesian product?',
-    answer: 'Absolutely! We welcome product suggestions from our community. Please reach out via email or our social media channels with the product details, and we\'ll do our best to source it for you.',
-  },
-];
+const faqIcons = [ShoppingBag, Truck, Handshake, Package, Users];
 
-function FAQItem({ faq, index }: { faq: typeof faqs[0]; index: number }) {
+function useFaqs(t: (key: string) => string) {
+  return faqIcons.map((icon, i) => ({
+    icon,
+    question: t(\`faq\${i + 1}Question\`),
+    answer: t(\`faq\${i + 1}Answer\`),
+  }));
+}
+
+function FAQItem({ faq, index }: { faq: { icon: any; question: string; answer: string }; index: number }) {
   const [isOpen, setIsOpen] = useState(false);
   const Icon = faq.icon;
 
@@ -297,6 +279,7 @@ const contactCards = [
 
 export default function ContactPage() {
   const t = useTranslations('contact');
+  const faqs = useFaqs(t);
   const locale = useLocale();
 
   /* ─── Refs ─── */
