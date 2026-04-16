@@ -965,8 +965,8 @@ function ProductsContent() {
     setHighlightedProductId(product.id);
   }, []);
 
-  const tapLabel = locale === 'id' ? 'Ketuk produk untuk detail' : locale === 'zh-TW' ? '點擊產品查看詳情' : 'Tap any product for details';
-  const productLabel = locale === 'id' ? 'produk' : locale === 'zh-TW' ? '產品' : 'products';
+  const tapLabel = t('searchHint');
+  const productLabel = t('label');
 
   return (
     <div className="min-h-screen bg-cream">
@@ -980,7 +980,7 @@ function ProductsContent() {
             className="hero-reveal inline-flex items-center gap-2 text-cream/40 hover:text-cream text-sm mb-10 transition-colors duration-300 group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            {locale === 'id' ? 'Kembali ke Beranda' : locale === 'zh-TW' ? '返回首頁' : 'Back to Home'}
+            {t('backToHome')}
           </Link>
 
           <div ref={headerRef} className="max-w-3xl">
@@ -992,9 +992,9 @@ function ProductsContent() {
             </div>
 
             <h1 className="hero-reveal font-heading text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-[0.95]">
-              {locale === 'id' ? 'Jelajahi' : locale === 'zh-TW' ? '探索我們的' : 'Explore Our'}<br />
+              {t('title')}<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cream via-white to-cream/70">
-                {locale === 'id' ? 'Koleksi Kami' : locale === 'zh-TW' ? '產品系列' : 'Collections'}
+                {t('label')}
               </span>
             </h1>
 

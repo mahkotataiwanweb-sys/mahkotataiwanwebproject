@@ -764,14 +764,14 @@ export default function ContactPage() {
             {/* Left — Heading + Socials */}
             <div ref={contactLeftRef} className="lg:sticky lg:top-32">
               <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
-                Reach Out
+                {t('label')}
               </p>
               <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3 leading-tight">
-                Get in Touch
+                {t('title')}
               </h2>
               <div className="w-16 h-[2px] bg-red mb-4" />
               <LineReveal
-                text="Whether you have questions about our products, partnerships, or services — we'd love to hear from you. Reach out through any of these channels."
+                text={t('subtitle')}
                 className="text-navy/60 text-base sm:text-lg tracking-wide leading-relaxed max-w-md mb-10"
               />
 
@@ -837,9 +837,9 @@ export default function ContactPage() {
         <div className="max-w-4xl mx-auto px-6">
           {/* Section Header — Premium Scroll-Triggered Text Reveal */}
           <div ref={hoursHeaderRef} className="text-center mb-14">
-            <p className="bh-reveal-item text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3" style={{ opacity: 0 }}>Availability</p>
+            <p className="bh-reveal-item text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3" style={{ opacity: 0 }}>{t('businessHours')}</p>
             <h2 className="bh-reveal-title font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3 overflow-hidden">
-              {"Business Hours".split("").map((ch, i) => (
+              {t('businessHours').split("").map((ch, i) => (
                 <span key={i} className="bh-char" style={{ display: 'inline-block', opacity: 0, whiteSpace: ch === ' ' ? 'pre' : undefined }}>{ch}</span>
               ))}
             </h2>
@@ -1020,13 +1020,13 @@ export default function ContactPage() {
 <div className="max-w-3xl mx-auto px-6">
           {/* Section Header */}
           <div ref={faqHeaderRef} className="text-center mb-14">
-            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Got Questions?</p>
+            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">{t('faq.title')}</p>
             <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">
-              Frequently Asked Questions
+              {t('faq.title')}
             </h2>
             <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
             <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">
-              Find quick answers to common questions about our products and services
+              {t('subtitle')}
             </p>
           </div>
 
@@ -1052,11 +1052,11 @@ export default function ContactPage() {
             viewport={{ once: true }}
             transition={{ duration: 1.6, ease: [0.22, 0.68, 0, 1] }}
           >
-            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Find Us</p>
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">Our Location</h2>
+            <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">{t('label')}</p>
+            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">{t('title')}</h2>
             <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
             <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">
-              Visit our office in Linkou, New Taipei City
+              {t('subtitle')}
             </p>
           </motion.div>
 

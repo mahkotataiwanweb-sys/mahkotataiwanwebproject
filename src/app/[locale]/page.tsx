@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState, useCallback, useImperativeHandle } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import Image from 'next/image';
 import gsap from 'gsap';
@@ -219,6 +219,7 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
 
 export default function HomePage() {
   const locale = useLocale();
+  const t = useTranslations('discover');
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const topCardRef = useRef<AutoFlipCardHandle>(null);
@@ -395,7 +396,7 @@ export default function HomePage() {
                 fallbackTitle="Upcoming Events"
                 fallbackExcerpt="Discover our latest community events, celebrations, and gatherings across Taiwan"
                 fallbackHref={`/${locale}/events`}
-                btnLabel={locale === 'id' ? 'Lihat Acara' : '查看活動'}
+                btnLabel={t('viewEvents')}
                 locale={locale}
               />
             </div>
@@ -406,7 +407,7 @@ export default function HomePage() {
                 fallbackTitle="Community Activities"
                 fallbackExcerpt="See how our community enjoys Mahkota Taiwan products in their daily life"
                 fallbackHref={`/${locale}/lifestyle`}
-                btnLabel={locale === 'id' ? 'Lihat Aktivitas' : '查看活動'}
+                btnLabel={t('viewActivities')}
                 locale={locale}
               />
             </div>
