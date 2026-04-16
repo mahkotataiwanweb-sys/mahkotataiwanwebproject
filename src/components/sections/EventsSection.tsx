@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
@@ -15,6 +15,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function EventsSection() {
   const locale = useLocale();
+  const t = useTranslations('events');
   const [events, setEvents] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
@@ -132,21 +133,21 @@ export default function EventsSection() {
         <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-14">
           <div>
             <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
-              What&apos;s Happening
+              {t('label')}
             </p>
             <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">
-              Events
+              {t('title')}
             </h2>
             <div className="w-16 h-[2px] bg-red mb-4" />
             <p className="text-cream/50 max-w-lg">
-              Stay updated with our latest events, promotions, and community activities.
+              {t('subtitle')}
             </p>
           </div>
           <Link
             href={`/${locale}/events`}
             className="mt-6 sm:mt-0 inline-flex items-center gap-2 text-sm font-semibold text-red hover:text-red-light tracking-wide uppercase transition-colors group"
           >
-            View All Events
+            {t('viewAll')}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
@@ -167,8 +168,8 @@ export default function EventsSection() {
         ) : events.length === 0 ? (
           <div className="text-center py-20">
             <Calendar className="w-16 h-16 text-cream/15 mx-auto mb-4" />
-            <p className="text-cream/40 text-lg">Events coming soon!</p>
-            <p className="text-cream/25 text-sm mt-1">Stay tuned for exciting updates.</p>
+            <p className="text-cream/40 text-lg">{t('comingSoon')}</p>
+            <p className="text-cream/25 text-sm mt-1">{t('stayTuned')}</p>
           </div>
         ) : (
           <div className="relative group/carousel">
