@@ -94,7 +94,9 @@
     "calendar": "Calendar",
     "filtered": "Filtered:",
     "upcomingEvents": "Upcoming Events",
-    "upcomingEventsDesc": "Discover our latest community events, celebrations, and gatherings across Taiwan"
+    "upcomingEventsDesc": "Discover our latest community events, celebrations, and gatherings across Taiwan",
+    "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "dayAbbreviations": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
   },
   "lifestyle": {
     "title": "Activity",
@@ -277,6 +279,24 @@
     "allEvents": "All Events",
     "filterByDate": "Filter by Date",
     "clearFilter": "Clear Filter",
-    "photos": "photos"
+    "photos": "photos",
+    "calendar": "Calendar",
+    "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "dayAbbreviations": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+    "backToHome": "Back to Home"
+  },
+  "articles": {
+    "title": "Articles",
+    "loading": "Loading article…",
+    "notFound": "Article Not Found",
+    "notFoundMessage": "The article you're looking for doesn't exist or has been removed.",
+    "backToHome": "Back to Home"
+  },
+  "store": {
+    "allCities": "All Cities",
+    "all": "All",
+    "cities": ["Taipei", "New Taipei", "Taoyuan", "Keelung", "Hsinchu", "Hsinchu County", "Miaoli", "Taichung", "Changhua", "Nantou", "Yunlin", "Chiayi", "Chiayi County", "Tainan", "Kaohsiung", "Pingtung", "Liuqiu", "Orchid Island", "Green Island", "Penghu", "Kinmen", "Matsu"],
+    "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "dayAbbreviations": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
   }
 }
