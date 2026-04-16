@@ -377,13 +377,13 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto px-6 sm:px-10 relative z-10">
           {/* ── Header ── */}
           <div ref={headerRef} className="text-center mb-16">
-            <p className="text-[#C12126] text-sm sm:text-base tracking-[0.35em] uppercase font-bold mb-3">Discover</p>
+            <p className="text-[#C12126] text-sm sm:text-base tracking-[0.35em] uppercase font-bold mb-3">{t('label')}</p>
             <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">
-              Explore Mahkota Taiwan
+              {t('title')}
             </h2>
             <div className="w-16 h-[2px] bg-[#C12126] mx-auto mb-4 rounded-full" />
             <p className="text-navy/40 max-w-lg mx-auto text-base sm:text-lg tracking-wide">
-              Stay connected with our latest events and community activities
+              {t('subtitle')}
             </p>
           </div>
 
@@ -393,8 +393,8 @@ export default function HomePage() {
               <AutoFlipCard
                 ref={topCardRef}
                 articles={events}
-                fallbackTitle="Upcoming Events"
-                fallbackExcerpt="Discover our latest community events, celebrations, and gatherings across Taiwan"
+                fallbackTitle={t('fallbackTitle1')}
+                fallbackExcerpt={t('fallbackExcerpt1')}
                 fallbackHref={`/${locale}/events`}
                 btnLabel={t('viewEvents')}
                 locale={locale}
@@ -404,8 +404,8 @@ export default function HomePage() {
               <AutoFlipCard
                 ref={bottomCardRef}
                 articles={activities}
-                fallbackTitle="Community Activities"
-                fallbackExcerpt="See how our community enjoys Mahkota Taiwan products in their daily life"
+                fallbackTitle={t('fallbackTitle2')}
+                fallbackExcerpt={t('fallbackExcerpt2')}
                 fallbackHref={`/${locale}/lifestyle`}
                 btnLabel={t('viewActivities')}
                 locale={locale}
