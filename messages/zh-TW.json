@@ -39,8 +39,10 @@
     "highlight3": "正宗印尼風味，精心選材"
   },
   "products": {
+    "label": "我們的收藏",
     "title": "我們的產品",
     "subtitle": "探索我們豐富的正宗印尼食品選擇",
+    "showcaseSubtitle": "發現正宗的印尼風味，使用高級食材製作並通過清真認證。",
     "viewAll": "查看全部產品",
     "categories": "分類",
     "searchPlaceholder": "搜尋產品...",
@@ -58,6 +60,8 @@
     "backToHome": "回到首頁",
     "halal": "清真認證",
     "select": "選擇",
+    "navigate": "導航",
+    "defaultProductDescription": "優質印尼產品，採用正宗食譜和最高級的食材精心製作。",
     "noProductsInCategory": "找不到此分類的產品。"
   },
   "recipes": {

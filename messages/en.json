@@ -39,8 +39,10 @@
     "highlight3": "Authentic Indonesian flavors, carefully sourced"
   },
   "products": {
+    "label": "Our Collection",
     "title": "Our Products",
     "subtitle": "Discover our wide selection of authentic Indonesian food products",
+    "showcaseSubtitle": "Discover authentic Indonesian flavors, crafted with premium ingredients and halal certified.",
     "viewAll": "View All Products",
     "categories": "Categories",
     "searchPlaceholder": "Search products...",
@@ -58,6 +60,8 @@
     "backToHome": "Back to Home",
     "halal": "Halal Certified",
     "select": "select",
+    "navigate": "navigate",
+    "defaultProductDescription": "Premium quality Indonesian product, crafted with authentic recipes and the finest ingredients.",
     "noProductsInCategory": "No products found in this category."
   },
   "recipes": {

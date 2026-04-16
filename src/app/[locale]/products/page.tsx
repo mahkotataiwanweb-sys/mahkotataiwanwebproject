@@ -289,7 +289,7 @@ function SmartSearch({
               </span>
               <div className="hidden sm:flex items-center gap-1">
                 <kbd className="text-[9px] text-navy/25 bg-navy/5 px-1 py-0.5 rounded font-mono">↵</kbd>
-                <span className="text-[9px] text-navy/20">select</span>
+                <span className="text-[9px] text-navy/20">{t('select')}</span>
               </div>
             </div>
 
@@ -421,7 +421,7 @@ function SmartSearch({
           {focused && !query && (
             <div className="hidden sm:flex items-center mr-4 gap-1">
               <kbd className="text-[10px] text-navy/25 bg-navy/5 px-1.5 py-0.5 rounded font-mono">↑↓</kbd>
-              <span className="text-[10px] text-navy/20">navigate</span>
+              <span className="text-[10px] text-navy/20">{t('navigate')}</span>
             </div>
           )}
         </div>
@@ -447,6 +447,7 @@ function ProductModal({
   categoryName: string;
   onClose: () => void;
 }) {
+  const t = useTranslations('products');
   const name = getLocalizedField(product, 'name', locale);
   const description = getLocalizedField(product, 'description', locale);
   const imageUrl = product.detail_image_url || product.image_url;
@@ -569,7 +570,7 @@ function ProductModal({
             transition={{ delay: 0.5, duration: 0.7, ease: [0.22, 0.68, 0, 1] }}
             className="text-navy/55 text-sm sm:text-base leading-[1.85] whitespace-pre-line"
           >
-            {description || 'Premium quality Indonesian product, crafted with authentic recipes and the finest ingredients.'}
+            {description || t('defaultProductDescription')}
           </motion.p>
         </div>
       </motion.div>

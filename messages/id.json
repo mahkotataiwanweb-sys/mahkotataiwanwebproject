@@ -39,8 +39,10 @@
     "highlight3": "Cita rasa Indonesia otentik, dipilih dengan cermat"
   },
   "products": {
+    "label": "Koleksi Kami",
     "title": "Produk Kami",
     "subtitle": "Temukan beragam pilihan produk makanan Indonesia asli kami",
+    "showcaseSubtitle": "Temukan cita rasa Indonesia yang autentik, dibuat dengan bahan-bahan premium dan bersertifikat halal.",
     "viewAll": "Lihat Semua Produk",
     "categories": "Kategori",
     "searchPlaceholder": "Cari produk...",
@@ -58,7 +60,9 @@
     "tagline": "Cita Rasa Indonesia, di Taiwan.",
     "backToHome": "Kembali ke Beranda",
     "halal": "Bersertifikat Halal",
-    "select": "pilih"
+    "select": "pilih",
+    "navigate": "navigasi",
+    "defaultProductDescription": "Produk Indonesia berkualitas premium, dibuat dengan resep autentik dan bahan-bahan terbaik."
   },
   "recipes": {
     "title": "Resep",
