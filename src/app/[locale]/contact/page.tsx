@@ -837,9 +837,9 @@ export default function ContactPage() {
         <div className="max-w-4xl mx-auto px-6">
           {/* Section Header — Premium Scroll-Triggered Text Reveal */}
           <div ref={hoursHeaderRef} className="text-center mb-14">
-            <p className="bh-reveal-item text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3" style={{ opacity: 0 }}>Availability</p>
+            <p className="bh-reveal-item text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3" style={{ opacity: 0 }}>{t('availability')}</p>
             <h2 className="bh-reveal-title font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3 overflow-hidden">
-              {"Business Hours".split("").map((ch, i) => (
+              {t('businessHours').split("").map((ch, i) => (
                 <span key={i} className="bh-char" style={{ display: 'inline-block', opacity: 0, whiteSpace: ch === ' ' ? 'pre' : undefined }}>{ch}</span>
               ))}
             </h2>

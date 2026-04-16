@@ -88,7 +88,10 @@
     "send": "發送訊息",
     "namePlaceholder": "請輸入姓名",
     "emailPlaceholder": "請輸入電子郵件",
-    "messagePlaceholder": "在此撰寫訊息..."
+    "messagePlaceholder": "在此撰寫訊息...",
+    "businessHours": "營業時間",
+    "availability": "營業狀態",
+    "backToHome": "返回首頁"
   },
   "footer": {
     "description": "您在台灣值得信賴的正宗印尼食品來源。透過印尼風味連結文化。",
@@ -161,7 +164,16 @@
   "whereToBuy": {
     "title": "哪裡買",
     "subtitle": "在台灣各地值得信賴的零售合作夥伴找到皇冠台灣產品。",
-    "findUs": "找到我們"
+    "findUs": "找到我們",
+    "description": "在台灣 {cityCount} 個城市的 {storeCount} 家零售地點發現 Mahkota Taiwan 產品",
+    "partnerStores": "合作店家",
+    "citiesCovered": "涵蓋城市",
+    "islandCoverage": "島嶼覆蓋",
+    "alwaysOnline": "全天在線",
+    "label": "找到我們",
+    "mapLabel": "互動地圖",
+    "mapTitle": "找到離您最近的門市",
+    "mapDescription": "點擊任何圖標查看店鋪詳情、聯絡信息和方向"
   },
   "gallery": {
     "title": "相簿",

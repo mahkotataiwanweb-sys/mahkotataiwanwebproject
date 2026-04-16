@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { ArrowLeft, MapPin, Store, Globe, Sparkles, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
@@ -140,6 +140,7 @@ function ShimmerLines() {
 export default function WhereToBuyPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const locale = useLocale();
+  const t = useTranslations('whereToBuy');
   const [stores, setStores] = useState<StoreLocation[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -299,7 +300,7 @@ export default function WhereToBuyPage() {
   const cityCount = new Set(stores.map((s) => s.city)).size;
   const stats = [
     {
-      number: String(storeCount), label: 'Partner Stores', icon: Store,
+      number: String(storeCount), label: t('partnerStores'), icon: Store,
       gradient: '#C12126, transparent 40%, #FAEDD3, transparent 60%, #C12126',
       iconBg: 'bg-gradient-to-br from-red/10 to-red/[0.03]',
       iconColor: 'text-red',
@@ -308,7 +309,7 @@ export default function WhereToBuyPage() {
       accentColor: '#C12126',
     },
     {
-      number: String(cityCount), label: 'Cities Covered', icon: MapPin,
+      number: String(cityCount), label: t('citiesCovered'), icon: MapPin,
       gradient: '#003048, transparent 40%, #A8D8EA, transparent 60%, #003048',
       iconBg: 'bg-gradient-to-br from-navy/10 to-navy/[0.03]',
       iconColor: 'text-navy',
@@ -317,7 +318,7 @@ export default function WhereToBuyPage() {
       accentColor: '#003048',
     },
     {
-      number: '100%', label: 'Island Coverage', icon: Shield,
+      number: '100%', label: t('islandCoverage'), icon: Shield,
       gradient: '#C12126, transparent 40%, #003048, transparent 60%, #C12126',
       iconBg: 'bg-gradient-to-br from-red/8 to-navy/[0.03]',
       iconColor: 'text-red',
@@ -326,7 +327,7 @@ export default function WhereToBuyPage() {
       accentColor: '#C12126',
     },
     {
-      number: '24/7', label: 'Always Online', icon: Globe,
+      number: '24/7', label: t('alwaysOnline'), icon: Globe,
       gradient: '#003048, transparent 40%, #C12126, transparent 60%, #003048',
       iconBg: 'bg-gradient-to-br from-navy/10 to-red/[0.03]',
       iconColor: 'text-navy',
@@ -389,10 +390,12 @@ export default function WhereToBuyPage() {
             ✦ Find Us ✦
           </motion.span>
           <h1 className="hero-text text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-5">
-            Where to Buy
+            {t('title')}
           </h1>
           <p className="hero-text text-cream/60 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Discover Mahkota Taiwan products at <span className="text-cream/90 font-semibold">{storeCount || '...'}</span> retail locations across <span className="text-cream/90 font-semibold">{cityCount || '...'} cities</span> in Taiwan
+            {t('description')
+              .replace('{storeCount}', String(storeCount || '...'))
+              .replace('{cityCount}', String(cityCount || '...'))}
           </p>
 
           {/* Animated separator */}

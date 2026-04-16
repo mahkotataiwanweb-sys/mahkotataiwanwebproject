@@ -88,7 +88,10 @@
     "send": "Kirim Pesan",
     "namePlaceholder": "Masukkan nama lengkap",
     "emailPlaceholder": "Masukkan email",
-    "messagePlaceholder": "Tulis pesan Anda..."
+    "messagePlaceholder": "Tulis pesan Anda...",
+    "businessHours": "Jam Bisnis",
+    "availability": "Ketersediaan",
+    "backToHome": "Kembali ke Beranda"
   },
   "footer": {
     "description": "Sumber terpercaya untuk produk makanan Indonesia asli di Taiwan. Menjembatani budaya melalui cita rasa Indonesia.",
@@ -161,7 +164,16 @@
   "whereToBuy": {
     "title": "Tempat Membeli",
     "subtitle": "Temukan produk Mahkota Taiwan di mitra ritel terpercaya di seluruh Taiwan.",
-    "findUs": "Temukan Kami"
+    "findUs": "Temukan Kami",
+    "description": "Temukan produk Mahkota Taiwan di {storeCount} lokasi ritel di {cityCount} kota di Taiwan",
+    "partnerStores": "Toko Mitra",
+    "citiesCovered": "Kota Terjangkau",
+    "islandCoverage": "Jangkauan Pulau",
+    "alwaysOnline": "Selalu Online",
+    "label": "Temukan Kami",
+    "mapLabel": "Peta Interaktif",
+    "mapTitle": "Temukan Toko Terdekat",
+    "mapDescription": "Klik pin mana saja untuk melihat detail toko, informasi kontak, dan arah"
   },
   "gallery": {
     "title": "Galeri",

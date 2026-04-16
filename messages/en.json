@@ -88,7 +88,10 @@
     "send": "Send Message",
     "namePlaceholder": "Enter your full name",
     "emailPlaceholder": "Enter your email address",
-    "messagePlaceholder": "Write your message here..."
+    "messagePlaceholder": "Write your message here...",
+    "businessHours": "Business Hours",
+    "availability": "Availability",
+    "backToHome": "Back to Home"
   },
   "footer": {
     "description": "Your trusted source for authentic Indonesian food products in Taiwan. Bridging cultures through the flavors of Indonesia.",
@@ -161,7 +164,16 @@
   "whereToBuy": {
     "title": "Where to Buy",
     "subtitle": "Find Mahkota Taiwan products at these trusted retail partners across Taiwan.",
-    "findUs": "Find Us"
+    "findUs": "Find Us",
+    "description": "Discover Mahkota Taiwan products at {storeCount} retail locations across {cityCount} cities in Taiwan",
+    "partnerStores": "Partner Stores",
+    "citiesCovered": "Cities Covered",
+    "islandCoverage": "Island Coverage",
+    "alwaysOnline": "Always Online",
+    "label": "Find Us",
+    "mapLabel": "Interactive Map",
+    "mapTitle": "Find a Store Near You",
+    "mapDescription": "Click on any pin to see store details, contact information, and get directions"
   },
   "gallery": {
     "title": "Gallery",
