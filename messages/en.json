@@ -4,7 +4,7 @@
     "about": "About",
     "products": "Products",
     "recipes": "Recipes",
-    "events": "Events",
+    "events": "Event",
     "lifestyle": "Activity",
     "contact": "Contact",
     "language": "Language",
@@ -17,9 +17,7 @@
   "hero": {
     "tagline": "Indonesian Flavors, Now in Taiwan",
     "subtitle": "Your trusted source for authentic Indonesian food products in Taiwan. From beloved snacks to essential cooking ingredients, we bring the taste of home to you.",
-    "cta": "Explore Products",
-    "scroll": "Scroll",
-    "learnMore": "Learn More"
+    "cta": "Explore Products"
   },
   "about": {
     "title": "Mahkota Taiwan",
@@ -27,49 +25,26 @@
     "mission": "Our mission is to bridge cultures through food, providing high-quality Indonesian products with reliable distribution across Taiwan.",
     "stats": {
       "since": "Established",
-      "sinceValue": "2021",
+      "sinceValue": "2019",
       "stores": "Partner Stores",
-      "storesValue": "300+",
-      "products": "Product Lines",
-      "productsValue": "26+",
+      "storesValue": "500+",
+      "products": "Products",
+      "productsValue": "1000+",
       "customers": "Happy Customers",
-      "customersValue": "1,000,000+"
+      "customersValue": "50,000+"
     },
     "label": "Who We Are",
     "highlight1": "Halal certified products ensuring quality and trust",
     "highlight2": "Direct distribution network across Taiwan",
-    "highlight3": "Authentic Indonesian flavors, carefully sourced",
-    "values": {
-      "title": "Our Values",
-      "qualityFirst": "Quality First",
-      "qualityFirstDesc": "Every product is carefully selected and tested to meet the highest standards of quality before reaching our shelves.",
-      "culturalBridge": "Cultural Bridge",
-      "culturalBridgeDesc": "We bridge the gap between Indonesian heritage and Taiwanese daily life, bringing authentic flavors to every home.",
-      "community": "Community",
-      "communityDesc": "Building a strong community of over 1 million customers who trust us to deliver the tastes of home.",
-      "integrity": "Integrity",
-      "integrityDesc": "Operating with transparency and trust in every partnership and transaction, ensuring lasting relationships built on mutual respect."
-    },
-    "milestones": {
-      "title": "Our Journey",
-      "2021": { "title": "Founded", "description": "Mahkota Taiwan was established with a vision to bring authentic Indonesian products to Taiwan." },
-      "2022": { "title": "100+ Stores", "description": "Expanded our network to over 100 retail partner stores across northern Taiwan." },
-      "2023": { "title": "300+ Stores", "description": "Reached 300+ partner stores island-wide, becoming the leading Indonesian product distributor." },
-      "2024": { "title": "Expanded Product Lines", "description": "Introduced new product categories including beverages, snacks, and household essentials." },
-      "2025": { "title": "1 Million+ Customers", "description": "Proudly serving over 1 million customers, a testament to our quality and community trust." }
-    },
-    "partners": "Our Partners",
-    "backToHome": "Back to Home"
+    "highlight3": "Authentic Indonesian flavors, carefully sourced"
   },
   "products": {
     "title": "Our Products",
     "subtitle": "Discover our wide selection of authentic Indonesian food products",
-    "label": "Our Collection",
     "viewAll": "View All Products",
     "categories": "Categories",
     "searchPlaceholder": "Search products...",
     "noProducts": "No products found",
-    "noProductsInCategory": "No products found in this category.",
     "addToInquiry": "Add to Inquiry",
     "details": "View Details",
     "all": "All",
@@ -82,7 +57,8 @@
     "tagline": "Indonesian Taste, in Taiwan.",
     "backToHome": "Back to Home",
     "halal": "Halal Certified",
-    "select": "select"
+    "select": "select",
+    "noProductsInCategory": "No products found in this category."
   },
   "recipes": {
     "title": "Recipes",
@@ -97,7 +73,8 @@
     "fromOurKitchen": "From Our Kitchen",
     "recipeInspirations": "Recipe Inspirations",
     "discoverRecipes": "Discover delicious recipes crafted with Mahkota Taiwan products",
-    "backToHome": "Home"
+    "backToHome": "Home",
+    "backToRecipes": "Back to All Recipes"
   },
   "events": {
     "title": "Events",
@@ -218,35 +195,13 @@
     "send": "Send Message",
     "namePlaceholder": "Enter your full name",
     "emailPlaceholder": "Enter your email address",
-    "messagePlaceholder": "Write your message here...",
-    "backToHome": "Back to Home",
-    "businessHours": "Business Hours",
-    "mondayFriday": "Monday - Friday",
-    "saturday": "Saturday",
-    "sunday": "Sunday",
-    "closed": "Closed",
-    "openInMaps": "Open in Maps",
-    "callNow": "Call now",
-    "sendEmail": "Send email",
-    "faq": {
-      "title": "Frequently Asked Questions",
-      "q1": "How can I order Mahkota Taiwan products?",
-      "a1": "You can order our products through any of our 300+ partner stores across Taiwan. Check our store locator to find the nearest location, or contact us directly for bulk orders.",
-      "q2": "Do you offer delivery services?",
-      "a2": "Yes! We offer delivery services for bulk and wholesale orders. For individual purchases, please visit any of our partner stores. Contact our team for delivery schedules and minimum order quantities.",
-      "q3": "How can I become a retail partner?",
-      "a3": "We're always looking for new retail partners! Please send us an email at mahkotataiwan@gmail.com or call us at +886-2-26099118 with your store details, and our partnership team will get back to you within 2 business days.",
-      "q4": "What types of products do you distribute?",
-      "a4": "We distribute a wide range of authentic Indonesian products including instant noodles, seasonings, sauces, beverages, snacks, cooking essentials, and household items. We carry 26+ carefully selected product lines.",
-      "q5": "Can I request a specific Indonesian product?",
-      "a5": "Absolutely! We welcome product suggestions from our community. Please reach out via email or our social media channels with the product details, and we'll do our best to source it for you."
-    }
+    "messagePlaceholder": "Write your message here..."
   },
   "footer": {
     "description": "Your trusted source for authentic Indonesian food products in Taiwan. Bridging cultures through the flavors of Indonesia.",
     "quickLinks": "Quick Links",
     "followUs": "Follow Us",
-    "copyright": "\u00a9 {year} Mahkota Taiwan. All rights reserved.",
+    "copyright": "© {year} Mahkota Taiwan. All rights reserved.",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "links": {
@@ -255,7 +210,7 @@
       "products": "Products",
       "allProducts": "All Products",
       "recipes": "Recipes",
-      "events": "Events",
+      "events": "Event",
       "lifestyle": "Activity",
       "contact": "Contact",
       "whereToBuy": "Where to Buy",
@@ -270,7 +225,7 @@
     },
     "office": "Office",
     "warehouse": "Warehouse",
-    "tagline": "Crafted with \u2764\ufe0f for Indonesian community in Taiwan",
+    "tagline": "Crafted with ❤️ for Indonesian community in Taiwan",
     "allRightsReserved": "All rights reserved."
   },
   "admin": {
@@ -308,15 +263,12 @@
     "previous": "Previous",
     "close": "Close",
     "readMore": "Read More",
-    "showLess": "Show Less",
-    "backToHome": "Back to Home",
-    "filters": "Filters",
-    "clearAll": "Clear all",
-    "noPhotosFound": "No photos found",
-    "noPhotosMessage": "Try adjusting your filters to discover more memories.",
-    "resetFilters": "Reset Filters",
-    "photos": "Photos",
-    "allEvents": "All Events"
+    "showLess": "Show Less"
+  },
+  "whereToBuy": {
+    "title": "Where to Buy",
+    "subtitle": "Find Mahkota Taiwan products at these trusted retail partners across Taiwan.",
+    "findUs": "Find Us"
   },
   "gallery": {
     "title": "Gallery",
@@ -325,18 +277,6 @@
     "allEvents": "All Events",
     "filterByDate": "Filter by Date",
     "clearFilter": "Clear Filter",
-    "photos": "photos",
-    "backToHome": "Back to Home",
-    "noPhotosFound": "No photos found",
-    "noPhotosMessage": "Try adjusting your filters to discover more memories.",
-    "resetFilters": "Reset Filters"
-  },
-  "marquee": {
-    "mahkotaTaiwan": "Mahkota Taiwan",
-    "rasaIndonesia": "Indonesian Flavors",
-    "hadirDiTaiwan": "Available in Taiwan",
-    "halalCertified": "Halal Certified",
-    "premiumQuality": "Premium Quality",
-    "stores": "300+ Stores"
+    "photos": "photos"
   }
 }

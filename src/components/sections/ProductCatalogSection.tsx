@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -471,6 +471,7 @@ function InfiniteSlider({
 /* ------------------------------------------------------------------ */
 export default function ProductCatalogSection() {
   const locale = useLocale();
+  const t = useTranslations('products');
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -594,10 +595,10 @@ export default function ProductCatalogSection() {
           {/* Section Heading */}
           <div ref={headerRef} className="text-center mb-6 sm:mb-8 px-4">
             <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-navy mb-2 drop-shadow-sm">
-              {locale === 'id' ? 'Produk Kami' : locale === 'zh-TW' ? '我們的產品' : 'Our Products'}
+              {t('title')}
             </h2>
             <p className="text-navy/60 text-base sm:text-lg md:text-xl font-body tracking-wide">
-              {locale === 'id' ? 'Cita Rasa Indonesia, di Taiwan.' : locale === 'zh-TW' ? '印尼風味，在台灣。' : 'Indonesian Taste, in Taiwan.'}
+              {t('tagline')}
             </p>
           </div>
 

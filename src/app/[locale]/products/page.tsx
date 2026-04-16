@@ -81,6 +81,7 @@ function SmartSearch({
   locale: string;
   onSelectProduct: (product: Product, categoryId: string) => void;
 }) {
+  const t = useTranslations('products');
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -240,17 +241,9 @@ function SmartSearch({
     }
   }, [activeIndex, flatList, onSelectProduct]);
 
-  const placeholderText = locale === 'id'
-    ? 'Cari produk di semua kategori...'
-    : locale === 'zh-TW'
-    ? '搜尋所有類別的產品...'
-    : 'Search products across all categories...';
+  const placeholderText = t('searchAllCategories');
 
-  const searchHint = locale === 'id'
-    ? 'Ketik nama, deskripsi, atau kategori produk'
-    : locale === 'zh-TW'
-    ? '輸入產品名稱、描述或類別'
-    : 'Type product name, description, or category';
+  const searchHint = t('searchHint');
 
   const showDropdown = focused && query.trim().length > 0;
 
@@ -282,17 +275,17 @@ function SmartSearch({
               </div>
             </motion.div>
             <p className="text-navy/50 text-sm font-medium mb-1">
-              {locale === 'id' ? 'Produk tidak ditemukan' : locale === 'zh-TW' ? '找不到產品' : 'No products found'}
+              {t('noProductsFound')}
             </p>
             <p className="text-navy/30 text-xs">
-              {locale === 'id' ? 'Coba kata kunci lain' : locale === 'zh-TW' ? '嘗試其他關鍵字' : 'Try different keywords'}
+              {t('tryDifferentKeywords')}
             </p>
           </div>
         ) : (
           <div className="py-2">
             <div className="px-5 py-2 flex items-center justify-between">
               <span className="text-[10px] font-semibold text-navy/30 uppercase tracking-[0.15em]">
-                {results.length} {locale === 'id' ? 'hasil' : locale === 'zh-TW' ? '個結果' : 'results'}
+                {results.length} {t('results')}
               </span>
               <div className="hidden sm:flex items-center gap-1">
                 <kbd className="text-[9px] text-navy/25 bg-navy/5 px-1 py-0.5 rounded font-mono">↵</kbd>
@@ -600,6 +593,7 @@ function CategoryDropdown({
   productCounts: Record<string, number>;
   onSelect: (categoryId: string) => void;
 }) {
+  const t = useTranslations('products');
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -616,8 +610,8 @@ function CategoryDropdown({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const categoryLabel = locale === 'id' ? 'Kategori' : locale === 'zh-TW' ? '\u985e\u5225' : 'Category';
-  const itemsLabel = locale === 'id' ? 'produk' : locale === 'zh-TW' ? '\u9805' : 'items';
+  const categoryLabel = t('categories');
+  const itemsLabel = t('select');
 
   return (
     <div ref={dropdownRef} className="relative inline-block">
@@ -1009,15 +1003,15 @@ function ProductsContent() {
             <div className="hero-reveal flex gap-10 mt-10 pt-8 border-t border-white/10">
               <div>
                 <span className="font-heading text-3xl sm:text-4xl font-bold text-white">{products.length}</span>
-                <p className="text-cream/40 text-sm mt-1">{locale === 'id' ? 'Produk' : locale === 'zh-TW' ? '產品' : 'Products'}</p>
+                <p className="text-cream/40 text-sm mt-1">{t('title')}</p>
               </div>
               <div>
                 <span className="font-heading text-3xl sm:text-4xl font-bold text-white">{categories.length}</span>
-                <p className="text-cream/40 text-sm mt-1">{locale === 'id' ? 'Kategori' : locale === 'zh-TW' ? '類別' : 'Categories'}</p>
+                <p className="text-cream/40 text-sm mt-1">{t('categories')}</p>
               </div>
               <div>
                 <span className="font-heading text-3xl sm:text-4xl font-bold text-red">100%</span>
-                <p className="text-cream/40 text-sm mt-1">{locale === 'id' ? 'Otentik' : locale === 'zh-TW' ? '正宗' : 'Authentic'}</p>
+                <p className="text-cream/40 text-sm mt-1">{t('halal')}</p>
               </div>
             </div>
 
@@ -1125,7 +1119,7 @@ function ProductsContent() {
                   <div className="text-center py-20">
                     <Package className="w-16 h-16 text-navy/10 mx-auto mb-4" />
                     <p className="text-navy/40 text-sm">
-                      {locale === 'id' ? 'Belum ada produk di kategori ini' : locale === 'zh-TW' ? '此類別尚無產品' : 'No products in this category yet'}
+                      {t('noProductsInCategory')}
                     </p>
                   </div>
                 )}

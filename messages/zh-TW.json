@@ -17,9 +17,7 @@
   "hero": {
     "tagline": "印尼風味，在台灣呈現",
     "subtitle": "您在台灣值得信賴的正宗印尼食品來源。從受歡迎的零食到必備的烹飪食材，我們為您帶來家鄉的味道。",
-    "cta": "瀏覽產品",
-    "scroll": "向下滾動",
-    "learnMore": "瞭解更多"
+    "cta": "瀏覽產品"
   },
   "about": {
     "title": "Mahkota Taiwan",
@@ -27,49 +25,26 @@
     "mission": "我們的使命是透過食物連結文化，以可靠的配送網絡在全台灣提供高品質的印尼產品。",
     "stats": {
       "since": "成立於",
-      "sinceValue": "2021",
+      "sinceValue": "2019",
       "stores": "合作店家",
-      "storesValue": "300+",
-      "products": "產品線",
-      "productsValue": "26+",
+      "storesValue": "500+",
+      "products": "產品種類",
+      "productsValue": "1000+",
       "customers": "滿意客戶",
-      "customersValue": "1,000,000+"
+      "customersValue": "50,000+"
     },
     "label": "關於我們",
     "highlight1": "清真認證產品，保證品質與信任",
     "highlight2": "覆蓋全台灣的直接配送網絡",
-    "highlight3": "正宗印尼風味，精心選材",
-    "values": {
-      "title": "我們的價值觀",
-      "qualityFirst": "品質第一",
-      "qualityFirstDesc": "每項產品都經過精心選擇和測試，確保符合最高品質標準後才上架。",
-      "culturalBridge": "文化橋梁",
-      "culturalBridgeDesc": "我們搭建印尼文化遺產與台灣日常生活之間的橋梁，將正宗風味帶入每一個家庭。",
-      "community": "社區",
-      "communityDesc": "建立超過100萬顧客的強大社區，他們信任我們傳遞家鄉的味道。",
-      "integrity": "誠信",
-      "integrityDesc": "在每項夥伴關係和交易中秉持透明和信任，確保建立基於互相尊重的長期關係。"
-    },
-    "milestones": {
-      "title": "我們的旅程",
-      "2021": { "title": "成立", "description": "Mahkota Taiwan 以將正宗印尼產品帶入台灣的願景而成立。" },
-      "2022": { "title": "100+ 家店", "description": "網絡擴展至台灣北部超過100家零售合作店家。" },
-      "2023": { "title": "300+ 家店", "description": "達到全台300+家合作店家，成為領先的印尼產品經銷商。" },
-      "2024": { "title": "擴大產品線", "description": "推出飲品、零食和家居用品等新產品類別。" },
-      "2025": { "title": "100萬+ 客戶", "description": "榮幸為超過100萬顧客服務，證明我們的品質和社區信任。" }
-    },
-    "partners": "我們的夥伴",
-    "backToHome": "回到首頁"
+    "highlight3": "正宗印尼風味，精心選材"
   },
   "products": {
     "title": "我們的產品",
     "subtitle": "探索我們豐富的正宗印尼食品選擇",
-    "label": "我們的系列",
     "viewAll": "查看全部產品",
     "categories": "分類",
     "searchPlaceholder": "搜尋產品...",
     "noProducts": "找不到產品",
-    "noProductsInCategory": "此分類中找不到產品。",
     "addToInquiry": "加入詢價",
     "details": "查看詳情",
     "all": "全部",
@@ -82,7 +57,8 @@
     "tagline": "印尼風味，在台灣。",
     "backToHome": "回到首頁",
     "halal": "清真認證",
-    "select": "選擇"
+    "select": "選擇",
+    "noProductsInCategory": "找不到此分類的產品。"
   },
   "recipes": {
     "title": "食譜",
@@ -97,7 +73,8 @@
     "fromOurKitchen": "來自我們的廚房",
     "recipeInspirations": "食譜靈感",
     "discoverRecipes": "發現使用 Mahkota Taiwan 產品製作的美味食譜",
-    "backToHome": "首頁"
+    "backToHome": "首頁",
+    "backToRecipes": "返回所有食譜"
   },
   "events": {
     "title": "活動",
@@ -211,36 +188,14 @@
     "office": "辦公室地址",
     "phone": "電話",
     "followUs": "在社交媒體上關注我們",
-    "formTitle": "傳送訊息給我們",
+    "formTitle": "發送訊息",
     "name": "姓名",
     "email": "電子郵件",
     "message": "訊息",
     "send": "發送訊息",
     "namePlaceholder": "請輸入姓名",
     "emailPlaceholder": "請輸入電子郵件",
-    "messagePlaceholder": "在此撰寫訊息...",
-    "backToHome": "回到首頁",
-    "businessHours": "營業時間",
-    "mondayFriday": "週一至週五",
-    "saturday": "週六",
-    "sunday": "週日",
-    "closed": "休息",
-    "openInMaps": "在地圖中打開",
-    "callNow": "現在致電",
-    "sendEmail": "發送電子郵件",
-    "faq": {
-      "title": "常見問題",
-      "q1": "如何訂購 Mahkota Taiwan 產品？",
-      "a1": "您可以透過全台300+家合作店家訂購我們的產品。查看我們的商店定位器找到最近的位置，或直接聯繫我們進行大宗訂單。",
-      "q2": "你們提供送貨服務嗎？",
-      "a2": "是的！我們為大宗和批發訂單提供配送服務。對於個人購買，請造訪我們的任何合作店家。聯繫我們的團隊瞭解配送時間表和最低訂單量。",
-      "q3": "如何成為零售夥伴？",
-      "a3": "我們一直在尋找新的零售夥伴！請發送電子郵件至 mahkotataiwan@gmail.com 或致電 +886-2-26099118，並提供您的商店詳情，我們的夥伴關係團隊將在2個工作日內回覆您。",
-      "q4": "你們經銷什麼類型的產品？",
-      "a4": "我們經銷多種正宗印尼產品，包括即食麵、調味料、醬料、飲品、零食、烹飪必需品和家居用品。我們提供26+條精心挑選的產品線。",
-      "q5": "我能要求特定的印尼產品嗎？",
-      "a5": "當然可以！我們歡迎社區提出的產品建議。請透過電子郵件或我們的社交媒體渠道聯繫我們並提供產品詳情，我們會盡力為您採購。"
-    }
+    "messagePlaceholder": "在此撰寫訊息..."
   },
   "footer": {
     "description": "您在台灣值得信賴的正宗印尼食品來源。透過印尼風味連結文化。",
@@ -258,7 +213,7 @@
       "events": "活動",
       "lifestyle": "活動花絮",
       "contact": "聯絡我們",
-      "whereToBuy": "哪裡購買",
+      "whereToBuy": "哪裡買",
       "gallery": "相簿"
     },
     "contactUs": "聯絡我們",
@@ -302,41 +257,26 @@
     "loading": "載入中...",
     "error": "發生錯誤",
     "success": "成功！",
-    "noData": "沒有可用數據",
+    "noData": "沒有資料",
     "back": "返回",
-    "next": "下一個",
-    "previous": "上一個",
+    "next": "下一頁",
+    "previous": "上一頁",
     "close": "關閉",
     "readMore": "閱讀更多",
-    "showLess": "顯示較少",
-    "backToHome": "回到首頁",
-    "filters": "篩選器",
-    "clearAll": "清除全部",
-    "noPhotosFound": "找不到相片",
-    "noPhotosMessage": "嘗試調整篩選器以發現更多回憶。",
-    "resetFilters": "重設篩選器",
-    "photos": "相片",
-    "allEvents": "所有活動"
+    "showLess": "收起"
+  },
+  "whereToBuy": {
+    "title": "哪裡買",
+    "subtitle": "在台灣各地值得信賴的零售合作夥伴找到皇冠台灣產品。",
+    "findUs": "找到我們"
   },
   "gallery": {
     "title": "相簿",
-    "subtitle": "瀏覽我們的時刻和活動集合",
-    "noImages": "尚無相簿圖片。",
+    "subtitle": "瀏覽我們的精彩時刻和活動照片",
+    "noImages": "目前還沒有相簿照片。",
     "allEvents": "所有活動",
     "filterByDate": "按日期篩選",
-    "clearFilter": "清除篩選器",
-    "photos": "相片",
-    "backToHome": "回到首頁",
-    "noPhotosFound": "找不到相片",
-    "noPhotosMessage": "嘗試調整篩選器以發現更多回憶。",
-    "resetFilters": "重設篩選器"
-  },
-  "marquee": {
-    "mahkotaTaiwan": "Mahkota Taiwan",
-    "rasaIndonesia": "印尼風味",
-    "hadirDiTaiwan": "在台灣呈現",
-    "halalCertified": "清真認證",
-    "premiumQuality": "高級品質",
-    "stores": "300+ 家店"
+    "clearFilter": "清除篩選",
+    "photos": "張照片"
   }
 }
