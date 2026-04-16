@@ -47,8 +47,11 @@
     "partnersDescription": "Working with Taiwan's leading retailers to bring you the best Indonesian products",
     "storyLabel": "Our Story",
     "storyTitle": "The Journey So Far",
-    "ctaButtonProducts": "Browse Products",
-    "ctaButtonContact": "Contact Us"
+    "ctaButtonProducts": "Explore Products",
+    "ctaButtonContact": "Contact Us",
+    "ctaTitle": "Ready to Taste Our Products?",
+    "ctaDescription": "Explore our full range of authentic Indonesian flavors and find them at retail locations near you.",
+    "backToHome": "Back to Home"
   },
   "products": {
     "label": "Our Collection",

@@ -48,7 +48,10 @@
     "storyLabel": "Kisah Kami",
     "storyTitle": "Perjalanan Hingga Saat Ini",
     "ctaButtonProducts": "Jelajahi Produk",
-    "ctaButtonContact": "Hubungi Kami"
+    "ctaButtonContact": "Hubungi Kami",
+    "ctaTitle": "Siap Mencoba Produk Kami?",
+    "ctaDescription": "Jelajahi rangkaian lengkap cita rasa Indonesia asli dan temukan mereka di lokasi ritel terdekat Anda.",
+    "backToHome": "Kembali ke Beranda"
   },
   "products": {
     "label": "Koleksi Kami",

@@ -47,8 +47,11 @@
     "partnersDescription": "與台灣領先的零售商合作，為您帶來最好的印尼產品",
     "storyLabel": "我們的故事",
     "storyTitle": "迄今為止的旅程",
-    "ctaButtonProducts": "瀏覽產品",
-    "ctaButtonContact": "聯繫我們"
+    "ctaButtonProducts": "探索產品",
+    "ctaButtonContact": "聯繫我們",
+    "ctaTitle": "準備好品嚐我們的產品了嗎？",
+    "ctaDescription": "探索我們完整的道地印尼風味系列，並在靠近您的零售地點找到它們。",
+    "backToHome": "返回首頁"
   },
   "products": {
     "label": "我們的收藏",
