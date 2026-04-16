@@ -130,7 +130,7 @@ export default function ProductsSection() {
                   <div className="aspect-square bg-gradient-to-br from-cream to-cream-dark flex items-center justify-center relative overflow-hidden">
                     <div className="text-center">
                       <Package className="w-12 h-12 text-navy/20 mx-auto mb-2" />
-                      <p className="text-navy/30 text-xs">Product Image</p>
+                      <p className="text-navy/30 text-xs">{t('productImage')}</p>
                     </div>
                     {/* Hover overlay */}
                     <div className="absolute inset-0 bg-navy/0 group-hover:bg-navy/5 transition-colors duration-500" />

@@ -400,9 +400,10 @@ export default function HeroSlider() {
           src={currentSlide.image_url}
           alt={title}
           fill
-          className="object-cover"
+          className="object-cover w-full h-full"
           priority={currentIndex === 0}
           sizes="100vw"
+          quality={90}
         />
       </motion.div>
     );
@@ -411,7 +412,7 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full h-[55vh] md:h-[75vh] min-h-[400px] max-h-[900px] overflow-hidden"
+      className="relative w-full h-[70vh] sm:h-[100dvh] overflow-hidden"
       style={{ transformOrigin: 'center center' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}

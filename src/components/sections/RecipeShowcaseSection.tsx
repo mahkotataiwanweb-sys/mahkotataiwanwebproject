@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import Image from 'next/image';
 import gsap from 'gsap';
@@ -256,6 +256,7 @@ function FloatingParticles() {
 /* ------------------------------------------------------------------ */
 export default function RecipeShowcaseSection() {
   const locale = useLocale();
+  const t = useTranslations('recipes');
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -303,18 +304,14 @@ export default function RecipeShowcaseSection() {
 
   if (recipes.length === 0) return null;
 
-  const heading = locale === 'id' ? 'Resep Inspirasi' : locale === 'zh-TW' ? '靈感食譜' : 'Recipe Inspirations';
-  const subtitle = locale === 'id'
-    ? 'Temukan resep lezat dengan produk Mahkota Taiwan'
-    : locale === 'zh-TW'
-    ? '探索使用皇冠台灣產品的美味食譜'
-    : 'Discover delicious recipes crafted with Mahkota Taiwan products';
-  const ctaText = locale === 'id' ? 'Lihat Semua Resep' : locale === 'zh-TW' ? '查看所有食譜' : 'View All Recipes';
+  const heading = t('heading');
+  const subtitle = t('headingSub');
+  const ctaText = t('viewAll');
 
   return (
     <section
       ref={sectionRef}
-      className="relative py-20 sm:py-32 bg-navy overflow-hidden"
+      className="relative py-16 sm:py-24 bg-navy overflow-hidden"
     >
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
@@ -340,11 +337,11 @@ export default function RecipeShowcaseSection() {
       {/* Content */}
       <div className="relative z-10">
         {/* Heading */}
-        <div ref={headingRef} className="text-center mb-8 sm:mb-14 px-6" style={{ perspective: '800px' }}>
+        <div ref={headingRef} className="text-center mb-6 sm:mb-10 px-6" style={{ perspective: '800px' }}>
           <div className="inline-flex items-center gap-2 mb-4">
             <Sparkles className="w-4 h-4 text-red" />
             <span className="text-red text-xs font-bold tracking-[0.3em] uppercase">
-              {locale === 'id' ? 'Dari Dapur Kami' : locale === 'zh-TW' ? '來自我們的廚房' : 'From Our Kitchen'}
+              {t('fromOurKitchen')}
             </span>
             <Sparkles className="w-4 h-4 text-red" />
           </div>
@@ -364,7 +361,7 @@ export default function RecipeShowcaseSection() {
         <CylinderCarousel recipes={recipes} locale={locale} />
 
         {/* CTA Button */}
-        <div className="text-center mt-8 sm:mt-12 px-6">
+        <div className="text-center mt-6 sm:mt-10 px-6">
           <Link
             href={`/${locale}/recipes`}
             className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-red to-red/80 text-white font-heading font-bold text-sm sm:text-base tracking-wide shadow-[0_8px_32px_rgba(193,33,38,0.35)] hover:shadow-[0_12px_48px_rgba(193,33,38,0.5)] transition-all duration-500 hover:scale-105"

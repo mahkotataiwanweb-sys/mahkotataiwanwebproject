@@ -1,0 +1,10 @@
+# Ignore node_modules
+node_modules/
+
+# Ignore local files
+.env.local
+.env.*.local
+
+# Ignore git files
+.git/
+.gitignore

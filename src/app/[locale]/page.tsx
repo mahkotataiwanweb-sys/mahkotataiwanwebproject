@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState, useCallback, useImperativeHandle } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import Image from 'next/image';
 import gsap from 'gsap';
@@ -200,11 +200,11 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
         </div>
         <div style={{ perspective: '2500px' }}>
           <div ref={textBoxRef} style={{ opacity: 0, transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}>
-            <div className="relative bg-white mx-8 sm:mx-14 -mt-8 sm:-mt-12 px-5 sm:px-7 py-5 sm:py-6 shadow-[0_4px_30px_rgba(0,0,0,0.08)]" style={{ clipPath: 'polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px)' }}>
+            <div className="relative bg-white mx-4 sm:mx-6 -mt-5 sm:-mt-6 px-3 sm:px-4 py-3 sm:py-3 shadow-[0_4px_30px_rgba(0,0,0,0.08)]" style={{ clipPath: 'polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px)' }}>
               <div className="text-center">
-                <h3 className="font-heading text-base sm:text-lg font-bold text-navy mb-2 leading-tight">{data.title}</h3>
-                <p className="text-navy/50 text-xs sm:text-sm leading-relaxed mb-4 max-w-sm mx-auto">{data.excerpt}</p>
-                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#003048] text-white text-xs sm:text-sm font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300">
+                <h3 className="font-heading text-xs sm:text-sm font-bold text-navy mb-2 leading-tight">{data.title}</h3>
+                <p className="text-navy/50 text-[10px] sm:text-xs leading-relaxed mb-2 max-w-sm mx-auto">{data.excerpt}</p>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#003048] text-white text-[11px] font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300">
                   <span>{btnLabel}</span>
                 </div>
               </div>
@@ -219,6 +219,7 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
 
 export default function HomePage() {
   const locale = useLocale();
+  const t = useTranslations('discover');
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const topCardRef = useRef<AutoFlipCardHandle>(null);
@@ -376,26 +377,26 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto px-6 sm:px-10 relative z-10">
           {/* ── Header ── */}
           <div ref={headerRef} className="text-center mb-16">
-            <p className="text-[#C12126] text-sm sm:text-base tracking-[0.35em] uppercase font-bold mb-3">Discover</p>
+            <p className="text-[#C12126] text-sm sm:text-base tracking-[0.35em] uppercase font-bold mb-3">{t('label')}</p>
             <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">
-              Explore Mahkota Taiwan
+              {t('title')}
             </h2>
             <div className="w-16 h-[2px] bg-[#C12126] mx-auto mb-4 rounded-full" />
             <p className="text-navy/40 max-w-lg mx-auto text-base sm:text-lg tracking-wide">
-              Stay connected with our latest events and community activities
+              {t('subtitle')}
             </p>
           </div>
 
           {/* ── Cards — sequenced: top flips, then bottom, never together ── */}
-          <div className="flex flex-col gap-20 sm:gap-28">
+          <div className="flex flex-col gap-10 sm:gap-14 lg:gap-12 max-w-lg mx-auto">
             <div ref={topWrapRef}>
               <AutoFlipCard
                 ref={topCardRef}
                 articles={events}
-                fallbackTitle="Upcoming Events"
-                fallbackExcerpt="Discover our latest community events, celebrations, and gatherings across Taiwan"
+                fallbackTitle={t('fallbackTitle1')}
+                fallbackExcerpt={t('fallbackExcerpt1')}
                 fallbackHref={`/${locale}/events`}
-                btnLabel={locale === 'id' ? 'Lihat Acara' : '查看活動'}
+                btnLabel={t('viewEvents')}
                 locale={locale}
               />
             </div>
@@ -403,10 +404,10 @@ export default function HomePage() {
               <AutoFlipCard
                 ref={bottomCardRef}
                 articles={activities}
-                fallbackTitle="Community Activities"
-                fallbackExcerpt="See how our community enjoys Mahkota Taiwan products in their daily life"
+                fallbackTitle={t('fallbackTitle2')}
+                fallbackExcerpt={t('fallbackExcerpt2')}
                 fallbackHref={`/${locale}/lifestyle`}
-                btnLabel={locale === 'id' ? 'Lihat Aktivitas' : '查看活動'}
+                btnLabel={t('viewActivities')}
                 locale={locale}
               />
             </div>

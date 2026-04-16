@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -49,6 +49,8 @@ function parseRecipeContent(content: string) {
 /* ------------------------------------------------------------------ */
 export default function RecipeDetailPage() {
   const locale = useLocale();
+  const t = useTranslations('recipes');
+  const tNav = useTranslations('nav');
   const params = useParams();
   const slug = params.slug as string;
   const [recipe, setRecipe] = useState<Article | null>(null);
@@ -116,10 +118,10 @@ export default function RecipeDetailPage() {
         <div className="text-center">
           <ChefHat className="w-16 h-16 text-navy/15 mx-auto mb-4" />
           <h2 className="font-heading text-2xl font-bold text-navy mb-2">
-            {locale === 'id' ? 'Resep tidak ditemukan' : locale === 'zh-TW' ? '找不到食譜' : 'Recipe not found'}
+            {t('noRecipes')}
           </h2>
           <Link href={`/${locale}/recipes`} className="text-red hover:text-red-dark font-medium text-sm">
-            {locale === 'id' ? 'Kembali ke resep' : locale === 'zh-TW' ? '返回食譜' : 'Back to recipes'}
+            {t('viewAll')}
           </Link>
         </div>
       </main>
@@ -141,7 +143,7 @@ export default function RecipeDetailPage() {
             className="inline-flex items-center gap-2 text-white/40 hover:text-white/70 text-sm font-medium mb-8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            {locale === 'id' ? 'Semua Resep' : locale === 'zh-TW' ? '所有食譜' : 'All Recipes'}
+            {t('viewAll')}
           </Link>
 
           <motion.div
@@ -152,7 +154,7 @@ export default function RecipeDetailPage() {
             <div className="flex items-center gap-3 mb-4">
               <span className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.2em] uppercase text-red-light bg-red/10 px-3 py-1.5 rounded-full">
                 <ChefHat className="w-3 h-3" />
-                {locale === 'id' ? 'Resep' : locale === 'zh-TW' ? '食譜' : 'Recipe'}
+                {t('recipe')}
               </span>
               {getLocalizedField(recipe, 'description', locale) && (
                 <span className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.2em] uppercase text-white/60 bg-white/5 px-3 py-1.5 rounded-full">
@@ -301,7 +303,7 @@ export default function RecipeDetailPage() {
             className="inline-flex items-center gap-2 text-red hover:text-red-dark font-semibold text-sm transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            {locale === 'id' ? 'Kembali ke Semua Resep' : locale === 'zh-TW' ? '返回所有食譜' : 'Back to All Recipes'}
+            {t('backToRecipes')}
           </Link>
         </div>
       </section>

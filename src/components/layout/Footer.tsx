@@ -125,9 +125,10 @@ export default function Footer() {
   };
 
   const useDbMenus = menuTree && menuTree.length > 0;
+  const tNav = useTranslations('nav');
 
   /* Products dropdown label */
-  const ourCollectionLabel = locale === 'id' ? 'Koleksi Kami' : locale === 'zh-TW' ? '我們的系列' : 'Our Collection';
+  const ourCollectionLabel = tNav('ourCollection');
 
   const officeAddress = settings?.office_address || 'No. 83, Liyuan 2nd Street, Linkou District, New Taipei City';
   const warehouseAddress = settings?.warehouse_address || 'No. 53, Lane 216, Nanshi 4th Street, Linkou District, New Taipei City';

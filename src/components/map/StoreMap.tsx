@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { MapPin, Phone, Navigation, X, ChevronDown, Locate } from 'lucide-react';
+import { MapPin, Phone, Navigation, X, ChevronDown, Locate, Plus, Minus } from 'lucide-react';
 import gsap from 'gsap';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -1238,7 +1238,22 @@ function PremiumDropdown({
           {/* Thin top accent */}
           <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(193,33,38,0.2), transparent)' }} />
 
-          <div ref={listRef} className="premium-dropdown-list overflow-y-auto max-h-[320px] py-1.5 px-1.5">
+          <div
+            ref={listRef}
+            className="premium-dropdown-list overflow-y-auto max-h-[320px] py-1.5 px-1.5"
+            onWheel={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const element = listRef.current;
+              if (!element) return;
+              element.scrollTop += e.deltaY;
+            }}
+            onTouchMove={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            style={{ touchAction: 'none', pointerEvents: 'auto' }}
+          >
             {options.map((city, i) => {
               const isActive = value === city;
               const label = city === 'All' ? 'All Cities' : city;
@@ -1392,7 +1407,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
       center: [23.69, 120.96],
       zoom: 8,
       zoomControl: false,
-      scrollWheelZoom: !isMobile,
+      scrollWheelZoom: false,
       dragging: !isMobile,
       touchZoom: true,
       attributionControl: false,
@@ -1412,7 +1427,6 @@ export default function StoreMap({ stores }: StoreMapProps) {
     const handleResize = () => { map.invalidateSize(); };
     window.addEventListener('resize', handleResize);
 
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
     L.control.attribution({ position: 'bottomleft', prefix: false }).addAttribution('© OpenStreetMap').addTo(map);
 
     mapRef.current = map;
@@ -1653,7 +1667,7 @@ export default function StoreMap({ stores }: StoreMapProps) {
   };
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full max-w-4xl mx-auto">
       {/* ─── Top bar ─── */}
       <div className="absolute top-4 left-3 right-3 sm:left-4 sm:right-4 z-[1000] flex items-center gap-2 sm:gap-3">
         {/* Premium dropdown */}
@@ -1770,9 +1784,26 @@ export default function StoreMap({ stores }: StoreMapProps) {
         <OceanWaterEffects />
         <div
           ref={mapContainerRef}
-          className="illustrated-map w-full h-[600px] sm:h-[750px] lg:h-[900px] overflow-hidden"
+          className="illustrated-map w-full h-[600px] sm:h-[750px] lg:h-[600px] overflow-hidden"
           style={{ background: '#2E8BC9' }}
         />
+        {/* Custom Zoom Buttons */}
+        <div className="absolute bottom-4 right-4 z-[1000] flex flex-col gap-1.5">
+          <button
+            onClick={() => mapRef.current?.zoomIn()}
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-navy/80 backdrop-blur-md text-cream/90 hover:bg-navy hover:text-white border border-white/10 shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
+            aria-label="Zoom in"
+          >
+            <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
+          </button>
+          <button
+            onClick={() => mapRef.current?.zoomOut()}
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-navy/80 backdrop-blur-md text-cream/90 hover:bg-navy hover:text-white border border-white/10 shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
+            aria-label="Zoom out"
+          >
+            <Minus className="w-3.5 h-3.5" strokeWidth={2.5} />
+          </button>
+        </div>
       </div>
 
       {/* ─── Store popup ─── */}

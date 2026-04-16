@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
@@ -16,6 +16,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function ProductsShowcase() {
   const locale = useLocale();
+  const t = useTranslations('products');
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -110,21 +111,21 @@ export default function ProductsShowcase() {
         <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-12">
           <div>
             <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
-              Our Collection
+              {t('label')}
             </p>
             <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-3">
-              Our Products
+              {t('title')}
             </h2>
             <div className="w-16 h-[2px] bg-red mb-4" />
             <p className="text-navy/60 max-w-lg">
-              Discover authentic Indonesian flavors, crafted with premium ingredients and halal certified.
+              {t('showcaseSubtitle')}
             </p>
           </div>
           <Link
             href={`/${locale}/products`}
             className="mt-6 sm:mt-0 inline-flex items-center gap-2 text-sm font-semibold text-red hover:text-red-dark tracking-wide uppercase transition-colors group"
           >
-            View All Products
+            {t('viewAll')}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
@@ -139,7 +140,7 @@ export default function ProductsShowcase() {
                 : 'bg-cream text-navy/70 hover:bg-cream-dark hover:text-navy'
             }`}
           >
-            ✨ All
+            ✨ {t('all')}
           </button>
           {categories.map((cat) => (
             <button
@@ -201,7 +202,7 @@ export default function ProductsShowcase() {
             ) : filteredProducts.length === 0 ? (
               <div className="w-full text-center py-16">
                 <Package className="w-12 h-12 text-navy/20 mx-auto mb-3" />
-                <p className="text-navy/40">No products found in this category.</p>
+                <p className="text-navy/40">{t('noProductsInCategory')}</p>
               </div>
             ) : (
               <AnimatePresence mode="popLayout">
@@ -229,7 +230,7 @@ export default function ProductsShowcase() {
                         ) : (
                           <div className="text-center">
                             <Package className="w-12 h-12 text-navy/20 mx-auto mb-2" />
-                            <p className="text-navy/30 text-xs">Product Image</p>
+                            <p className="text-navy/30 text-xs">{t('productImage')}</p>
                           </div>
                         )}
                         <div className="absolute inset-0 bg-navy/0 group-hover:bg-navy/5 transition-colors duration-500" />
