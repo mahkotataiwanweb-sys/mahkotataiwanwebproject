@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { ArrowLeft, MapPin, Store, Globe, Sparkles, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
@@ -140,6 +140,7 @@ function ShimmerLines() {
 export default function WhereToBuyPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const locale = useLocale();
+  const t = useTranslations('whereToBuy');
   const [stores, setStores] = useState<StoreLocation[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -299,7 +300,7 @@ export default function WhereToBuyPage() {
   const cityCount = new Set(stores.map((s) => s.city)).size;
   const stats = [
     {
-      number: String(storeCount), label: 'Partner Stores', icon: Store,
+      number: String(storeCount), label: t('partnerStores'), icon: Store,
       gradient: '#C12126, transparent 40%, #FAEDD3, transparent 60%, #C12126',
       iconBg: 'bg-gradient-to-br from-red/10 to-red/[0.03]',
       iconColor: 'text-red',
@@ -308,7 +309,7 @@ export default function WhereToBuyPage() {
       accentColor: '#C12126',
     },
     {
-      number: String(cityCount), label: 'Cities Covered', icon: MapPin,
+      number: String(cityCount), label: t('citiesCovered'), icon: MapPin,
       gradient: '#003048, transparent 40%, #A8D8EA, transparent 60%, #003048',
       iconBg: 'bg-gradient-to-br from-navy/10 to-navy/[0.03]',
       iconColor: 'text-navy',
@@ -317,7 +318,7 @@ export default function WhereToBuyPage() {
       accentColor: '#003048',
     },
     {
-      number: '100%', label: 'Island Coverage', icon: Shield,
+      number: '100%', label: t('islandCoverage'), icon: Shield,
       gradient: '#C12126, transparent 40%, #003048, transparent 60%, #C12126',
       iconBg: 'bg-gradient-to-br from-red/8 to-navy/[0.03]',
       iconColor: 'text-red',
@@ -326,7 +327,7 @@ export default function WhereToBuyPage() {
       accentColor: '#C12126',
     },
     {
-      number: '24/7', label: 'Always Online', icon: Globe,
+      number: '24/7', label: t('alwaysOnline'), icon: Globe,
       gradient: '#003048, transparent 40%, #C12126, transparent 60%, #003048',
       iconBg: 'bg-gradient-to-br from-navy/10 to-red/[0.03]',
       iconColor: 'text-navy',
@@ -372,7 +373,7 @@ export default function WhereToBuyPage() {
               className="inline-flex items-center gap-2 text-cream/60 hover:text-cream transition-colors text-sm group"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              Back to Home
+              {t('backToHome')}
             </Link>
           </div>
 
@@ -386,13 +387,13 @@ export default function WhereToBuyPage() {
             animate={{ opacity: [0.85, 1, 0.85], scale: [0.98, 1, 0.98] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
-            ✦ Find Us ✦
+            ✦ {t('label')} ✦
           </motion.span>
           <h1 className="hero-text text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-5">
-            Where to Buy
+            {t('title')}
           </h1>
           <p className="hero-text text-cream/60 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Discover Mahkota Taiwan products at <span className="text-cream/90 font-semibold">{storeCount || '...'}</span> retail locations across <span className="text-cream/90 font-semibold">{cityCount || '...'} cities</span> in Taiwan
+            {t('description')} <span className="text-cream/90 font-semibold">{storeCount || '...'}</span> {t('locations')} <span className="text-cream/90 font-semibold">{cityCount || '...'} {t('cities')}</span> {t('inTaiwan')}
           </p>
 
           {/* Animated separator */}
@@ -459,13 +460,13 @@ export default function WhereToBuyPage() {
           {/* Section header */}
           <div className="text-center mb-12">
             <span className="map-header-text inline-block text-red/80 text-sm font-semibold tracking-[0.25em] uppercase">
-              Interactive Map
+              {t('mapLabel')}
             </span>
             <h2 className="map-header-text text-3xl md:text-4xl lg:text-5xl font-heading font-bold text-navy mt-3 mb-4">
-              Find a Store Near You
+              {t('mapTitle')}
             </h2>
             <p className="map-header-text text-navy/50 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
-              Click on any pin to see store details, contact information, and get directions
+              {t('mapDescription')}
             </p>
             <motion.div
               className="map-header-text w-20 h-1 bg-gradient-to-r from-red to-red/40 mx-auto mt-5 rounded-full"
@@ -481,7 +482,7 @@ export default function WhereToBuyPage() {
               <div className="w-full h-[600px] sm:h-[750px] lg:h-[450px] bg-cream-light flex items-center justify-center">
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-10 h-10 border-2 border-red border-t-transparent rounded-full animate-spin" />
-                  <p className="text-navy/40 text-sm">Loading stores...</p>
+                  <p className="text-navy/40 text-sm">{t('loadingStores')}</p>
                 </div>
               </div>
             )}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -32,6 +32,7 @@ function formatDate(dateStr: string, locale: string): string {
 export default function ArticleDetailPage() {
   const { slug } = useParams();
   const locale = useLocale();
+  const t = useTranslations('articles');
 
   const [article, setArticle] = useState<Article | null>(null);
   const [related, setRelated] = useState<Article[]>([]);
@@ -161,7 +162,7 @@ export default function ArticleDetailPage() {
           className="flex flex-col items-center gap-4"
         >
           <div className="w-12 h-12 border-[3px] border-[#C12126] border-t-transparent rounded-full animate-spin" />
-          <span className="text-[#003048]/40 text-sm font-medium tracking-wide">Loading article…</span>
+          <span className="text-[#003048]/40 text-sm font-medium tracking-wide">{t('loading')}</span>
         </motion.div>
       </div>
     );
@@ -174,15 +175,15 @@ export default function ArticleDetailPage() {
         <div className="w-24 h-24 rounded-full bg-[#003048]/5 flex items-center justify-center">
           <span className="text-5xl">📄</span>
         </div>
-        <h1 className="font-heading text-3xl font-bold text-[#003048]">Article Not Found</h1>
+        <h1 className="font-heading text-3xl font-bold text-[#003048]">{t('notFound')}</h1>
         <p className="text-[#003048]/50 max-w-sm text-center text-sm">
-          The article you&apos;re looking for doesn&apos;t exist or has been removed.
+          {t('notFoundDescription')}
         </p>
         <Link
           href={`/${locale}`}
           className="inline-flex items-center gap-2 px-6 py-3 bg-[#003048] text-white rounded-full text-sm font-medium hover:bg-[#003048]/90 transition"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Home
+          <ArrowLeft className="w-4 h-4" /> {t('backToHome')}
         </Link>
       </div>
     );
@@ -285,7 +286,7 @@ export default function ArticleDetailPage() {
                 </span>
                 <span className="flex items-center gap-1.5 text-white/70 text-sm">
                   <Clock className="w-3.5 h-3.5" />
-                  {readingTime} min read
+                  {readingTime} {t('minRead')}
                 </span>
               </div>
 
@@ -334,8 +335,8 @@ export default function ArticleDetailPage() {
                 <ImagesIcon className="w-5 h-5 text-[#C12126]" />
               </div>
               <div>
-                <h2 className="font-heading text-2xl font-bold text-[#003048]">Gallery</h2>
-                <p className="text-[#003048]/40 text-xs mt-0.5">{galleryImages.length} photos</p>
+                <h2 className="font-heading text-2xl font-bold text-[#003048]">{t('gallery')}</h2>
+                <p className="text-[#003048]/40 text-xs mt-0.5">{galleryImages.length} {t('photos')}</p>
               </div>
             </div>
 
@@ -374,12 +375,12 @@ export default function ArticleDetailPage() {
         {related.length > 0 && (
           <div className="mt-20 pt-14 border-t border-[#003048]/10">
             <div data-anim className="flex items-center justify-between mb-10">
-              <h2 className="font-heading text-2xl font-bold text-[#003048]">Related Articles</h2>
+              <h2 className="font-heading text-2xl font-bold text-[#003048]">{t('relatedArticles')}</h2>
               <Link
                 href={backHref}
                 className="text-sm text-[#C12126] font-semibold hover:underline flex items-center gap-1 transition"
               >
-                View All <ArrowUpRight className="w-3.5 h-3.5" />
+                {t('viewAll')} <ArrowUpRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 

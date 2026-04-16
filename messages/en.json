@@ -98,7 +98,9 @@
     "calendar": "Calendar",
     "filtered": "Filtered:",
     "upcomingEvents": "Upcoming Events",
-    "upcomingEventsDesc": "Discover our latest community events, celebrations, and gatherings across Taiwan"
+    "upcomingEventsDesc": "Discover our latest community events, celebrations, and gatherings across Taiwan",
+    "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "dayAbbreviations": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
   },
   "lifestyle": {
     "title": "Activity",
@@ -269,11 +271,6 @@
     "readMore": "Read More",
     "showLess": "Show Less"
   },
-  "whereToBuy": {
-    "title": "Where to Buy",
-    "subtitle": "Find Mahkota Taiwan products at these trusted retail partners across Taiwan.",
-    "findUs": "Find Us"
-  },
   "gallery": {
     "title": "Gallery",
     "subtitle": "Browse our collection of moments and events",
@@ -281,6 +278,135 @@
     "allEvents": "All Events",
     "filterByDate": "Filter by Date",
     "clearFilter": "Clear Filter",
-    "photos": "photos"
+    "photos": "photos",
+    "calendar": "Calendar",
+    "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "dayAbbreviations": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+    "backToHome": "Back to Home"
+  },
+  "articles": {
+    "title": "Articles",
+    "loading": "Loading article…",
+    "notFound": "Article Not Found",
+    "notFoundMessage": "The article you're looking for doesn't exist or has been removed.",
+    "backToHome": "Back to Home"
+  },
+  "store": {
+    "allCities": "All Cities",
+    "all": "All",
+    "cities": ["Taipei", "New Taipei", "Taoyuan", "Keelung", "Hsinchu", "Hsinchu County", "Miaoli", "Taichung", "Changhua", "Nantou", "Yunlin", "Chiayi", "Chiayi County", "Tainan", "Kaohsiung", "Pingtung", "Liuqiu", "Orchid Island", "Green Island", "Penghu", "Kinmen", "Matsu"],
+    "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "dayAbbreviations": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+  },
+  "discover": {
+    "label": "Discover",
+    "title": "Explore Mahkota Taiwan",
+    "subtitle": "Stay connected with our latest events and community activities",
+    "fallbackTitle1": "Upcoming Events",
+    "fallbackExcerpt1": "Discover our latest community events, celebrations, and gatherings across Taiwan",
+    "fallbackTitle2": "Community Activities",
+    "fallbackExcerpt2": "See how our community enjoys Mahkota Taiwan products in their daily life"
+  },
+  "aboutPage": {
+    "missionLabel": "Our Mission",
+    "missionTitle": "Bridging Indonesian Flavors to Taiwan",
+    "missionSubtitle": "More than a distributor — a cultural ambassador bringing the taste of home.",
+    "valuesLabel": "What We Stand For",
+    "valuesTitle": "Our Values",
+    "value1Title": "Quality First",
+    "value1Desc": "Every product is carefully selected and tested to meet the highest standards of quality before reaching our shelves.",
+    "value2Title": "Cultural Bridge",
+    "value2Desc": "We bridge the gap between Indonesian heritage and Taiwanese daily life, bringing authentic flavors to every home.",
+    "value3Title": "Community",
+    "value3Desc": "Building a strong community of over 1 million customers who trust us to deliver the tastes of home.",
+    "value4Title": "Integrity",
+    "value4Desc": "Operating with transparency and trust in every partnership and transaction, ensuring lasting relationships built on mutual respect.",
+    "partnersLabel": "Collaboration",
+    "partnersTitle": "Trusted Partners",
+    "partnersSubtitle": "Working with Taiwan's leading retailers to bring you the best Indonesian products",
+    "partnerStoreFallback": "Partner Store",
+    "storyLabel": "Our Story",
+    "storyTitle": "The Journey So Far",
+    "milestone2021": "2021",
+    "milestone2021Title": "Founded",
+    "milestone2021Desc": "Mahkota Taiwan was established with a vision to bring authentic Indonesian products to Taiwan.",
+    "milestone2022": "2022",
+    "milestone2022Title": "100+ Stores",
+    "milestone2022Desc": "Expanded our network to over 100 retail partner stores across northern Taiwan.",
+    "milestone2023": "2023",
+    "milestone2023Title": "300+ Stores",
+    "milestone2023Desc": "Reached 300+ partner stores island-wide, becoming the leading Indonesian product distributor.",
+    "milestone2024": "2024",
+    "milestone2024Title": "Expanded Product Lines",
+    "milestone2024Desc": "Introduced new product categories including beverages, snacks, and household essentials.",
+    "milestone2025": "2025",
+    "milestone2025Title": "1 Million+ Customers",
+    "milestone2025Desc": "Proudly serving over 1 million customers, a testament to our quality and community trust.",
+    "ctaTitle": "Want to Learn More?",
+    "ctaSubtitle": "Discover our products or get in touch with our team today.",
+    "ctaButton1": "Browse Products",
+    "ctaButton2": "Contact Us"
+  },
+  "articlesPage": {
+    "loading": "Loading article…",
+    "notFound": "Article Not Found",
+    "notFoundMessage": "The article you're looking for doesn't exist or has been removed.",
+    "minRead": "min read",
+    "galleryTitle": "Gallery",
+    "photosCount": "photos",
+    "relatedTitle": "Related Articles",
+    "viewAll": "View All"
+  },
+  "eventsPage": {
+    "label": "What's Happening",
+    "title": "Events",
+    "subtitle": "Discover our latest events, cultural celebrations, and community gatherings.",
+    "noEvents": "No events found",
+    "noEventsMessage": "Check back later for upcoming events and community gatherings."
+  },
+  "galleryPage": {
+    "label": "Gallery",
+    "photosCount": "Photos",
+    "eventsCount": "Events",
+    "activeFilter": "Active Event Filter",
+    "clearAll": "Clear all",
+    "noPhotos": "No photos found",
+    "noPhotosMessage": "Try adjusting your filters to discover more memories.",
+    "resetFilters": "Reset Filters"
+  },
+  "lifestylePage": {
+    "label": "Showcase",
+    "sublabel": "Lifestyle",
+    "title": "Activity",
+    "subtitle": "See how our community enjoys Mahkota Taiwan products in their everyday life.",
+    "noActivities": "No activities found",
+    "noActivitiesMessage": "Check back later for new activities and community highlights."
+  },
+  "whereToByPage": {
+    "label": "Find Us",
+    "title": "Where to Buy",
+    "subtitle": "Discover Mahkota Taiwan products at {storeCount} retail locations across {cityCount} cities in Taiwan",
+    "stat1Label": "Partner Stores",
+    "stat2Label": "Cities Covered",
+    "stat3Label": "Island Coverage",
+    "stat4Label": "Always Online",
+    "mapLabel": "Interactive Map",
+    "mapTitle": "Find a Store Near You",
+    "mapSubtitle": "Click on any pin to see store details, contact information, and get directions"
+  },
+  "contactPage": {
+    "monFri": "Mon – Fri",
+    "businessHoursMF": "9:00 AM – 6:00 PM",
+    "saturday": "Saturday",
+    "businessHoursSat": "9:00 AM – 1:00 PM",
+    "sunday": "Sunday",
+    "closed": "Closed",
+    "businessHoursFootnote": "* Taiwan Standard Time (GMT+8) · Closed on Sundays & national holidays",
+    "faqTitle": "FAQ",
+    "ctaTitle": "Interested in Becoming a Partner?",
+    "ctaSubtitle": "Join 300+ stores across Taiwan selling Mahkota Taiwan products",
+    "ctaButton1": "Contact Our Team",
+    "ctaButton2": "Call Us Now",
+    "ctaFootnote": "We typically respond to partnership inquiries within 2 business days"
   }
 }

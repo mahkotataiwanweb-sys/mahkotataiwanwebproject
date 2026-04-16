@@ -821,7 +821,7 @@ export default function AboutPage() {
               className="inline-flex items-center gap-2 text-cream/60 hover:text-cream transition-colors text-sm group"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              Back to Home
+              {t('backToHome')}
             </Link>
           </div>
 
@@ -873,16 +873,16 @@ export default function AboutPage() {
           <div ref={textRef}>
             {/* Centered heading */}
             <div className="text-center mb-12">
-              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Our Mission</p>
+              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">{t('missionLabel')}</p>
               <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy leading-tight mb-4">
-                Bridging Indonesian Flavors to Taiwan
+                {t('missionTitle')}
               </h2>
               <div
                 ref={redLineRef}
                 className="w-16 h-[2px] bg-red mx-auto mb-6 origin-center"
               />
               <p className="text-red/80 font-medium text-sm sm:text-base tracking-wide">
-                More than a distributor — a cultural ambassador bringing the taste of home.
+                {t('missionCTA')}
               </p>
             </div>
 
@@ -941,8 +941,8 @@ export default function AboutPage() {
 <div ref={valuesRef} className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <div ref={valuesTitleRef}>
-              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">What We Stand For</p>
-              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">Our Values</h2>
+              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">{t('valuesLabel')}</p>
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">{t('valuesTitle')}</h2>
               <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
             </div>
           </div>
@@ -991,10 +991,10 @@ export default function AboutPage() {
               viewport={{ once: true }}
               transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
             >
-              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Collaboration</p>
-              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">Trusted Partners</h2>
+              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">{t('partnersLabel')}</p>
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">{t('partnersTitle')}</h2>
               <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
-              <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">Working with Taiwan&apos;s leading retailers to bring you the best Indonesian products</p>
+              <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">{t('partnersDescription')}</p>
             </motion.div>
           </div>
 
@@ -1088,8 +1088,8 @@ export default function AboutPage() {
               viewport={{ once: true }}
               transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
             >
-              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">Our Story</p>
-              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">The Journey So Far</h2>
+              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">{t('storyLabel')}</p>
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">{t('storyTitle')}</h2>
               <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
             </motion.div>
           </div>
@@ -1182,24 +1182,24 @@ export default function AboutPage() {
               </motion.div>
 
               <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-5 leading-tight">
-                Want to Learn More?
+                {t('ctaTitle')}
               </h2>
               <p className="text-cream/70 mb-10 max-w-lg mx-auto text-sm tracking-wide">
-                Discover our products or get in touch with our team today.
+                {t('ctaDescription')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href={`/${locale}/products`}
                   className="inline-flex items-center justify-center gap-2 bg-red hover:bg-red/90 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-red/20 text-base"
                 >
-                  Browse Products
+                  {t('ctaButtonProducts')}
                   <ChevronRight className="w-5 h-5" />
                 </Link>
                 <Link
                   href={`/${locale}/contact`}
                   className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 border border-white/20 hover:border-white/30 text-base backdrop-blur-sm"
                 >
-                  Contact Us
+                  {t('ctaButtonContact')}
                 </Link>
               </div>
             </div>

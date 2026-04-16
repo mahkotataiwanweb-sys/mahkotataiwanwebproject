@@ -98,7 +98,9 @@
     "calendar": "日曆",
     "filtered": "已篩選：",
     "upcomingEvents": "即將推出的活動",
-    "upcomingEventsDesc": "發現我們在全台灣舉辦的最新社區活動、慶典和聚會"
+    "upcomingEventsDesc": "發現我們在全台灣舉辦的最新社區活動、慶典和聚會",
+    "monthNames": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+    "dayAbbreviations": ["日", "一", "二", "三", "四", "五", "六"]
   },
   "lifestyle": {
     "title": "活動花絮",
@@ -269,11 +271,6 @@
     "readMore": "閱讀更多",
     "showLess": "收起"
   },
-  "whereToBuy": {
-    "title": "哪裡買",
-    "subtitle": "在台灣各地值得信賴的零售合作夥伴找到皇冠台灣產品。",
-    "findUs": "找到我們"
-  },
   "gallery": {
     "title": "相簿",
     "subtitle": "瀏覽我們的精彩時刻和活動照片",
@@ -281,6 +278,135 @@
     "allEvents": "所有活動",
     "filterByDate": "按日期篩選",
     "clearFilter": "清除篩選",
-    "photos": "張照片"
+    "photos": "張照片",
+    "calendar": "日曆",
+    "monthNames": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+    "dayAbbreviations": ["日", "一", "二", "三", "四", "五", "六"],
+    "backToHome": "回到首頁"
+  },
+  "articles": {
+    "title": "文章",
+    "loading": "正在載入文章…",
+    "notFound": "找不到文章",
+    "notFoundMessage": "您要查找的文章不存在或已被移除。",
+    "backToHome": "回到首頁"
+  },
+  "store": {
+    "allCities": "所有城市",
+    "all": "全部",
+    "cities": ["台北", "新北", "桃園", "基隆", "新竹", "新竹縣", "苗栗", "台中", "彰化", "南投", "雲林", "嘉義", "嘉義縣", "台南", "高雄", "屏東", "琉球", "蘭嶼", "綠島", "澎湖", "金門", "馬祖"],
+    "monthNames": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+    "dayAbbreviations": ["日", "一", "二", "三", "四", "五", "六"]
+  },
+  "discover": {
+    "label": "發現",
+    "title": "探索 Mahkota Taiwan",
+    "subtitle": "掌握我們最新的活動和社區活動",
+    "fallbackTitle1": "即將推出的活動",
+    "fallbackExcerpt1": "發現我們在全台灣舉辦的最新社區活動、慶典和聚會",
+    "fallbackTitle2": "社區活動",
+    "fallbackExcerpt2": "看看我們的社區如何在日常生活中享受 Mahkota Taiwan 產品"
+  },
+  "aboutPage": {
+    "missionLabel": "我們的使命",
+    "missionTitle": "將印尼風味帶入台灣",
+    "missionSubtitle": "不僅是經銷商——更是文化使者，為您帶來家鄉的味道。",
+    "valuesLabel": "我們堅持的信念",
+    "valuesTitle": "我們的價值觀",
+    "value1Title": "品質第一",
+    "value1Desc": "每項產品都經過精心選擇和測試，確保符合最高品質標準後才上架。",
+    "value2Title": "文化橋梁",
+    "value2Desc": "我們搭建印尼文化遺產與台灣日常生活之間的橋梁，將正宗風味帶入每一個家庭。",
+    "value3Title": "社區",
+    "value3Desc": "建立超過100萬顧客的強大社區，他們信任我們傳遞家鄉的味道。",
+    "value4Title": "誠信",
+    "value4Desc": "在每項夥伴關係和交易中秉持透明和信任，確保建立基於互相尊重的長期關係。",
+    "partnersLabel": "合作",
+    "partnersTitle": "信賴的夥伴",
+    "partnersSubtitle": "與台灣領先的零售商合作，為您提供最佳的印尼產品",
+    "partnerStoreFallback": "合作店家",
+    "storyLabel": "我們的故事",
+    "storyTitle": "至今的旅程",
+    "milestone2021": "2021",
+    "milestone2021Title": "成立",
+    "milestone2021Desc": "Mahkota Taiwan 以將正宗印尼產品帶入台灣的願景而成立。",
+    "milestone2022": "2022",
+    "milestone2022Title": "100+ 家店",
+    "milestone2022Desc": "網絡擴展至台灣北部超過100家零售合作店家。",
+    "milestone2023": "2023",
+    "milestone2023Title": "300+ 家店",
+    "milestone2023Desc": "達到全台300+家合作店家，成為領先的印尼產品經銷商。",
+    "milestone2024": "2024",
+    "milestone2024Title": "擴大產品線",
+    "milestone2024Desc": "推出飲品、零食和家居用品等新產品類別。",
+    "milestone2025": "2025",
+    "milestone2025Title": "100萬+ 客戶",
+    "milestone2025Desc": "榮幸為超過100萬顧客服務，證明我們的品質和社區信任。",
+    "ctaTitle": "想瞭解更多？",
+    "ctaSubtitle": "探索我們的產品或立即聯繫我們的團隊。",
+    "ctaButton1": "瀏覽產品",
+    "ctaButton2": "聯繫我們"
+  },
+  "articlesPage": {
+    "loading": "正在載入文章…",
+    "notFound": "找不到文章",
+    "notFoundMessage": "您要查找的文章不存在或已被移除。",
+    "minRead": "分鐘閱讀",
+    "galleryTitle": "相簿",
+    "photosCount": "張照片",
+    "relatedTitle": "相關文章",
+    "viewAll": "查看全部"
+  },
+  "eventsPage": {
+    "label": "發生什麼事",
+    "title": "活動",
+    "subtitle": "發現我們最新的社區活動、文化慶典和聚會。",
+    "noEvents": "找不到活動",
+    "noEventsMessage": "稍後回來查看即將舉辦的活動和社區聚會。"
+  },
+  "galleryPage": {
+    "label": "相簿",
+    "photosCount": "張照片",
+    "eventsCount": "個活動",
+    "activeFilter": "活躍的活動篩選",
+    "clearAll": "清除全部",
+    "noPhotos": "找不到照片",
+    "noPhotosMessage": "嘗試調整篩選以發現更多時刻。",
+    "resetFilters": "重設篩選"
+  },
+  "lifestylePage": {
+    "label": "展覽",
+    "sublabel": "生活方式",
+    "title": "活動花絮",
+    "subtitle": "看看我們的社區如何在日常生活中享受 Mahkota Taiwan 產品。",
+    "noActivities": "找不到活動",
+    "noActivitiesMessage": "稍後回來查看新的活動和社區亮點。"
+  },
+  "whereToByPage": {
+    "label": "找到我們",
+    "title": "哪裡購買",
+    "subtitle": "在台灣 {cityCount} 個城市的 {storeCount} 個零售地點找到 Mahkota Taiwan 產品",
+    "stat1Label": "合作店家",
+    "stat2Label": "涵蓋城市",
+    "stat3Label": "島嶼覆蓋",
+    "stat4Label": "始終線上",
+    "mapLabel": "互動地圖",
+    "mapTitle": "找到附近的商店",
+    "mapSubtitle": "點擊任何釘標以查看商店詳情、聯繫信息和方向"
+  },
+  "contactPage": {
+    "monFri": "週一 – 週五",
+    "businessHoursMF": "09:00 – 18:00",
+    "saturday": "週六",
+    "businessHoursSat": "09:00 – 13:00",
+    "sunday": "週日",
+    "closed": "休息",
+    "businessHoursFootnote": "* 台灣標準時間 (GMT+8) · 週日及國定假日休息",
+    "faqTitle": "常見問題",
+    "ctaTitle": "有興趣成為合作夥伴？",
+    "ctaSubtitle": "加入全台灣 300+ 家販賣 Mahkota Taiwan 產品的商店",
+    "ctaButton1": "聯繫我們的團隊",
+    "ctaButton2": "現在致電我們",
+    "ctaFootnote": "我們通常在 2 個工作日內回應合作夥伴詢問"
   }
 }

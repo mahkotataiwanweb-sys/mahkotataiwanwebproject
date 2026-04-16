@@ -97,11 +97,13 @@ function CalendarDropdown({
   selectedDate,
   onSelectDate,
   onClear,
+  t,
 }: {
   images: GalleryImage[];
   selectedDate: string | null;
   onSelectDate: (d: string) => void;
   onClear: () => void;
+  t: (key: string) => string;
 }) {
   const [open, setOpen] = useState(false);
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
@@ -137,7 +139,7 @@ function CalendarDropdown({
         }`}
       >
         <CalendarIcon className="w-4 h-4" />
-        {selectedDate ? formatDate(selectedDate, 'en') : 'Calendar'}
+        {selectedDate ? formatDate(selectedDate, 'en') : t('calendar')}
         {selectedDate && (
           <span
             onClick={(e) => {
@@ -242,7 +244,7 @@ function CalendarDropdown({
 
 export default function GalleryPage() {
   const locale = useLocale();
-  const t = useTranslations();
+  const t = useTranslations('gallery');
 
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -416,7 +418,7 @@ export default function GalleryPage() {
               className="inline-flex items-center gap-2 text-[#FAEDD3]/50 hover:text-[#FAEDD3] transition-colors text-sm"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to Home
+              {t('backToHome')}
             </Link>
           </div>
 
@@ -424,29 +426,29 @@ export default function GalleryPage() {
           <div className="hero-anim mb-5">
             <span className="inline-flex items-center gap-2 bg-[#C12126]/15 border border-[#C12126]/30 text-[#C12126] px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-[0.2em]">
               <Camera className="w-3.5 h-3.5" />
-              Gallery
+              {t('label')}
             </span>
           </div>
 
           {/* Heading */}
           <h1 className="hero-anim font-heading text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-            {t('gallery.title')}
+            {t('title')}
           </h1>
 
           {/* Subtitle */}
           <p className="hero-anim text-lg sm:text-xl text-[#FAEDD3]/60 max-w-2xl mx-auto leading-relaxed">
-            {t('gallery.subtitle')}
+            {t('subtitle')}
           </p>
 
           {/* Stats Strip */}
           <div className="hero-anim mt-12 flex flex-wrap justify-center gap-8 text-[#FAEDD3]/40">
             <div className="flex items-center gap-2">
               <Camera className="w-4 h-4" />
-              <span className="text-sm">{images.length} Photos</span>
+              <span className="text-sm">{images.length} {t('photos')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CalendarIcon className="w-4 h-4" />
-              <span className="text-sm">{events.length} Events</span>
+              <span className="text-sm">{events.length} {t('events')}</span>
             </div>
           </div>
         </div>
@@ -471,7 +473,7 @@ export default function GalleryPage() {
                   : 'bg-white/70 text-[#003048]/70 border-[#003048]/15 hover:border-[#003048]/40 hover:bg-white'
               }`}
             >
-              All Events
+              {t('allEvents')}
             </button>
             {events.map((evt) => (
               <button
@@ -500,13 +502,14 @@ export default function GalleryPage() {
               setActiveEvent(null);
             }}
             onClear={() => setSelectedDate(null)}
+            t={t}
           />
         </div>
 
         {/* Active filter badges */}
         {(activeEvent || selectedDate) && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-3 flex items-center gap-2">
-            <span className="text-xs text-[#003048]/40">Filters:</span>
+            <span className="text-xs text-[#003048]/40">{t('filters')}:</span>
             {activeEvent && (
               <span className="inline-flex items-center gap-1 bg-[#003048]/10 text-[#003048] text-xs px-3 py-1 rounded-full">
                 {activeEvent}
@@ -530,7 +533,7 @@ export default function GalleryPage() {
               }}
               className="text-xs text-[#003048]/40 hover:text-[#C12126] transition ml-2 underline underline-offset-2"
             >
-              Clear all
+              {t('clearAll')}
             </button>
           </div>
         )}
@@ -560,8 +563,8 @@ export default function GalleryPage() {
             <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-[#003048]/5 flex items-center justify-center">
               <Camera className="w-10 h-10 text-[#003048]/20" />
             </div>
-            <h3 className="font-heading text-2xl text-[#003048] mb-2">No photos found</h3>
-            <p className="text-[#003048]/50">Try adjusting your filters to discover more memories.</p>
+            <h3 className="font-heading text-2xl text-[#003048] mb-2">{t('noPhotosFound')}</h3>
+            <p className="text-[#003048]/50">{t('noPhotosDescription')}</p>
             <button
               onClick={() => {
                 setActiveEvent(null);
@@ -569,7 +572,7 @@ export default function GalleryPage() {
               }}
               className="mt-6 px-6 py-2.5 rounded-full bg-[#003048] text-white text-sm font-medium hover:bg-[#003048]/90 transition"
             >
-              Reset Filters
+              {t('resetFilters')}
             </button>
           </motion.div>
         ) : (

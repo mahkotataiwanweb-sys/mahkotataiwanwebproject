@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
@@ -15,6 +15,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function RecipesSection() {
   const locale = useLocale();
+  const t = useTranslations('recipes');
   const [recipes, setRecipes] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
@@ -79,14 +80,10 @@ export default function RecipesSection() {
     return () => ctx.revert();
   }, [loading, recipes.length]);
 
-  const headingLabel = locale === 'id' ? 'Ide Lezat' : locale === 'zh-TW' ? '美味創意' : 'Delicious Ideas';
-  const headingTitle = locale === 'id' ? 'Resep' : locale === 'zh-TW' ? '食譜' : 'Recipes';
-  const headingSub = locale === 'id'
-    ? 'Dapatkan inspirasi resep lezat menggunakan produk Mahkota Taiwan.'
-    : locale === 'zh-TW'
-    ? '使用皇冠台灣產品獲得美味食譜靈感。'
-    : 'Get inspired with delicious recipes using Mahkota Taiwan products.';
-  const viewAllLabel = locale === 'id' ? 'Lihat Semua Resep' : locale === 'zh-TW' ? '查看全部食譜' : 'View All Recipes';
+  const headingLabel = t('label');
+  const headingTitle = t('title');
+  const headingSub = t('subtitle');
+  const viewAllLabel = t('viewAll');
 
   return (
     <section ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">

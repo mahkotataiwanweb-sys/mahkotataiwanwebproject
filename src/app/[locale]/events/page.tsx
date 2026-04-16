@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
@@ -50,11 +50,13 @@ function CalendarDropdown({
   selectedDate,
   onSelectDate,
   onClear,
+  t,
 }: {
   events: Article[];
   selectedDate: string | null;
   onSelectDate: (d: string) => void;
   onClear: () => void;
+  t: (key: string) => string;
 }) {
   const [open, setOpen] = useState(false);
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
@@ -90,7 +92,7 @@ function CalendarDropdown({
         }`}
       >
         <CalendarIcon className="w-4 h-4" />
-        {selectedDate ? formatElegantDate(selectedDate) : 'Calendar'}
+        {selectedDate ? formatElegantDate(selectedDate) : t('calendar')}
         {selectedDate && (
           <span
             onClick={(e) => { e.stopPropagation(); onClear(); }}
@@ -176,6 +178,7 @@ function CalendarDropdown({
 
 export default function EventsPage() {
   const locale = useLocale();
+  const t = useTranslations('events');
 
   /* state */
   const [events, setEvents] = useState<Article[]>([]);
@@ -284,7 +287,7 @@ export default function EventsPage() {
               className="group mb-10 inline-flex items-center gap-2 text-sm text-[#FAEDD3]/60 transition hover:text-[#FAEDD3]"
             >
               <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              Back to Home
+              {t('backToHome')}
             </Link>
           </div>
 
@@ -293,7 +296,7 @@ export default function EventsPage() {
             data-hero-anim
             className="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-[#C12126]"
           >
-            What&apos;s Happening
+            {t('label')}
           </p>
 
           {/* heading */}
@@ -301,7 +304,7 @@ export default function EventsPage() {
             data-hero-anim
             className="font-heading text-5xl font-bold text-[#FAEDD3] md:text-7xl lg:text-8xl"
           >
-            Events
+            {t('title')}
           </h1>
 
           {/* accent line */}
@@ -312,7 +315,7 @@ export default function EventsPage() {
             data-hero-anim
             className="mt-6 max-w-lg text-base leading-relaxed text-[#FAEDD3]/60 md:text-lg"
           >
-            Discover our latest events, cultural celebrations, and community gatherings.
+            {t('subtitle')}
           </p>
         </div>
       </section>
@@ -322,7 +325,7 @@ export default function EventsPage() {
         {/* Sort + Calendar */}
         <div className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-2">
-            <span className="text-[#003048]/40 text-sm mr-1">Sort by:</span>
+            <span className="text-[#003048]/40 text-sm mr-1">{t('sortBy')}:</span>
             <button
               onClick={() => setSortOrder('newest')}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
@@ -331,7 +334,7 @@ export default function EventsPage() {
                   : 'border border-[#003048]/15 text-[#003048]/60 hover:border-[#003048]/30'
               }`}
             >
-              Newest
+              {t('newest')}
             </button>
             <button
               onClick={() => setSortOrder('oldest')}
@@ -341,7 +344,7 @@ export default function EventsPage() {
                   : 'border border-[#003048]/15 text-[#003048]/60 hover:border-[#003048]/30'
               }`}
             >
-              Oldest
+              {t('oldest')}
             </button>
           </div>
           <CalendarDropdown
@@ -349,13 +352,14 @@ export default function EventsPage() {
             selectedDate={selectedDate}
             onSelectDate={(d) => setSelectedDate(d)}
             onClear={() => setSelectedDate(null)}
+            t={t}
           />
         </div>
 
         {/* Active date filter */}
         {selectedDate && (
           <div className="flex items-center gap-2 mb-6">
-            <span className="text-xs text-[#003048]/40">Filtered:</span>
+            <span className="text-xs text-[#003048]/40">{t('filtered')}:</span>
             <span className="inline-flex items-center gap-1 bg-[#C12126]/10 text-[#C12126] text-xs px-3 py-1 rounded-full">
               {formatElegantDate(selectedDate)}
               <button onClick={() => setSelectedDate(null)} className="hover:text-[#003048] transition">
@@ -398,10 +402,10 @@ export default function EventsPage() {
               </svg>
             </div>
             <h3 className="font-heading text-2xl font-bold text-[#003048]">
-              No events found
+              {t('noEventsFound')}
             </h3>
             <p className="mt-2 max-w-sm text-[#003048]/50">
-              Check back later for upcoming events and community gatherings.
+              {t('noEventsDescription')}
             </p>
           </motion.div>
         ) : (
@@ -470,7 +474,7 @@ export default function EventsPage() {
 
                       {/* read more */}
                       <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[#C12126] transition-all group-hover:gap-3 duration-300">
-                        Read More <span aria-hidden className="text-base">→</span>
+                        {t('readMore')} <span aria-hidden className="text-base">→</span>
                       </span>
                     </div>
                   </div>
