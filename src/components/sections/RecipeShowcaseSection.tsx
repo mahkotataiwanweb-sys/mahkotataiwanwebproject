@@ -344,7 +344,7 @@ export default function RecipeShowcaseSection() {
           <div className="inline-flex items-center gap-2 mb-4">
             <Sparkles className="w-4 h-4 text-red" />
             <span className="text-red text-xs font-bold tracking-[0.3em] uppercase">
-              {locale === 'id' ? 'Dari Dapur Kami' : locale === 'zh-TW' ? '來自我們的廚房' : 'From Our Kitchen'}
+              {t('fromOurKitchen')}
             </span>
             <Sparkles className="w-4 h-4 text-red" />
           </div>

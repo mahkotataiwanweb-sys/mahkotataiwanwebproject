@@ -174,10 +174,11 @@ export default function Navbar() {
 
   const hamburgerColor = useLightText ? 'text-white' : 'text-navy';
   const useDbMenus = menuTree && menuTree.length > 0;
+  const tNav = useTranslations('nav');
 
   /* ---- Products dropdown labels ---- */
-  const ourCollectionLabel = locale === 'id' ? 'Koleksi Kami' : locale === 'zh-TW' ? '我們的系列' : 'Our Collection';
-  const recipesLabel = locale === 'id' ? 'Resep' : locale === 'zh-TW' ? '食譜' : 'Recipes';
+  const ourCollectionLabel = tNav('ourCollection');
+  const recipesLabel = tNav('recipes');
 
   /* ===== RENDER PRODUCTS DROPDOWN (shared) ===== */
   const renderProductsDropdownContent = (onLinkClick: () => void) => (

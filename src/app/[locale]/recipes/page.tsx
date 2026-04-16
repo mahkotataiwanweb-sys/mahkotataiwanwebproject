@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
@@ -22,6 +22,7 @@ function RecipeCard({ recipe, locale, index }: { recipe: Article; locale: string
   const cardRef = useRef<HTMLDivElement>(null);
   const title = getLocalizedField(recipe, 'title', locale);
   const excerpt = getLocalizedField(recipe, 'excerpt', locale);
+  const tRecipes = useTranslations('recipes');
 
   // Varied heights for true masonry look
   const heightPattern = [320, 260, 350, 240, 300, 280, 370, 250, 310, 290];
@@ -92,7 +93,7 @@ function RecipeCard({ recipe, locale, index }: { recipe: Article; locale: string
             <div className="flex items-center gap-1.5 mb-2">
               <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.15em] uppercase text-white/80 bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-full">
                 <ChefHat className="w-2.5 h-2.5" />
-                {locale === 'id' ? 'Resep' : locale === 'zh-TW' ? '食譜' : 'Recipe'}
+                {tRecipes('recipe')}
               </span>
               {getLocalizedField(recipe, 'description', locale) && (
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.15em] uppercase text-white/80 bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-full">
@@ -126,6 +127,8 @@ function RecipeCard({ recipe, locale, index }: { recipe: Article; locale: string
 /* ------------------------------------------------------------------ */
 export default function RecipesPage() {
   const locale = useLocale();
+  const t = useTranslations('recipes');
+  const tNav = useTranslations('nav');
   const [recipes, setRecipes] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -166,12 +169,8 @@ export default function RecipesPage() {
     return () => ctx.revert();
   }, []);
 
-  const headingText = locale === 'id' ? 'Resep Olahan' : locale === 'zh-TW' ? '精選食譜' : 'Our Recipes';
-  const subtitleText = locale === 'id'
-    ? 'Inspirasi masakan lezat menggunakan produk Mahkota Taiwan'
-    : locale === 'zh-TW'
-    ? '使用皇冠台灣產品的美味食譜靈感'
-    : 'Delicious cooking inspirations with Mahkota Taiwan products';
+  const headingText = t('title');
+  const subtitleText = t('subtitle');
 
   return (
     <main className="min-h-screen bg-cream">
@@ -185,11 +184,11 @@ export default function RecipesPage() {
             className="inline-flex items-center gap-2 text-white/50 hover:text-white/80 text-sm font-medium mb-8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            {locale === 'id' ? 'Beranda' : locale === 'zh-TW' ? '首頁' : 'Home'}
+            {tNav('home')}
           </Link>
 
           <p className="text-red-light text-sm tracking-[0.3em] uppercase font-semibold mb-3">
-            {locale === 'id' ? 'Ide Lezat' : locale === 'zh-TW' ? '美味創意' : 'Delicious Ideas'}
+            {t('label')}
           </p>
           <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
             {headingText}
@@ -217,7 +216,7 @@ export default function RecipesPage() {
           <div className="text-center py-20">
             <ChefHat className="w-16 h-16 text-navy/15 mx-auto mb-4" />
             <p className="text-navy/40 text-lg">
-              {locale === 'id' ? 'Belum ada resep' : locale === 'zh-TW' ? '尚無食譜' : 'No recipes yet'}
+              {t('noRecipes')}
             </p>
           </div>
         ) : (

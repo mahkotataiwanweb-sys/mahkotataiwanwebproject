@@ -165,7 +165,7 @@ export default function RecipesSection() {
                     <div>
                       <span className="inline-flex items-center gap-1.5 text-red/60 text-[10px] font-bold tracking-[0.2em] uppercase mb-1.5">
                         <ChefHat className="w-3 h-3" />
-                        {locale === 'id' ? 'Resep' : locale === 'zh-TW' ? '食譜' : 'Recipe'}
+                        {t('recipe')}
                       </span>
                       <h3 className="font-heading text-lg font-bold text-navy group-hover:text-red transition-colors duration-300 mb-1.5">
                         {title}
