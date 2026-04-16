@@ -130,7 +130,11 @@
     "title": "Eksplorasi Mahkota Taiwan",
     "subtitle": "Tetap terhubung dengan acara dan aktivitas komunitas terbaru kami",
     "viewEvents": "Lihat Acara",
-    "viewActivities": "Lihat Aktivitas"
+    "viewActivities": "Lihat Aktivitas",
+    "fallbackTitle1": "Acara Mendatang",
+    "fallbackExcerpt1": "Temukan acara komunitas, perayaan, dan pertemuan terbaru kami di seluruh Taiwan",
+    "fallbackTitle2": "Aktivitas Komunitas",
+    "fallbackExcerpt2": "Lihat bagaimana komunitas kami menikmati produk Mahkota Taiwan dalam kehidupan sehari-hari"
   },
   "videoShowcase": {
     "label": "Konten Visual",
@@ -145,6 +149,11 @@
   "whereToBuy": {
     "title": "Tempat Membeli",
     "subtitle": "Temukan produk Mahkota Taiwan di mitra ritel terpercaya di seluruh Taiwan.",
+    "label": "Temukan Kami",
+    "description": "Temukan produk Mahkota Taiwan di {storeCount} lokasi ritel di {cityCount} kota di Taiwan",
+    "locations": "Toko Mitra",
+    "cities": "Kota yang Dilayani",
+    "inTaiwan": "Jangkauan Pulau",
     "findUs": "Temukan Kami",
     "viewAllLocations": "Lihat Semua Lokasi",
     "tasteSoGood": "Rasanya sangat enak!",
@@ -201,7 +210,20 @@
     "send": "Kirim Pesan",
     "namePlaceholder": "Masukkan nama lengkap",
     "emailPlaceholder": "Masukkan email",
-    "messagePlaceholder": "Tulis pesan Anda..."
+    "messagePlaceholder": "Tulis pesan Anda...",
+    "mondayToFriday": "Senin – Jumat",
+    "weekdayHours": "09:00 – 18:00",
+    "saturday": "Sabtu",
+    "saturdayHours": "09:00 – 13:00",
+    "sunday": "Minggu",
+    "sundayStatus": "Ditutup",
+    "timezoneNote": "* Waktu Taiwan (GMT+8) · Ditutup hari Minggu & hari libur nasional",
+    "ctaTitle": "Tertarik Menjadi Mitra?",
+    "ctaDescription": "Bergabunglah dengan 300+ toko di seluruh Taiwan yang menjual produk Mahkota Taiwan",
+    "ctaButtonEmail": "Hubungi Tim Kami",
+    "ctaButtonPhone": "Hubungi Kami",
+    "ctaFootnote": "Kami biasanya merespons pertanyaan kemitraan dalam 2 hari kerja",
+    "faqTitle": "Pertanyaan yang Sering Diajukan"
   },
   "footer": {
     "description": "Sumber terpercaya untuk produk makanan Indonesia asli di Taiwan. Menjembatani budaya melalui cita rasa Indonesia.",
@@ -297,15 +319,6 @@
     "cities": ["Taipei", "New Taipei", "Taoyuan", "Keelung", "Hsinchu", "Hsinchu County", "Miaoli", "Taichung", "Changhua", "Nantou", "Yunlin", "Chiayi", "Chiayi County", "Tainan", "Kaohsiung", "Pingtung", "Liuqiu", "Orchid Island", "Green Island", "Penghu", "Kinmen", "Matsu"],
     "monthNames": ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"],
     "dayAbbreviations": ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"]
-  },
-  "discover": {
-    "label": "Jelajahi",
-    "title": "Eksplorasi Mahkota Taiwan",
-    "subtitle": "Tetap terhubung dengan acara dan aktivitas komunitas terbaru kami",
-    "fallbackTitle1": "Acara Mendatang",
-    "fallbackExcerpt1": "Temukan acara komunitas, perayaan, dan pertemuan terbaru kami di seluruh Taiwan",
-    "fallbackTitle2": "Aktivitas Komunitas",
-    "fallbackExcerpt2": "Lihat bagaimana komunitas kami menikmati produk Mahkota Taiwan dalam kehidupan sehari-hari"
   },
   "aboutPage": {
     "missionLabel": "Misi Kami",

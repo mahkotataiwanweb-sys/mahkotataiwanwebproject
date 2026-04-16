@@ -130,7 +130,11 @@
     "title": "探索 Mahkota Taiwan",
     "subtitle": "掌握我們最新的活動和社區活動",
     "viewEvents": "查看活動",
-    "viewActivities": "查看活動"
+    "viewActivities": "查看活動",
+    "fallbackTitle1": "即將推出的活動",
+    "fallbackExcerpt1": "發現我們在全台灣舉辦的最新社區活動、慶典和聚會",
+    "fallbackTitle2": "社區活動",
+    "fallbackExcerpt2": "看看我們的社區如何在日常生活中享受 Mahkota Taiwan 產品"
   },
   "videoShowcase": {
     "label": "視覺內容",
@@ -145,6 +149,11 @@
   "whereToBuy": {
     "title": "哪裡購買",
     "subtitle": "在全台灣的信賴零售夥伴處找到 Mahkota Taiwan 產品。",
+    "label": "找到我們",
+    "description": "在台灣全島 {cityCount} 個城市的 {storeCount} 個零售地點找到 Mahkota Taiwan 產品",
+    "locations": "合作店家",
+    "cities": "涵蓋城市",
+    "inTaiwan": "島嶼覆蓋",
     "findUs": "找到我們",
     "viewAllLocations": "查看所有位置",
     "tasteSoGood": "味道太好了！",
@@ -201,7 +210,20 @@
     "send": "發送訊息",
     "namePlaceholder": "請輸入姓名",
     "emailPlaceholder": "請輸入電子郵件",
-    "messagePlaceholder": "在此撰寫訊息..."
+    "messagePlaceholder": "在此撰寫訊息...",
+    "mondayToFriday": "週一 – 週五",
+    "weekdayHours": "09:00 – 18:00",
+    "saturday": "週六",
+    "saturdayHours": "09:00 – 13:00",
+    "sunday": "週日",
+    "sundayStatus": "休息",
+    "timezoneNote": "* 台灣標準時間（GMT+8） · 週日及國定假日休息",
+    "ctaTitle": "有興趣成為合作夥伴嗎？",
+    "ctaDescription": "加入全台灣 300+ 家販售 Mahkota Taiwan 產品的店家",
+    "ctaButtonEmail": "聯繫我們的團隊",
+    "ctaButtonPhone": "現在致電我們",
+    "ctaFootnote": "我們通常在 2 個工作天內回應合作諮詢",
+    "faqTitle": "常見問題"
   },
   "footer": {
     "description": "您在台灣值得信賴的正宗印尼食品來源。透過印尼風味連結文化。",
@@ -297,15 +319,6 @@
     "cities": ["台北", "新北", "桃園", "基隆", "新竹", "新竹縣", "苗栗", "台中", "彰化", "南投", "雲林", "嘉義", "嘉義縣", "台南", "高雄", "屏東", "琉球", "蘭嶼", "綠島", "澎湖", "金門", "馬祖"],
     "monthNames": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
     "dayAbbreviations": ["日", "一", "二", "三", "四", "五", "六"]
-  },
-  "discover": {
-    "label": "發現",
-    "title": "探索 Mahkota Taiwan",
-    "subtitle": "掌握我們最新的活動和社區活動",
-    "fallbackTitle1": "即將推出的活動",
-    "fallbackExcerpt1": "發現我們在全台灣舉辦的最新社區活動、慶典和聚會",
-    "fallbackTitle2": "社區活動",
-    "fallbackExcerpt2": "看看我們的社區如何在日常生活中享受 Mahkota Taiwan 產品"
   },
   "aboutPage": {
     "missionLabel": "我們的使命",

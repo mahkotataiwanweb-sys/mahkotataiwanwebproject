@@ -130,7 +130,11 @@
     "title": "Explore Mahkota Taiwan",
     "subtitle": "Stay connected with our latest events and community activities",
     "viewEvents": "View Events",
-    "viewActivities": "View Activities"
+    "viewActivities": "View Activities",
+    "fallbackTitle1": "Upcoming Events",
+    "fallbackExcerpt1": "Discover our latest community events, celebrations, and gatherings across Taiwan",
+    "fallbackTitle2": "Community Activities",
+    "fallbackExcerpt2": "See how our community enjoys Mahkota Taiwan products in their daily life"
   },
   "videoShowcase": {
     "label": "Visual Content",
@@ -145,6 +149,11 @@
   "whereToBuy": {
     "title": "Where to Buy",
     "subtitle": "Find Mahkota Taiwan products at these trusted retail partners across Taiwan.",
+    "label": "Find Us",
+    "description": "Discover Mahkota Taiwan products at {storeCount} retail locations across {cityCount} cities in Taiwan",
+    "locations": "Partner Stores",
+    "cities": "Cities Covered",
+    "inTaiwan": "Island Coverage",
     "findUs": "Find Us",
     "viewAllLocations": "View All Locations",
     "tasteSoGood": "Taste so good!",
@@ -201,7 +210,20 @@
     "send": "Send Message",
     "namePlaceholder": "Enter your full name",
     "emailPlaceholder": "Enter your email address",
-    "messagePlaceholder": "Write your message here..."
+    "messagePlaceholder": "Write your message here...",
+    "mondayToFriday": "Mon – Fri",
+    "weekdayHours": "9:00 AM – 6:00 PM",
+    "saturday": "Saturday",
+    "saturdayHours": "9:00 AM – 1:00 PM",
+    "sunday": "Sunday",
+    "sundayStatus": "Closed",
+    "timezoneNote": "* Taiwan Standard Time (GMT+8) · Closed on Sundays & national holidays",
+    "ctaTitle": "Interested in Becoming a Partner?",
+    "ctaDescription": "Join 300+ stores across Taiwan selling Mahkota Taiwan products",
+    "ctaButtonEmail": "Contact Our Team",
+    "ctaButtonPhone": "Call Us Now",
+    "ctaFootnote": "We typically respond to partnership inquiries within 2 business days",
+    "faqTitle": "FAQ"
   },
   "footer": {
     "description": "Your trusted source for authentic Indonesian food products in Taiwan. Bridging cultures through the flavors of Indonesia.",
@@ -297,15 +319,6 @@
     "cities": ["Taipei", "New Taipei", "Taoyuan", "Keelung", "Hsinchu", "Hsinchu County", "Miaoli", "Taichung", "Changhua", "Nantou", "Yunlin", "Chiayi", "Chiayi County", "Tainan", "Kaohsiung", "Pingtung", "Liuqiu", "Orchid Island", "Green Island", "Penghu", "Kinmen", "Matsu"],
     "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     "dayAbbreviations": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
-  },
-  "discover": {
-    "label": "Discover",
-    "title": "Explore Mahkota Taiwan",
-    "subtitle": "Stay connected with our latest events and community activities",
-    "fallbackTitle1": "Upcoming Events",
-    "fallbackExcerpt1": "Discover our latest community events, celebrations, and gatherings across Taiwan",
-    "fallbackTitle2": "Community Activities",
-    "fallbackExcerpt2": "See how our community enjoys Mahkota Taiwan products in their daily life"
   },
   "aboutPage": {
     "missionLabel": "Our Mission",
