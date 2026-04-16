@@ -36,7 +36,19 @@
     "label": "Who We Are",
     "highlight1": "Halal certified products ensuring quality and trust",
     "highlight2": "Direct distribution network across Taiwan",
-    "highlight3": "Authentic Indonesian flavors, carefully sourced"
+    "highlight3": "Authentic Indonesian flavors, carefully sourced",
+    "missionLabel": "Our Mission",
+    "missionTitle": "Bridging Indonesian Flavors to Taiwan",
+    "missionCTA": "Discover our products or get in touch with our team today.",
+    "valuesLabel": "What We Stand For",
+    "valuesTitle": "Our Values",
+    "partnersLabel": "Collaboration",
+    "partnersTitle": "Trusted Partners",
+    "partnersDescription": "Working with Taiwan's leading retailers to bring you the best Indonesian products",
+    "storyLabel": "Our Story",
+    "storyTitle": "The Journey So Far",
+    "ctaButtonProducts": "Browse Products",
+    "ctaButtonContact": "Contact Us"
   },
   "products": {
     "label": "Our Collection",
@@ -99,8 +111,30 @@
     "filtered": "Filtered:",
     "upcomingEvents": "Upcoming Events",
     "upcomingEventsDesc": "Discover our latest community events, celebrations, and gatherings across Taiwan",
-    "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-    "dayAbbreviations": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+    "monthNames": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "dayAbbreviations": [
+      "Su",
+      "Mo",
+      "Tu",
+      "We",
+      "Th",
+      "Fr",
+      "Sa"
+    ],
+    "noEventsDescription": "Check back later for upcoming events and community gatherings."
   },
   "lifestyle": {
     "title": "Activity",
@@ -118,7 +152,11 @@
     "filtered": "Filtered:",
     "communityActivities": "Community Activities",
     "communityActivitiesDesc": "See how our community enjoys Mahkota Taiwan products in their daily life",
-    "viewActivities": "View Activities"
+    "viewActivities": "View Activities",
+    "showcase": "Lifestyle",
+    "lifestyleLabel": "Showcase",
+    "noActivitiesFound": "No activities found",
+    "noActivitiesDescription": "Check back later for new activities and community highlights."
   },
   "moments": {
     "label": "Community",
@@ -223,7 +261,12 @@
     "ctaButtonEmail": "Contact Our Team",
     "ctaButtonPhone": "Call Us Now",
     "ctaFootnote": "We typically respond to partnership inquiries within 2 business days",
-    "faqTitle": "FAQ"
+    "faqTitle": "FAQ",
+    "faq": {
+      "title": "FAQ"
+    },
+    "officeTitle": "Office Address",
+    "getDirections": "Get Directions"
   },
   "footer": {
     "description": "Your trusted source for authentic Indonesian food products in Taiwan. Bridging cultures through the flavors of Indonesia.",
@@ -302,23 +345,94 @@
     "clearFilter": "Clear Filter",
     "photos": "photos",
     "calendar": "Calendar",
-    "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-    "dayAbbreviations": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
-    "backToHome": "Back to Home"
+    "monthNames": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "dayAbbreviations": [
+      "Su",
+      "Mo",
+      "Tu",
+      "We",
+      "Th",
+      "Fr",
+      "Sa"
+    ],
+    "backToHome": "Back to Home",
+    "clearAll": "Clear all",
+    "noPhotosFound": "No photos found",
+    "noPhotosDescription": "Try adjusting your filters to discover more memories.",
+    "resetFilters": "Reset Filters"
   },
   "articles": {
     "title": "Articles",
     "loading": "Loading article…",
     "notFound": "Article Not Found",
     "notFoundMessage": "The article you're looking for doesn't exist or has been removed.",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "notFoundDescription": "The article you're looking for doesn't exist or has been removed.",
+    "relatedArticles": "Related Articles"
   },
   "store": {
     "allCities": "All Cities",
     "all": "All",
-    "cities": ["Taipei", "New Taipei", "Taoyuan", "Keelung", "Hsinchu", "Hsinchu County", "Miaoli", "Taichung", "Changhua", "Nantou", "Yunlin", "Chiayi", "Chiayi County", "Tainan", "Kaohsiung", "Pingtung", "Liuqiu", "Orchid Island", "Green Island", "Penghu", "Kinmen", "Matsu"],
-    "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-    "dayAbbreviations": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+    "cities": [
+      "Taipei",
+      "New Taipei",
+      "Taoyuan",
+      "Keelung",
+      "Hsinchu",
+      "Hsinchu County",
+      "Miaoli",
+      "Taichung",
+      "Changhua",
+      "Nantou",
+      "Yunlin",
+      "Chiayi",
+      "Chiayi County",
+      "Tainan",
+      "Kaohsiung",
+      "Pingtung",
+      "Liuqiu",
+      "Orchid Island",
+      "Green Island",
+      "Penghu",
+      "Kinmen",
+      "Matsu"
+    ],
+    "monthNames": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "dayAbbreviations": [
+      "Su",
+      "Mo",
+      "Tu",
+      "We",
+      "Th",
+      "Fr",
+      "Sa"
+    ]
   },
   "aboutPage": {
     "missionLabel": "Our Mission",

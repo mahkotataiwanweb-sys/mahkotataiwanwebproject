@@ -36,7 +36,19 @@
     "label": "Siapa Kami",
     "highlight1": "Produk bersertifikat Halal menjamin kualitas dan kepercayaan",
     "highlight2": "Jaringan distribusi langsung di seluruh Taiwan",
-    "highlight3": "Cita rasa Indonesia otentik, dipilih dengan cermat"
+    "highlight3": "Cita rasa Indonesia otentik, dipilih dengan cermat",
+    "missionLabel": "Misi Kami",
+    "missionTitle": "Menjembatani Cita Rasa Indonesia ke Taiwan",
+    "missionCTA": "Temukan produk kami atau hubungi tim kami hari ini.",
+    "valuesLabel": "Apa yang Kami Perjuangkan",
+    "valuesTitle": "Nilai-Nilai Kami",
+    "partnersLabel": "Kolaborasi",
+    "partnersTitle": "Mitra Terpercaya",
+    "partnersDescription": "Bekerja dengan pengecer terkemuka Taiwan untuk membawa produk Indonesia terbaik kepada Anda",
+    "storyLabel": "Kisah Kami",
+    "storyTitle": "Perjalanan Hingga Saat Ini",
+    "ctaButtonProducts": "Jelajahi Produk",
+    "ctaButtonContact": "Hubungi Kami"
   },
   "products": {
     "label": "Koleksi Kami",
@@ -99,8 +111,30 @@
     "filtered": "Disaring:",
     "upcomingEvents": "Acara Mendatang",
     "upcomingEventsDesc": "Temukan acara komunitas, perayaan, dan pertemuan terbaru kami di seluruh Taiwan",
-    "monthNames": ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"],
-    "dayAbbreviations": ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"]
+    "monthNames": [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember"
+    ],
+    "dayAbbreviations": [
+      "Min",
+      "Sen",
+      "Sel",
+      "Rab",
+      "Kam",
+      "Jum",
+      "Sab"
+    ],
+    "noEventsDescription": "Kunjungi kembali nanti untuk acara mendatang dan pertemuan komunitas."
   },
   "lifestyle": {
     "title": "Aktivitas",
@@ -118,7 +152,11 @@
     "filtered": "Disaring:",
     "communityActivities": "Aktivitas Komunitas",
     "communityActivitiesDesc": "Lihat bagaimana komunitas kami menikmati produk Mahkota Taiwan dalam kehidupan sehari-hari",
-    "viewActivities": "Lihat Aktivitas"
+    "viewActivities": "Lihat Aktivitas",
+    "showcase": "Gaya Hidup",
+    "lifestyleLabel": "Pameran",
+    "noActivitiesFound": "Tidak ada aktivitas ditemukan",
+    "noActivitiesDescription": "Kunjungi kembali nanti untuk aktivitas baru dan sorotan komunitas."
   },
   "moments": {
     "label": "Komunitas",
@@ -223,7 +261,12 @@
     "ctaButtonEmail": "Hubungi Tim Kami",
     "ctaButtonPhone": "Hubungi Kami",
     "ctaFootnote": "Kami biasanya merespons pertanyaan kemitraan dalam 2 hari kerja",
-    "faqTitle": "Pertanyaan yang Sering Diajukan"
+    "faqTitle": "Pertanyaan yang Sering Diajukan",
+    "faq": {
+      "title": "Pertanyaan yang Sering Diajukan"
+    },
+    "officeTitle": "Alamat Kantor",
+    "getDirections": "Dapatkan Petunjuk Arah"
   },
   "footer": {
     "description": "Sumber terpercaya untuk produk makanan Indonesia asli di Taiwan. Menjembatani budaya melalui cita rasa Indonesia.",
@@ -302,23 +345,94 @@
     "clearFilter": "Hapus Filter",
     "photos": "foto",
     "calendar": "Kalender",
-    "monthNames": ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"],
-    "dayAbbreviations": ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"],
-    "backToHome": "Kembali ke Beranda"
+    "monthNames": [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember"
+    ],
+    "dayAbbreviations": [
+      "Min",
+      "Sen",
+      "Sel",
+      "Rab",
+      "Kam",
+      "Jum",
+      "Sab"
+    ],
+    "backToHome": "Kembali ke Beranda",
+    "clearAll": "Hapus semua",
+    "noPhotosFound": "Tidak ada foto ditemukan",
+    "noPhotosDescription": "Coba sesuaikan filter Anda untuk menemukan lebih banyak kenangan.",
+    "resetFilters": "Setel Ulang Filter"
   },
   "articles": {
     "title": "Artikel",
     "loading": "Memuat artikel…",
     "notFound": "Artikel Tidak Ditemukan",
     "notFoundMessage": "Artikel yang Anda cari tidak ada atau telah dihapus.",
-    "backToHome": "Kembali ke Beranda"
+    "backToHome": "Kembali ke Beranda",
+    "notFoundDescription": "Artikel yang Anda cari tidak ada atau telah dihapus.",
+    "relatedArticles": "Artikel Terkait"
   },
   "store": {
     "allCities": "Semua Kota",
     "all": "Semua",
-    "cities": ["Taipei", "New Taipei", "Taoyuan", "Keelung", "Hsinchu", "Hsinchu County", "Miaoli", "Taichung", "Changhua", "Nantou", "Yunlin", "Chiayi", "Chiayi County", "Tainan", "Kaohsiung", "Pingtung", "Liuqiu", "Orchid Island", "Green Island", "Penghu", "Kinmen", "Matsu"],
-    "monthNames": ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"],
-    "dayAbbreviations": ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"]
+    "cities": [
+      "Taipei",
+      "New Taipei",
+      "Taoyuan",
+      "Keelung",
+      "Hsinchu",
+      "Hsinchu County",
+      "Miaoli",
+      "Taichung",
+      "Changhua",
+      "Nantou",
+      "Yunlin",
+      "Chiayi",
+      "Chiayi County",
+      "Tainan",
+      "Kaohsiung",
+      "Pingtung",
+      "Liuqiu",
+      "Orchid Island",
+      "Green Island",
+      "Penghu",
+      "Kinmen",
+      "Matsu"
+    ],
+    "monthNames": [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember"
+    ],
+    "dayAbbreviations": [
+      "Min",
+      "Sen",
+      "Sel",
+      "Rab",
+      "Kam",
+      "Jum",
+      "Sab"
+    ]
   },
   "aboutPage": {
     "missionLabel": "Misi Kami",
