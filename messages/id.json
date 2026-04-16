@@ -267,11 +267,6 @@
     "readMore": "Baca Selengkapnya",
     "showLess": "Tampilkan Lebih Sedikit"
   },
-  "whereToBuy": {
-    "title": "Tempat Membeli",
-    "subtitle": "Temukan produk Mahkota Taiwan di mitra ritel terpercaya di seluruh Taiwan.",
-    "findUs": "Temukan Kami"
-  },
   "gallery": {
     "title": "Galeri",
     "subtitle": "Jelajahi koleksi momen dan acara kami",
@@ -298,5 +293,116 @@
     "cities": ["Taipei", "New Taipei", "Taoyuan", "Keelung", "Hsinchu", "Hsinchu County", "Miaoli", "Taichung", "Changhua", "Nantou", "Yunlin", "Chiayi", "Chiayi County", "Tainan", "Kaohsiung", "Pingtung", "Liuqiu", "Orchid Island", "Green Island", "Penghu", "Kinmen", "Matsu"],
     "monthNames": ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"],
     "dayAbbreviations": ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"]
+  },
+  "discover": {
+    "label": "Jelajahi",
+    "title": "Eksplorasi Mahkota Taiwan",
+    "subtitle": "Tetap terhubung dengan acara dan aktivitas komunitas terbaru kami",
+    "fallbackTitle1": "Acara Mendatang",
+    "fallbackExcerpt1": "Temukan acara komunitas, perayaan, dan pertemuan terbaru kami di seluruh Taiwan",
+    "fallbackTitle2": "Aktivitas Komunitas",
+    "fallbackExcerpt2": "Lihat bagaimana komunitas kami menikmati produk Mahkota Taiwan dalam kehidupan sehari-hari"
+  },
+  "aboutPage": {
+    "missionLabel": "Misi Kami",
+    "missionTitle": "Menjembatani Cita Rasa Indonesia ke Taiwan",
+    "missionSubtitle": "Lebih dari sekadar distributor — duta budaya yang menghadirkan cita rasa rumah.",
+    "valuesLabel": "Apa yang Kami Perjuangkan",
+    "valuesTitle": "Nilai-Nilai Kami",
+    "value1Title": "Kualitas Utama",
+    "value1Desc": "Setiap produk dipilih dengan cermat dan diuji untuk memenuhi standar kualitas tertinggi sebelum sampai ke rak kami.",
+    "value2Title": "Jembatan Budaya",
+    "value2Desc": "Kami menjembatani celah antara warisan Indonesia dan kehidupan sehari-hari Taiwan, menghadirkan cita rasa otentik ke setiap rumah.",
+    "value3Title": "Komunitas",
+    "value3Desc": "Membangun komunitas kuat lebih dari 1 juta pelanggan yang mempercayai kami untuk menghadirkan cita rasa rumah.",
+    "value4Title": "Integritas",
+    "value4Desc": "Beroperasi dengan transparansi dan kepercayaan dalam setiap kemitraan dan transaksi, memastikan hubungan jangka panjang yang dibangun atas dasar saling menghormati.",
+    "partnersLabel": "Kolaborasi",
+    "partnersTitle": "Mitra Terpercaya",
+    "partnersSubtitle": "Bekerja dengan pengecer terkemuka Taiwan untuk menghadirkan produk Indonesia terbaik kepada Anda",
+    "partnerStoreFallback": "Toko Mitra",
+    "storyLabel": "Cerita Kami",
+    "storyTitle": "Perjalanan Sejauh Ini",
+    "milestone2021": "2021",
+    "milestone2021Title": "Didirikan",
+    "milestone2021Desc": "Mahkota Taiwan didirikan dengan visi menghadirkan produk Indonesia asli ke Taiwan.",
+    "milestone2022": "2022",
+    "milestone2022Title": "100+ Toko",
+    "milestone2022Desc": "Memperluas jaringan ke lebih dari 100 toko mitra ritel di Taiwan utara.",
+    "milestone2023": "2023",
+    "milestone2023Title": "300+ Toko",
+    "milestone2023Desc": "Mencapai 300+ toko mitra di seluruh Taiwan, menjadi distributor produk Indonesia terkemuka.",
+    "milestone2024": "2024",
+    "milestone2024Title": "Lini Produk Diperluas",
+    "milestone2024Desc": "Memperkenalkan kategori produk baru termasuk minuman, camilan, dan kebutuhan rumah tangga.",
+    "milestone2025": "2025",
+    "milestone2025Title": "1 Juta+ Pelanggan",
+    "milestone2025Desc": "Dengan bangga melayani lebih dari 1 juta pelanggan, bukti nyata dari kualitas dan kepercayaan komunitas kami.",
+    "ctaTitle": "Ingin Tahu Lebih Lanjut?",
+    "ctaSubtitle": "Jelajahi produk kami atau hubungi tim kami hari ini.",
+    "ctaButton1": "Jelajahi Produk",
+    "ctaButton2": "Hubungi Kami"
+  },
+  "articlesPage": {
+    "loading": "Memuat artikel…",
+    "notFound": "Artikel Tidak Ditemukan",
+    "notFoundMessage": "Artikel yang Anda cari tidak ada atau telah dihapus.",
+    "minRead": "menit membaca",
+    "galleryTitle": "Galeri",
+    "photosCount": "foto",
+    "relatedTitle": "Artikel Terkait",
+    "viewAll": "Lihat Semua"
+  },
+  "eventsPage": {
+    "label": "Ada Apa",
+    "title": "Acara",
+    "subtitle": "Temukan acara, perayaan budaya, dan pertemuan komunitas terbaru kami.",
+    "noEvents": "Acara tidak ditemukan",
+    "noEventsMessage": "Kunjungi kembali nanti untuk acara dan pertemuan komunitas mendatang."
+  },
+  "galleryPage": {
+    "label": "Galeri",
+    "photosCount": "Foto",
+    "eventsCount": "Acara",
+    "activeFilter": "Filter Acara Aktif",
+    "clearAll": "Hapus semua",
+    "noPhotos": "Foto tidak ditemukan",
+    "noPhotosMessage": "Coba sesuaikan filter Anda untuk menemukan lebih banyak momen.",
+    "resetFilters": "Reset Filter"
+  },
+  "lifestylePage": {
+    "label": "Pameran",
+    "sublabel": "Gaya Hidup",
+    "title": "Aktivitas",
+    "subtitle": "Lihat bagaimana komunitas kami menikmati produk Mahkota Taiwan dalam kehidupan sehari-hari.",
+    "noActivities": "Aktivitas tidak ditemukan",
+    "noActivitiesMessage": "Kunjungi kembali nanti untuk aktivitas dan sorotan komunitas baru."
+  },
+  "whereToByPage": {
+    "label": "Temukan Kami",
+    "title": "Tempat Membeli",
+    "subtitle": "Temukan produk Mahkota Taiwan di {storeCount} lokasi ritel di {cityCount} kota di Taiwan",
+    "stat1Label": "Toko Mitra",
+    "stat2Label": "Kota yang Dilayani",
+    "stat3Label": "Jangkauan Pulau",
+    "stat4Label": "Selalu Online",
+    "mapLabel": "Peta Interaktif",
+    "mapTitle": "Cari Toko Terdekat",
+    "mapSubtitle": "Klik pada pin mana pun untuk melihat detail toko, informasi kontak, dan arah"
+  },
+  "contactPage": {
+    "monFri": "Senin – Jumat",
+    "businessHoursMF": "09:00 – 18:00",
+    "saturday": "Sabtu",
+    "businessHoursSat": "09:00 – 13:00",
+    "sunday": "Minggu",
+    "closed": "Tutup",
+    "businessHoursFootnote": "* Waktu Standar Taiwan (GMT+8) · Tutup pada hari Minggu & hari libur nasional",
+    "faqTitle": "FAQ",
+    "ctaTitle": "Tertarik Menjadi Mitra?",
+    "ctaSubtitle": "Bergabung dengan 300+ toko di seluruh Taiwan yang menjual produk Mahkota Taiwan",
+    "ctaButton1": "Hubungi Tim Kami",
+    "ctaButton2": "Hubungi Kami Sekarang",
+    "ctaFootnote": "Kami biasanya merespons pertanyaan kemitraan dalam 2 hari kerja"
   }
 }
