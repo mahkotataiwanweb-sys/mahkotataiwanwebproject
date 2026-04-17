@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -42,6 +42,8 @@ const PIN_LOCATIONS = [
 ];
 
 export default function WhereToBuySection() {
+  const locale = useLocale();
+  const t = useTranslations('whereToBuy');
   const sectionRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<SVGSVGElement>(null);
@@ -49,7 +51,6 @@ export default function WhereToBuySection() {
   const topTextRef = useRef<HTMLParagraphElement>(null);
   const bottomTextRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const locale = useLocale();
 
   useEffect(() => {
     if (!sectionRef.current || !mapRef.current) return;
@@ -262,7 +263,7 @@ export default function WhereToBuySection() {
           {/* Text — top left: letter-by-letter reveal */}
           <div className="text-left w-full max-w-sm">
             <p ref={topTextRef} className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-navy italic leading-tight">
-              {'Taste so good!'.split('').map((char, i) => (
+              {t('tasteSoGood').split('').map((char, i) => (
                 <span
                   key={i}
                   className="letter-char inline-block"
@@ -419,7 +420,7 @@ export default function WhereToBuySection() {
           {/* Text — bottom right: letter-by-letter reveal */}
           <div ref={bottomTextRef} className="text-right w-full max-w-sm">
             <p className="letter-line-a font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-red leading-tight">
-              {'300+ Store'.split('').map((char, i) => (
+              {t('storeCount').split('').map((char, i) => (
                 <span
                   key={`a-${i}`}
                   className="letter-char inline-block"
@@ -429,7 +430,7 @@ export default function WhereToBuySection() {
               ))}
             </p>
             <p className="letter-line-b font-heading text-sm sm:text-base md:text-lg lg:text-xl text-navy/60 font-medium tracking-wide">
-              {'all over Taiwan'.split('').map((char, i) => (
+              {t('allOverTaiwan').split('').map((char, i) => (
                 <span
                   key={`b-${i}`}
                   className="letter-char inline-block"

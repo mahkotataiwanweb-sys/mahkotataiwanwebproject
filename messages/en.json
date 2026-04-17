@@ -17,7 +17,11 @@
   "hero": {
     "tagline": "Indonesian Flavors, Now in Taiwan",
     "subtitle": "Your trusted source for authentic Indonesian food products in Taiwan. From beloved snacks to essential cooking ingredients, we bring the taste of home to you.",
-    "cta": "Explore Products"
+    "cta": "Explore Products",
+    "visualContent": "Visual Content",
+    "watchOurStories": "Watch Our Stories",
+    "storyDescription": "Discover Mahkota Taiwan through our video content across YouTube, Shorts, TikTok, and Reels.",
+    "showingVideos": "Showing"
   },
   "about": {
     "title": "Mahkota Taiwan",
@@ -195,6 +199,7 @@
     "findUs": "Find Us",
     "viewAllLocations": "View All Locations",
     "tasteSoGood": "Taste so good!",
+    "storeCount": "300+ Store",
     "store": "Store",
     "allOverTaiwan": "all over Taiwan",
     "backToHome": "Back to Home",

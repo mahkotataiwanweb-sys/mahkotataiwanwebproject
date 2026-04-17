@@ -17,7 +17,11 @@
   "hero": {
     "tagline": "印尼風味，在台灣呈現",
     "subtitle": "您在台灣值得信賴的正宗印尼食品來源。從受歡迎的零食到必備的烹飪食材，我們為您帶來家鄉的味道。",
-    "cta": "瀏覽產品"
+    "cta": "瀏覽產品",
+    "visualContent": "視覺內容",
+    "watchOurStories": "觀看我們的故事",
+    "storyDescription": "透過我們在 YouTube、YouTube Shorts、TikTok 和 Reels 上的影片內容，了解Mahkota Taiwan。",
+    "showingVideos": "顯示"
   },
   "about": {
     "title": "Mahkota Taiwan",
@@ -195,6 +199,7 @@
     "findUs": "找到我們",
     "viewAllLocations": "查看所有位置",
     "tasteSoGood": "味道太好了！",
+    "storeCount": "300+ 家門店",
     "store": "商店",
     "allOverTaiwan": "遍佈全台灣",
     "backToHome": "回到首頁",
