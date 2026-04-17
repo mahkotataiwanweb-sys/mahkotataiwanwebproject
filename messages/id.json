@@ -17,7 +17,10 @@
   "hero": {
     "tagline": "Rasa Indonesia, Hadir di Taiwan",
     "subtitle": "Sumber terpercaya untuk produk makanan Indonesia asli di Taiwan. Dari camilan favorit hingga bumbu masak esensial, kami membawa cita rasa rumah untuk Anda.",
-    "cta": "Jelajahi Produk"
+    "cta": "Jelajahi Produk",
+    "visualContent": "Konten Visual",
+    "watchOurStories": "Tonton Cerita Kami",
+    "storyDescription": "Temukan Mahkota Taiwan melalui konten video kami di YouTube, Shorts, TikTok, dan Reels."
   },
   "about": {
     "title": "Mahkota Taiwan",
@@ -68,6 +71,28 @@
       "integrity": {
         "title": "Integritas",
         "description": "Beroperasi dengan transparansi dan kepercayaan dalam setiap kemitraan dan transaksi, memastikan hubungan yang langgeng dibangun atas dasar saling menghormati."
+      }
+    },
+    "milestones": {
+      "founded": {
+        "title": "Didirikan",
+        "description": "Mahkota Taiwan didirikan dengan visi untuk membawa produk Indonesia asli ke Taiwan."
+      },
+      "stores100": {
+        "title": "100+ Toko",
+        "description": "Memperluas jaringan kami ke lebih dari 100 toko mitra ritel di seluruh Taiwan utara."
+      },
+      "stores300": {
+        "title": "300+ Toko",
+        "description": "Mencapai 300+ toko mitra di seluruh pulau, menjadi distributor produk Indonesia terkemuka."
+      },
+      "expandedLines": {
+        "title": "Lini Produk Diperluas",
+        "description": "Memperkenalkan kategori produk baru termasuk minuman, camilan, dan perlengkapan rumah tangga."
+      },
+      "customers1M": {
+        "title": "1 Juta+ Pelanggan",
+        "description": "Dengan bangga melayani lebih dari 1 juta pelanggan, bukti komitmen kami terhadap kualitas dan kepercayaan komunitas."
       }
     }
   },

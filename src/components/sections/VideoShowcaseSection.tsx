@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
@@ -280,6 +280,7 @@ function VideoCard({
 /* Main Component */
 export default function VideoShowcaseSection() {
   const locale = useLocale();
+  const t = useTranslations('hero');
   const sectionRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -407,15 +408,14 @@ export default function VideoShowcaseSection() {
           transition={{ duration: 0.6 }}
         >
           <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
-            Visual Content
+            {t('visualContent')}
           </p>
           <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight mb-4">
-            Watch Our Stories
+            {t('watchOurStories')}
           </h2>
           <div className="w-16 h-[2px] bg-red mx-auto mb-6" />
           <p className="text-gray-100 max-w-2xl mx-auto text-base sm:text-lg">
-            Discover Mahkota Taiwan through our video content across YouTube,
-            Shorts, TikTok, and Reels.
+            {t('storyDescription')}
           </p>
         </motion.div>
 

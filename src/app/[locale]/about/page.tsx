@@ -35,15 +35,7 @@ const stats = [
   { icon: Users, key: 'customers', value: 1, prefix: '', suffix: 'M+', displayType: 'million' as const },
 ];
 
-// Values array is now built inside AboutPage component using translations
-
-const milestones = [
-  { year: '2021', title: 'Founded', description: 'Mahkota Taiwan was established with a vision to bring authentic Indonesian products to Taiwan.' },
-  { year: '2022', title: '100+ Stores', description: 'Expanded our network to over 100 retail partner stores across northern Taiwan.' },
-  { year: '2023', title: '300+ Stores', description: 'Reached 300+ partner stores island-wide, becoming the leading Indonesian product distributor.' },
-  { year: '2024', title: 'Expanded Product Lines', description: 'Introduced new product categories including beverages, snacks, and household essentials.' },
-  { year: '2025', title: '1 Million+ Customers', description: 'Proudly serving over 1 million customers, a testament to our quality and community trust.' },
-];
+// Values and milestones arrays are now built inside AboutPage component using translations
 
 function TiltCard({ children, className }: { children: React.ReactNode; className?: string }) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -292,6 +284,16 @@ export default function AboutPage() {
       title: valuesData?.integrity?.title || t('values.integrity.title'),
       description: valuesData?.integrity?.description || t('values.integrity.description'),
     },
+  ];
+
+  // Build milestones array from translations
+  const milestonesData = t.raw('milestones') as any;
+  const milestones = [
+    { year: '2021', title: milestonesData?.founded?.title || t('milestones.founded.title'), description: milestonesData?.founded?.description || t('milestones.founded.description') },
+    { year: '2022', title: milestonesData?.stores100?.title || t('milestones.stores100.title'), description: milestonesData?.stores100?.description || t('milestones.stores100.description') },
+    { year: '2023', title: milestonesData?.stores300?.title || t('milestones.stores300.title'), description: milestonesData?.stores300?.description || t('milestones.stores300.description') },
+    { year: '2024', title: milestonesData?.expandedLines?.title || t('milestones.expandedLines.title'), description: milestonesData?.expandedLines?.description || t('milestones.expandedLines.description') },
+    { year: '2025', title: milestonesData?.customers1M?.title || t('milestones.customers1M.title'), description: milestonesData?.customers1M?.description || t('milestones.customers1M.description') },
   ];
 
   // Fetch partner logos from Supabase

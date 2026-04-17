@@ -17,7 +17,10 @@
   "hero": {
     "tagline": "印尼風味，在台灣呈現",
     "subtitle": "您在台灣值得信賴的正宗印尼食品來源。從受歡迎的零食到必備的烹飪食材，我們為您帶來家鄉的味道。",
-    "cta": "瀏覽產品"
+    "cta": "瀏覽產品",
+    "visualContent": "視覺內容",
+    "watchOurStories": "觀看我們的故事",
+    "storyDescription": "通過我們在 YouTube、Shorts、TikTok 和 Reels 上的視頻內容發現 Mahkota Taiwan。"
   },
   "about": {
     "title": "Mahkota Taiwan",
@@ -68,6 +71,28 @@
       "integrity": {
         "title": "誠信",
         "description": "在每項夥伴關係和交易中以透明和信任的方式運營，確保建立在相互尊重基礎上的持久關係。"
+      }
+    },
+    "milestones": {
+      "founded": {
+        "title": "成立",
+        "description": "Mahkota Taiwan 成立，願景是將道地印尼產品帶到台灣。"
+      },
+      "stores100": {
+        "title": "100+ 家門市",
+        "description": "將網絡擴展至台灣北部超過 100 家零售合作夥伴門市。"
+      },
+      "stores300": {
+        "title": "300+ 家門市",
+        "description": "達到全台 300+ 家合作門市，成為領先的印尼產品經銷商。"
+      },
+      "expandedLines": {
+        "title": "擴展產品線",
+        "description": "推出新的產品類別，包括飲料、小食和家居用品。"
+      },
+      "customers1M": {
+        "title": "100 萬+ 客戶",
+        "description": "驕傲地服務超過 100 萬名客戶，證明我們對品質和社區信任的承諾。"
       }
     }
   },
