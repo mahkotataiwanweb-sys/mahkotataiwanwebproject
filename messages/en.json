@@ -234,7 +234,7 @@
     "title": "Where to Buy",
     "subtitle": "Find Mahkota Taiwan products at these trusted retail partners across Taiwan.",
     "label": "Find Us",
-    "description": "Discover Mahkota Taiwan products at {storeCount} retail locations across {cityCount} cities in Taiwan",
+    "description": "Discover Mahkota Taiwan products at",
     "locations": "Partner Stores",
     "cities": "Cities Covered",
     "inTaiwan": "Island Coverage",
@@ -464,7 +464,9 @@
     "notFoundMessage": "The article you're looking for doesn't exist or has been removed.",
     "backToHome": "Back to Home",
     "notFoundDescription": "The article you're looking for doesn't exist or has been removed.",
-    "relatedArticles": "Related Articles"
+    "relatedArticles": "Related Articles",
+    "minRead": "min read",
+    "viewAll": "View All"
   },
   "store": {
     "allCities": "All Cities",

@@ -234,7 +234,7 @@
     "title": "哪裡購買",
     "subtitle": "在全台灣的信賴零售夥伴處找到 Mahkota Taiwan 產品。",
     "label": "找到我們",
-    "description": "在台灣 {cityCount} 個城市的 {storeCount} 家零售地點發現 Mahkota Taiwan 產品",
+    "description": "在台灣發現 Mahkota Taiwan 產品",
     "locations": "合作店家",
     "cities": "涵蓋城市",
     "inTaiwan": "島嶼覆蓋",
@@ -464,7 +464,9 @@
     "notFoundMessage": "您要查找的文章不存在或已被移除。",
     "backToHome": "回到首頁",
     "notFoundDescription": "您要找的文章不存在或已被刪除。",
-    "relatedArticles": "相關文章"
+    "relatedArticles": "相關文章",
+    "minRead": "分鐘閱讀",
+    "viewAll": "查看全部"
   },
   "store": {
     "allCities": "所有城市",

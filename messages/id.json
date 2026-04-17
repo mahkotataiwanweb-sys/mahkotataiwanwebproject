@@ -234,7 +234,7 @@
     "title": "Tempat Membeli",
     "subtitle": "Temukan produk Mahkota Taiwan di mitra ritel terpercaya di seluruh Taiwan.",
     "label": "Temukan Kami",
-    "description": "Temukan produk Mahkota Taiwan di {storeCount} lokasi ritel di {cityCount} kota di Taiwan",
+    "description": "Temukan produk Mahkota Taiwan di",
     "locations": "Toko Mitra",
     "cities": "Kota yang Dilayani",
     "inTaiwan": "Jangkauan Pulau",
@@ -464,7 +464,9 @@
     "notFoundMessage": "Artikel yang Anda cari tidak ada atau telah dihapus.",
     "backToHome": "Kembali ke Beranda",
     "notFoundDescription": "Artikel yang Anda cari tidak ada atau telah dihapus.",
-    "relatedArticles": "Artikel Terkait"
+    "relatedArticles": "Artikel Terkait",
+    "minRead": "menit baca",
+    "viewAll": "Lihat Semua"
   },
   "store": {
     "allCities": "Semua Kota",
