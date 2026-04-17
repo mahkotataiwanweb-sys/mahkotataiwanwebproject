@@ -51,7 +51,25 @@
     "ctaButtonContact": "Contact Us",
     "ctaTitle": "Ready to Taste Our Products?",
     "ctaDescription": "Explore our full range of authentic Indonesian flavors and find them at retail locations near you.",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "values": {
+      "qualityFirst": {
+        "title": "Quality First",
+        "description": "Every product is carefully selected and tested to meet the highest standards of quality before reaching our shelves."
+      },
+      "culturalBridge": {
+        "title": "Cultural Bridge",
+        "description": "We bridge the gap between Indonesian heritage and Taiwanese daily life, bringing authentic flavors to every home."
+      },
+      "community": {
+        "title": "Community",
+        "description": "Building a strong community of over 1 million customers who trust us to deliver the tastes of home."
+      },
+      "integrity": {
+        "title": "Integrity",
+        "description": "Operating with transparency and trust in every partnership and transaction, ensuring lasting relationships built on mutual respect."
+      }
+    }
   },
   "products": {
     "label": "Our Collection",
@@ -275,6 +293,28 @@
     "businessHours": "Business Hours",
     "availability": "Availability",
     "backToHome": "Back to Home",
+    "faqs": {
+      "faq1": {
+        "question": "How can I order Mahkota Taiwan products?",
+        "answer": "You can order our products through any of our 300+ partner stores across Taiwan. Check our store locator to find the nearest location, or contact us directly for bulk orders."
+      },
+      "faq2": {
+        "question": "Do you offer delivery services?",
+        "answer": "Yes! We offer delivery services for bulk and wholesale orders. For individual purchases, please visit any of our partner stores. Contact our team for delivery schedules and minimum order quantities."
+      },
+      "faq3": {
+        "question": "How can I become a retail partner?",
+        "answer": "We're always looking for new retail partners! Please send us an email at mahkotataiwan@gmail.com or call us at +886-2-26099118 with your store details, and our partnership team will get back to you within 2 business days."
+      },
+      "faq4": {
+        "question": "What types of products do you distribute?",
+        "answer": "We distribute a wide range of authentic Indonesian products including instant noodles, seasonings, sauces, beverages, snacks, cooking essentials, and household items. We carry 26+ carefully selected product lines."
+      },
+      "faq5": {
+        "question": "Can I request a specific Indonesian product?",
+        "answer": "Absolutely! We welcome product suggestions from our community. Please reach out via email or our social media channels with the product details, and we'll do our best to source it for you."
+      }
+    },
     "faq1Question": "How can I order Mahkota Taiwan products?",
     "faq1Answer": "You can order our products through any of our 300+ partner stores across Taiwan. Check our store locator to find the nearest location, or contact us directly for bulk orders.",
     "faq2Question": "Do you offer delivery services?",

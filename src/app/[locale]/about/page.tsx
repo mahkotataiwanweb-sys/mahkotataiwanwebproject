@@ -35,28 +35,7 @@ const stats = [
   { icon: Users, key: 'customers', value: 1, prefix: '', suffix: 'M+', displayType: 'million' as const },
 ];
 
-const values = [
-  {
-    icon: Shield,
-    title: 'Quality First',
-    description: 'Every product is carefully selected and tested to meet the highest standards of quality before reaching our shelves.',
-  },
-  {
-    icon: Heart,
-    title: 'Cultural Bridge',
-    description: 'We bridge the gap between Indonesian heritage and Taiwanese daily life, bringing authentic flavors to every home.',
-  },
-  {
-    icon: Users,
-    title: 'Community',
-    description: 'Building a strong community of over 1 million customers who trust us to deliver the tastes of home.',
-  },
-  {
-    icon: Star,
-    title: 'Integrity',
-    description: 'Operating with transparency and trust in every partnership and transaction, ensuring lasting relationships built on mutual respect.',
-  },
-];
+// Values array is now built inside AboutPage component using translations
 
 const milestones = [
   { year: '2021', title: 'Founded', description: 'Mahkota Taiwan was established with a vision to bring authentic Indonesian products to Taiwan.' },
@@ -289,6 +268,31 @@ export default function AboutPage() {
   const singleSetWidthRef = useRef(0);
 
   const [partners, setPartners] = useState<StorePartner[]>([]);
+
+  // Build values array from translations
+  const valuesData = t.raw('values') as any;
+  const values = [
+    {
+      icon: Shield,
+      title: valuesData?.qualityFirst?.title || t('values.qualityFirst.title'),
+      description: valuesData?.qualityFirst?.description || t('values.qualityFirst.description'),
+    },
+    {
+      icon: Heart,
+      title: valuesData?.culturalBridge?.title || t('values.culturalBridge.title'),
+      description: valuesData?.culturalBridge?.description || t('values.culturalBridge.description'),
+    },
+    {
+      icon: Users,
+      title: valuesData?.community?.title || t('values.community.title'),
+      description: valuesData?.community?.description || t('values.community.description'),
+    },
+    {
+      icon: Star,
+      title: valuesData?.integrity?.title || t('values.integrity.title'),
+      description: valuesData?.integrity?.description || t('values.integrity.description'),
+    },
+  ];
 
   // Fetch partner logos from Supabase
   useEffect(() => {
