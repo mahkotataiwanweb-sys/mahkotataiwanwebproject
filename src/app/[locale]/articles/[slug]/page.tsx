@@ -195,7 +195,7 @@ export default function ArticleDetailPage() {
   const excerpt = getLocalizedField(article, 'excerpt', locale);
   const galleryImages = article.gallery_images || [];
   const date = formatDate(article.published_at, locale);
-  const typeLabel = article.type.charAt(0).toUpperCase() + article.type.slice(1);
+  const typeLabel = article.type === 'event' ? t('typeEvent') : article.type === 'lifestyle' ? t('typeLifestyle') : article.type.charAt(0).toUpperCase() + article.type.slice(1);
   const readingTime = Math.max(1, Math.ceil(content.split(/\s+/).length / 200));
   const paragraphs = content.split('\n').filter((p) => p.trim());
 
@@ -205,7 +205,7 @@ export default function ArticleDetailPage() {
       : article.type === 'lifestyle'
         ? `/${locale}/lifestyle`
         : `/${locale}`;
-  const backLabel = article.type === 'event' ? 'Events' : article.type === 'lifestyle' ? 'Activities' : 'Home';
+  const backLabel = article.type === 'event' ? t('backEvents') : article.type === 'lifestyle' ? t('backActivities') : t('backHome');
 
   /* ══════════════════════════════════════════════════
      RENDER

@@ -20,8 +20,7 @@
     "cta": "瀏覽產品",
     "visualContent": "視覺內容",
     "watchOurStories": "觀看我們的故事",
-    "storyDescription": "透過我們在 YouTube、YouTube Shorts、TikTok 和 Reels 上的影片內容，了解Mahkota Taiwan。",
-    "showingVideos": "顯示"
+    "storyDescription": "通過我們在 YouTube、Shorts、TikTok 和 Reels 上的視頻內容發現 Mahkota Taiwan。"
   },
   "about": {
     "title": "Mahkota Taiwan",
@@ -51,8 +50,51 @@
     "partnersDescription": "與台灣領先的零售商合作，為您帶來最好的印尼產品",
     "storyLabel": "我們的故事",
     "storyTitle": "迄今為止的旅程",
-    "ctaButtonProducts": "瀏覽產品",
-    "ctaButtonContact": "聯繫我們"
+    "ctaButtonProducts": "探索產品",
+    "ctaButtonContact": "聯繫我們",
+    "ctaTitle": "準備好品嚐我們的產品了嗎？",
+    "ctaDescription": "探索我們完整的道地印尼風味系列，並在靠近您的零售地點找到它們。",
+    "backToHome": "返回首頁",
+    "values": {
+      "qualityFirst": {
+        "title": "品質優先",
+        "description": "每個產品都經過精心挑選和測試，以達到最高品質標準後才到達我們的貨架。"
+      },
+      "culturalBridge": {
+        "title": "文化橋梁",
+        "description": "我們在印尼遺產與台灣日常生活之間搭起橋梁，為每個家庭帶來道地風味。"
+      },
+      "community": {
+        "title": "社群",
+        "description": "建立超過 100 萬名客戶的強大社群，他們相信我們能提供家的滋味。"
+      },
+      "integrity": {
+        "title": "誠信",
+        "description": "在每項夥伴關係和交易中以透明和信任的方式運營，確保建立在相互尊重基礎上的持久關係。"
+      }
+    },
+    "milestones": {
+      "founded": {
+        "title": "成立",
+        "description": "Mahkota Taiwan 成立，願景是將道地印尼產品帶到台灣。"
+      },
+      "stores100": {
+        "title": "100+ 家門市",
+        "description": "將網絡擴展至台灣北部超過 100 家零售合作夥伴門市。"
+      },
+      "stores300": {
+        "title": "300+ 家門市",
+        "description": "達到全台 300+ 家合作門市，成為領先的印尼產品經銷商。"
+      },
+      "expandedLines": {
+        "title": "擴展產品線",
+        "description": "推出新的產品類別，包括飲料、小食和家居用品。"
+      },
+      "customers1M": {
+        "title": "100 萬+ 客戶",
+        "description": "驕傲地服務超過 100 萬名客戶，證明我們對品質和社區信任的承諾。"
+      }
+    }
   },
   "products": {
     "label": "我們的收藏",
@@ -192,26 +234,27 @@
     "title": "哪裡購買",
     "subtitle": "在全台灣的信賴零售夥伴處找到 Mahkota Taiwan 產品。",
     "label": "找到我們",
-    "description": "在台灣全島 {cityCount} 個城市的 {storeCount} 個零售地點找到 Mahkota Taiwan 產品",
+    "description": "在台灣發現 Mahkota Taiwan 產品",
     "locations": "合作店家",
     "cities": "涵蓋城市",
     "inTaiwan": "島嶼覆蓋",
     "findUs": "找到我們",
     "viewAllLocations": "查看所有位置",
     "tasteSoGood": "味道太好了！",
-    "storeCount": "300+ 家門店",
     "store": "商店",
     "allOverTaiwan": "遍佈全台灣",
     "backToHome": "回到首頁",
     "partnerStores": "合作店家",
     "citiesCovered": "涵蓋城市",
     "islandCoverage": "島嶼覆蓋",
-    "alwaysOnline": "始終線上",
+    "alwaysOnline": "全天在線",
     "interactiveMap": "互動地圖",
     "findStoreNearYou": "找到附近的商店",
-    "mapDescription": "點擊任何釘標以查看商店詳情、聯繫信息和方向",
+    "mapDescription": "點擊任何圖標查看店鋪詳情、聯絡信息和方向",
     "loadingMap": "地圖載入中...",
-    "loadingStores": "商店載入中..."
+    "loadingStores": "商店載入中...",
+    "mapLabel": "互動地圖",
+    "mapTitle": "找到離您最近的門市"
   },
   "contact": {
     "title": "與我們聯繫",
@@ -271,7 +314,42 @@
       "title": "常見問題"
     },
     "officeTitle": "辦公室地址",
-    "getDirections": "取得方向"
+    "getDirections": "取得方向",
+    "businessHours": "營業時間",
+    "availability": "營業狀態",
+    "backToHome": "返回首頁",
+    "faqs": {
+      "faq1": {
+        "question": "我如何訂購 Mahkota Taiwan 產品？",
+        "answer": "您可以通過我們在台灣各地的 300+ 家合作店購買產品。查看我們的商店定位器找到最近的位置，或直接聯繫我們以進行批量訂單。"
+      },
+      "faq2": {
+        "question": "您提供快遞服務嗎？",
+        "answer": "是的！我們為批量和批發訂單提供快遞服務。對於個人購買，請訪問我們的任何合作店。聯繫我們的團隊了解快遞時間表和最低訂單數量。"
+      },
+      "faq3": {
+        "question": "我如何成為零售合作夥伴？",
+        "answer": "我們一直在尋找新的零售合作夥伴！請通過 mahkotataiwan@gmail.com 向我們發送電子郵件或撥打 +886-2-26099118 告知您的商店詳情，我們的合作夥伴團隊將在 2 個工作天內與您聯繫。"
+      },
+      "faq4": {
+        "question": "您分發什麼類型的產品？",
+        "answer": "我們分發多種道地印尼產品，包括速凍麵、調味料、醬料、飲料、小食、烹飪必需品和家居用品。我們提供 26 多條精心挑選的產品線。"
+      },
+      "faq5": {
+        "question": "我可以請求特定的印尼產品嗎？",
+        "answer": "當然可以！我們歡迎來自社區的產品建議。請通過電子郵件或我們的社群媒體渠道與我們聯繫並提供產品詳情，我們會盡力為您尋找。"
+      }
+    },
+    "faq1Question": "我如何訂購 Mahkota Taiwan 產品？",
+    "faq1Answer": "您可以通過我們在台灣各地的 300+ 家合作店購買產品。查看我們的商店定位器找到最近的位置，或直接聯繫我們以進行批量訂單。",
+    "faq2Question": "您提供快遞服務嗎？",
+    "faq2Answer": "是的！我們為批量和批發訂單提供快遞服務。對於個人購買，請訪問我們的任何合作店。聯繫我們的團隊了解快遞時間表和最低訂單數量。",
+    "faq3Question": "我如何成為零售合作夥伴？",
+    "faq3Answer": "我們一直在尋找新的零售合作夥伴！請通過 mahkotataiwan@gmail.com 向我們發送電子郵件或撥打 +886-2-26099118 告知您的商店詳情，我們的合作夥伴團隊將在 2 個工作天內與您聯繫。",
+    "faq4Question": "您分發什麼類型的產品？",
+    "faq4Answer": "我們分發多種道地印尼產品，包括速凍麵、調味料、醬料、飲料、小食、烹飪必需品和家居用品。我們提供 26 多條精心挑選的產品線。",
+    "faq5Question": "我可以請求特定的印尼產品嗎？",
+    "faq5Answer": "當然可以！我們歡迎來自社區的產品建議。請通過電子郵件或我們的社群媒體渠道與我們聯繫並提供產品詳情，我們會盡力為您尋找。"
   },
   "footer": {
     "description": "您在台灣值得信賴的正宗印尼食品來源。透過印尼風味連結文化。",
@@ -386,7 +464,16 @@
     "notFoundMessage": "您要查找的文章不存在或已被移除。",
     "backToHome": "回到首頁",
     "notFoundDescription": "您要找的文章不存在或已被刪除。",
-    "relatedArticles": "相關文章"
+    "relatedArticles": "相關文章",
+    "minRead": "分鐘閱讀",
+    "viewAll": "查看全部文章",
+    "typeEvent": "活動",
+    "typeLifestyle": "生活方式",
+    "backEvents": "活動",
+    "backActivities": "生活方式",
+    "backHome": "首頁",
+    "gallery": "相冊",
+    "photos": "張照片"
   },
   "store": {
     "allCities": "所有城市",

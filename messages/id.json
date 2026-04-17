@@ -20,8 +20,7 @@
     "cta": "Jelajahi Produk",
     "visualContent": "Konten Visual",
     "watchOurStories": "Tonton Cerita Kami",
-    "storyDescription": "Temukan Mahkota Taiwan melalui konten video kami di YouTube, Shorts, TikTok, dan Reels.",
-    "showingVideos": "Menampilkan"
+    "storyDescription": "Temukan Mahkota Taiwan melalui konten video kami di YouTube, Shorts, TikTok, dan Reels."
   },
   "about": {
     "title": "Mahkota Taiwan",
@@ -52,7 +51,50 @@
     "storyLabel": "Kisah Kami",
     "storyTitle": "Perjalanan Hingga Saat Ini",
     "ctaButtonProducts": "Jelajahi Produk",
-    "ctaButtonContact": "Hubungi Kami"
+    "ctaButtonContact": "Hubungi Kami",
+    "ctaTitle": "Siap Mencoba Produk Kami?",
+    "ctaDescription": "Jelajahi rangkaian lengkap cita rasa Indonesia asli dan temukan mereka di lokasi ritel terdekat Anda.",
+    "backToHome": "Kembali ke Beranda",
+    "values": {
+      "qualityFirst": {
+        "title": "Kualitas Utama",
+        "description": "Setiap produk dipilih dengan cermat dan diuji untuk memenuhi standar kualitas tertinggi sebelum sampai ke rak kami."
+      },
+      "culturalBridge": {
+        "title": "Jembatan Budaya",
+        "description": "Kami menjembatani kesenjangan antara warisan Indonesia dan kehidupan sehari-hari Taiwan, membawa cita rasa autentik ke setiap rumah."
+      },
+      "community": {
+        "title": "Komunitas",
+        "description": "Membangun komunitas yang kuat dari lebih dari 1 juta pelanggan yang mempercayai kami untuk memberikan cita rasa rumah."
+      },
+      "integrity": {
+        "title": "Integritas",
+        "description": "Beroperasi dengan transparansi dan kepercayaan dalam setiap kemitraan dan transaksi, memastikan hubungan yang langgeng dibangun atas dasar saling menghormati."
+      }
+    },
+    "milestones": {
+      "founded": {
+        "title": "Didirikan",
+        "description": "Mahkota Taiwan didirikan dengan visi untuk membawa produk Indonesia asli ke Taiwan."
+      },
+      "stores100": {
+        "title": "100+ Toko",
+        "description": "Memperluas jaringan kami ke lebih dari 100 toko mitra ritel di seluruh Taiwan utara."
+      },
+      "stores300": {
+        "title": "300+ Toko",
+        "description": "Mencapai 300+ toko mitra di seluruh pulau, menjadi distributor produk Indonesia terkemuka."
+      },
+      "expandedLines": {
+        "title": "Lini Produk Diperluas",
+        "description": "Memperkenalkan kategori produk baru termasuk minuman, camilan, dan perlengkapan rumah tangga."
+      },
+      "customers1M": {
+        "title": "1 Juta+ Pelanggan",
+        "description": "Dengan bangga melayani lebih dari 1 juta pelanggan, bukti komitmen kami terhadap kualitas dan kepercayaan komunitas."
+      }
+    }
   },
   "products": {
     "label": "Koleksi Kami",
@@ -192,26 +234,27 @@
     "title": "Tempat Membeli",
     "subtitle": "Temukan produk Mahkota Taiwan di mitra ritel terpercaya di seluruh Taiwan.",
     "label": "Temukan Kami",
-    "description": "Temukan produk Mahkota Taiwan di {storeCount} lokasi ritel di {cityCount} kota di Taiwan",
+    "description": "Temukan produk Mahkota Taiwan di",
     "locations": "Toko Mitra",
     "cities": "Kota yang Dilayani",
     "inTaiwan": "Jangkauan Pulau",
     "findUs": "Temukan Kami",
     "viewAllLocations": "Lihat Semua Lokasi",
     "tasteSoGood": "Rasanya sangat enak!",
-    "storeCount": "300+ Toko",
     "store": "Toko",
     "allOverTaiwan": "di seluruh Taiwan",
     "backToHome": "Kembali ke Beranda",
     "partnerStores": "Toko Mitra",
-    "citiesCovered": "Kota yang Dilayani",
+    "citiesCovered": "Kota Terjangkau",
     "islandCoverage": "Jangkauan Pulau",
     "alwaysOnline": "Selalu Online",
     "interactiveMap": "Peta Interaktif",
     "findStoreNearYou": "Cari Toko Terdekat",
-    "mapDescription": "Klik pin mana pun untuk melihat detail toko, informasi kontak, dan arah",
+    "mapDescription": "Klik pin mana saja untuk melihat detail toko, informasi kontak, dan arah",
     "loadingMap": "Peta sedang dimuat...",
-    "loadingStores": "Toko sedang dimuat..."
+    "loadingStores": "Toko sedang dimuat...",
+    "mapLabel": "Peta Interaktif",
+    "mapTitle": "Temukan Toko Terdekat"
   },
   "contact": {
     "title": "Mari Terhubung",
@@ -271,7 +314,42 @@
       "title": "Pertanyaan yang Sering Diajukan"
     },
     "officeTitle": "Alamat Kantor",
-    "getDirections": "Dapatkan Petunjuk Arah"
+    "getDirections": "Dapatkan Petunjuk Arah",
+    "businessHours": "Jam Bisnis",
+    "availability": "Ketersediaan",
+    "backToHome": "Kembali ke Beranda",
+    "faqs": {
+      "faq1": {
+        "question": "Bagaimana cara saya memesan produk Mahkota Taiwan?",
+        "answer": "Anda dapat memesan produk kami melalui salah satu dari 300+ toko mitra kami di seluruh Taiwan. Periksa lokator toko kami untuk menemukan lokasi terdekat, atau hubungi kami langsung untuk pesanan dalam jumlah besar."
+      },
+      "faq2": {
+        "question": "Apakah Anda menawarkan layanan pengiriman?",
+        "answer": "Ya! Kami menawarkan layanan pengiriman untuk pesanan massal dan grosir. Untuk pembelian individual, silakan kunjungi salah satu toko mitra kami. Hubungi tim kami untuk jadwal pengiriman dan jumlah pesanan minimum."
+      },
+      "faq3": {
+        "question": "Bagaimana cara saya menjadi mitra ritel?",
+        "answer": "Kami selalu mencari mitra ritel baru! Silakan kirimkan email kepada kami di mahkotataiwan@gmail.com atau hubungi kami di +886-2-26099118 dengan detail toko Anda, dan tim kemitraan kami akan menghubungi Anda dalam 2 hari kerja."
+      },
+      "faq4": {
+        "question": "Jenis produk apa yang Anda distribusikan?",
+        "answer": "Kami mendistribusikan berbagai produk Indonesia asli termasuk mie instan, bumbu, saus, minuman, camilan, bahan makanan pokok, dan barang-barang rumah tangga. Kami membawa 26+ lini produk pilihan."
+      },
+      "faq5": {
+        "question": "Bisakah saya meminta produk Indonesia tertentu?",
+        "answer": "Tentu saja! Kami menyambut saran produk dari komunitas kami. Silakan hubungi kami melalui email atau saluran media sosial kami dengan detail produk, dan kami akan berusaha sebaik mungkin untuk mendapatkannya untuk Anda."
+      }
+    },
+    "faq1Question": "Bagaimana cara saya memesan produk Mahkota Taiwan?",
+    "faq1Answer": "Anda dapat memesan produk kami melalui salah satu dari 300+ toko mitra kami di seluruh Taiwan. Periksa lokator toko kami untuk menemukan lokasi terdekat, atau hubungi kami langsung untuk pesanan dalam jumlah besar.",
+    "faq2Question": "Apakah Anda menawarkan layanan pengiriman?",
+    "faq2Answer": "Ya! Kami menawarkan layanan pengiriman untuk pesanan massal dan grosir. Untuk pembelian individual, silakan kunjungi salah satu toko mitra kami. Hubungi tim kami untuk jadwal pengiriman dan jumlah pesanan minimum.",
+    "faq3Question": "Bagaimana cara saya menjadi mitra ritel?",
+    "faq3Answer": "Kami selalu mencari mitra ritel baru! Silakan kirimkan email kepada kami di mahkotataiwan@gmail.com atau hubungi kami di +886-2-26099118 dengan detail toko Anda, dan tim kemitraan kami akan menghubungi Anda dalam 2 hari kerja.",
+    "faq4Question": "Jenis produk apa yang Anda distribusikan?",
+    "faq4Answer": "Kami mendistribusikan berbagai produk Indonesia asli termasuk mie instan, bumbu, saus, minuman, camilan, bahan makanan pokok, dan barang-barang rumah tangga. Kami membawa 26+ lini produk pilihan.",
+    "faq5Question": "Bisakah saya meminta produk Indonesia tertentu?",
+    "faq5Answer": "Tentu saja! Kami menyambut saran produk dari komunitas kami. Silakan hubungi kami melalui email atau saluran media sosial kami dengan detail produk, dan kami akan berusaha sebaik mungkin untuk mendapatkannya untuk Anda."
   },
   "footer": {
     "description": "Sumber terpercaya untuk produk makanan Indonesia asli di Taiwan. Menjembatani budaya melalui cita rasa Indonesia.",
@@ -386,7 +464,16 @@
     "notFoundMessage": "Artikel yang Anda cari tidak ada atau telah dihapus.",
     "backToHome": "Kembali ke Beranda",
     "notFoundDescription": "Artikel yang Anda cari tidak ada atau telah dihapus.",
-    "relatedArticles": "Artikel Terkait"
+    "relatedArticles": "Artikel Terkait",
+    "minRead": "menit baca",
+    "viewAll": "Lihat Semua Artikel",
+    "typeEvent": "Acara",
+    "typeLifestyle": "Aktivitas",
+    "backEvents": "Acara",
+    "backActivities": "Aktivitas",
+    "backHome": "Beranda",
+    "gallery": "Galeri",
+    "photos": "foto"
   },
   "store": {
     "allCities": "Semua Kota",

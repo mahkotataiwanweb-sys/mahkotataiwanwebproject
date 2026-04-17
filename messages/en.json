@@ -20,8 +20,7 @@
     "cta": "Explore Products",
     "visualContent": "Visual Content",
     "watchOurStories": "Watch Our Stories",
-    "storyDescription": "Discover Mahkota Taiwan through our video content across YouTube, Shorts, TikTok, and Reels.",
-    "showingVideos": "Showing"
+    "storyDescription": "Discover Mahkota Taiwan through our video content across YouTube, Shorts, TikTok, and Reels."
   },
   "about": {
     "title": "Mahkota Taiwan",
@@ -51,8 +50,51 @@
     "partnersDescription": "Working with Taiwan's leading retailers to bring you the best Indonesian products",
     "storyLabel": "Our Story",
     "storyTitle": "The Journey So Far",
-    "ctaButtonProducts": "Browse Products",
-    "ctaButtonContact": "Contact Us"
+    "ctaButtonProducts": "Explore Products",
+    "ctaButtonContact": "Contact Us",
+    "ctaTitle": "Ready to Taste Our Products?",
+    "ctaDescription": "Explore our full range of authentic Indonesian flavors and find them at retail locations near you.",
+    "backToHome": "Back to Home",
+    "values": {
+      "qualityFirst": {
+        "title": "Quality First",
+        "description": "Every product is carefully selected and tested to meet the highest standards of quality before reaching our shelves."
+      },
+      "culturalBridge": {
+        "title": "Cultural Bridge",
+        "description": "We bridge the gap between Indonesian heritage and Taiwanese daily life, bringing authentic flavors to every home."
+      },
+      "community": {
+        "title": "Community",
+        "description": "Building a strong community of over 1 million customers who trust us to deliver the tastes of home."
+      },
+      "integrity": {
+        "title": "Integrity",
+        "description": "Operating with transparency and trust in every partnership and transaction, ensuring lasting relationships built on mutual respect."
+      }
+    },
+    "milestones": {
+      "founded": {
+        "title": "Founded",
+        "description": "Mahkota Taiwan was established with a vision to bring authentic Indonesian products to Taiwan."
+      },
+      "stores100": {
+        "title": "100+ Stores",
+        "description": "Expanded our network to over 100 retail partner stores across northern Taiwan."
+      },
+      "stores300": {
+        "title": "300+ Stores",
+        "description": "Reached 300+ partner stores island-wide, becoming the leading Indonesian product distributor."
+      },
+      "expandedLines": {
+        "title": "Expanded Product Lines",
+        "description": "Introduced new product categories including beverages, snacks, and household essentials."
+      },
+      "customers1M": {
+        "title": "1 Million+ Customers",
+        "description": "Proudly serving over 1 million customers, a testament to our quality and community trust."
+      }
+    }
   },
   "products": {
     "label": "Our Collection",
@@ -192,14 +234,13 @@
     "title": "Where to Buy",
     "subtitle": "Find Mahkota Taiwan products at these trusted retail partners across Taiwan.",
     "label": "Find Us",
-    "description": "Discover Mahkota Taiwan products at {storeCount} retail locations across {cityCount} cities in Taiwan",
+    "description": "Discover Mahkota Taiwan products at",
     "locations": "Partner Stores",
     "cities": "Cities Covered",
     "inTaiwan": "Island Coverage",
     "findUs": "Find Us",
     "viewAllLocations": "View All Locations",
     "tasteSoGood": "Taste so good!",
-    "storeCount": "300+ Store",
     "store": "Store",
     "allOverTaiwan": "all over Taiwan",
     "backToHome": "Back to Home",
@@ -211,7 +252,9 @@
     "findStoreNearYou": "Find a Store Near You",
     "mapDescription": "Click on any pin to see store details, contact information, and get directions",
     "loadingMap": "Loading map...",
-    "loadingStores": "Loading stores..."
+    "loadingStores": "Loading stores...",
+    "mapLabel": "Interactive Map",
+    "mapTitle": "Find a Store Near You"
   },
   "contact": {
     "title": "Let's Connect",
@@ -271,7 +314,42 @@
       "title": "FAQ"
     },
     "officeTitle": "Office Address",
-    "getDirections": "Get Directions"
+    "getDirections": "Get Directions",
+    "businessHours": "Business Hours",
+    "availability": "Availability",
+    "backToHome": "Back to Home",
+    "faqs": {
+      "faq1": {
+        "question": "How can I order Mahkota Taiwan products?",
+        "answer": "You can order our products through any of our 300+ partner stores across Taiwan. Check our store locator to find the nearest location, or contact us directly for bulk orders."
+      },
+      "faq2": {
+        "question": "Do you offer delivery services?",
+        "answer": "Yes! We offer delivery services for bulk and wholesale orders. For individual purchases, please visit any of our partner stores. Contact our team for delivery schedules and minimum order quantities."
+      },
+      "faq3": {
+        "question": "How can I become a retail partner?",
+        "answer": "We're always looking for new retail partners! Please send us an email at mahkotataiwan@gmail.com or call us at +886-2-26099118 with your store details, and our partnership team will get back to you within 2 business days."
+      },
+      "faq4": {
+        "question": "What types of products do you distribute?",
+        "answer": "We distribute a wide range of authentic Indonesian products including instant noodles, seasonings, sauces, beverages, snacks, cooking essentials, and household items. We carry 26+ carefully selected product lines."
+      },
+      "faq5": {
+        "question": "Can I request a specific Indonesian product?",
+        "answer": "Absolutely! We welcome product suggestions from our community. Please reach out via email or our social media channels with the product details, and we'll do our best to source it for you."
+      }
+    },
+    "faq1Question": "How can I order Mahkota Taiwan products?",
+    "faq1Answer": "You can order our products through any of our 300+ partner stores across Taiwan. Check our store locator to find the nearest location, or contact us directly for bulk orders.",
+    "faq2Question": "Do you offer delivery services?",
+    "faq2Answer": "Yes! We offer delivery services for bulk and wholesale orders. For individual purchases, please visit any of our partner stores. Contact our team for delivery schedules and minimum order quantities.",
+    "faq3Question": "How can I become a retail partner?",
+    "faq3Answer": "We're always looking for new retail partners! Please send us an email at mahkotataiwan@gmail.com or call us at +886-2-26099118 with your store details, and our partnership team will get back to you within 2 business days.",
+    "faq4Question": "What types of products do you distribute?",
+    "faq4Answer": "We distribute a wide range of authentic Indonesian products including instant noodles, seasonings, sauces, beverages, snacks, cooking essentials, and household items. We carry 26+ carefully selected product lines.",
+    "faq5Question": "Can I request a specific Indonesian product?",
+    "faq5Answer": "Absolutely! We welcome product suggestions from our community. Please reach out via email or our social media channels with the product details, and we'll do our best to source it for you."
   },
   "footer": {
     "description": "Your trusted source for authentic Indonesian food products in Taiwan. Bridging cultures through the flavors of Indonesia.",
@@ -386,7 +464,16 @@
     "notFoundMessage": "The article you're looking for doesn't exist or has been removed.",
     "backToHome": "Back to Home",
     "notFoundDescription": "The article you're looking for doesn't exist or has been removed.",
-    "relatedArticles": "Related Articles"
+    "relatedArticles": "Related Articles",
+    "minRead": "min read",
+    "viewAll": "View All Articles",
+    "typeEvent": "Event",
+    "typeLifestyle": "Activity",
+    "backEvents": "Events",
+    "backActivities": "Activities",
+    "backHome": "Home",
+    "gallery": "Gallery",
+    "photos": "photos"
   },
   "store": {
     "allCities": "All Cities",
