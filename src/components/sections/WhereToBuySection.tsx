@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -50,6 +50,7 @@ export default function WhereToBuySection() {
   const bottomTextRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const locale = useLocale();
+  const t = useTranslations('whereToBuy');
 
   useEffect(() => {
     if (!sectionRef.current || !mapRef.current) return;
@@ -247,11 +248,11 @@ export default function WhereToBuySection() {
         {/* Header */}
         <div ref={headerRef} className="text-center mb-12">
           <span className="inline-block text-red/80 text-sm font-semibold tracking-widest uppercase mb-3">
-            Find Us
+            {t('findUs')}
           </span>
           <Link href={`/${locale}/where-to-buy`} className="hover:text-red transition-colors duration-300">
             <h2 className="text-4xl md:text-5xl font-heading font-bold text-navy hover:text-red transition-colors duration-300">
-              Where to Buy
+              {t('title')}
             </h2>
           </Link>
           <div className="red-line-reveal w-16 h-1 bg-red mx-auto mt-4 rounded-full origin-center" />
@@ -262,7 +263,7 @@ export default function WhereToBuySection() {
           {/* Text — top left: letter-by-letter reveal */}
           <div className="text-left w-full max-w-sm">
             <p ref={topTextRef} className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-navy italic leading-tight">
-              {'Taste so good!'.split('').map((char, i) => (
+              {t('tasteSoGood').split('').map((char, i) => (
                 <span
                   key={i}
                   className="letter-char inline-block"
@@ -411,7 +412,7 @@ export default function WhereToBuySection() {
               }`}
             >
               <span className="text-white text-lg font-semibold tracking-wide bg-red/90 px-6 py-3 rounded-full shadow-lg transform transition-transform duration-300 group-hover:scale-105">
-                View All Locations →
+                {t('viewAllLocations')} →
               </span>
             </div>
           </Link>
@@ -419,7 +420,7 @@ export default function WhereToBuySection() {
           {/* Text — bottom right: letter-by-letter reveal */}
           <div ref={bottomTextRef} className="text-right w-full max-w-sm">
             <p className="letter-line-a font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-red leading-tight">
-              {'300+ Store'.split('').map((char, i) => (
+              {`300+ ${t('store')}`.split('').map((char, i) => (
                 <span
                   key={`a-${i}`}
                   className="letter-char inline-block"
@@ -429,7 +430,7 @@ export default function WhereToBuySection() {
               ))}
             </p>
             <p className="letter-line-b font-heading text-sm sm:text-base md:text-lg lg:text-xl text-navy/60 font-medium tracking-wide">
-              {'all over Taiwan'.split('').map((char, i) => (
+              {t('allOverTaiwan').split('').map((char, i) => (
                 <span
                   key={`b-${i}`}
                   className="letter-char inline-block"
