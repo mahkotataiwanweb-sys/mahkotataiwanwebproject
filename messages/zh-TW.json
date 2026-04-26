@@ -5,13 +5,11 @@
     "products": "產品",
     "recipes": "食譜",
     "events": "活動",
-    "lifestyle": "活動花絮",
+    "activity": "活動花絮",
     "contact": "聯絡",
     "language": "語言",
     "allProducts": "所有產品",
-    "gallery": "相簿",
     "whereToBuy": "哪裡購買",
-    "journal": "日誌",
     "ourCollection": "我們的系列"
   },
   "hero": {
@@ -182,10 +180,9 @@
     ],
     "noEventsDescription": "稍後回來查看即將推出的活動和社區聚會。"
   },
-  "lifestyle": {
+  "activity": {
     "title": "活動花絮",
     "label": "展覽",
-    "labelSuffix": "生活方式",
     "subtitle": "看看我們的社區如何在日常生活中享受 Mahkota Taiwan 產品。",
     "noActivities": "找不到活動",
     "noActivitiesMessage": "稍後回來查看新的活動和社區亮點。",
@@ -199,15 +196,8 @@
     "communityActivities": "社區活動",
     "communityActivitiesDesc": "看看我們的社區如何在日常生活中享受 Mahkota Taiwan 產品",
     "viewActivities": "查看活動",
-    "showcase": "生活方式",
-    "lifestyleLabel": "展覽",
     "noActivitiesFound": "未找到活動",
     "noActivitiesDescription": "稍後回來查看新活動和社區亮點。"
-  },
-  "moments": {
-    "label": "社區",
-    "title": "Mahkota 時刻",
-    "subtitle": "看看我們的社區如何在日常生活中享受 Mahkota Taiwan 產品。"
   },
   "discover": {
     "label": "發現",
@@ -365,17 +355,15 @@
       "allProducts": "所有產品",
       "recipes": "食譜",
       "events": "活動",
-      "lifestyle": "活動花絮",
+      "activity": "活動花絮",
       "contact": "聯絡我們",
-      "whereToBuy": "哪裡買",
-      "gallery": "相簿"
+      "whereToBuy": "哪裡買"
     },
     "contactUs": "聯絡我們",
     "certifications": "認證",
     "sections": {
       "products": "產品",
-      "company": "公司",
-      "journal": "日誌"
+      "company": "公司"
     },
     "office": "辦公室",
     "warehouse": "倉庫",
@@ -419,44 +407,6 @@
     "readMore": "閱讀更多",
     "showLess": "收起"
   },
-  "gallery": {
-    "title": "相簿",
-    "subtitle": "瀏覽我們的精彩時刻和活動照片",
-    "noImages": "目前還沒有相簿照片。",
-    "allEvents": "所有活動",
-    "filterByDate": "按日期篩選",
-    "clearFilter": "清除篩選",
-    "photos": "張照片",
-    "calendar": "日曆",
-    "monthNames": [
-      "1月",
-      "2月",
-      "3月",
-      "4月",
-      "5月",
-      "6月",
-      "7月",
-      "8月",
-      "9月",
-      "10月",
-      "11月",
-      "12月"
-    ],
-    "dayAbbreviations": [
-      "日",
-      "一",
-      "二",
-      "三",
-      "四",
-      "五",
-      "六"
-    ],
-    "backToHome": "回到首頁",
-    "clearAll": "清除全部",
-    "noPhotosFound": "未找到照片",
-    "noPhotosDescription": "嘗試調整篩選條件以發現更多回憶。",
-    "resetFilters": "重置篩選條件"
-  },
   "articles": {
     "title": "文章",
     "loading": "正在載入文章…",
@@ -468,12 +418,12 @@
     "minRead": "分鐘閱讀",
     "viewAll": "查看全部文章",
     "typeEvent": "活動",
-    "typeLifestyle": "生活方式",
+    "typeActivity": "活動花絮",
     "backEvents": "活動",
-    "backActivities": "生活方式",
+    "backActivities": "活動花絮",
     "backHome": "首頁",
-    "gallery": "相冊",
-    "photos": "張照片"
+    "galleryTitle": "相冊",
+    "photosLabel": "張照片"
   },
   "store": {
     "allCities": "所有城市",
@@ -575,31 +525,6 @@
     "photosCount": "張照片",
     "relatedTitle": "相關文章",
     "viewAll": "查看全部"
-  },
-  "eventsPage": {
-    "label": "發生什麼事",
-    "title": "活動",
-    "subtitle": "發現我們最新的社區活動、文化慶典和聚會。",
-    "noEvents": "找不到活動",
-    "noEventsMessage": "稍後回來查看即將舉辦的活動和社區聚會。"
-  },
-  "galleryPage": {
-    "label": "相簿",
-    "photosCount": "張照片",
-    "eventsCount": "個活動",
-    "activeFilter": "活躍的活動篩選",
-    "clearAll": "清除全部",
-    "noPhotos": "找不到照片",
-    "noPhotosMessage": "嘗試調整篩選以發現更多時刻。",
-    "resetFilters": "重設篩選"
-  },
-  "lifestylePage": {
-    "label": "展覽",
-    "sublabel": "生活方式",
-    "title": "活動花絮",
-    "subtitle": "看看我們的社區如何在日常生活中享受 Mahkota Taiwan 產品。",
-    "noActivities": "找不到活動",
-    "noActivitiesMessage": "稍後回來查看新的活動和社區亮點。"
   },
   "whereToByPage": {
     "label": "找到我們",

@@ -5,13 +5,11 @@
     "products": "Produk",
     "recipes": "Resep",
     "events": "Acara",
-    "lifestyle": "Aktivitas",
+    "activity": "Aktivitas",
     "contact": "Kontak",
     "language": "Bahasa",
     "allProducts": "Semua Produk",
-    "gallery": "Galeri",
     "whereToBuy": "Tempat Membeli",
-    "journal": "Jurnal",
     "ourCollection": "Koleksi Kami"
   },
   "hero": {
@@ -182,10 +180,9 @@
     ],
     "noEventsDescription": "Kunjungi kembali nanti untuk acara mendatang dan pertemuan komunitas."
   },
-  "lifestyle": {
+  "activity": {
     "title": "Aktivitas",
     "label": "Pameran",
-    "labelSuffix": "Gaya Hidup",
     "subtitle": "Lihat bagaimana komunitas kami menikmati produk Mahkota Taiwan dalam kehidupan sehari-hari.",
     "noActivities": "Aktivitas tidak ditemukan",
     "noActivitiesMessage": "Kunjungi kembali nanti untuk aktivitas dan sorotan komunitas baru.",
@@ -199,15 +196,8 @@
     "communityActivities": "Aktivitas Komunitas",
     "communityActivitiesDesc": "Lihat bagaimana komunitas kami menikmati produk Mahkota Taiwan dalam kehidupan sehari-hari",
     "viewActivities": "Lihat Aktivitas",
-    "showcase": "Gaya Hidup",
-    "lifestyleLabel": "Pameran",
     "noActivitiesFound": "Tidak ada aktivitas ditemukan",
     "noActivitiesDescription": "Kunjungi kembali nanti untuk aktivitas baru dan sorotan komunitas."
-  },
-  "moments": {
-    "label": "Komunitas",
-    "title": "Momen Mahkota",
-    "subtitle": "Lihat bagaimana komunitas kami menikmati produk Mahkota Taiwan dalam kehidupan sehari-hari."
   },
   "discover": {
     "label": "Jelajahi",
@@ -365,17 +355,15 @@
       "allProducts": "Semua Produk",
       "recipes": "Resep",
       "events": "Acara",
-      "lifestyle": "Aktivitas",
+      "activity": "Aktivitas",
       "contact": "Kontak",
-      "whereToBuy": "Tempat Membeli",
-      "gallery": "Galeri"
+      "whereToBuy": "Tempat Membeli"
     },
     "contactUs": "Hubungi Kami",
     "certifications": "Sertifikasi",
     "sections": {
       "products": "Produk",
-      "company": "Perusahaan",
-      "journal": "Jurnal"
+      "company": "Perusahaan"
     },
     "office": "Kantor",
     "warehouse": "Gudang",
@@ -419,44 +407,6 @@
     "readMore": "Baca Selengkapnya",
     "showLess": "Tampilkan Lebih Sedikit"
   },
-  "gallery": {
-    "title": "Galeri",
-    "subtitle": "Jelajahi koleksi momen dan acara kami",
-    "noImages": "Belum ada gambar galeri.",
-    "allEvents": "Semua Acara",
-    "filterByDate": "Filter berdasarkan Tanggal",
-    "clearFilter": "Hapus Filter",
-    "photos": "foto",
-    "calendar": "Kalender",
-    "monthNames": [
-      "Januari",
-      "Februari",
-      "Maret",
-      "April",
-      "Mei",
-      "Juni",
-      "Juli",
-      "Agustus",
-      "September",
-      "Oktober",
-      "November",
-      "Desember"
-    ],
-    "dayAbbreviations": [
-      "Min",
-      "Sen",
-      "Sel",
-      "Rab",
-      "Kam",
-      "Jum",
-      "Sab"
-    ],
-    "backToHome": "Kembali ke Beranda",
-    "clearAll": "Hapus semua",
-    "noPhotosFound": "Tidak ada foto ditemukan",
-    "noPhotosDescription": "Coba sesuaikan filter Anda untuk menemukan lebih banyak kenangan.",
-    "resetFilters": "Setel Ulang Filter"
-  },
   "articles": {
     "title": "Artikel",
     "loading": "Memuat artikel…",
@@ -468,12 +418,12 @@
     "minRead": "menit baca",
     "viewAll": "Lihat Semua Artikel",
     "typeEvent": "Acara",
-    "typeLifestyle": "Aktivitas",
+    "typeActivity": "Aktivitas",
     "backEvents": "Acara",
     "backActivities": "Aktivitas",
     "backHome": "Beranda",
-    "gallery": "Galeri",
-    "photos": "foto"
+    "galleryTitle": "Galeri",
+    "photosLabel": "foto"
   },
   "store": {
     "allCities": "Semua Kota",
@@ -575,31 +525,6 @@
     "photosCount": "foto",
     "relatedTitle": "Artikel Terkait",
     "viewAll": "Lihat Semua"
-  },
-  "eventsPage": {
-    "label": "Ada Apa",
-    "title": "Acara",
-    "subtitle": "Temukan acara, perayaan budaya, dan pertemuan komunitas terbaru kami.",
-    "noEvents": "Acara tidak ditemukan",
-    "noEventsMessage": "Kunjungi kembali nanti untuk acara dan pertemuan komunitas mendatang."
-  },
-  "galleryPage": {
-    "label": "Galeri",
-    "photosCount": "Foto",
-    "eventsCount": "Acara",
-    "activeFilter": "Filter Acara Aktif",
-    "clearAll": "Hapus semua",
-    "noPhotos": "Foto tidak ditemukan",
-    "noPhotosMessage": "Coba sesuaikan filter Anda untuk menemukan lebih banyak momen.",
-    "resetFilters": "Reset Filter"
-  },
-  "lifestylePage": {
-    "label": "Pameran",
-    "sublabel": "Gaya Hidup",
-    "title": "Aktivitas",
-    "subtitle": "Lihat bagaimana komunitas kami menikmati produk Mahkota Taiwan dalam kehidupan sehari-hari.",
-    "noActivities": "Aktivitas tidak ditemukan",
-    "noActivitiesMessage": "Kunjungi kembali nanti untuk aktivitas dan sorotan komunitas baru."
   },
   "whereToByPage": {
     "label": "Temukan Kami",
