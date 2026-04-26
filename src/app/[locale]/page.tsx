@@ -244,7 +244,7 @@ export default function HomePage() {
         supabase
           .from('articles')
           .select('*')
-          .eq('type', 'activity')
+          .eq('type', 'lifestyle')
           .eq('is_active', true)
           .order('published_at', { ascending: false })
           .limit(10),

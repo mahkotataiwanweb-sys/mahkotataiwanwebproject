@@ -7,12 +7,12 @@ import toast from 'react-hot-toast';
 import { Plus, Pencil, Trash2, X, Upload, Newspaper, Eye, EyeOff, GripVertical, Images } from 'lucide-react';
 import Image from 'next/image';
 
-type ArticleType = 'event' | 'news' | 'activity' | 'recipe';
+type ArticleType = 'event' | 'news' | 'lifestyle' | 'recipe';
 
 const typeColors: Record<ArticleType, string> = {
   event: 'bg-blue-100 text-blue-700',
   recipe: 'bg-orange-100 text-orange-700',
-  activity: 'bg-green-100 text-green-700',
+  lifestyle: 'bg-green-100 text-green-700',
   news: 'bg-purple-100 text-purple-700',
 };
 
@@ -272,7 +272,7 @@ export default function ArticlesPage() {
     { label: 'All', value: 'all' },
     { label: 'Events', value: 'event' },
     { label: 'Recipes', value: 'recipe' },
-    { label: 'Activities', value: 'activity' },
+    { label: 'Activities', value: 'lifestyle' },
     { label: 'News', value: 'news' },
   ];
 
@@ -426,7 +426,7 @@ export default function ArticlesPage() {
                     >
                       <option value="event">Event</option>
                       <option value="recipe">Recipe</option>
-                      <option value="activity">Activity</option>
+                      <option value="lifestyle">Activity</option>
                       <option value="news">News</option>
                     </select>
                   </div>

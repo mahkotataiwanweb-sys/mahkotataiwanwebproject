@@ -199,7 +199,7 @@ export default function ActivityPage() {
         const { data, error } = await supabase
           .from('articles')
           .select('*')
-          .eq('type', 'activity')
+          .eq('type', 'lifestyle')
           .eq('is_active', true)
           .order('sort_order', { ascending: true });
         if (!error && data) setArticles(data as Article[]);

@@ -315,7 +315,7 @@ export interface HeroSlideUpdate {
 
 export interface Article {
   id: string;
-  type: 'event' | 'news' | 'activity' | 'recipe';
+  type: 'event' | 'news' | 'lifestyle' | 'recipe';
   title_en: string;
   title_id: string;
   title_zh: string;
@@ -341,7 +341,7 @@ export interface Article {
 
 export interface ArticleInsert {
   id?: string;
-  type: 'event' | 'news' | 'activity' | 'recipe';
+  type: 'event' | 'news' | 'lifestyle' | 'recipe';
   title_en: string;
   title_id: string;
   title_zh: string;
@@ -367,7 +367,7 @@ export interface ArticleInsert {
 
 export interface ArticleUpdate {
   id?: string;
-  type?: 'event' | 'news' | 'activity' | 'recipe';
+  type?: 'event' | 'news' | 'lifestyle' | 'recipe';
   title_en?: string;
   title_id?: string;
   title_zh?: string;

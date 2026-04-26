@@ -195,17 +195,17 @@ export default function ArticleDetailPage() {
   const excerpt = getLocalizedField(article, 'excerpt', locale);
   const galleryImages = article.gallery_images || [];
   const date = formatDate(article.published_at, locale);
-  const typeLabel = article.type === 'event' ? t('typeEvent') : article.type === 'activity' ? t('typeActivity') : article.type.charAt(0).toUpperCase() + article.type.slice(1);
+  const typeLabel = article.type === 'event' ? t('typeEvent') : article.type === 'lifestyle' ? t('typeActivity') : article.type.charAt(0).toUpperCase() + article.type.slice(1);
   const readingTime = Math.max(1, Math.ceil(content.split(/\s+/).length / 200));
   const paragraphs = content.split('\n').filter((p) => p.trim());
 
   const backHref =
     article.type === 'event'
       ? `/${locale}/events`
-      : article.type === 'activity'
+      : article.type === 'lifestyle'
         ? `/${locale}/activity`
         : `/${locale}`;
-  const backLabel = article.type === 'event' ? t('backEvents') : article.type === 'activity' ? t('backActivities') : t('backHome');
+  const backLabel = article.type === 'event' ? t('backEvents') : article.type === 'lifestyle' ? t('backActivities') : t('backHome');
 
   /* ══════════════════════════════════════════════════
      RENDER
