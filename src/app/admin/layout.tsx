@@ -20,7 +20,6 @@ const sidebarLinks = [
   { href: '/admin/video-showcase', label: 'Video Showcase', icon: Play },
   { href: '/admin/navbar', label: 'Navbar Menu', icon: Menu },
   { href: '/admin/footer', label: 'Footer Links', icon: Link2 },
-  { href: '/admin/gallery', label: 'Gallery', icon: ImageIconAlt },
   { href: '/admin/store-partners', label: 'Store Partners', icon: Store },
   { href: '/admin/content', label: 'Content', icon: FileText },
   { href: '/admin/pages', label: 'Pages', icon: Globe },

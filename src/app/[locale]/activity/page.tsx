@@ -177,9 +177,9 @@ function CalendarDropdown({
 
 /* ───────────── page ───────────── */
 
-export default function LifestylePage() {
+export default function ActivityPage() {
   const locale = useLocale();
-  const t = useTranslations('lifestyle');
+  const t = useTranslations('activity');
 
   /* state */
   const [articles, setArticles] = useState<Article[]>([]);
@@ -199,7 +199,7 @@ export default function LifestylePage() {
         const { data, error } = await supabase
           .from('articles')
           .select('*')
-          .eq('type', 'lifestyle')
+          .eq('type', 'activity')
           .eq('is_active', true)
           .order('sort_order', { ascending: true });
         if (!error && data) setArticles(data as Article[]);
@@ -306,9 +306,8 @@ export default function LifestylePage() {
             data-hero-anim
             className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em]"
           >
-            <span className="text-[#C12126]">{t('showcase')}</span>
+            <span className="text-[#C12126]">{t('label')}</span>
             <span className="inline-block h-px w-8 bg-[#FAEDD3]/30" />
-            <span className="text-[#FAEDD3]/40">{t('lifestyleLabel')}</span>
           </p>
 
           {/* Heading */}

@@ -31,23 +31,15 @@ const fallbackNavItems: FallbackNavItem[] = [
       { key: 'recipes', href: '/recipes' },
     ],
   },
-  {
-    type: 'dropdown',
-    key: 'journal',
-    href: '/moments',
-    children: [
-      { key: 'events', href: '/events' },
-      { key: 'lifestyle', href: '/lifestyle' },
-      { key: 'gallery', href: '/gallery' },
-    ],
-  },
+  { type: 'link', key: 'events', href: '/events' },
+  { type: 'link', key: 'activity', href: '/activity' },
   { type: 'link', key: 'about', href: '/about' },
   { type: 'link', key: 'contact', href: '/contact' },
   { type: 'link', key: 'whereToBuy', href: '/where-to-buy' },
 ];
 
 // Pages with dark backgrounds where navbar needs light text
-const darkHeaderPages = ['/products', '/lifestyle', '/events', '/about', '/gallery', '/where-to-buy', '/contact', '/recipes'];
+const darkHeaderPages = ['/products', '/activity', '/events', '/about', '/where-to-buy', '/contact', '/recipes'];
 
 /* ------------------------------------------------------------------ */
 /*  Main Navbar                                                        */

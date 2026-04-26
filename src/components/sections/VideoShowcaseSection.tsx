@@ -571,7 +571,7 @@ export default function VideoShowcaseSection() {
                 className="text-center mt-12"
               >
                 <p className="text-sm text-gray-300">
-                  Showing {categoryVideos.length} video{categoryVideos.length !== 1 ? 's' : ''}
+                  {t('showingVideos')} {categoryVideos.length} video{categoryVideos.length !== 1 ? 's' : ''}
                 </p>
               </motion.div>
             )}

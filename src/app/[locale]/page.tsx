@@ -244,7 +244,7 @@ export default function HomePage() {
         supabase
           .from('articles')
           .select('*')
-          .eq('type', 'lifestyle')
+          .eq('type', 'activity')
           .eq('is_active', true)
           .order('published_at', { ascending: false })
           .limit(10),
@@ -406,7 +406,7 @@ export default function HomePage() {
                 articles={activities}
                 fallbackTitle={t('fallbackTitle2')}
                 fallbackExcerpt={t('fallbackExcerpt2')}
-                fallbackHref={`/${locale}/lifestyle`}
+                fallbackHref={`/${locale}/activity`}
                 btnLabel={t('viewActivities')}
                 locale={locale}
               />

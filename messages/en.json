@@ -5,13 +5,11 @@
     "products": "Products",
     "recipes": "Recipes",
     "events": "Event",
-    "lifestyle": "Activity",
+    "activity": "Activity",
     "contact": "Contact",
     "language": "Language",
     "allProducts": "All Products",
-    "gallery": "Gallery",
     "whereToBuy": "Where to Buy",
-    "journal": "Journal",
     "ourCollection": "Our Collection"
   },
   "hero": {
@@ -182,10 +180,9 @@
     ],
     "noEventsDescription": "Check back later for upcoming events and community gatherings."
   },
-  "lifestyle": {
-    "title": "Activity",
+  "activity": {
+    "title": "Activities",
     "label": "Showcase",
-    "labelSuffix": "Lifestyle",
     "subtitle": "See how our community enjoys Mahkota Taiwan products in their everyday life.",
     "noActivities": "No activities found",
     "noActivitiesMessage": "Check back later for new activities and community highlights.",
@@ -199,15 +196,8 @@
     "communityActivities": "Community Activities",
     "communityActivitiesDesc": "See how our community enjoys Mahkota Taiwan products in their daily life",
     "viewActivities": "View Activities",
-    "showcase": "Lifestyle",
-    "lifestyleLabel": "Showcase",
     "noActivitiesFound": "No activities found",
     "noActivitiesDescription": "Check back later for new activities and community highlights."
-  },
-  "moments": {
-    "label": "Community",
-    "title": "Mahkota Moments",
-    "subtitle": "See how our community enjoys Mahkota Taiwan products in their everyday life."
   },
   "discover": {
     "label": "Discover",
@@ -364,18 +354,16 @@
       "products": "Products",
       "allProducts": "All Products",
       "recipes": "Recipes",
-      "events": "Event",
-      "lifestyle": "Activity",
+      "events": "Events",
+      "activity": "Activities",
       "contact": "Contact",
-      "whereToBuy": "Where to Buy",
-      "gallery": "Gallery"
+      "whereToBuy": "Where to Buy"
     },
     "contactUs": "Contact Us",
     "certifications": "Certifications",
     "sections": {
       "products": "Products",
-      "company": "Company",
-      "journal": "Journal"
+      "company": "Company"
     },
     "office": "Office",
     "warehouse": "Warehouse",
@@ -419,44 +407,6 @@
     "readMore": "Read More",
     "showLess": "Show Less"
   },
-  "gallery": {
-    "title": "Gallery",
-    "subtitle": "Browse our collection of moments and events",
-    "noImages": "No gallery images available yet.",
-    "allEvents": "All Events",
-    "filterByDate": "Filter by Date",
-    "clearFilter": "Clear Filter",
-    "photos": "photos",
-    "calendar": "Calendar",
-    "monthNames": [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
-    ],
-    "dayAbbreviations": [
-      "Su",
-      "Mo",
-      "Tu",
-      "We",
-      "Th",
-      "Fr",
-      "Sa"
-    ],
-    "backToHome": "Back to Home",
-    "clearAll": "Clear all",
-    "noPhotosFound": "No photos found",
-    "noPhotosDescription": "Try adjusting your filters to discover more memories.",
-    "resetFilters": "Reset Filters"
-  },
   "articles": {
     "title": "Articles",
     "loading": "Loading article…",
@@ -466,7 +416,14 @@
     "notFoundDescription": "The article you're looking for doesn't exist or has been removed.",
     "relatedArticles": "Related Articles",
     "minRead": "min read",
-    "viewAll": "View All Articles"
+    "viewAll": "View All Articles",
+    "typeEvent": "Event",
+    "typeActivity": "Activity",
+    "backEvents": "Events",
+    "backActivities": "Activities",
+    "backHome": "Home",
+    "galleryTitle": "Gallery",
+    "photosLabel": "photos"
   },
   "store": {
     "allCities": "All Cities",
@@ -568,31 +525,6 @@
     "photosCount": "photos",
     "relatedTitle": "Related Articles",
     "viewAll": "View All"
-  },
-  "eventsPage": {
-    "label": "What's Happening",
-    "title": "Events",
-    "subtitle": "Discover our latest events, cultural celebrations, and community gatherings.",
-    "noEvents": "No events found",
-    "noEventsMessage": "Check back later for upcoming events and community gatherings."
-  },
-  "galleryPage": {
-    "label": "Gallery",
-    "photosCount": "Photos",
-    "eventsCount": "Events",
-    "activeFilter": "Active Event Filter",
-    "clearAll": "Clear all",
-    "noPhotos": "No photos found",
-    "noPhotosMessage": "Try adjusting your filters to discover more memories.",
-    "resetFilters": "Reset Filters"
-  },
-  "lifestylePage": {
-    "label": "Showcase",
-    "sublabel": "Lifestyle",
-    "title": "Activity",
-    "subtitle": "See how our community enjoys Mahkota Taiwan products in their everyday life.",
-    "noActivities": "No activities found",
-    "noActivitiesMessage": "Check back later for new activities and community highlights."
   },
   "whereToByPage": {
     "label": "Find Us",
