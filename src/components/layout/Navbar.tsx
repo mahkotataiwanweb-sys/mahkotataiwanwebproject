@@ -94,12 +94,13 @@ export default function Navbar() {
     fetchData();
   }, []);
 
-  // Build DB menu tree
+  // Build DB menu tree (filter out gallery)
   const menuTree = useMemo(() => {
     if (dbMenuItems.length === 0) return null;
-    const topLevel = dbMenuItems.filter((item) => item.parent_id === null);
+    const filtered = dbMenuItems.filter((item) => !item.url?.includes('gallery'));
+    const topLevel = filtered.filter((item) => item.parent_id === null);
     const childrenMap = new Map<string, NavMenuItem[]>();
-    dbMenuItems.forEach((item) => {
+    filtered.forEach((item) => {
       if (item.parent_id) {
         const existing = childrenMap.get(item.parent_id) || [];
         existing.push(item);
