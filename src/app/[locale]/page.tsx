@@ -406,7 +406,7 @@ export default function HomePage() {
                 articles={activities}
                 fallbackTitle={t('fallbackTitle2')}
                 fallbackExcerpt={t('fallbackExcerpt2')}
-                fallbackHref={`/${locale}/lifestyle`}
+                fallbackHref={`/${locale}/activity`}
                 btnLabel={t('viewActivities')}
                 locale={locale}
               />

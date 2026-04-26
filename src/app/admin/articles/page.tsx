@@ -272,7 +272,7 @@ export default function ArticlesPage() {
     { label: 'All', value: 'all' },
     { label: 'Events', value: 'event' },
     { label: 'Recipes', value: 'recipe' },
-    { label: 'Lifestyle', value: 'activity' },
+    { label: 'Activities', value: 'activity' },
     { label: 'News', value: 'news' },
   ];
 
@@ -426,7 +426,7 @@ export default function ArticlesPage() {
                     >
                       <option value="event">Event</option>
                       <option value="recipe">Recipe</option>
-                      <option value="activity">Lifestyle</option>
+                      <option value="activity">Activity</option>
                       <option value="news">News</option>
                     </select>
                   </div>
