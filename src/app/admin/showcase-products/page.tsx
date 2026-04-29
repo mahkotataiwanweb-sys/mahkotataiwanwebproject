@@ -1,8 +1,29 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Image from 'next/image';
-import { Pencil, Trash2, Plus, X, Save, GripVertical } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, ShoppingBag } from 'lucide-react';
+import toast from 'react-hot-toast';
+
+import {
+  AdminButton,
+  AdminPageHeader,
+  AdminModal,
+  AdminInput,
+  AdminLabel,
+  AdminSelect,
+  AdminTable,
+  AdminToggle,
+  ImageUpload,
+  MultilingualField,
+  TranslateAllButton,
+  StatusPill,
+  SortControl,
+  EmptyState,
+  type ColumnDef,
+  type MultilingualValue,
+  emptyMultilingual,
+} from '@/components/admin/ui';
 
 interface ShowcaseProduct {
   id: string;
@@ -27,523 +48,322 @@ const CATEGORIES = [
   { value: 'snack', label: 'Snack' },
 ];
 
-const EMPTY_PRODUCT: Omit<ShowcaseProduct, 'id'> = {
+interface FormState {
+  id?: string;
+  category: string;
+  name: MultilingualValue;
+  description: MultilingualValue;
+  image_url: string;
+  detail_image_url: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+const emptyForm = (): FormState => ({
   category: 'abon-sapi',
-  name: '',
-  name_zh: '',
-  name_id: '',
-  description_en: '',
-  description_id: '',
-  description_zh: '',
-  image_url: null,
-  detail_image_url: null,
+  name: emptyMultilingual(),
+  description: emptyMultilingual(),
+  image_url: '',
+  detail_image_url: '',
   sort_order: 0,
   is_active: true,
-};
+});
 
 export default function ShowcaseProductsAdmin() {
-  const [products, setProducts] = useState<ShowcaseProduct[]>([]);
+  const [items, setItems] = useState<ShowcaseProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<ShowcaseProduct | null>(null);
-  const [isNew, setIsNew] = useState(false);
+  const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
-  const [uploading, setUploading] = useState(false);
-  const [uploadingDetail, setUploadingDetail] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState<FormState>(emptyForm());
 
-  const fetchProducts = useCallback(async () => {
+  const fetchItems = useCallback(async () => {
+    setLoading(true);
     try {
       const res = await fetch('/api/showcase-products');
       const data = await res.json();
-      setProducts(data);
+      setItems(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('Failed to fetch products:', err);
+      toast.error('Failed to fetch');
+      console.error(err);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    fetchItems();
+  }, [fetchItems]);
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    return items.filter((p) => {
+      if (filterCategory !== 'all' && p.category !== filterCategory) return false;
+      if (q && ![p.name, p.name_id, p.name_zh].some((v) => (v || '').toLowerCase().includes(q))) return false;
+      return true;
+    });
+  }, [items, search, filterCategory]);
+
+  const openAdd = () => {
+    setForm({ ...emptyForm(), sort_order: items.length });
+    setShowModal(true);
+  };
+
+  const openEdit = (p: ShowcaseProduct) => {
+    setForm({
+      id: p.id,
+      category: p.category,
+      name: { en: p.name || '', id: p.name_id || '', zh: p.name_zh || '' },
+      description: { en: p.description_en || '', id: p.description_id || '', zh: p.description_zh || '' },
+      image_url: p.image_url || '',
+      detail_image_url: p.detail_image_url || '',
+      sort_order: p.sort_order,
+      is_active: p.is_active,
+    });
+    setShowModal(true);
+  };
 
   const handleSave = async () => {
-    if (!editing) return;
+    if (!form.name.en.trim()) {
+      toast.error('English name is required');
+      return;
+    }
     setSaving(true);
-
     try {
-      if (isNew) {
-        const { ...body } = editing;
-        const res = await fetch('/api/showcase-products', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        });
-        if (!res.ok) throw new Error('Failed to create');
-      } else {
-        const res = await fetch('/api/showcase-products', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(editing),
-        });
-        if (!res.ok) throw new Error('Failed to update');
-      }
-
-      setEditing(null);
-      setIsNew(false);
-      fetchProducts();
+      const payload = {
+        category: form.category,
+        name: form.name.en,
+        name_id: form.name.id,
+        name_zh: form.name.zh,
+        description_en: form.description.en,
+        description_id: form.description.id,
+        description_zh: form.description.zh,
+        image_url: form.image_url || null,
+        detail_image_url: form.detail_image_url || null,
+        sort_order: form.sort_order,
+        is_active: form.is_active,
+      };
+      const res = await fetch('/api/showcase-products', {
+        method: form.id ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form.id ? { id: form.id, ...payload } : payload),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      toast.success(form.id ? 'Updated' : 'Created');
+      setShowModal(false);
+      fetchItems();
     } catch (err) {
-      console.error('Save error:', err);
-      alert('Failed to save product');
+      toast.error(err instanceof Error ? err.message : 'Failed');
     } finally {
       setSaving(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
-
-    try {
-      const res = await fetch(`/api/showcase-products?id=${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete');
-      fetchProducts();
-    } catch (err) {
-      console.error('Delete error:', err);
-      alert('Failed to delete product');
+  const handleDelete = async (p: ShowcaseProduct) => {
+    if (!confirm(`Delete "${p.name}"?`)) return;
+    const res = await fetch(`/api/showcase-products?id=${p.id}`, { method: 'DELETE' });
+    if (!res.ok) toast.error('Failed to delete');
+    else {
+      toast.success('Deleted');
+      fetchItems();
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !editing) return;
-
-    setUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('folder', 'showcase-products');
-
-    try {
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.url) {
-        setEditing({ ...editing, image_url: data.url });
-      }
-    } catch (err) {
-      console.error('Upload error:', err);
-      alert('Failed to upload image');
-    } finally {
-      setUploading(false);
-    }
+  const toggleActive = async (p: ShowcaseProduct) => {
+    await fetch('/api/showcase-products', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: p.id, is_active: !p.is_active }),
+    });
+    setItems((prev) => prev.map((x) => (x.id === p.id ? { ...x, is_active: !x.is_active } : x)));
   };
 
-
-  const handleDetailImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !editing) return;
-    setUploadingDetail(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('folder', 'showcase-products/detail');
-    try {
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.url) {
-        setEditing({ ...editing, detail_image_url: data.url });
-      }
-    } catch (err) {
-      console.error('Upload error:', err);
-      alert('Failed to upload detail image');
-    } finally {
-      setUploadingDetail(false);
-    }
-  };
-
-  const handleToggleActive = async (product: ShowcaseProduct) => {
-    try {
-      await fetch('/api/showcase-products', {
+  const move = async (p: ShowcaseProduct, dir: -1 | 1) => {
+    const idx = items.findIndex((x) => x.id === p.id);
+    const swap = items[idx + dir];
+    if (!swap) return;
+    await Promise.all([
+      fetch('/api/showcase-products', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: product.id, is_active: !product.is_active }),
-      });
-      fetchProducts();
-    } catch (err) {
-      console.error('Toggle error:', err);
-    }
+        body: JSON.stringify({ id: p.id, sort_order: swap.sort_order }),
+      }),
+      fetch('/api/showcase-products', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: swap.id, sort_order: p.sort_order }),
+      }),
+    ]);
+    fetchItems();
   };
 
-  const filtered = filterCategory === 'all' ? products : products.filter((p) => p.category === filterCategory);
+  const columns: ColumnDef<ShowcaseProduct>[] = [
+    {
+      key: 'product',
+      label: 'Product',
+      render: (p) => (
+        <div className="flex items-center gap-3">
+          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-[var(--color-admin-surface-2)] dark:bg-[var(--color-admin-surface-2-dark)] flex-shrink-0">
+            {p.image_url ? (
+              <Image src={p.image_url} alt="" fill className="object-cover" sizes="48px" unoptimized />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center"><ShoppingBag className="w-4 h-4 text-[var(--color-admin-faint)]" /></div>
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="font-medium truncate">{p.name}</p>
+            <p className="text-xs text-[var(--color-admin-muted)] dark:text-[var(--color-admin-muted-dark)] truncate">{p.name_id || p.name_zh}</p>
+          </div>
+        </div>
+      ),
+    },
+    { key: 'category', label: 'Category', render: (p) => <span className="admin-pill admin-pill-neutral">{CATEGORIES.find((c) => c.value === p.category)?.label || p.category}</span> },
+    { key: 'status', label: 'Status', render: (p) => <StatusPill active={p.is_active} onClick={() => toggleActive(p)} /> },
+    {
+      key: 'order',
+      label: 'Order',
+      render: (p, i) => (
+        <SortControl
+          onUp={() => move(p, -1)}
+          onDown={() => move(p, 1)}
+          disabledUp={i === 0}
+          disabledDown={i === filtered.length - 1}
+          value={p.sort_order}
+        />
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      align: 'right',
+      render: (p) => (
+        <div className="flex items-center justify-end gap-1">
+          <button onClick={() => openEdit(p)} className="admin-btn-icon admin-btn-icon-edit" title="Edit"><Pencil className="w-4 h-4" /></button>
+          <button onClick={() => handleDelete(p)} className="admin-btn-icon admin-btn-icon-delete" title="Delete"><Trash2 className="w-4 h-4" /></button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Product Catalog Showcase</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Manage products displayed in the homepage product catalog section
-          </p>
+      <AdminPageHeader
+        title="Showcase Products"
+        subtitle="Produk highlight untuk halaman utama (terpisah dari katalog produk utama)"
+        actions={
+          <AdminButton variant="accent" iconLeft={<Plus className="w-4 h-4" />} onClick={openAdd}>
+            Add Showcase Product
+          </AdminButton>
+        }
+      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="admin-search-wrap">
+          <Search className="w-4 h-4 admin-search-icon" />
+          <AdminInput value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search…" />
         </div>
-        <button
-          onClick={() => {
-            setEditing(EMPTY_PRODUCT as ShowcaseProduct);
-            setIsNew(true);
-          }}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Add Product
-        </button>
-      </div>
-
-      {/* Category Filter */}
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => setFilterCategory('all')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-            filterCategory === 'all'
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
-        >
-          All ({products.length})
-        </button>
-        {CATEGORIES.map((cat) => {
-          const count = products.filter((p) => p.category === cat.value).length;
-          return (
-            <button
-              key={cat.value}
-              onClick={() => setFilterCategory(cat.value)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                filterCategory === cat.value
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {cat.label} ({count})
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Products Grid */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((product) => (
-            <div
-              key={product.id}
-              className={`bg-white rounded-xl border p-4 transition-all hover:shadow-md ${
-                !product.is_active ? 'opacity-50' : ''
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                {/* Image */}
-                <div className="w-20 h-20 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden flex items-center justify-center">
-                  {product.image_url ? (
-                    <Image
-                      src={product.image_url}
-                      alt={product.name}
-                      width={80}
-                      height={80}
-                      className="object-contain"
-                      unoptimized
-                    />
-                  ) : (
-                    <span className="text-3xl">🍽️</span>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 truncate">{product.name}</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {CATEGORIES.find((c) => c.value === product.category)?.label}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1 line-clamp-2">
-                    {product.description_en || 'No description'}
-                  </p>
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-col gap-1">
-                  <button
-                    onClick={() => {
-                      setEditing(product);
-                      setIsNew(false);
-                    }}
-                    className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-                    title="Edit"
-                  >
-                    <Pencil className="w-4 h-4 text-gray-500" />
-                  </button>
-                  <button
-                    onClick={() => handleToggleActive(product)}
-                    className={`p-1.5 rounded-lg transition-colors ${
-                      product.is_active ? 'hover:bg-green-50' : 'hover:bg-gray-100'
-                    }`}
-                    title={product.is_active ? 'Deactivate' : 'Activate'}
-                  >
-                    <div
-                      className={`w-4 h-4 rounded-full border-2 ${
-                        product.is_active
-                          ? 'bg-green-500 border-green-500'
-                          : 'bg-white border-gray-300'
-                      }`}
-                    />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(product.id)}
-                    className="p-1.5 rounded-lg hover:bg-red-50 transition-colors"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                  </button>
-                </div>
-              </div>
-            </div>
+        <AdminSelect value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+          <option value="all">All categories ({items.length})</option>
+          {CATEGORIES.map((c) => (
+            <option key={c.value} value={c.value}>
+              {c.label} ({items.filter((p) => p.category === c.value).length})
+            </option>
           ))}
-        </div>
-      )}
+        </AdminSelect>
+      </div>
 
-      {/* Edit / New Modal */}
-      {editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-lg font-bold text-gray-900">
-                {isNew ? 'Add New Product' : 'Edit Product'}
-              </h2>
-              <button
-                onClick={() => {
-                  setEditing(null);
-                  setIsNew(false);
-                }}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      <AdminTable
+        columns={columns}
+        data={filtered}
+        loading={loading}
+        emptyState={
+          <EmptyState
+            title="No showcase products"
+            description="Add a product to feature on the homepage carousel."
+            icon={<ShoppingBag className="w-6 h-6" />}
+            action={<AdminButton variant="accent" iconLeft={<Plus className="w-4 h-4" />} onClick={openAdd}>Add</AdminButton>}
+          />
+        }
+      />
 
-            {/* Modal Body */}
-            <div className="p-6 space-y-5">
-              {/* Category */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                <select
-                  value={editing.category}
-                  onChange={(e) => setEditing({ ...editing, category: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                >
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+      <AdminModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        title={form.id ? 'Edit Showcase Product' : 'Add Showcase Product'}
+        size="lg"
+        footer={
+          <>
+            <TranslateAllButton
+              fields={[
+                { base: 'name', values: form.name, context: 'product name' },
+                { base: 'description', values: form.description, context: 'product description' },
+              ]}
+              onUpdate={(u) => setForm((p) => ({ ...p, name: u.name || p.name, description: u.description || p.description }))}
+            />
+            <AdminButton variant="ghost" onClick={() => setShowModal(false)}>Cancel</AdminButton>
+            <AdminButton variant="primary" loading={saving} onClick={handleSave}>{form.id ? 'Save changes' : 'Create'}</AdminButton>
+          </>
+        }
+      >
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <ImageUpload
+              label="Card Image"
+              description="Transparent PNG recommended"
+              value={form.image_url}
+              onChange={(url) => setForm((p) => ({ ...p, image_url: url }))}
+              folder="showcase-products"
+            />
+            <ImageUpload
+              label="Detail Image"
+              description="Big card / product detail"
+              value={form.detail_image_url}
+              onChange={(url) => setForm((p) => ({ ...p, detail_image_url: url }))}
+              folder="showcase-products/detail"
+            />
+          </div>
 
-              {/* Image Upload */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Product Image
-                </label>
-                <div className="flex items-center gap-4">
-                  <div className="w-24 h-24 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
-                    {editing.image_url ? (
-                      <Image
-                        src={editing.image_url}
-                        alt="Preview"
-                        width={96}
-                        height={96}
-                        className="object-contain"
-                        unoptimized
-                      />
-                    ) : (
-                      <span className="text-4xl">📷</span>
-                    )}
-                  </div>
-                  <div>
-                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageUpload}
-                      />
-                      {uploading ? 'Uploading...' : 'Upload Image'}
-                    </label>
-                    <p className="text-xs text-gray-400 mt-1">PNG with transparent background recommended</p>
-                  </div>
-                </div>
-              </div>
+          <div>
+            <AdminLabel>Category</AdminLabel>
+            <AdminSelect value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}>
+              {CATEGORIES.map((c) => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </AdminSelect>
+          </div>
 
+          <MultilingualField
+            label="Name"
+            required
+            values={form.name}
+            onChange={(values) => setForm((p) => ({ ...p, name: values }))}
+            context="product name"
+          />
 
-              {/* Detail Image (Big Card) */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Detail Image <span className="text-xs text-gray-400 font-normal">(Big Card)</span>
-                </label>
-                <p className="text-xs text-gray-400 mb-2">Shown in the large product detail card only. Does NOT affect the small card image.</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-24 h-24 rounded-lg bg-[#0c1929] flex items-center justify-center overflow-hidden">
-                    {editing.detail_image_url ? (
-                      <Image
-                        src={editing.detail_image_url}
-                        alt="Detail Preview"
-                        width={96}
-                        height={96}
-                        className="object-contain"
-                        unoptimized
-                      />
-                    ) : (
-                      <span className="text-xs text-gray-500 text-center leading-tight">No detail<br/>image</span>
-                    )}
-                  </div>
-                  <div>
-                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleDetailImageUpload}
-                      />
-                      {uploadingDetail ? 'Uploading...' : 'Upload Detail Image'}
-                    </label>
-                    <p className="text-xs text-gray-400 mt-1">Professional product photo recommended</p>
-                    {editing.detail_image_url && (
-                      <button
-                        onClick={() => setEditing({ ...editing, detail_image_url: null })}
-                        className="text-xs text-red-500 hover:text-red-700 mt-1"
-                      >
-                        Remove detail image
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-              {/* Names */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Name (English)
-                  </label>
-                  <input
-                    type="text"
-                    value={editing.name}
-                    onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                    placeholder="Product name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Name (中文)
-                  </label>
-                  <input
-                    type="text"
-                    value={editing.name_zh}
-                    onChange={(e) => setEditing({ ...editing, name_zh: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                    placeholder="產品名稱"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Name (Indonesia)
-                  </label>
-                  <input
-                    type="text"
-                    value={editing.name_id}
-                    onChange={(e) => setEditing({ ...editing, name_id: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                    placeholder="Nama produk"
-                  />
-                </div>
-              </div>
+          <MultilingualField
+            label="Description"
+            multiline
+            rows={3}
+            values={form.description}
+            onChange={(values) => setForm((p) => ({ ...p, description: values }))}
+            context="product description"
+          />
 
-              {/* Descriptions */}
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description (English)
-                  </label>
-                  <textarea
-                    value={editing.description_en}
-                    onChange={(e) => setEditing({ ...editing, description_en: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                    rows={2}
-                    placeholder="Short product description"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description (中文)
-                  </label>
-                  <textarea
-                    value={editing.description_zh}
-                    onChange={(e) => setEditing({ ...editing, description_zh: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                    rows={2}
-                    placeholder="產品描述"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description (Indonesia)
-                  </label>
-                  <textarea
-                    value={editing.description_id}
-                    onChange={(e) => setEditing({ ...editing, description_id: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                    rows={2}
-                    placeholder="Deskripsi produk"
-                  />
-                </div>
-              </div>
-
-              {/* Sort Order */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Sort Order
-                </label>
-                <input
-                  type="number"
-                  value={editing.sort_order}
-                  onChange={(e) =>
-                    setEditing({ ...editing, sort_order: parseInt(e.target.value) || 0 })
-                  }
-                  className="w-24 px-3 py-2 border rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="flex items-center justify-end gap-3 p-6 border-t">
-              <button
-                onClick={() => {
-                  setEditing(null);
-                  setIsNew(false);
-                }}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={!editing.name || saving}
-                className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-              >
-                <Save className="w-4 h-4" />
-                {saving ? 'Saving...' : 'Save Product'}
-              </button>
+          <div className="flex flex-wrap items-center gap-6">
+            <AdminToggle checked={form.is_active} onChange={(v) => setForm((p) => ({ ...p, is_active: v }))} label="Active" />
+            <div className="flex items-center gap-2">
+              <AdminLabel className="!mb-0">Sort</AdminLabel>
+              <AdminInput
+                type="number"
+                value={form.sort_order}
+                onChange={(e) => setForm((p) => ({ ...p, sort_order: parseInt(e.target.value) || 0 }))}
+                className="w-24"
+              />
             </div>
           </div>
         </div>
-      )}
+      </AdminModal>
     </div>
   );
 }

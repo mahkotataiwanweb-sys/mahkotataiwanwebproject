@@ -1,115 +1,222 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
-import { SiteContent } from '@/types/database';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { Save, FileText, Sparkles, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { Save, FileText } from 'lucide-react';
+
+import { supabase } from '@/lib/supabase';
+import type { SiteContent } from '@/types/database';
+import {
+  AdminButton,
+  AdminPageHeader,
+  EmptyState,
+  MultilingualField,
+} from '@/components/admin/ui';
+
+interface ContentDraft extends SiteContent {
+  _dirty?: boolean;
+}
 
 export default function ContentPage() {
-  const [content, setContent] = useState<SiteContent[]>([]);
+  const [items, setItems] = useState<ContentDraft[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>('all');
 
   const fetchContent = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase.from('site_content').select('*').order('section').order('key');
-    if (error) toast.error('Failed to load content');
-    else setContent(data || []);
+    if (error) toast.error('Failed to load');
+    else setItems(data || []);
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetchContent(); }, [fetchContent]);
+  useEffect(() => {
+    fetchContent();
+  }, [fetchContent]);
 
-  const updateField = (id: string, field: string, value: string) => {
-    setContent(prev => prev.map(item =>
-      item.id === id ? { ...item, [field]: value } : item
-    ));
-  };
+  const sections = useMemo(() => Array.from(new Set(items.map((c) => c.section))), [items]);
+
+  const visible = useMemo(() => {
+    if (activeSection === 'all') return items;
+    return items.filter((c) => c.section === activeSection);
+  }, [items, activeSection]);
+
+  const dirtyCount = useMemo(() => items.filter((i) => i._dirty).length, [items]);
 
   const saveAll = async () => {
     setSaving(true);
     try {
-      for (const item of content) {
-        await supabase.from('site_content').update({
-          value_en: item.value_en,
-          value_id: item.value_id,
-          value_zh: item.value_zh,
-        }).eq('id', item.id);
+      const dirty = items.filter((i) => i._dirty);
+      if (dirty.length === 0) {
+        toast('No changes to save', { icon: 'ℹ️' });
+        return;
       }
-      toast.success('All content saved!');
-    } catch {
-      toast.error('Failed to save');
+      for (const it of dirty) {
+        await supabase
+          .from('site_content')
+          .update({
+            value_en: it.value_en,
+            value_id: it.value_id,
+            value_zh: it.value_zh,
+          })
+          .eq('id', it.id);
+      }
+      toast.success(`Saved ${dirty.length} item${dirty.length === 1 ? '' : 's'}`);
+      setItems((prev) => prev.map((i) => ({ ...i, _dirty: false })));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to save');
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
 
-  const sections = [...new Set(content.map(c => c.section))];
-
-  if (loading) return <div className="text-gray-400 text-center py-12">Loading content...</div>;
+  const translateAllVisible = async () => {
+    setTranslating(true);
+    let translated = 0;
+    try {
+      for (const it of visible) {
+        const langs: ('en' | 'id' | 'zh')[] = ['en', 'id', 'zh'];
+        let source: 'en' | 'id' | 'zh' | null = null;
+        for (const l of langs) {
+          if ((it[`value_${l}`] || '').trim()) {
+            source = l;
+            break;
+          }
+        }
+        if (!source) continue;
+        const targets = langs.filter((l) => l !== source && !(it[`value_${l}`] || '').trim());
+        if (targets.length === 0) continue;
+        const res = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: it[`value_${source}`], from: source, to: targets, context: `${it.section} ${it.key}` }),
+        });
+        const data = await res.json();
+        if (data.error) continue;
+        const next: Partial<ContentDraft> = {};
+        for (const t of targets) {
+          if (data.translations?.[t]) {
+            next[`value_${t}` as keyof SiteContent] = data.translations[t] as never;
+            translated += 1;
+          }
+        }
+        setItems((prev) => prev.map((p) => (p.id === it.id ? { ...p, ...next, _dirty: true } : p)));
+      }
+      if (translated === 0) {
+        toast('All visible fields are already filled', { icon: 'ℹ️' });
+      } else {
+        toast.success(`Translated ${translated} field${translated === 1 ? '' : 's'} (don't forget to save)`);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Translation failed');
+    } finally {
+      setTranslating(false);
+    }
+  };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Content Management</h1>
-          <p className="text-gray-500 text-sm">Edit website text in all languages</p>
-        </div>
-        <button onClick={saveAll} disabled={saving}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-navy text-white rounded-xl text-sm font-medium hover:bg-navy-light disabled:opacity-50 transition-colors">
-          <Save className="w-4 h-4" /> {saving ? 'Saving...' : 'Save All'}
-        </button>
-      </div>
+    <div className="space-y-6">
+      <AdminPageHeader
+        title="Site Content"
+        subtitle="Edit semua key-value konten website (homepage, sections, dll.)"
+        actions={
+          <>
+            <AdminButton variant="ghost" onClick={translateAllVisible} disabled={translating}>
+              {translating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+              Auto-Translate Visible
+            </AdminButton>
+            <AdminButton variant="primary" onClick={saveAll} loading={saving} iconLeft={<Save className="w-4 h-4" />}>
+              Save {dirtyCount > 0 ? `(${dirtyCount})` : 'All'}
+            </AdminButton>
+          </>
+        }
+      />
 
-      {content.length === 0 ? (
-        <div className="bg-white rounded-xl p-8 text-center text-gray-400">
-          <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-          <p>No content found. Run database setup first.</p>
+      {/* Section tabs */}
+      {sections.length > 0 && (
+        <div className="flex flex-wrap gap-2 admin-surface p-2">
+          <button
+            onClick={() => setActiveSection('all')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${
+              activeSection === 'all'
+                ? 'bg-[var(--color-admin-ink)] text-white dark:bg-[var(--color-admin-accent)] dark:text-[#1A1308]'
+                : 'text-[var(--color-admin-muted)] hover:bg-[var(--color-admin-surface-2)] dark:hover:bg-[var(--color-admin-surface-2-dark)]'
+            }`}
+          >
+            All ({items.length})
+          </button>
+          {sections.map((s) => (
+            <button
+              key={s}
+              onClick={() => setActiveSection(s)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${
+                activeSection === s
+                  ? 'bg-[var(--color-admin-ink)] text-white dark:bg-[var(--color-admin-accent)] dark:text-[#1A1308]'
+                  : 'text-[var(--color-admin-muted)] hover:bg-[var(--color-admin-surface-2)] dark:hover:bg-[var(--color-admin-surface-2-dark)]'
+              }`}
+            >
+              {s} ({items.filter((i) => i.section === s).length})
+            </button>
+          ))}
         </div>
-      ) : sections.map((section) => (
-        <div key={section} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 capitalize">{section}</h2>
-          <div className="space-y-4">
-            {content.filter(c => c.section === section).map((item) => (
-              <div key={item.id} className="border border-gray-100 rounded-lg p-4">
-                <label className="text-sm font-medium text-gray-700 mb-2 block capitalize">{item.key.replace(/_/g, ' ')}</label>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div>
-                    <span className="text-xs text-gray-400 mb-1 block">🇺🇸 English</span>
-                    {item.content_type === 'textarea' || item.content_type === 'richtext' ? (
-                      <textarea value={item.value_en} onChange={(e) => updateField(item.id, 'value_en', e.target.value)} rows={3}
-                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm resize-none focus:outline-none focus:border-navy" />
-                    ) : (
-                      <input type={item.content_type === 'number' ? 'number' : 'text'} value={item.value_en} onChange={(e) => updateField(item.id, 'value_en', e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
-                    )}
-                  </div>
-                  <div>
-                    <span className="text-xs text-gray-400 mb-1 block">🇮🇩 Indonesia</span>
-                    {item.content_type === 'textarea' || item.content_type === 'richtext' ? (
-                      <textarea value={item.value_id} onChange={(e) => updateField(item.id, 'value_id', e.target.value)} rows={3}
-                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm resize-none focus:outline-none focus:border-navy" />
-                    ) : (
-                      <input type={item.content_type === 'number' ? 'number' : 'text'} value={item.value_id} onChange={(e) => updateField(item.id, 'value_id', e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
-                    )}
-                  </div>
-                  <div>
-                    <span className="text-xs text-gray-400 mb-1 block">🇹🇼 繁體中文</span>
-                    {item.content_type === 'textarea' || item.content_type === 'richtext' ? (
-                      <textarea value={item.value_zh} onChange={(e) => updateField(item.id, 'value_zh', e.target.value)} rows={3}
-                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm resize-none focus:outline-none focus:border-navy" />
-                    ) : (
-                      <input type={item.content_type === 'number' ? 'number' : 'text'} value={item.value_zh} onChange={(e) => updateField(item.id, 'value_zh', e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
-                    )}
-                  </div>
+      )}
+
+      {loading ? (
+        <div className="space-y-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="admin-skeleton h-28" />
+          ))}
+        </div>
+      ) : items.length === 0 ? (
+        <div className="admin-surface">
+          <EmptyState
+            title="No content yet"
+            description="Run /api/setup to seed initial site content."
+            icon={<FileText className="w-6 h-6" />}
+          />
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {visible.map((it) => (
+            <div key={it.id} className="admin-surface p-5">
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.12em] text-[var(--color-admin-faint)] dark:text-[var(--color-admin-faint-dark)] font-semibold">
+                    {it.section} · {it.content_type}
+                  </p>
+                  <h3 className="font-semibold capitalize text-[var(--color-admin-ink)] dark:text-[var(--color-admin-ink-dark)] mt-0.5">
+                    {it.key.replace(/_/g, ' ')}
+                  </h3>
                 </div>
+                {it._dirty && <span className="admin-pill admin-pill-warn">unsaved</span>}
               </div>
-            ))}
-          </div>
+              <MultilingualField
+                label="Value"
+                multiline={it.content_type === 'textarea' || it.content_type === 'richtext'}
+                rows={3}
+                values={{
+                  en: it.value_en || '',
+                  id: it.value_id || '',
+                  zh: it.value_zh || '',
+                }}
+                onChange={(v) => {
+                  setItems((prev) =>
+                    prev.map((p) =>
+                      p.id === it.id
+                        ? { ...p, value_en: v.en, value_id: v.id, value_zh: v.zh, _dirty: true }
+                        : p
+                    )
+                  );
+                }}
+                context={`${it.section} ${it.key}`}
+              />
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 }
+
