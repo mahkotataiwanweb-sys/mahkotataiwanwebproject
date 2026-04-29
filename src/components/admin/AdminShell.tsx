@@ -13,7 +13,9 @@ import {
   Package,
   ShoppingBag,
   Newspaper,
-  Images,
+  Calendar,
+  Sparkles as SparklesIcon,
+  ChefHat,
   Play,
   MapPin,
   Store,
@@ -70,8 +72,10 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: 'Artikel & Media',
     items: [
-      { href: '/admin/articles', label: 'Articles', icon: Newspaper, description: 'Blog, news, recipe, event' },
-      { href: '/admin/gallery', label: 'Gallery Images', icon: Images, description: 'Galeri foto event' },
+      { href: '/admin/events', label: 'Events', icon: Calendar, description: 'Acara & expo' },
+      { href: '/admin/activities', label: 'Activity', icon: SparklesIcon, description: 'Lifestyle / activity' },
+      { href: '/admin/recipes', label: 'Recipes', icon: ChefHat, description: 'Resep masakan' },
+      { href: '/admin/news', label: 'News', icon: Newspaper, description: 'Berita & pengumuman' },
       { href: '/admin/video-showcase', label: 'Video Showcases', icon: Play, description: 'YouTube · Shorts · TikTok · Reels' },
     ],
   },
