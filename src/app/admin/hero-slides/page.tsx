@@ -1,61 +1,68 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { supabase, getStorageUrl } from '@/lib/supabase';
-import { HeroSlide } from '@/types/database';
-import toast from 'react-hot-toast';
-import { Plus, Pencil, Trash2, X, Upload, ImageIcon, Play, Film, Image as ImageLucide } from 'lucide-react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Image from 'next/image';
+import { Plus, Pencil, Trash2, ImageIcon, Play, Film, Search } from 'lucide-react';
+import toast from 'react-hot-toast';
 
-const defaultForm = {
-  title_en: '', title_id: '', title_zh: '',
-  subtitle_en: '', subtitle_id: '', subtitle_zh: '',
+import { supabase } from '@/lib/supabase';
+import type { HeroSlide } from '@/types/database';
+import {
+  AdminButton,
+  AdminPageHeader,
+  AdminModal,
+  AdminInput,
+  AdminLabel,
+  AdminToggle,
+  ImageUpload,
+  MultilingualField,
+  TranslateAllButton,
+  StatusPill,
+  SortControl,
+  EmptyState,
+  emptyMultilingual,
+  fromRow,
+  toRow,
+  type MultilingualValue,
+} from '@/components/admin/ui';
+import { swapSortOrder } from '@/lib/admin-helpers';
+
+type MediaType = 'image' | 'video' | 'gif';
+
+interface FormState {
+  id?: string;
+  title: MultilingualValue;
+  subtitle: MultilingualValue;
+  image_url: string;
+  media_type: MediaType;
+  link_url: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+const emptyForm = (): FormState => ({
+  title: emptyMultilingual(),
+  subtitle: emptyMultilingual(),
   image_url: '',
-  media_type: 'image' as 'image' | 'video' | 'gif',
+  media_type: 'image',
   link_url: '',
   sort_order: 0,
   is_active: true,
-};
+});
 
-const mediaTypeOptions: { value: 'image' | 'video' | 'gif'; label: string }[] = [
-  { value: 'image', label: 'Image' },
-  { value: 'video', label: 'Video' },
-  { value: 'gif', label: 'GIF' },
+const MEDIA_TYPES: { value: MediaType; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { value: 'image', label: 'Image', icon: ImageIcon },
+  { value: 'video', label: 'Video', icon: Film },
+  { value: 'gif', label: 'GIF', icon: Play },
 ];
-
-function getAcceptType(mediaType: 'image' | 'video' | 'gif') {
-  switch (mediaType) {
-    case 'video': return 'video/mp4,video/webm,video/quicktime';
-    case 'gif': return 'image/gif';
-    default: return 'image/*';
-  }
-}
-
-function getUploadPath(mediaType: 'image' | 'video' | 'gif') {
-  switch (mediaType) {
-    case 'video': return 'hero-slides/videos';
-    case 'gif': return 'hero-slides/gifs';
-    default: return 'hero-slides';
-  }
-}
-
-function getMediaTypeBadge(mediaType: string) {
-  switch (mediaType) {
-    case 'video':
-      return { label: 'Video', className: 'bg-purple-100 text-purple-700' };
-    case 'gif':
-      return { label: 'GIF', className: 'bg-orange-100 text-orange-700' };
-    default:
-      return { label: 'Image', className: 'bg-blue-100 text-blue-700' };
-  }
-}
 
 export default function HeroSlidesPage() {
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [editingSlide, setEditingSlide] = useState<HeroSlide | null>(null);
-  const [form, setForm] = useState({ ...defaultForm });
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState<FormState>(emptyForm());
 
   const fetchSlides = useCallback(async () => {
     setLoading(true);
@@ -63,7 +70,6 @@ export default function HeroSlidesPage() {
       .from('hero_slides')
       .select('*')
       .order('sort_order', { ascending: true });
-
     if (error) toast.error('Failed to load slides');
     else setSlides(data || []);
     setLoading(false);
@@ -73,19 +79,26 @@ export default function HeroSlidesPage() {
     fetchSlides();
   }, [fetchSlides]);
 
-  const openAddModal = () => {
-    setEditingSlide(null);
-    setForm({ ...defaultForm });
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return slides;
+    return slides.filter((s) =>
+      [s.title_en, s.title_id, s.title_zh, s.subtitle_en].some((v) => (v || '').toLowerCase().includes(q))
+    );
+  }, [slides, search]);
+
+  const openAdd = () => {
+    setForm({ ...emptyForm(), sort_order: slides.length });
     setShowModal(true);
   };
 
-  const openEditModal = (slide: HeroSlide) => {
-    setEditingSlide(slide);
+  const openEdit = (slide: HeroSlide) => {
     setForm({
-      title_en: slide.title_en, title_id: slide.title_id, title_zh: slide.title_zh,
-      subtitle_en: slide.subtitle_en, subtitle_id: slide.subtitle_id, subtitle_zh: slide.subtitle_zh,
+      id: slide.id,
+      title: fromRow(slide as unknown as Record<string, unknown>, 'title'),
+      subtitle: fromRow(slide as unknown as Record<string, unknown>, 'subtitle'),
       image_url: slide.image_url || '',
-      media_type: slide.media_type || 'image',
+      media_type: (slide.media_type as MediaType) || 'image',
       link_url: slide.link_url || '',
       sort_order: slide.sort_order,
       is_active: slide.is_active,
@@ -94,136 +107,161 @@ export default function HeroSlidesPage() {
   };
 
   const handleSave = async () => {
-    if (!form.title_en.trim()) {
+    if (!form.title.en.trim()) {
       toast.error('English title is required');
       return;
     }
-
-    const payload = {
-      ...form,
-      image_url: form.image_url || null,
-      link_url: form.link_url || null,
-    };
-
+    setSaving(true);
     try {
-      if (editingSlide) {
-        const { error } = await supabase.from('hero_slides').update(payload).eq('id', editingSlide.id);
+      const payload = {
+        ...toRow(form.title, 'title'),
+        ...toRow(form.subtitle, 'subtitle'),
+        image_url: form.image_url || null,
+        media_type: form.media_type,
+        link_url: form.link_url || null,
+        sort_order: form.sort_order,
+        is_active: form.is_active,
+      };
+      if (form.id) {
+        const { error } = await supabase.from('hero_slides').update(payload).eq('id', form.id);
         if (error) throw error;
-        toast.success('Slide updated!');
+        toast.success('Slide updated');
       } else {
         const { error } = await supabase.from('hero_slides').insert(payload);
         if (error) throw error;
-        toast.success('Slide created!');
+        toast.success('Slide created');
       }
       setShowModal(false);
       fetchSlides();
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to save slide';
-      toast.error(message);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to save');
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this slide?')) return;
-    const { error } = await supabase.from('hero_slides').delete().eq('id', id);
+  const handleDelete = async (slide: HeroSlide) => {
+    if (!confirm(`Delete slide "${slide.title_en}"?`)) return;
+    const { error } = await supabase.from('hero_slides').delete().eq('id', slide.id);
     if (error) toast.error('Failed to delete');
-    else { toast.success('Slide deleted'); fetchSlides(); }
+    else {
+      toast.success('Slide deleted');
+      fetchSlides();
+    }
   };
 
-  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const ext = file.name.split('.').pop();
-    const uploadPath = getUploadPath(form.media_type);
-    const fileName = `${uploadPath}/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from('media').upload(fileName, file);
-    if (error) { toast.error('Upload failed'); return; }
-    const url = getStorageUrl('media', fileName);
-    setForm({ ...form, image_url: url });
-    const typeLabel = form.media_type === 'video' ? 'Video' : form.media_type === 'gif' ? 'GIF' : 'Image';
-    toast.success(`${typeLabel} uploaded!`);
+  const toggleActive = async (slide: HeroSlide) => {
+    const { error } = await supabase.from('hero_slides').update({ is_active: !slide.is_active }).eq('id', slide.id);
+    if (error) toast.error('Failed to toggle');
+    else {
+      setSlides((prev) => prev.map((s) => (s.id === slide.id ? { ...s, is_active: !s.is_active } : s)));
+    }
+  };
+
+  const move = async (slide: HeroSlide, direction: -1 | 1) => {
+    const idx = slides.findIndex((s) => s.id === slide.id);
+    const swap = slides[idx + direction];
+    if (!swap) return;
+    await swapSortOrder('hero_slides', slide, swap);
+    fetchSlides();
   };
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Hero Slides</h1>
-          <p className="text-gray-500 text-sm">{slides.length} slides total</p>
-        </div>
-        <button onClick={openAddModal} className="inline-flex items-center gap-2 px-4 py-2.5 bg-navy text-white rounded-xl text-sm font-medium hover:bg-navy-light transition-colors">
-          <Plus className="w-4 h-4" /> Add Slide
-        </button>
+    <div className="space-y-6">
+      <AdminPageHeader
+        title="Hero Slides"
+        subtitle={`${slides.length} slides · ${slides.filter((s) => s.is_active).length} active`}
+        actions={
+          <AdminButton variant="accent" iconLeft={<Plus className="w-4 h-4" />} onClick={openAdd}>
+            Add Slide
+          </AdminButton>
+        }
+      />
+
+      <div className="admin-search-wrap max-w-md">
+        <Search className="w-4 h-4 admin-search-icon" />
+        <AdminInput
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search slides…"
+        />
       </div>
 
-      {/* Slides Grid */}
       {loading ? (
-        <div className="text-center py-12 text-gray-400">Loading...</div>
-      ) : slides.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-          <ImageIcon className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-          <p className="text-gray-500">No hero slides yet</p>
-          <p className="text-gray-400 text-sm mt-1">Add your first slide to get started</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="admin-skeleton h-72" />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="admin-surface">
+          <EmptyState
+            title="No hero slides"
+            description="Add your first slide to power the homepage carousel."
+            icon={<ImageIcon className="w-6 h-6" />}
+            action={
+              <AdminButton variant="accent" iconLeft={<Plus className="w-4 h-4" />} onClick={openAdd}>
+                Add Slide
+              </AdminButton>
+            }
+          />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {slides.map((slide) => {
-            const badge = getMediaTypeBadge(slide.media_type);
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filtered.map((slide, idx) => {
+            const isVideo = slide.media_type === 'video';
             return (
-              <div key={slide.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                {/* Media Preview */}
-                <div className="relative h-40 bg-gray-100">
+              <div key={slide.id} className="admin-surface overflow-hidden flex flex-col">
+                <div className="relative aspect-[16/9] bg-[var(--color-admin-surface-2)] dark:bg-[var(--color-admin-surface-2-dark)]">
                   {slide.image_url ? (
-                    slide.media_type === 'video' ? (
-                      <div className="flex items-center justify-center h-full bg-gray-900/10">
+                    isVideo ? (
+                      <>
+                        <video src={slide.image_url} muted preload="metadata" className="w-full h-full object-cover" />
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-12 h-12 rounded-full bg-black/60 flex items-center justify-center">
-                            <Play className="w-6 h-6 text-white ml-0.5" />
+                          <div className="w-12 h-12 rounded-full bg-black/55 flex items-center justify-center">
+                            <Play className="w-5 h-5 text-white ml-0.5" />
                           </div>
                         </div>
-                        <video src={slide.image_url} className="w-full h-full object-cover" muted preload="metadata" />
-                      </div>
+                      </>
                     ) : (
-                      <Image src={slide.image_url} alt={slide.title_en} fill className="object-cover" />
+                      <Image src={slide.image_url} alt={slide.title_en} fill className="object-cover" sizes="320px" unoptimized />
                     )
                   ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <ImageIcon className="w-10 h-10 text-gray-300" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <ImageIcon className="w-8 h-8 text-[var(--color-admin-faint)]" />
                     </div>
                   )}
-                  {/* Status Badge */}
-                  <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${slide.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                      {slide.is_active ? 'Active' : 'Inactive'}
-                    </span>
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${badge.className}`}>
-                      {badge.label}
-                    </span>
-                  </div>
-                  {/* Order Badge */}
-                  <div className="absolute top-2 left-2">
-                    <span className="text-xs px-2 py-1 rounded-full font-medium bg-black/50 text-white">
-                      #{slide.sort_order}
+                  <div className="absolute top-2 left-2 flex gap-1.5">
+                    <span className="admin-pill admin-pill-neutral !bg-black/60 !text-white">#{slide.sort_order}</span>
+                    <span className={`admin-pill ${slide.media_type === 'video' ? 'admin-pill-info' : slide.media_type === 'gif' ? 'admin-pill-warn' : 'admin-pill-accent'}`}>
+                      {slide.media_type.toUpperCase()}
                     </span>
                   </div>
                 </div>
 
-                {/* Content */}
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 truncate">{slide.title_en || 'Untitled'}</h3>
-                  <p className="text-gray-500 text-sm mt-1 truncate">{slide.subtitle_en || 'No subtitle'}</p>
+                <div className="p-4 flex-1 flex flex-col gap-2">
+                  <div>
+                    <h3 className="font-semibold text-[var(--color-admin-ink)] dark:text-[var(--color-admin-ink-dark)] truncate">{slide.title_en || 'Untitled'}</h3>
+                    <p className="text-xs text-[var(--color-admin-muted)] dark:text-[var(--color-admin-muted-dark)] line-clamp-2">{slide.subtitle_en || '—'}</p>
+                  </div>
                   {slide.link_url && (
-                    <p className="text-blue-500 text-xs mt-2 truncate">{slide.link_url}</p>
+                    <p className="text-[11px] text-[var(--color-admin-accent)] truncate">{slide.link_url}</p>
                   )}
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 mt-4 pt-3 border-t border-gray-100">
-                    <button onClick={() => openEditModal(slide)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                      <Pencil className="w-3.5 h-3.5" /> Edit
-                    </button>
-                    <button onClick={() => handleDelete(slide.id)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-auto">
-                      <Trash2 className="w-3.5 h-3.5" /> Delete
-                    </button>
+                  <div className="flex items-center justify-between mt-auto pt-3 border-t border-[var(--color-admin-border)] dark:border-[var(--color-admin-border-dark)]">
+                    <div className="flex items-center gap-2">
+                      <StatusPill active={slide.is_active} onClick={() => toggleActive(slide)} size="sm" />
+                      <SortControl
+                        onUp={() => move(slide, -1)}
+                        onDown={() => move(slide, 1)}
+                        disabledUp={idx === 0}
+                        disabledDown={idx === filtered.length - 1}
+                      />
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => openEdit(slide)} className="admin-btn-icon admin-btn-icon-edit" title="Edit"><Pencil className="w-4 h-4" /></button>
+                      <button onClick={() => handleDelete(slide)} className="admin-btn-icon admin-btn-icon-delete" title="Delete"><Trash2 className="w-4 h-4" /></button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -232,133 +270,111 @@ export default function HeroSlidesPage() {
         </div>
       )}
 
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowModal(false)}>
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">{editingSlide ? 'Edit Slide' : 'Add Slide'}</h2>
-              <button onClick={() => setShowModal(false)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
-            </div>
-
-            <div className="space-y-4">
-              {/* Media Type Selector */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Media Type</label>
-                <div className="flex items-center gap-3">
-                  {mediaTypeOptions.map((option) => (
-                    <label
-                      key={option.value}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer transition-colors text-sm font-medium ${
-                        form.media_type === option.value
-                          ? 'border-navy bg-navy/5 text-navy'
-                          : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="media_type"
-                        value={option.value}
-                        checked={form.media_type === option.value}
-                        onChange={(e) => setForm({ ...form, media_type: e.target.value as 'image' | 'video' | 'gif', image_url: '' })}
-                        className="sr-only"
-                      />
-                      {option.value === 'image' && <ImageLucide className="w-4 h-4" />}
-                      {option.value === 'video' && <Film className="w-4 h-4" />}
-                      {option.value === 'gif' && <Play className="w-4 h-4" />}
-                      {option.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Media Upload */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {form.media_type === 'video' ? 'Slide Video' : form.media_type === 'gif' ? 'Slide GIF' : 'Slide Image'}
-                </label>
-                <div className="flex items-center gap-4">
-                  {form.image_url && (
-                    form.media_type === 'video' ? (
-                      <video src={form.image_url} width={120} height={60} className="rounded-lg object-cover" muted preload="metadata" />
-                    ) : (
-                      <Image src={form.image_url} alt="" width={120} height={60} className="rounded-lg object-cover" />
-                    )
-                  )}
-                  <label className="flex items-center gap-2 px-4 py-2 border border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 text-sm text-gray-500">
-                    <Upload className="w-4 h-4" />
-                    {form.media_type === 'video' ? 'Upload Video' : form.media_type === 'gif' ? 'Upload GIF' : 'Upload Image'}
-                    <input type="file" accept={getAcceptType(form.media_type)} onChange={handleMediaUpload} className="hidden" />
-                  </label>
-                </div>
-                {form.media_type === 'video' && (
-                  <p className="text-xs text-gray-400 mt-1">Supported formats: MP4, WebM, MOV</p>
-                )}
-                {form.media_type === 'gif' && (
-                  <p className="text-xs text-gray-400 mt-1">Supported format: GIF</p>
-                )}
-              </div>
-
-              {/* Title fields */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title (EN)</label>
-                  <input type="text" value={form.title_en} onChange={(e) => setForm({ ...form, title_en: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" required />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title (ID)</label>
-                  <input type="text" value={form.title_id} onChange={(e) => setForm({ ...form, title_id: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title (中文)</label>
-                  <input type="text" value={form.title_zh} onChange={(e) => setForm({ ...form, title_zh: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
-                </div>
-              </div>
-
-              {/* Subtitle fields */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Subtitle (EN)</label>
-                  <input type="text" value={form.subtitle_en} onChange={(e) => setForm({ ...form, subtitle_en: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Subtitle (ID)</label>
-                  <input type="text" value={form.subtitle_id} onChange={(e) => setForm({ ...form, subtitle_id: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Subtitle (中文)</label>
-                  <input type="text" value={form.subtitle_zh} onChange={(e) => setForm({ ...form, subtitle_zh: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
-                </div>
-              </div>
-
-              {/* Link URL */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Link URL</label>
-                <input type="text" value={form.link_url} onChange={(e) => setForm({ ...form, link_url: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
-              </div>
-
-              {/* Toggles */}
-              <div className="flex items-center gap-6">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-navy focus:ring-navy" />
-                  <span className="text-sm text-gray-700">Active</span>
-                </label>
-                <div className="flex items-center gap-2">
-                  <label className="text-sm text-gray-700">Sort Order</label>
-                  <input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} className="w-20 px-2 py-1 rounded border border-gray-200 text-sm" />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
-              <button onClick={handleSave} className="px-6 py-2 bg-navy text-white text-sm font-medium rounded-lg hover:bg-navy-light transition-colors">
-                {editingSlide ? 'Update' : 'Create'}
-              </button>
+      <AdminModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        title={form.id ? 'Edit Hero Slide' : 'Add Hero Slide'}
+        description="Image, video, or GIF banner that appears on the homepage carousel."
+        size="lg"
+        footer={
+          <>
+            <TranslateAllButton
+              fields={[
+                { base: 'title', values: form.title, context: 'hero slide title' },
+                { base: 'subtitle', values: form.subtitle, context: 'hero slide subtitle' },
+              ]}
+              onUpdate={(updates) =>
+                setForm((prev) => ({
+                  ...prev,
+                  title: updates.title || prev.title,
+                  subtitle: updates.subtitle || prev.subtitle,
+                }))
+              }
+            />
+            <AdminButton variant="ghost" onClick={() => setShowModal(false)}>Cancel</AdminButton>
+            <AdminButton variant="primary" loading={saving} onClick={handleSave}>
+              {form.id ? 'Save changes' : 'Create slide'}
+            </AdminButton>
+          </>
+        }
+      >
+        <div className="space-y-5">
+          <div>
+            <AdminLabel>Media Type</AdminLabel>
+            <div className="flex flex-wrap gap-2">
+              {MEDIA_TYPES.map(({ value, label, icon: Icon }) => (
+                <button
+                  type="button"
+                  key={value}
+                  onClick={() => setForm((p) => ({ ...p, media_type: value, image_url: '' }))}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                    form.media_type === value
+                      ? 'border-[var(--color-admin-accent)] bg-[var(--color-admin-accent-soft)] text-[#7A5C0A] dark:bg-[rgba(184,134,11,0.18)] dark:text-[#F4D58D]'
+                      : 'border-[var(--color-admin-border-strong)] dark:border-[var(--color-admin-border-strong-dark)] text-[var(--color-admin-ink-2)] dark:text-[var(--color-admin-ink-2-dark)] hover:bg-[var(--color-admin-surface-2)] dark:hover:bg-[var(--color-admin-surface-2-dark)]'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
+
+          <ImageUpload
+            label={form.media_type === 'video' ? 'Slide Video' : form.media_type === 'gif' ? 'Slide GIF' : 'Slide Image'}
+            description={form.media_type === 'video' ? 'MP4, WebM, MOV' : form.media_type === 'gif' ? 'GIF format' : 'JPG, PNG, WebP recommended'}
+            value={form.image_url}
+            onChange={(url) => setForm((p) => ({ ...p, image_url: url }))}
+            folder={form.media_type === 'video' ? 'hero-slides/videos' : form.media_type === 'gif' ? 'hero-slides/gifs' : 'hero-slides'}
+            accept={form.media_type === 'video' ? 'video/mp4,video/webm,video/quicktime' : form.media_type === 'gif' ? 'image/gif' : 'image/*'}
+            variant="wide"
+          />
+
+          <MultilingualField
+            label="Title"
+            required
+            values={form.title}
+            onChange={(values) => setForm((p) => ({ ...p, title: values }))}
+            context="hero slide title"
+          />
+
+          <MultilingualField
+            label="Subtitle"
+            multiline
+            rows={2}
+            values={form.subtitle}
+            onChange={(values) => setForm((p) => ({ ...p, subtitle: values }))}
+            context="hero slide subtitle"
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <AdminLabel>Link URL</AdminLabel>
+              <AdminInput
+                value={form.link_url}
+                onChange={(e) => setForm((p) => ({ ...p, link_url: e.target.value }))}
+                placeholder="https://…"
+              />
+            </div>
+            <div>
+              <AdminLabel>Sort Order</AdminLabel>
+              <AdminInput
+                type="number"
+                value={form.sort_order}
+                onChange={(e) => setForm((p) => ({ ...p, sort_order: parseInt(e.target.value) || 0 }))}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6 pt-1">
+            <AdminToggle
+              checked={form.is_active}
+              onChange={(v) => setForm((p) => ({ ...p, is_active: v }))}
+              label="Active (visible on website)"
+            />
+          </div>
         </div>
-      )}
+      </AdminModal>
     </div>
   );
 }

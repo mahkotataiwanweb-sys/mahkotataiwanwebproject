@@ -1,174 +1,209 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { supabase, getStorageUrl } from '@/lib/supabase';
-import { StorePartner } from '@/types/database';
-import toast from 'react-hot-toast';
-import { Plus, Pencil, Trash2, X, Upload, Store, ExternalLink } from 'lucide-react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Image from 'next/image';
+import { Plus, Pencil, Trash2, Search, Store, ExternalLink } from 'lucide-react';
+import toast from 'react-hot-toast';
 
-const defaultForm = {
+import { supabase } from '@/lib/supabase';
+import type { StorePartner } from '@/types/database';
+import {
+  AdminButton,
+  AdminPageHeader,
+  AdminModal,
+  AdminInput,
+  AdminLabel,
+  AdminToggle,
+  ImageUpload,
+  StatusPill,
+  SortControl,
+  EmptyState,
+} from '@/components/admin/ui';
+import { swapSortOrder } from '@/lib/admin-helpers';
+
+interface FormState {
+  id?: string;
+  name: string;
+  logo_url: string;
+  website_url: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+const emptyForm = (): FormState => ({
   name: '',
   logo_url: '',
   website_url: '',
   sort_order: 0,
   is_active: true,
-};
+});
 
 export default function StorePartnersPage() {
-  const [partners, setPartners] = useState<StorePartner[]>([]);
+  const [items, setItems] = useState<StorePartner[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [editingPartner, setEditingPartner] = useState<StorePartner | null>(null);
-  const [form, setForm] = useState({ ...defaultForm });
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState<FormState>(emptyForm());
 
-  const fetchPartners = useCallback(async () => {
+  const fetchItems = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('store_partners')
       .select('*')
       .order('sort_order', { ascending: true });
-
-    if (error) toast.error('Failed to load partners');
-    else setPartners(data || []);
+    if (error) toast.error('Failed to load');
+    else setItems(data || []);
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    fetchPartners();
-  }, [fetchPartners]);
+    fetchItems();
+  }, [fetchItems]);
 
-  const openAddModal = () => {
-    setEditingPartner(null);
-    setForm({ ...defaultForm });
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return items;
+    return items.filter((p) => (p.name || '').toLowerCase().includes(q));
+  }, [items, search]);
+
+  const openAdd = () => {
+    setForm({ ...emptyForm(), sort_order: items.length });
     setShowModal(true);
   };
 
-  const openEditModal = (partner: StorePartner) => {
-    setEditingPartner(partner);
+  const openEdit = (p: StorePartner) => {
     setForm({
-      name: partner.name,
-      logo_url: partner.logo_url || '',
-      website_url: partner.website_url || '',
-      sort_order: partner.sort_order,
-      is_active: partner.is_active,
+      id: p.id,
+      name: p.name,
+      logo_url: p.logo_url || '',
+      website_url: p.website_url || '',
+      sort_order: p.sort_order,
+      is_active: p.is_active,
     });
     setShowModal(true);
   };
 
   const handleSave = async () => {
     if (!form.name.trim()) {
-      toast.error('Partner name is required');
+      toast.error('Name is required');
       return;
     }
-
-    const payload = {
-      ...form,
-      logo_url: form.logo_url || null,
-      website_url: form.website_url || null,
-    };
-
+    setSaving(true);
     try {
-      if (editingPartner) {
-        const { error } = await supabase.from('store_partners').update(payload).eq('id', editingPartner.id);
+      const payload = {
+        name: form.name,
+        logo_url: form.logo_url || null,
+        website_url: form.website_url || null,
+        sort_order: form.sort_order,
+        is_active: form.is_active,
+      };
+      if (form.id) {
+        const { error } = await supabase.from('store_partners').update(payload).eq('id', form.id);
         if (error) throw error;
-        toast.success('Partner updated!');
+        toast.success('Partner updated');
       } else {
         const { error } = await supabase.from('store_partners').insert(payload);
         if (error) throw error;
-        toast.success('Partner created!');
+        toast.success('Partner created');
       }
       setShowModal(false);
-      fetchPartners();
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to save partner';
-      toast.error(message);
+      fetchItems();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed');
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this partner?')) return;
-    const { error } = await supabase.from('store_partners').delete().eq('id', id);
+  const handleDelete = async (p: StorePartner) => {
+    if (!confirm(`Delete partner "${p.name}"?`)) return;
+    const { error } = await supabase.from('store_partners').delete().eq('id', p.id);
     if (error) toast.error('Failed to delete');
-    else { toast.success('Partner deleted'); fetchPartners(); }
+    else {
+      toast.success('Deleted');
+      fetchItems();
+    }
   };
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const ext = file.name.split('.').pop();
-    const fileName = `store-partners/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from('media').upload(fileName, file);
-    if (error) { toast.error('Upload failed'); return; }
-    const url = getStorageUrl('media', fileName);
-    setForm({ ...form, logo_url: url });
-    toast.success('Logo uploaded!');
+  const toggleActive = async (p: StorePartner) => {
+    const { error } = await supabase.from('store_partners').update({ is_active: !p.is_active }).eq('id', p.id);
+    if (error) toast.error('Failed');
+    else setItems((prev) => prev.map((x) => (x.id === p.id ? { ...x, is_active: !x.is_active } : x)));
+  };
+
+  const move = async (p: StorePartner, dir: -1 | 1) => {
+    const idx = items.findIndex((x) => x.id === p.id);
+    const swap = items[idx + dir];
+    if (!swap) return;
+    await swapSortOrder('store_partners', p, swap);
+    fetchItems();
   };
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Store Partners</h1>
-          <p className="text-gray-500 text-sm">{partners.length} partners total</p>
-        </div>
-        <button onClick={openAddModal} className="inline-flex items-center gap-2 px-4 py-2.5 bg-navy text-white rounded-xl text-sm font-medium hover:bg-navy-light transition-colors">
-          <Plus className="w-4 h-4" /> Add Partner
-        </button>
+    <div className="space-y-6">
+      <AdminPageHeader
+        title="Store Partners"
+        subtitle={`${items.length} partners · ${items.filter((p) => p.is_active).length} active`}
+        actions={
+          <AdminButton variant="accent" iconLeft={<Plus className="w-4 h-4" />} onClick={openAdd}>
+            Add Partner
+          </AdminButton>
+        }
+      />
+
+      <div className="admin-search-wrap max-w-md">
+        <Search className="w-4 h-4 admin-search-icon" />
+        <AdminInput value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search partners…" />
       </div>
 
-      {/* Partners Grid */}
       {loading ? (
-        <div className="text-center py-12 text-gray-400">Loading...</div>
-      ) : partners.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-          <Store className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-          <p className="text-gray-500">No store partners yet</p>
-          <p className="text-gray-400 text-sm mt-1">Add your first partner to get started</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="admin-skeleton h-52" />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="admin-surface">
+          <EmptyState
+            title="No store partners"
+            description="Add retailers and marketplaces selling Mahkota Taiwan products."
+            icon={<Store className="w-6 h-6" />}
+            action={<AdminButton variant="accent" iconLeft={<Plus className="w-4 h-4" />} onClick={openAdd}>Add Partner</AdminButton>}
+          />
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {partners.map((partner) => (
-            <div key={partner.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-              {/* Logo */}
-              <div className="relative h-32 bg-gray-50 flex items-center justify-center p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {filtered.map((partner, idx) => (
+            <div key={partner.id} className="admin-surface overflow-hidden flex flex-col">
+              <div className="relative h-32 bg-[var(--color-admin-surface-2)] dark:bg-[var(--color-admin-surface-2-dark)] flex items-center justify-center p-4">
                 {partner.logo_url ? (
-                  <Image src={partner.logo_url} alt={partner.name} width={120} height={80} className="object-contain max-h-full" />
+                  <Image src={partner.logo_url} alt={partner.name} width={140} height={80} className="object-contain max-h-full" unoptimized />
                 ) : (
-                  <Store className="w-12 h-12 text-gray-300" />
+                  <Store className="w-10 h-10 text-[var(--color-admin-faint)]" />
                 )}
-                {/* Status Badge */}
-                <div className="absolute top-2 right-2">
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${partner.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {partner.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
-                {/* Order Badge */}
-                <div className="absolute top-2 left-2">
-                  <span className="text-xs px-2 py-1 rounded-full font-medium bg-gray-200 text-gray-600">
-                    #{partner.sort_order}
-                  </span>
-                </div>
+                <div className="absolute top-2 left-2"><span className="admin-pill admin-pill-neutral">#{partner.sort_order}</span></div>
+                <div className="absolute top-2 right-2"><StatusPill active={partner.is_active} onClick={() => toggleActive(partner)} size="sm" /></div>
               </div>
-
-              {/* Content */}
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 truncate">{partner.name}</h3>
+              <div className="p-4 flex-1 flex flex-col">
+                <h3 className="font-semibold text-[var(--color-admin-ink)] dark:text-[var(--color-admin-ink-dark)] truncate">{partner.name}</h3>
                 {partner.website_url && (
-                  <a href={partner.website_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-500 text-xs mt-1 truncate hover:underline">
-                    <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                  <a href={partner.website_url} target="_blank" rel="noopener noreferrer" className="text-xs text-[var(--color-admin-accent)] truncate inline-flex items-center gap-1 mt-1 hover:underline">
+                    <ExternalLink className="w-3 h-3" />
                     {partner.website_url}
                   </a>
                 )}
-
-                {/* Actions */}
-                <div className="flex items-center gap-2 mt-4 pt-3 border-t border-gray-100">
-                  <button onClick={() => openEditModal(partner)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                    <Pencil className="w-3.5 h-3.5" /> Edit
-                  </button>
-                  <button onClick={() => handleDelete(partner.id)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-auto">
-                    <Trash2 className="w-3.5 h-3.5" /> Delete
-                  </button>
+                <div className="flex items-center justify-between mt-auto pt-3 border-t border-[var(--color-admin-border)] dark:border-[var(--color-admin-border-dark)]">
+                  <SortControl
+                    onUp={() => move(partner, -1)}
+                    onDown={() => move(partner, 1)}
+                    disabledUp={idx === 0}
+                    disabledDown={idx === filtered.length - 1}
+                  />
+                  <div className="flex gap-1">
+                    <button onClick={() => openEdit(partner)} className="admin-btn-icon admin-btn-icon-edit"><Pencil className="w-4 h-4" /></button>
+                    <button onClick={() => handleDelete(partner)} className="admin-btn-icon admin-btn-icon-delete"><Trash2 className="w-4 h-4" /></button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -176,64 +211,55 @@ export default function StorePartnersPage() {
         </div>
       )}
 
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowModal(false)}>
-          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">{editingPartner ? 'Edit Partner' : 'Add Partner'}</h2>
-              <button onClick={() => setShowModal(false)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
-            </div>
-
-            <div className="space-y-4">
-              {/* Logo Upload */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Logo</label>
-                <div className="flex items-center gap-4">
-                  {form.logo_url && (
-                    <Image src={form.logo_url} alt="" width={80} height={60} className="rounded-lg object-contain bg-gray-50 p-2" />
-                  )}
-                  <label className="flex items-center gap-2 px-4 py-2 border border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 text-sm text-gray-500">
-                    <Upload className="w-4 h-4" /> Upload Logo
-                    <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
-                  </label>
-                </div>
-              </div>
-
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Partner Name</label>
-                <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" required placeholder="e.g. Tokopedia" />
-              </div>
-
-              {/* Website URL */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Website URL</label>
-                <input type="text" value={form.website_url} onChange={(e) => setForm({ ...form, website_url: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
-              </div>
-
-              {/* Toggles */}
-              <div className="flex items-center gap-6">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-navy focus:ring-navy" />
-                  <span className="text-sm text-gray-700">Active</span>
-                </label>
-                <div className="flex items-center gap-2">
-                  <label className="text-sm text-gray-700">Sort Order</label>
-                  <input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} className="w-20 px-2 py-1 rounded border border-gray-200 text-sm" />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
-              <button onClick={handleSave} className="px-6 py-2 bg-navy text-white text-sm font-medium rounded-lg hover:bg-navy-light transition-colors">
-                {editingPartner ? 'Update' : 'Create'}
-              </button>
+      <AdminModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        title={form.id ? 'Edit Store Partner' : 'Add Store Partner'}
+        size="md"
+        footer={
+          <>
+            <AdminButton variant="ghost" onClick={() => setShowModal(false)}>Cancel</AdminButton>
+            <AdminButton variant="primary" loading={saving} onClick={handleSave}>{form.id ? 'Save changes' : 'Create'}</AdminButton>
+          </>
+        }
+      >
+        <div className="space-y-5">
+          <ImageUpload
+            label="Logo"
+            value={form.logo_url}
+            onChange={(url) => setForm((p) => ({ ...p, logo_url: url }))}
+            folder="store-partners"
+          />
+          <div>
+            <AdminLabel required>Partner Name</AdminLabel>
+            <AdminInput
+              value={form.name}
+              onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+              placeholder="e.g. Indomaret, Tokopedia"
+            />
+          </div>
+          <div>
+            <AdminLabel>Website URL</AdminLabel>
+            <AdminInput
+              value={form.website_url}
+              onChange={(e) => setForm((p) => ({ ...p, website_url: e.target.value }))}
+              placeholder="https://…"
+            />
+          </div>
+          <div className="flex flex-wrap items-center gap-6">
+            <AdminToggle checked={form.is_active} onChange={(v) => setForm((p) => ({ ...p, is_active: v }))} label="Active" />
+            <div className="flex items-center gap-2">
+              <AdminLabel className="!mb-0">Sort</AdminLabel>
+              <AdminInput
+                type="number"
+                value={form.sort_order}
+                onChange={(e) => setForm((p) => ({ ...p, sort_order: parseInt(e.target.value) || 0 }))}
+                className="w-24"
+              />
             </div>
           </div>
         </div>
-      )}
+      </AdminModal>
     </div>
   );
 }

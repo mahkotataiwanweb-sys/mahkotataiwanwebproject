@@ -1,146 +1,206 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase, getStorageUrl } from '@/lib/supabase';
-import { CompanySettings } from '@/types/database';
+import { Save, Building2, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { Save, Upload, Building2 } from 'lucide-react';
-import Image from 'next/image';
+
+import { supabase } from '@/lib/supabase';
+import type { CompanySettings } from '@/types/database';
+import {
+  AdminButton,
+  AdminPageHeader,
+  AdminInput,
+  AdminTextarea,
+  AdminLabel,
+  ImageUpload,
+  MultilingualField,
+  TranslateAllButton,
+  EmptyState,
+  type MultilingualValue,
+} from '@/components/admin/ui';
+
+interface FormState {
+  id: string;
+  company_name: string;
+  tagline: MultilingualValue;
+  email: string;
+  email2: string;
+  phone: string;
+  warehouse_address: string;
+  office_address: string;
+  logo_url: string;
+  tiktok_url: string;
+  facebook_url: string;
+  instagram_url: string;
+}
+
+function fromSettings(s: CompanySettings): FormState {
+  return {
+    id: s.id,
+    company_name: s.company_name || '',
+    tagline: { en: s.tagline_en || '', id: s.tagline_id || '', zh: s.tagline_zh || '' },
+    email: s.email || '',
+    email2: (s as unknown as { email2?: string }).email2 || '',
+    phone: s.phone || '',
+    warehouse_address: s.warehouse_address || '',
+    office_address: s.office_address || '',
+    logo_url: s.logo_url || '',
+    tiktok_url: s.tiktok_url || '',
+    facebook_url: s.facebook_url || '',
+    instagram_url: s.instagram_url || '',
+  };
+}
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState<CompanySettings | null>(null);
+  const [form, setForm] = useState<FormState | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    async function fetchSettings() {
+    (async () => {
       const { data, error } = await supabase.from('company_settings').select('*').single();
-      if (!error && data) setSettings(data);
+      if (!error && data) setForm(fromSettings(data));
       setLoading(false);
-    }
-    fetchSettings();
+    })();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20 text-[var(--color-admin-muted)]">
+        <Loader2 className="w-5 h-5 animate-spin" />
+      </div>
+    );
+  }
+  if (!form) {
+    return (
+      <div className="admin-surface">
+        <EmptyState
+          title="No settings record"
+          description="Run /api/setup to seed the company_settings row."
+          icon={<Building2 className="w-6 h-6" />}
+        />
+      </div>
+    );
+  }
+
+  const update = <K extends keyof FormState>(key: K, value: FormState[K]) => {
+    setForm((prev) => (prev ? { ...prev, [key]: value } : prev));
+  };
+
   const handleSave = async () => {
-    if (!settings) return;
+    if (!form) return;
     setSaving(true);
-    const { id, created_at, updated_at, ...updateData } = settings;
-    void id; void created_at; void updated_at;
-    const { error } = await supabase.from('company_settings').update(updateData).eq('id', settings.id);
-    if (error) toast.error('Failed to save');
-    else toast.success('Settings saved!');
-    setSaving(false);
+    try {
+      const payload = {
+        company_name: form.company_name,
+        tagline_en: form.tagline.en,
+        tagline_id: form.tagline.id,
+        tagline_zh: form.tagline.zh,
+        email: form.email,
+        email2: form.email2 || null,
+        phone: form.phone,
+        warehouse_address: form.warehouse_address,
+        office_address: form.office_address,
+        logo_url: form.logo_url || null,
+        tiktok_url: form.tiktok_url || null,
+        facebook_url: form.facebook_url || null,
+        instagram_url: form.instagram_url || null,
+      };
+      const { error } = await supabase.from('company_settings').update(payload).eq('id', form.id);
+      if (error) throw error;
+      toast.success('Settings saved');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed');
+    } finally {
+      setSaving(false);
+    }
   };
-
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !settings) return;
-    const fileName = `logo/${Date.now()}.${file.name.split('.').pop()}`;
-    const { error } = await supabase.storage.from('media').upload(fileName, file);
-    if (error) { toast.error('Upload failed'); return; }
-    setSettings({ ...settings, logo_url: getStorageUrl('media', fileName) });
-    toast.success('Logo uploaded!');
-  };
-
-  const update = (field: string, value: string) => {
-    if (settings) setSettings({ ...settings, [field]: value });
-  };
-
-  if (loading) return <div className="text-gray-400 text-center py-12">Loading...</div>;
-  if (!settings) return (
-    <div className="text-gray-400 text-center py-12">
-      <Building2 className="w-12 h-12 mx-auto mb-3" />
-      <p>No settings found. Run setup first.</p>
-    </div>
-  );
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-500 text-sm">Company information &amp; social media</p>
-        </div>
-        <button onClick={handleSave} disabled={saving}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-navy text-white rounded-xl text-sm font-medium hover:bg-navy-light disabled:opacity-50">
-          <Save className="w-4 h-4" /> {saving ? 'Saving...' : 'Save'}
-        </button>
-      </div>
+    <div className="space-y-6">
+      <AdminPageHeader
+        title="Company Settings"
+        subtitle="Profil perusahaan, kontak, dan social media"
+        actions={
+          <>
+            <TranslateAllButton
+              fields={[{ base: 'tagline', values: form.tagline, context: 'company tagline' }]}
+              onUpdate={(u) => setForm((p) => (p ? { ...p, tagline: u.tagline || p.tagline } : p))}
+            />
+            <AdminButton variant="primary" loading={saving} onClick={handleSave} iconLeft={<Save className="w-4 h-4" />}>
+              Save changes
+            </AdminButton>
+          </>
+        }
+      />
 
-      <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* General */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h2 className="text-lg font-semibold mb-4">General</h2>
-          <div className="space-y-4">
+        <div className="admin-surface p-6 lg:col-span-2">
+          <h2 className="font-heading text-lg font-bold mb-4 text-[var(--color-admin-ink)] dark:text-[var(--color-admin-ink-dark)]">General</h2>
+          <div className="space-y-5">
+            <ImageUpload
+              label="Logo"
+              value={form.logo_url}
+              onChange={(url) => update('logo_url', url)}
+              folder="logo"
+              variant="square"
+            />
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Logo</label>
-              <div className="flex items-center gap-4">
-                {settings.logo_url && <Image src={settings.logo_url} alt="" width={48} height={48} className="rounded-lg" />}
-                <label className="flex items-center gap-2 px-4 py-2 border border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 text-sm text-gray-500">
-                  <Upload className="w-4 h-4" /> Upload Logo
-                  <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
-                </label>
-              </div>
+              <AdminLabel>Company Name</AdminLabel>
+              <AdminInput value={form.company_name} onChange={(e) => update('company_name', e.target.value)} />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
-              <input type="text" value={settings.company_name} onChange={(e) => update('company_name', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tagline (EN)</label>
-                <input type="text" value={settings.tagline_en} onChange={(e) => update('tagline_en', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tagline (ID)</label>
-                <input type="text" value={settings.tagline_id} onChange={(e) => update('tagline_id', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tagline (中文)</label>
-                <input type="text" value={settings.tagline_zh} onChange={(e) => update('tagline_zh', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
-              </div>
-            </div>
+            <MultilingualField
+              label="Tagline"
+              values={form.tagline}
+              onChange={(v) => update('tagline', v)}
+              context="company tagline"
+            />
           </div>
         </div>
 
         {/* Contact */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h2 className="text-lg font-semibold mb-4">Contact</h2>
+        <div className="admin-surface p-6">
+          <h2 className="font-heading text-lg font-bold mb-4 text-[var(--color-admin-ink)] dark:text-[var(--color-admin-ink-dark)]">Contact</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-              <input type="text" value={settings.phone} onChange={(e) => update('phone', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
+              <AdminLabel>Phone</AdminLabel>
+              <AdminInput value={form.phone} onChange={(e) => update('phone', e.target.value)} placeholder="+62…" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input type="email" value={settings.email} onChange={(e) => update('email', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
+              <AdminLabel>Email (primary)</AdminLabel>
+              <AdminInput type="email" value={form.email} onChange={(e) => update('email', e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Warehouse Address</label>
-              <textarea value={settings.warehouse_address} onChange={(e) => update('warehouse_address', e.target.value)} rows={2} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm resize-none focus:outline-none focus:border-navy" />
+              <AdminLabel>Email (secondary)</AdminLabel>
+              <AdminInput type="email" value={form.email2} onChange={(e) => update('email2', e.target.value)} placeholder="optional" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Office Address</label>
-              <textarea value={settings.office_address} onChange={(e) => update('office_address', e.target.value)} rows={2} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm resize-none focus:outline-none focus:border-navy" />
+              <AdminLabel>Warehouse Address</AdminLabel>
+              <AdminTextarea value={form.warehouse_address} onChange={(e) => update('warehouse_address', e.target.value)} rows={3} />
+            </div>
+            <div>
+              <AdminLabel>Office Address</AdminLabel>
+              <AdminTextarea value={form.office_address} onChange={(e) => update('office_address', e.target.value)} rows={3} />
             </div>
           </div>
         </div>
 
         {/* Social Media */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h2 className="text-lg font-semibold mb-4">Social Media</h2>
+        <div className="admin-surface p-6">
+          <h2 className="font-heading text-lg font-bold mb-4 text-[var(--color-admin-ink)] dark:text-[var(--color-admin-ink-dark)]">Social Media</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">TikTok URL</label>
-              <input type="url" value={settings.tiktok_url || ''} onChange={(e) => update('tiktok_url', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
+              <AdminLabel>TikTok URL</AdminLabel>
+              <AdminInput value={form.tiktok_url} onChange={(e) => update('tiktok_url', e.target.value)} placeholder="https://tiktok.com/@…" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Facebook URL</label>
-              <input type="url" value={settings.facebook_url || ''} onChange={(e) => update('facebook_url', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
+              <AdminLabel>Facebook URL</AdminLabel>
+              <AdminInput value={form.facebook_url} onChange={(e) => update('facebook_url', e.target.value)} placeholder="https://facebook.com/…" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Instagram URL</label>
-              <input type="url" value={settings.instagram_url || ''} onChange={(e) => update('instagram_url', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-navy" />
+              <AdminLabel>Instagram URL</AdminLabel>
+              <AdminInput value={form.instagram_url} onChange={(e) => update('instagram_url', e.target.value)} placeholder="https://instagram.com/…" />
             </div>
           </div>
         </div>
@@ -148,3 +208,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+
