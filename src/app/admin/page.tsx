@@ -10,7 +10,9 @@ import {
   Play,
   ShoppingBag,
   MapPin,
-  Images,
+  Calendar,
+  ChefHat,
+  Sparkles as SparklesIcon,
   ArrowUpRight,
   Sparkles,
   TrendingUp,
@@ -22,38 +24,52 @@ import { AdminPageHeader } from '@/components/admin/ui';
 type StatKey =
   | 'products'
   | 'categories'
-  | 'articles'
+  | 'showcaseProducts'
+  | 'events'
+  | 'activities'
+  | 'recipes'
+  | 'news'
   | 'heroSlides'
   | 'storePartners'
   | 'storeLocations'
-  | 'showcaseProducts'
   | 'videoShowcases'
-  | 'galleryImages'
   | 'siteContent';
 
-const STAT_DEFINITIONS: { key: StatKey; label: string; table: string; href: string; icon: React.ComponentType<{ className?: string }>; tone: string }[] = [
-  { key: 'products', label: 'Products', table: 'products', href: '/admin/products', icon: Package, tone: 'from-blue-500 to-indigo-500' },
-  { key: 'categories', label: 'Categories', table: 'categories', href: '/admin/categories', icon: FolderOpen, tone: 'from-emerald-500 to-teal-500' },
-  { key: 'showcaseProducts', label: 'Showcase Products', table: 'showcase_products', href: '/admin/showcase-products', icon: ShoppingBag, tone: 'from-fuchsia-500 to-pink-500' },
-  { key: 'articles', label: 'Articles', table: 'articles', href: '/admin/articles', icon: Newspaper, tone: 'from-violet-500 to-purple-500' },
-  { key: 'galleryImages', label: 'Gallery Images', table: 'gallery_images', href: '/admin/gallery', icon: Images, tone: 'from-rose-500 to-red-500' },
-  { key: 'videoShowcases', label: 'Video Showcases', table: 'video_showcases', href: '/admin/video-showcase', icon: Play, tone: 'from-orange-500 to-amber-500' },
-  { key: 'heroSlides', label: 'Hero Slides', table: 'hero_slides', href: '/admin/hero-slides', icon: ImageIcon, tone: 'from-yellow-500 to-amber-500' },
-  { key: 'storeLocations', label: 'Store Locations', table: 'store_locations', href: '/admin/store-locations', icon: MapPin, tone: 'from-sky-500 to-cyan-500' },
-  { key: 'storePartners', label: 'Store Partners', table: 'store_partners', href: '/admin/store-partners', icon: Store, tone: 'from-cyan-500 to-blue-500' },
+interface StatDef {
+  key: StatKey;
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  tone: string;
+}
+
+const STAT_DEFINITIONS: StatDef[] = [
+  { key: 'products', label: 'Products', href: '/admin/products', icon: Package, tone: 'from-blue-500 to-indigo-500' },
+  { key: 'categories', label: 'Categories', href: '/admin/categories', icon: FolderOpen, tone: 'from-emerald-500 to-teal-500' },
+  { key: 'showcaseProducts', label: 'Showcase Products', href: '/admin/showcase-products', icon: ShoppingBag, tone: 'from-fuchsia-500 to-pink-500' },
+  { key: 'events', label: 'Events', href: '/admin/events', icon: Calendar, tone: 'from-violet-500 to-purple-500' },
+  { key: 'activities', label: 'Activity', href: '/admin/activities', icon: SparklesIcon, tone: 'from-rose-500 to-pink-500' },
+  { key: 'recipes', label: 'Recipes', href: '/admin/recipes', icon: ChefHat, tone: 'from-amber-500 to-orange-500' },
+  { key: 'news', label: 'News', href: '/admin/news', icon: Newspaper, tone: 'from-indigo-500 to-blue-500' },
+  { key: 'videoShowcases', label: 'Video Showcases', href: '/admin/video-showcase', icon: Play, tone: 'from-orange-500 to-red-500' },
+  { key: 'heroSlides', label: 'Hero Slides', href: '/admin/hero-slides', icon: ImageIcon, tone: 'from-yellow-500 to-amber-500' },
+  { key: 'storeLocations', label: 'Store Locations', href: '/admin/store-locations', icon: MapPin, tone: 'from-sky-500 to-cyan-500' },
+  { key: 'storePartners', label: 'Store Partners', href: '/admin/store-partners', icon: Store, tone: 'from-cyan-500 to-blue-500' },
 ];
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Record<StatKey, number>>({
     products: 0,
     categories: 0,
-    articles: 0,
+    showcaseProducts: 0,
+    events: 0,
+    activities: 0,
+    recipes: 0,
+    news: 0,
     heroSlides: 0,
     storePartners: 0,
     storeLocations: 0,
-    showcaseProducts: 0,
     videoShowcases: 0,
-    galleryImages: 0,
     siteContent: 0,
   });
   const [loading, setLoading] = useState(true);
@@ -61,26 +77,34 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function load() {
       try {
-        const tables: { key: StatKey; table: string }[] = [
-          { key: 'products', table: 'products' },
-          { key: 'categories', table: 'categories' },
-          { key: 'articles', table: 'articles' },
-          { key: 'heroSlides', table: 'hero_slides' },
-          { key: 'storePartners', table: 'store_partners' },
-          { key: 'storeLocations', table: 'store_locations' },
-          { key: 'showcaseProducts', table: 'showcase_products' },
-          { key: 'videoShowcases', table: 'video_showcases' },
-          { key: 'galleryImages', table: 'gallery_images' },
-          { key: 'siteContent', table: 'site_content' },
-        ];
-        const results = await Promise.all(
-          tables.map(({ table }) => supabase.from(table).select('id', { count: 'exact', head: true }))
-        );
-        const next = { ...stats };
-        tables.forEach(({ key }, i) => {
-          next[key] = results[i].count || 0;
+        const tableQueries = await Promise.all([
+          supabase.from('products').select('id', { count: 'exact', head: true }),
+          supabase.from('categories').select('id', { count: 'exact', head: true }),
+          supabase.from('showcase_products').select('id', { count: 'exact', head: true }),
+          supabase.from('articles').select('id', { count: 'exact', head: true }).eq('type', 'event'),
+          supabase.from('articles').select('id', { count: 'exact', head: true }).eq('type', 'lifestyle'),
+          supabase.from('articles').select('id', { count: 'exact', head: true }).eq('type', 'recipe'),
+          supabase.from('articles').select('id', { count: 'exact', head: true }).eq('type', 'news'),
+          supabase.from('hero_slides').select('id', { count: 'exact', head: true }),
+          supabase.from('store_partners').select('id', { count: 'exact', head: true }),
+          supabase.from('store_locations').select('id', { count: 'exact', head: true }),
+          supabase.from('video_showcases').select('id', { count: 'exact', head: true }),
+          supabase.from('site_content').select('id', { count: 'exact', head: true }),
+        ]);
+        setStats({
+          products: tableQueries[0].count || 0,
+          categories: tableQueries[1].count || 0,
+          showcaseProducts: tableQueries[2].count || 0,
+          events: tableQueries[3].count || 0,
+          activities: tableQueries[4].count || 0,
+          recipes: tableQueries[5].count || 0,
+          news: tableQueries[6].count || 0,
+          heroSlides: tableQueries[7].count || 0,
+          storePartners: tableQueries[8].count || 0,
+          storeLocations: tableQueries[9].count || 0,
+          videoShowcases: tableQueries[10].count || 0,
+          siteContent: tableQueries[11].count || 0,
         });
-        setStats(next);
       } catch (err) {
         console.error('Failed to load stats:', err);
       } finally {
@@ -88,7 +112,6 @@ export default function AdminDashboard() {
       }
     }
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -104,7 +127,6 @@ export default function AdminDashboard() {
         }
       />
 
-      {/* Hero callout */}
       <div className="relative overflow-hidden admin-surface p-6 sm:p-8">
         <div className="absolute -right-20 -top-20 w-64 h-64 rounded-full bg-gradient-to-br from-[var(--color-admin-accent-soft)] to-transparent blur-3xl pointer-events-none" />
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
@@ -116,13 +138,12 @@ export default function AdminDashboard() {
               Konsol terpadu untuk semua konten website
             </h2>
             <p className="text-sm text-[var(--color-admin-muted)] dark:text-[var(--color-admin-muted-dark)] mt-1.5">
-              Atur halaman, produk, artikel, lokasi toko, navigasi, dan pengaturan brand — semua di satu tempat. Setiap field 3 bahasa kini dilengkapi auto-translate berbasis Claude AI.
+              Atur halaman, produk, event, activity, recipe, news, lokasi toko, navigasi, dan pengaturan brand — semua di satu tempat. Setiap field 3 bahasa kini dilengkapi auto-translate berbasis Claude AI.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Stat grid */}
       <section>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--color-admin-muted)] dark:text-[var(--color-admin-muted-dark)]">
@@ -152,7 +173,6 @@ export default function AdminDashboard() {
         </div>
       </section>
 
-      {/* Quick actions */}
       <section className="admin-surface p-6">
         <h3 className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--color-admin-muted)] dark:text-[var(--color-admin-muted-dark)] mb-4">
           Quick actions
@@ -160,8 +180,8 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
           <QuickAction href="/admin/hero-slides" icon={ImageIcon} label="Hero" />
           <QuickAction href="/admin/products" icon={Package} label="Products" />
-          <QuickAction href="/admin/articles" icon={Newspaper} label="Articles" />
-          <QuickAction href="/admin/gallery" icon={Images} label="Gallery" />
+          <QuickAction href="/admin/events" icon={Calendar} label="Events" />
+          <QuickAction href="/admin/recipes" icon={ChefHat} label="Recipes" />
           <QuickAction href="/admin/store-locations" icon={MapPin} label="Stores" />
           <QuickAction href="/admin/settings" icon={Store} label="Company" />
         </div>
