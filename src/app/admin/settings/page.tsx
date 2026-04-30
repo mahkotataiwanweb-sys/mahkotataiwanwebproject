@@ -32,6 +32,7 @@ interface FormState {
   tiktok_url: string;
   facebook_url: string;
   instagram_url: string;
+  line_url: string;
 }
 
 function fromSettings(s: CompanySettings): FormState {
@@ -40,7 +41,7 @@ function fromSettings(s: CompanySettings): FormState {
     company_name: s.company_name || '',
     tagline: { en: s.tagline_en || '', id: s.tagline_id || '', zh: s.tagline_zh || '' },
     email: s.email || '',
-    email2: (s as unknown as { email2?: string }).email2 || '',
+    email2: s.email2 || '',
     phone: s.phone || '',
     warehouse_address: s.warehouse_address || '',
     office_address: s.office_address || '',
@@ -48,6 +49,7 @@ function fromSettings(s: CompanySettings): FormState {
     tiktok_url: s.tiktok_url || '',
     facebook_url: s.facebook_url || '',
     instagram_url: s.instagram_url || '',
+    line_url: s.line_url || '',
   };
 }
 
@@ -105,6 +107,7 @@ export default function SettingsPage() {
         tiktok_url: form.tiktok_url || null,
         facebook_url: form.facebook_url || null,
         instagram_url: form.instagram_url || null,
+        line_url: form.line_url || null,
       };
       const { error } = await supabase.from('company_settings').update(payload).eq('id', form.id);
       if (error) throw error;
@@ -201,6 +204,10 @@ export default function SettingsPage() {
             <div>
               <AdminLabel>Instagram URL</AdminLabel>
               <AdminInput value={form.instagram_url} onChange={(e) => update('instagram_url', e.target.value)} placeholder="https://instagram.com/…" />
+            </div>
+            <div>
+              <AdminLabel>LINE URL</AdminLabel>
+              <AdminInput value={form.line_url} onChange={(e) => update('line_url', e.target.value)} placeholder="https://line.me/ti/p/@…" />
             </div>
           </div>
         </div>

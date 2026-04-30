@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import SandTexture from '@/components/effects/SandTexture';
 import HeroBackground from '@/components/effects/HeroBackground';
+import EditableText from '@/components/EditableText';
 
 function LineIcon({ className }: { className?: string }) {
   return (
@@ -708,13 +709,13 @@ export default function ContactPage() {
             animate={{ opacity: [0.85, 1, 0.85], scale: [0.98, 1, 0.98] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
-            ✦ {t('label')} ✦
+            ✦ <EditableText page="contact" section="hero" k="label">{t('label')}</EditableText> ✦
           </motion.span>
           <h1 className="hero-text text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-5">
-            {t('title')}
+            <EditableText page="contact" section="hero" k="title">{t('title')}</EditableText>
           </h1>
           <p className="hero-text text-cream/60 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            {t('subtitle')}
+            <EditableText page="contact" section="hero" k="subtitle">{t('subtitle')}</EditableText>
           </p>
 
           {/* Animated separator */}
@@ -1128,10 +1129,10 @@ export default function ContactPage() {
               </motion.div>
 
               <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-5 leading-tight">
-                {t('ctaTitle')}
+                <EditableText page="contact" section="cta" k="title">{t('ctaTitle')}</EditableText>
               </h2>
               <p className="text-cream/70 text-sm tracking-wide mb-10 max-w-lg mx-auto">
-                {t('ctaDescription')}
+                <EditableText page="contact" section="cta" k="description">{t('ctaDescription')}</EditableText>
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -1139,7 +1140,7 @@ export default function ContactPage() {
                   href="mailto:mahkotataiwan@gmail.com?subject=Partnership%20Inquiry"
                   className="inline-flex items-center justify-center gap-2 bg-red hover:bg-red/90 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-red/20 text-base"
                 >
-                  {t('ctaButtonEmail')}
+                  <EditableText page="contact" section="cta" k="button_email">{t('ctaButtonEmail')}</EditableText>
                   <ChevronRight className="w-5 h-5" />
                 </a>
                 <a
@@ -1147,12 +1148,12 @@ export default function ContactPage() {
                   className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 border border-white/20 hover:border-white/30 text-base backdrop-blur-sm"
                 >
                   <Phone className="w-4 h-4" />
-                  {t('ctaButtonPhone')}
+                  <EditableText page="contact" section="cta" k="button_phone">{t('ctaButtonPhone')}</EditableText>
                 </a>
               </div>
 
               <p className="text-cream/25 text-xs mt-10">
-                {t('ctaFootnote')}
+                <EditableText page="contact" section="cta" k="footnote">{t('ctaFootnote')}</EditableText>
               </p>
             </div>
           </div>

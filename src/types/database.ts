@@ -215,6 +215,7 @@ export interface CompanySettings {
   tagline_id: string;
   tagline_zh: string;
   email: string;
+  email2: string | null;
   phone: string;
   warehouse_address: string;
   office_address: string;
@@ -222,6 +223,7 @@ export interface CompanySettings {
   tiktok_url: string | null;
   facebook_url: string | null;
   instagram_url: string | null;
+  line_url: string | null;
   created_at: string;
   updated_at: string;
 }

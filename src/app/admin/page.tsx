@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import {
   Package,
   FolderOpen,
-  Newspaper,
   ImageIcon,
   Store,
   Play,
@@ -28,7 +27,6 @@ type StatKey =
   | 'events'
   | 'activities'
   | 'recipes'
-  | 'news'
   | 'heroSlides'
   | 'storePartners'
   | 'storeLocations'
@@ -50,7 +48,6 @@ const STAT_DEFINITIONS: StatDef[] = [
   { key: 'events', label: 'Events', href: '/admin/events', icon: Calendar, tone: 'from-violet-500 to-purple-500' },
   { key: 'activities', label: 'Activity', href: '/admin/activities', icon: SparklesIcon, tone: 'from-rose-500 to-pink-500' },
   { key: 'recipes', label: 'Recipes', href: '/admin/recipes', icon: ChefHat, tone: 'from-amber-500 to-orange-500' },
-  { key: 'news', label: 'News', href: '/admin/news', icon: Newspaper, tone: 'from-indigo-500 to-blue-500' },
   { key: 'videoShowcases', label: 'Video Showcases', href: '/admin/video-showcase', icon: Play, tone: 'from-orange-500 to-red-500' },
   { key: 'heroSlides', label: 'Hero Slides', href: '/admin/hero-slides', icon: ImageIcon, tone: 'from-yellow-500 to-amber-500' },
   { key: 'storeLocations', label: 'Store Locations', href: '/admin/store-locations', icon: MapPin, tone: 'from-sky-500 to-cyan-500' },
@@ -65,7 +62,6 @@ export default function AdminDashboard() {
     events: 0,
     activities: 0,
     recipes: 0,
-    news: 0,
     heroSlides: 0,
     storePartners: 0,
     storeLocations: 0,
@@ -84,7 +80,6 @@ export default function AdminDashboard() {
           supabase.from('articles').select('id', { count: 'exact', head: true }).eq('type', 'event'),
           supabase.from('articles').select('id', { count: 'exact', head: true }).eq('type', 'lifestyle'),
           supabase.from('articles').select('id', { count: 'exact', head: true }).eq('type', 'recipe'),
-          supabase.from('articles').select('id', { count: 'exact', head: true }).eq('type', 'news'),
           supabase.from('hero_slides').select('id', { count: 'exact', head: true }),
           supabase.from('store_partners').select('id', { count: 'exact', head: true }),
           supabase.from('store_locations').select('id', { count: 'exact', head: true }),
@@ -98,12 +93,11 @@ export default function AdminDashboard() {
           events: tableQueries[3].count || 0,
           activities: tableQueries[4].count || 0,
           recipes: tableQueries[5].count || 0,
-          news: tableQueries[6].count || 0,
-          heroSlides: tableQueries[7].count || 0,
-          storePartners: tableQueries[8].count || 0,
-          storeLocations: tableQueries[9].count || 0,
-          videoShowcases: tableQueries[10].count || 0,
-          siteContent: tableQueries[11].count || 0,
+          heroSlides: tableQueries[6].count || 0,
+          storePartners: tableQueries[7].count || 0,
+          storeLocations: tableQueries[8].count || 0,
+          videoShowcases: tableQueries[9].count || 0,
+          siteContent: tableQueries[10].count || 0,
         });
       } catch (err) {
         console.error('Failed to load stats:', err);
