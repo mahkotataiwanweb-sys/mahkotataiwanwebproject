@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import { ArrowLeft, MapPin, Store, Globe, Sparkles, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
@@ -140,7 +141,7 @@ function ShimmerLines() {
 export default function WhereToBuyPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const locale = useLocale();
-  const t = useTranslations('whereToBuy');
+  const t = useEditableT('whereToBuy', 'where-to-buy');
   const [stores, setStores] = useState<StoreLocation[]>([]);
   const [loading, setLoading] = useState(true);
 

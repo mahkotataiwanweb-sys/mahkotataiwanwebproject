@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, Suspense, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -81,7 +82,7 @@ function SmartSearch({
   locale: string;
   onSelectProduct: (product: Product, categoryId: string) => void;
 }) {
-  const t = useTranslations('products');
+  const t = useEditableT('products');
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -447,7 +448,7 @@ function ProductModal({
   categoryName: string;
   onClose: () => void;
 }) {
-  const t = useTranslations('products');
+  const t = useEditableT('products');
   const name = getLocalizedField(product, 'name', locale);
   const description = getLocalizedField(product, 'description', locale);
   const imageUrl = product.detail_image_url || product.image_url;
@@ -594,7 +595,7 @@ function CategoryDropdown({
   productCounts: Record<string, number>;
   onSelect: (categoryId: string) => void;
 }) {
-  const t = useTranslations('products');
+  const t = useEditableT('products');
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -806,7 +807,7 @@ function FloatingProductCard({
 /* ------------------------------------------------------------------ */
 function ProductsContent() {
   const locale = useLocale();
-  const t = useTranslations('products');
+  const t = useEditableT('products');
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('category');
   const productParam = searchParams.get('product');

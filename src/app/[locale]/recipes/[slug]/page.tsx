@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -49,8 +50,8 @@ function parseRecipeContent(content: string) {
 /* ------------------------------------------------------------------ */
 export default function RecipeDetailPage() {
   const locale = useLocale();
-  const t = useTranslations('recipes');
-  const tNav = useTranslations('nav');
+  const t = useEditableT('recipes');
+  const tNav = useEditableT('nav', 'navbar');
   const params = useParams();
   const slug = params.slug as string;
   const [recipe, setRecipe] = useState<Article | null>(null);

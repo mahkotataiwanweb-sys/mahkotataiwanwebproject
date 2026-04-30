@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
@@ -15,7 +16,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function RecipesSection() {
   const locale = useLocale();
-  const t = useTranslations('recipes');
+  const t = useEditableT('recipes');
   const [recipes, setRecipes] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);

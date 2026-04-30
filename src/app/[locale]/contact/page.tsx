@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -279,7 +279,7 @@ const contactCards = [
 ];
 
 export default function ContactPage() {
-  const t = useTranslations('contact');
+  const t = useEditableT('contact');
   const faqs = useFaqs(t);
   const locale = useLocale();
 

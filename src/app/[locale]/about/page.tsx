@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -233,7 +233,7 @@ function LineReveal({ text, className }: { text: string; className?: string }) {
 }
 
 export default function AboutPage() {
-  const t = useTranslations('about');
+  const t = useEditableT('about');
   const locale = useLocale();
   const heroRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);

@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
@@ -280,7 +281,7 @@ function VideoCard({
 /* Main Component */
 export default function VideoShowcaseSection() {
   const locale = useLocale();
-  const t = useTranslations('hero');
+  const t = useEditableT('hero');
   const sectionRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 

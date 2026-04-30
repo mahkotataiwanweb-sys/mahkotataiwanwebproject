@@ -2,7 +2,8 @@
 
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -471,7 +472,7 @@ function InfiniteSlider({
 /* ------------------------------------------------------------------ */
 export default function ProductCatalogSection() {
   const locale = useLocale();
-  const t = useTranslations('products');
+  const t = useEditableT('products');
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);

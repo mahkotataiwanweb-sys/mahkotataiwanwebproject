@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
@@ -178,7 +179,7 @@ function CalendarDropdown({
 
 export default function EventsPage() {
   const locale = useLocale();
-  const t = useTranslations('events');
+  const t = useEditableT('events');
 
   /* state */
   const [events, setEvents] = useState<Article[]>([]);

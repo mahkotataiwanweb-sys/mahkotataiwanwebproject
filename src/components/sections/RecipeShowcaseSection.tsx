@@ -2,7 +2,8 @@
 
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import Link from 'next/link';
 import Image from 'next/image';
 import gsap from 'gsap';
@@ -256,7 +257,7 @@ function FloatingParticles() {
 /* ------------------------------------------------------------------ */
 export default function RecipeShowcaseSection() {
   const locale = useLocale();
-  const t = useTranslations('recipes');
+  const t = useEditableT('recipes');
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
