@@ -86,7 +86,12 @@ export default function Footer() {
   const menuTree = useMemo(() => {
     if (dbMenuItems.length === 0) return null;
 
-    const filtered = dbMenuItems.filter((item) => !item.url?.includes('gallery'));
+    // Filter out URLs for pages that no longer exist on the live site.
+    const filtered = dbMenuItems.filter((item) => {
+      const url = (item.url || '').toLowerCase();
+      if (/\/(gallery|news|lifestyle)(\/|$)/.test(url)) return false;
+      return true;
+    });
     const topLevel = filtered.filter((item) => item.parent_id === null);
     const childrenMap = new Map<string, NavMenuItem[]>();
 
@@ -130,6 +135,12 @@ export default function Footer() {
   const facebookUrl = settings?.facebook_url || 'https://www.facebook.com/share/1DhYShuL19/?mibextid=wwXIfr';
   const instagramUrl = settings?.instagram_url || 'https://www.instagram.com/mahkotatw';
   const tiktokUrl = settings?.tiktok_url || 'https://www.tiktok.com/@mahkotataiwan';
+  const lineUrl =
+    (settings as unknown as { line_url?: string })?.line_url || 'https://line.me/ti/p/@mahkotataiwan';
+
+  // Build Google Maps search URLs from the addresses themselves so edits flow through.
+  const officeMapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(officeAddress)}`;
+  const warehouseMapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(warehouseAddress)}`;
 
   const toggleMenu = (key: string) => {
     setExpandedMenu(expandedMenu === key ? null : key);
@@ -302,7 +313,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 mb-8">
           {/* Office */}
           <a
-            href="https://www.google.com/maps/search/No.+83,+Liyuan+2nd+Street,+Linkou+District,+New+Taipei+City"
+            href={officeMapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-start gap-2 group max-w-xs text-center md:text-left"
@@ -323,7 +334,7 @@ export default function Footer() {
 
           {/* Warehouse */}
           <a
-            href="https://www.google.com/maps/search/No.+53,+Lane+216,+Nanshi+4th+Street,+Linkou+District,+New+Taipei+City"
+            href={warehouseMapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-start gap-2 group max-w-xs text-center md:text-left"
@@ -391,7 +402,7 @@ export default function Footer() {
             <Music2 className="w-4 h-4" />
           </a>
           <a
-            href="https://line.me/ti/p/@mahkotataiwan"
+            href={lineUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="w-9 h-9 rounded-full bg-cream/10 flex items-center justify-center text-cream/70 hover:bg-red hover:text-white transition-all duration-200"

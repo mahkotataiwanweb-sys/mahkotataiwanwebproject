@@ -11,6 +11,7 @@ import { ArrowLeft, Award, Store, Package, Users, Shield, Heart, Sparkles, Chevr
 import { supabase } from '@/lib/supabase';
 import SandTexture from '@/components/effects/SandTexture';
 import HeroBackground from '@/components/effects/HeroBackground';
+import EditableText from '@/components/EditableText';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -841,13 +842,13 @@ export default function AboutPage() {
             animate={{ opacity: [0.85, 1, 0.85], scale: [0.98, 1, 0.98] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
-            ✦ {t('label')} ✦
+            ✦ <EditableText page="about" section="hero" k="label">{t('label')}</EditableText> ✦
           </motion.span>
           <h1 className="hero-text text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-5">
-            {t('title')}
+            <EditableText page="about" section="hero" k="title">{t('title')}</EditableText>
           </h1>
           <p className="hero-text text-cream/60 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            {t('mission')}
+            <EditableText page="about" section="hero" k="mission">{t('mission')}</EditableText>
           </p>
 
           {/* Animated separator */}
@@ -879,16 +880,18 @@ export default function AboutPage() {
           <div ref={textRef}>
             {/* Centered heading */}
             <div className="text-center mb-12">
-              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">{t('missionLabel')}</p>
+              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
+                <EditableText page="about" section="mission" k="label">{t('missionLabel')}</EditableText>
+              </p>
               <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy leading-tight mb-4">
-                {t('missionTitle')}
+                <EditableText page="about" section="mission" k="title">{t('missionTitle')}</EditableText>
               </h2>
               <div
                 ref={redLineRef}
                 className="w-16 h-[2px] bg-red mx-auto mb-6 origin-center"
               />
               <p className="text-red/80 font-medium text-sm sm:text-base tracking-wide">
-                {t('missionCTA')}
+                <EditableText page="about" section="mission" k="cta">{t('missionCTA')}</EditableText>
               </p>
             </div>
 
@@ -947,8 +950,12 @@ export default function AboutPage() {
 <div ref={valuesRef} className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <div ref={valuesTitleRef}>
-              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">{t('valuesLabel')}</p>
-              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">{t('valuesTitle')}</h2>
+              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
+                <EditableText page="about" section="values" k="label">{t('valuesLabel')}</EditableText>
+              </p>
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">
+                <EditableText page="about" section="values" k="title">{t('valuesTitle')}</EditableText>
+              </h2>
               <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
             </div>
           </div>
@@ -997,10 +1004,16 @@ export default function AboutPage() {
               viewport={{ once: true }}
               transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
             >
-              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">{t('partnersLabel')}</p>
-              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">{t('partnersTitle')}</h2>
+              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
+                <EditableText page="about" section="partners" k="label">{t('partnersLabel')}</EditableText>
+              </p>
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">
+                <EditableText page="about" section="partners" k="title">{t('partnersTitle')}</EditableText>
+              </h2>
               <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
-              <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">{t('partnersDescription')}</p>
+              <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">
+                <EditableText page="about" section="partners" k="description">{t('partnersDescription')}</EditableText>
+              </p>
             </motion.div>
           </div>
 
@@ -1094,8 +1107,12 @@ export default function AboutPage() {
               viewport={{ once: true }}
               transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
             >
-              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">{t('storyLabel')}</p>
-              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">{t('storyTitle')}</h2>
+              <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
+                <EditableText page="about" section="story" k="label">{t('storyLabel')}</EditableText>
+              </p>
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">
+                <EditableText page="about" section="story" k="title">{t('storyTitle')}</EditableText>
+              </h2>
               <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
             </motion.div>
           </div>
@@ -1188,24 +1205,24 @@ export default function AboutPage() {
               </motion.div>
 
               <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-5 leading-tight">
-                {t('ctaTitle')}
+                <EditableText page="about" section="cta" k="title">{t('ctaTitle')}</EditableText>
               </h2>
               <p className="text-cream/70 mb-10 max-w-lg mx-auto text-sm tracking-wide">
-                {t('ctaDescription')}
+                <EditableText page="about" section="cta" k="description">{t('ctaDescription')}</EditableText>
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href={`/${locale}/products`}
                   className="inline-flex items-center justify-center gap-2 bg-red hover:bg-red/90 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-red/20 text-base"
                 >
-                  {t('ctaButtonProducts')}
+                  <EditableText page="about" section="cta" k="button_products">{t('ctaButtonProducts')}</EditableText>
                   <ChevronRight className="w-5 h-5" />
                 </Link>
                 <Link
                   href={`/${locale}/contact`}
                   className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 border border-white/20 hover:border-white/30 text-base backdrop-blur-sm"
                 >
-                  {t('ctaButtonContact')}
+                  <EditableText page="about" section="cta" k="button_contact">{t('ctaButtonContact')}</EditableText>
                 </Link>
               </div>
             </div>

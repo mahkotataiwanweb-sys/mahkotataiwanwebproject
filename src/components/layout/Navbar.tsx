@@ -94,10 +94,15 @@ export default function Navbar() {
     fetchData();
   }, []);
 
-  // Build DB menu tree (filter out gallery)
+  // Build DB menu tree (filter out dead URLs that no longer exist on the live site)
   const menuTree = useMemo(() => {
     if (dbMenuItems.length === 0) return null;
-    const filtered = dbMenuItems.filter((item) => !item.url?.includes('gallery'));
+    const filtered = dbMenuItems.filter((item) => {
+      const url = (item.url || '').toLowerCase();
+      // Pages that have been removed from the live site
+      if (/\/(gallery|news|lifestyle)(\/|$)/.test(url)) return false;
+      return true;
+    });
     const topLevel = filtered.filter((item) => item.parent_id === null);
     const childrenMap = new Map<string, NavMenuItem[]>();
     filtered.forEach((item) => {
