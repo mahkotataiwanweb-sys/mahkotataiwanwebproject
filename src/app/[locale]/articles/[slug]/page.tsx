@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -32,7 +33,7 @@ function formatDate(dateStr: string, locale: string): string {
 export default function ArticleDetailPage() {
   const { slug } = useParams();
   const locale = useLocale();
-  const t = useTranslations('articles');
+  const t = useEditableT('articles');
 
   const [article, setArticle] = useState<Article | null>(null);
   const [related, setRelated] = useState<Article[]>([]);

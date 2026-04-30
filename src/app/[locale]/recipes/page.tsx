@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
@@ -22,7 +23,7 @@ function RecipeCard({ recipe, locale, index }: { recipe: Article; locale: string
   const cardRef = useRef<HTMLDivElement>(null);
   const title = getLocalizedField(recipe, 'title', locale);
   const excerpt = getLocalizedField(recipe, 'excerpt', locale);
-  const tRecipes = useTranslations('recipes');
+  const tRecipes = useEditableT('recipes');
 
   // Varied heights for true masonry look
   const heightPattern = [320, 260, 350, 240, 300, 280, 370, 250, 310, 290];
@@ -127,8 +128,8 @@ function RecipeCard({ recipe, locale, index }: { recipe: Article; locale: string
 /* ------------------------------------------------------------------ */
 export default function RecipesPage() {
   const locale = useLocale();
-  const t = useTranslations('recipes');
-  const tNav = useTranslations('nav');
+  const t = useEditableT('recipes');
+  const tNav = useEditableT('nav', 'navbar');
   const [recipes, setRecipes] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const headerRef = useRef<HTMLDivElement>(null);

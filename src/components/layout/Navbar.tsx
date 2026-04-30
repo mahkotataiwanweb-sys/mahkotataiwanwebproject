@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+
+import { useEditableT } from '@/hooks/useEditableT';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -45,7 +46,7 @@ const darkHeaderPages = ['/products', '/activity', '/events', '/about', '/where-
 /*  Main Navbar                                                        */
 /* ------------------------------------------------------------------ */
 export default function Navbar() {
-  const t = useTranslations('nav');
+  const t = useEditableT('nav', 'navbar');
   const locale = useLocale();
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -172,7 +173,7 @@ export default function Navbar() {
 
   const hamburgerColor = useLightText ? 'text-white' : 'text-navy';
   const useDbMenus = menuTree && menuTree.length > 0;
-  const tNav = useTranslations('nav');
+  const tNav = useEditableT('nav', 'navbar');
 
   /* ---- Products dropdown labels ---- */
   const ourCollectionLabel = tNav('ourCollection');

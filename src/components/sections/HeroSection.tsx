@@ -2,13 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { ChevronDown } from 'lucide-react';
 
 export default function HeroSection() {
-  const t = useTranslations('hero');
+  const t = useEditableT('hero');
   const sectionRef = useRef<HTMLElement>(null);
   const taglineRef = useRef<HTMLHeadingElement>(null);
 

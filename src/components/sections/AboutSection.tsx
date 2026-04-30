@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Award, Store, Package, Users } from 'lucide-react';
@@ -16,7 +16,7 @@ const stats = [
 ];
 
 export default function AboutSection() {
-  const t = useTranslations('about');
+  const t = useEditableT('about');
   const sectionRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);

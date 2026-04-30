@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Package } from 'lucide-react';
@@ -49,7 +49,7 @@ const products = [
 ];
 
 export default function ProductsSection() {
-  const t = useTranslations('products');
+  const t = useEditableT('products');
   const [activeCategory, setActiveCategory] = useState('all');
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);

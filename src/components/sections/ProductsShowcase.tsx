@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
@@ -16,7 +17,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function ProductsShowcase() {
   const locale = useLocale();
-  const t = useTranslations('products');
+  const t = useEditableT('products');
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>('all');

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { MapPin, Phone, Facebook, Instagram, Music2 } from 'lucide-react';
@@ -15,7 +15,7 @@ const socials = [
 ];
 
 export default function ContactSection() {
-  const t = useTranslations('contact');
+  const t = useEditableT('contact');
   const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 

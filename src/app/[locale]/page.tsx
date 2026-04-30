@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useRef, useEffect, useState, useCallback, useImperativeHandle } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import Link from 'next/link';
 import Image from 'next/image';
 import gsap from 'gsap';
@@ -219,7 +220,7 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
 
 export default function HomePage() {
   const locale = useLocale();
-  const t = useTranslations('discover');
+  const t = useEditableT('discover', 'home');
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const topCardRef = useRef<AutoFlipCardHandle>(null);

@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -50,7 +51,7 @@ export default function WhereToBuySection() {
   const bottomTextRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const locale = useLocale();
-  const t = useTranslations('whereToBuy');
+  const t = useEditableT('whereToBuy');
 
   useEffect(() => {
     if (!sectionRef.current || !mapRef.current) return;

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useEditableT } from '@/hooks/useEditableT';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -55,8 +56,8 @@ const fallbackNavItems: FallbackNavItem[] = [
 ];
 
 export default function Footer() {
-  const t = useTranslations('footer');
-  const navT = useTranslations('nav');
+  const t = useEditableT('footer');
+  const navT = useEditableT('nav', 'navbar');
   const locale = useLocale();
 
   const [settings, setSettings] = useState<CompanySettings | null>(null);
@@ -123,7 +124,7 @@ export default function Footer() {
   };
 
   const useDbMenus = menuTree && menuTree.length > 0;
-  const tNav = useTranslations('nav');
+  const tNav = useEditableT('nav', 'navbar');
 
   /* Products dropdown label */
   const ourCollectionLabel = tNav('ourCollection');
