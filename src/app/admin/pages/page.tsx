@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Save, Plus, Trash2, FileText, Globe, Sparkles, Loader2 } from 'lucide-react';
+import { Save, Plus, Trash2, FileText, Globe, Sparkles, Loader2, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { supabase } from '@/lib/supabase';
@@ -35,11 +35,18 @@ interface PageContent {
 }
 
 const PAGES = [
+  { value: 'home', label: 'Home' },
   { value: 'about', label: 'About Us' },
   { value: 'contact', label: 'Contact Us' },
-  { value: 'home', label: 'Home' },
   { value: 'products', label: 'Products' },
   { value: 'where-to-buy', label: 'Where to Buy' },
+  { value: 'events', label: 'Events' },
+  { value: 'activities', label: 'Activity' },
+  { value: 'recipes', label: 'Recipes' },
+  { value: 'articles', label: 'Articles' },
+  { value: 'navbar', label: 'Navbar' },
+  { value: 'footer', label: 'Footer' },
+  { value: 'hero', label: 'Hero (homepage)' },
 ];
 
 const CONTENT_TYPES = ['text', 'textarea', 'richtext', 'number', 'image', 'link', 'email', 'phone'];
@@ -54,6 +61,7 @@ export default function PagesEditorPage() {
   const [translating, setTranslating] = useState(false);
   const [activePage, setActivePage] = useState<string>('about');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [addingItem, setAddingItem] = useState(false);
   const [newItem, setNewItem] = useState({ section: '', key: '', content_type: 'text' });
 
@@ -204,6 +212,30 @@ export default function PagesEditorPage() {
     }
   };
 
+  const syncFromTranslations = async () => {
+    if (
+      !confirm(
+        'Import all i18n translation keys into page_content?\n\n' +
+        'This will add rows for every label/heading/text on the live site for ALL pages ' +
+        '(home, about, contact, products, events, recipes, activity, where-to-buy, navbar, footer, etc.) ' +
+        'so you can edit them from /admin/pages.\n\n' +
+        'Existing rows are NOT overwritten.'
+      )
+    ) return;
+    setSyncing(true);
+    try {
+      const res = await fetch('/api/admin/sync-page-content', { method: 'POST' });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      toast.success(`Imported ${data.inserted} new rows (${data.alreadyExisted} already existed)`);
+      fetchContent();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Sync failed');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <AdminPageHeader
@@ -211,6 +243,10 @@ export default function PagesEditorPage() {
         subtitle="Edit konten per halaman website (about, contact, dll.)"
         actions={
           <>
+            <AdminButton variant="ghost" onClick={syncFromTranslations} disabled={syncing}>
+              {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+              Sync from Translations
+            </AdminButton>
             <AdminButton variant="ghost" onClick={translateAllVisible} disabled={translating}>
               {translating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               Auto-Translate Visible
