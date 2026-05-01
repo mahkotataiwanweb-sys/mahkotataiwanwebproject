@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Plus, Pencil, Trash2, Search, Menu as MenuIcon, ChevronRight, Link2, Trash } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Menu as MenuIcon, ChevronRight, Link2, Trash, RotateCcw } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { supabase } from '@/lib/supabase';
@@ -242,6 +242,28 @@ export default function NavbarPage() {
         subtitle={`${menus.length} items · supports nested parent → child`}
         actions={
           <>
+            <AdminButton
+              variant="ghost"
+              iconLeft={<RotateCcw className="w-4 h-4" />}
+              onClick={async () => {
+                if (!confirm('Insert any missing canonical navbar items (Home, Products → Our Collection / Recipes, Events, Activity, About, Contact, Where to Buy)?\n\nExisting rows will NOT be overwritten.')) return;
+                try {
+                  const res = await fetch('/api/admin/seed-nav', { method: 'POST' });
+                  const data = await res.json();
+                  if (data.error) throw new Error(data.error);
+                  if (data.inserted_count === 0) {
+                    toast('All canonical menu items already exist', { icon: 'ℹ️' });
+                  } else {
+                    toast.success(`Added ${data.inserted_count} missing menu item${data.inserted_count === 1 ? '' : 's'}`);
+                  }
+                  fetchMenus();
+                } catch (err) {
+                  toast.error(err instanceof Error ? err.message : 'Seed failed');
+                }
+              }}
+            >
+              Restore Defaults
+            </AdminButton>
             <AdminButton
               variant="ghost"
               iconLeft={<Trash className="w-4 h-4" />}
