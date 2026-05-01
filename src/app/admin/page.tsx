@@ -112,7 +112,7 @@ export default function AdminDashboard() {
     <div className="space-y-8">
       <AdminPageHeader
         title="Dashboard"
-        subtitle="Selamat datang di Mahkota Taiwan CMS Console"
+        subtitle="Welcome to Mahkota Taiwan CMS Console"
         actions={
           <Link href="/admin/products" className="admin-btn admin-btn-accent">
             <Sparkles className="w-4 h-4" />
@@ -126,13 +126,13 @@ export default function AdminDashboard() {
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="max-w-xl">
             <span className="inline-flex items-center gap-1.5 admin-pill admin-pill-accent">
-              <TrendingUp className="w-3 h-3" /> Live data dari Supabase
+              <TrendingUp className="w-3 h-3" /> Live data from Supabase
             </span>
             <h2 className="font-heading text-2xl font-bold mt-3 text-[var(--color-admin-ink)] dark:text-[var(--color-admin-ink-dark)]">
-              Konsol terpadu untuk semua konten website
+              Unified console for all website content
             </h2>
             <p className="text-sm text-[var(--color-admin-muted)] dark:text-[var(--color-admin-muted-dark)] mt-1.5">
-              Atur halaman, produk, event, activity, recipe, news, lokasi toko, navigasi, dan pengaturan brand — semua di satu tempat. Setiap field 3 bahasa kini dilengkapi auto-translate berbasis Claude AI.
+              Manage pages, products, events, activities, recipes, news, store locations, navigation, and brand settings — all in one place. Every 3-language field is equipped with i18n-based auto-translate.
             </p>
           </div>
         </div>
@@ -141,7 +141,7 @@ export default function AdminDashboard() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--color-admin-muted)] dark:text-[var(--color-admin-muted-dark)]">
-            Ringkasan konten
+            Content summary
           </h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
