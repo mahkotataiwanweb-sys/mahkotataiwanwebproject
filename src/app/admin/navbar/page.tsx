@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Plus, Pencil, Trash2, Search, Menu as MenuIcon, ChevronRight, Link2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Menu as MenuIcon, ChevronRight, Link2, Trash } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { supabase } from '@/lib/supabase';
@@ -241,9 +241,29 @@ export default function NavbarPage() {
         title="Navbar Menus"
         subtitle={`${menus.length} items · supports nested parent → child`}
         actions={
-          <AdminButton variant="accent" iconLeft={<Plus className="w-4 h-4" />} onClick={openAdd}>
-            Add Menu Item
-          </AdminButton>
+          <>
+            <AdminButton
+              variant="ghost"
+              iconLeft={<Trash className="w-4 h-4" />}
+              onClick={async () => {
+                if (!confirm('Delete all dead navbar links (URLs containing /gallery, /news, /lifestyle, /moments, /journal)? This cannot be undone.')) return;
+                try {
+                  const res = await fetch('/api/admin/cleanup-nav', { method: 'POST' });
+                  const data = await res.json();
+                  if (data.error) throw new Error(data.error);
+                  toast.success(`Removed ${data.navbar_deleted} navbar + ${data.footer_deleted} footer dead links`);
+                  fetchMenus();
+                } catch (err) {
+                  toast.error(err instanceof Error ? err.message : 'Cleanup failed');
+                }
+              }}
+            >
+              Cleanup Dead Links
+            </AdminButton>
+            <AdminButton variant="accent" iconLeft={<Plus className="w-4 h-4" />} onClick={openAdd}>
+              Add Menu Item
+            </AdminButton>
+          </>
         }
       />
 
