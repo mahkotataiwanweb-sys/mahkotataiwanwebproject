@@ -161,7 +161,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             </div>
             <div className="leading-tight">
               <p className="font-heading text-[15px] font-bold text-white tracking-tight">Mahkota Taiwan</p>
-              <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--color-admin-sidebar-muted)]">CMS Console</p>
+              <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--color-admin-sidebar-muted)]">
+                CMS Console <span className="ml-1 px-1 py-0.5 rounded bg-[var(--color-admin-accent)] text-[#1A1308] text-[8px] font-bold">v2</span>
+              </p>
             </div>
           </Link>
           <button
