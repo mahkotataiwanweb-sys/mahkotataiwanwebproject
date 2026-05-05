@@ -312,7 +312,7 @@ export default function RecipeShowcaseSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative py-12 sm:py-16 bg-navy overflow-hidden"
+      className="relative pt-4 sm:pt-6 pb-12 sm:pb-16 bg-navy overflow-hidden"
     >
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
