@@ -492,7 +492,8 @@ export default function ProductCatalogSection() {
         .order('sort_order', { ascending: true });
       if (!error && data && data.length > 0) {
         setCategories(data as CategoryData[]);
-        setSelectedCategory(data[0].slug);
+        // Default landing on "All" so visitors see the entire catalog at once.
+        setSelectedCategory('all');
       }
     }
     fetchCategories();
@@ -512,7 +513,11 @@ export default function ProductCatalogSection() {
 
   useEffect(() => {
     if (!selectedCategory) return;
-    setProducts(allProducts.filter((p) => p.category === selectedCategory));
+    if (selectedCategory === 'all') {
+      setProducts(allProducts);
+    } else {
+      setProducts(allProducts.filter((p) => p.category === selectedCategory));
+    }
   }, [selectedCategory, allProducts]);
 
   /* Preload product images after initial page load for instant category switching */
@@ -580,7 +585,10 @@ export default function ProductCatalogSection() {
   }, []);
 
   const selectedCat = categories.find((c) => c.slug === selectedCategory);
-  const selectedLabel = selectedCat ? getCategoryName(selectedCat, locale) : '';
+  const allLabel =
+    locale === 'zh-TW' ? '全部產品' : locale === 'id' ? 'Semua Produk' : 'All Products';
+  const selectedLabel =
+    selectedCategory === 'all' ? allLabel : selectedCat ? getCategoryName(selectedCat, locale) : '';
 
   return (
     <>
@@ -611,7 +619,9 @@ export default function ProductCatalogSection() {
                 className="flex items-center gap-2 px-5 py-2 rounded-full bg-cream text-navy font-semibold text-sm shadow-md hover:shadow-lg transition-all duration-300 min-w-[200px] justify-between"
               >
                 <span className="font-heading text-sm flex items-center gap-2">
-                  {selectedCat && <CategoryIcon slug={selectedCat.slug} size={16} />}
+                  {selectedCategory === 'all'
+                    ? <span aria-hidden className="text-base leading-none">★</span>
+                    : selectedCat && <CategoryIcon slug={selectedCat.slug} size={16} />}
                   {selectedLabel}
                 </span>
                 <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`} />
@@ -626,6 +636,18 @@ export default function ProductCatalogSection() {
                     transition={{ duration: 0.2 }}
                     className="absolute top-full mt-1.5 left-0 right-0 bg-cream rounded-xl shadow-2xl overflow-hidden z-20"
                   >
+                    <button
+                      key="all"
+                      onClick={() => { setSelectedCategory('all'); setDropdownOpen(false); }}
+                      className={`w-full text-left px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                        selectedCategory === 'all' ? 'bg-red/10 text-red' : 'text-navy hover:bg-navy/5'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span aria-hidden className="text-base leading-none">★</span>
+                        {allLabel}
+                      </span>
+                    </button>
                     {categories.map((cat) => {
                       const catName = getCategoryName(cat, locale);
                       return (

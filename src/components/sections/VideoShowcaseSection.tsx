@@ -286,7 +286,7 @@ export default function VideoShowcaseSection() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [videos, setVideos] = useState<VideoShowcase[]>([]);
-  const [activeCategory, setActiveCategory] = useState<VideoCategory>('youtube');
+  const [activeCategory, setActiveCategory] = useState<VideoCategory>('tiktok');
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedVideo, setSelectedVideo] = useState<VideoShowcase | null>(null);
@@ -429,20 +429,6 @@ export default function VideoShowcaseSection() {
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <CategoryTab
-            category="youtube"
-            label="YouTube"
-            logo={YouTubeLogo}
-            isActive={activeCategory === 'youtube'}
-            onClick={() => handleCategoryChange('youtube')}
-          />
-          <CategoryTab
-            category="shorts"
-            label="Shorts"
-            logo={ShortsLogo}
-            isActive={activeCategory === 'shorts'}
-            onClick={() => handleCategoryChange('shorts')}
-          />
-          <CategoryTab
             category="tiktok"
             label="TikTok"
             logo={TikTokLogo}
@@ -455,6 +441,20 @@ export default function VideoShowcaseSection() {
             logo={ReelsLogo}
             isActive={activeCategory === 'reels'}
             onClick={() => handleCategoryChange('reels')}
+          />
+          <CategoryTab
+            category="shorts"
+            label="Shorts"
+            logo={ShortsLogo}
+            isActive={activeCategory === 'shorts'}
+            onClick={() => handleCategoryChange('shorts')}
+          />
+          <CategoryTab
+            category="youtube"
+            label="YouTube"
+            logo={YouTubeLogo}
+            isActive={activeCategory === 'youtube'}
+            onClick={() => handleCategoryChange('youtube')}
           />
         </motion.div>
 
