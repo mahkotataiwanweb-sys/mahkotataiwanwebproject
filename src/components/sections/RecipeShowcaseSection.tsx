@@ -71,7 +71,7 @@ function CylinderCarousel({
   }, []);
 
   // Radius: bigger on desktop for cinematic feel
-  const radius = isMobile ? 220 : 380;
+  const radius = isMobile ? 200 : 320;
 
   const animate = useCallback(() => {
     if (!isVisibleRef.current) { rafRef.current = requestAnimationFrame(animate); return; }
@@ -141,7 +141,7 @@ function CylinderCarousel({
     <div
       ref={wrapperRef}
       className="relative w-full overflow-hidden cursor-grab active:cursor-grabbing"
-      style={{ height: isMobile ? '380px' : '480px', perspective: '1200px' }}
+      style={{ height: isMobile ? '320px' : '380px', perspective: '1200px' }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -165,10 +165,10 @@ function CylinderCarousel({
               href={`/${locale}/recipes/${recipe.slug || recipe.id}`}
               className="carousel-card absolute will-change-transform"
               style={{
-                width: isMobile ? '200px' : '280px',
-                height: isMobile ? '270px' : '360px',
-                marginLeft: isMobile ? '-100px' : '-140px',
-                marginTop: isMobile ? '-135px' : '-180px',
+                width: isMobile ? '180px' : '220px',
+                height: isMobile ? '240px' : '290px',
+                marginLeft: isMobile ? '-90px' : '-110px',
+                marginTop: isMobile ? '-120px' : '-145px',
                 transition: 'filter 0.3s ease',
               }}
               onMouseEnter={() => setHoveredIndex(i)}
@@ -312,7 +312,7 @@ export default function RecipeShowcaseSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative py-16 sm:py-24 bg-navy overflow-hidden"
+      className="relative py-12 sm:py-16 bg-navy overflow-hidden"
     >
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
