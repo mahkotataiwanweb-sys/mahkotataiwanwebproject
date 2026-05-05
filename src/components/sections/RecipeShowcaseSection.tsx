@@ -71,7 +71,7 @@ function CylinderCarousel({
   }, []);
 
   // Radius: bigger on desktop for cinematic feel
-  const radius = isMobile ? 200 : 320;
+  const radius = isMobile ? 160 : 240;
 
   const animate = useCallback(() => {
     if (!isVisibleRef.current) { rafRef.current = requestAnimationFrame(animate); return; }
@@ -141,7 +141,7 @@ function CylinderCarousel({
     <div
       ref={wrapperRef}
       className="relative w-full overflow-hidden cursor-grab active:cursor-grabbing"
-      style={{ height: isMobile ? '320px' : '380px', perspective: '1200px' }}
+      style={{ height: isMobile ? '240px' : '280px', perspective: '1200px' }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -165,10 +165,10 @@ function CylinderCarousel({
               href={`/${locale}/recipes/${recipe.slug || recipe.id}`}
               className="carousel-card absolute will-change-transform"
               style={{
-                width: isMobile ? '180px' : '220px',
-                height: isMobile ? '240px' : '290px',
-                marginLeft: isMobile ? '-90px' : '-110px',
-                marginTop: isMobile ? '-120px' : '-145px',
+                width: isMobile ? '140px' : '170px',
+                height: isMobile ? '185px' : '220px',
+                marginLeft: isMobile ? '-70px' : '-85px',
+                marginTop: isMobile ? '-92px' : '-110px',
                 transition: 'filter 0.3s ease',
               }}
               onMouseEnter={() => setHoveredIndex(i)}
@@ -312,7 +312,7 @@ export default function RecipeShowcaseSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative -mt-8 sm:-mt-12 pt-0 pb-12 sm:pb-16 bg-navy overflow-hidden"
+      className="relative -mt-20 sm:-mt-28 pt-12 sm:pt-16 pb-10 sm:pb-14 bg-navy overflow-hidden"
     >
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
@@ -338,7 +338,7 @@ export default function RecipeShowcaseSection() {
       {/* Content */}
       <div className="relative z-10">
         {/* Heading */}
-        <div ref={headingRef} className="text-center mb-6 sm:mb-10 px-6" style={{ perspective: '800px' }}>
+        <div ref={headingRef} className="text-center mb-4 sm:mb-6 px-6" style={{ perspective: '800px' }}>
           <div className="inline-flex items-center gap-2 mb-4">
             <Sparkles className="w-4 h-4 text-red" />
             <span className="text-red text-xs font-bold tracking-[0.3em] uppercase">
@@ -347,7 +347,7 @@ export default function RecipeShowcaseSection() {
             <Sparkles className="w-4 h-4 text-red" />
           </div>
 
-          <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 leading-[1.05]">
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 leading-[1.05]">
             {heading}
           </h2>
 
@@ -362,7 +362,7 @@ export default function RecipeShowcaseSection() {
         <CylinderCarousel recipes={recipes} locale={locale} />
 
         {/* CTA Button */}
-        <div className="text-center mt-6 sm:mt-10 px-6">
+        <div className="text-center mt-4 sm:mt-6 px-6">
           <Link
             href={`/${locale}/recipes`}
             className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-red to-red/80 text-white font-heading font-bold text-sm sm:text-base tracking-wide shadow-[0_8px_32px_rgba(193,33,38,0.35)] hover:shadow-[0_12px_48px_rgba(193,33,38,0.5)] transition-all duration-500 hover:scale-105"
