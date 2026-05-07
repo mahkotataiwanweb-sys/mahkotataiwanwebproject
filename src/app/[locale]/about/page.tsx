@@ -9,7 +9,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Award, Store, Package, Users, Shield, Heart, Sparkles, ChevronRight, Star, Globe } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import SandTexture from '@/components/effects/SandTexture';
 import HeroBackground from '@/components/effects/HeroBackground';
 import EditableText from '@/components/EditableText';
 
@@ -785,7 +784,6 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen">
-      <SandTexture fixed />
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes floatSubtle {

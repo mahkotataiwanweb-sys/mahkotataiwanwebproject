@@ -63,7 +63,7 @@
     background-color: #F5F5F5;
     background-image: url('/images/bg-pattern.png');
     background-repeat: repeat;
-    background-size: cover;
+    background-size: 600px auto;
     background-attachment: fixed;
     color: var(--color-navy);
     overflow-x: hidden;

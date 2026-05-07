@@ -25,7 +25,6 @@ import {
   Package,
   Sparkles,
 } from 'lucide-react';
-import SandTexture from '@/components/effects/SandTexture';
 import HeroBackground from '@/components/effects/HeroBackground';
 import EditableText from '@/components/EditableText';
 
@@ -652,7 +651,6 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen">
-      <SandTexture fixed />
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes floatSubtle {

@@ -412,7 +412,7 @@ export default function VideoShowcaseSection() {
         >
           <path
             d="M0,60 C240,110 480,15 720,55 C960,95 1200,10 1440,45 L1440,0 L0,0 Z"
-            fill="var(--color-cream)"
+            fill="#F5F5F5"
           />
           <path
             d="M0,72 C240,122 480,27 720,67 C960,107 1200,22 1440,57"
@@ -436,7 +436,7 @@ export default function VideoShowcaseSection() {
         >
           <path
             d="M0,60 C240,110 480,15 720,55 C960,95 1200,10 1440,45 L1440,0 L0,0 Z"
-            fill="var(--color-cream)"
+            fill="#F5F5F5"
           />
           <path
             d="M0,72 C240,122 480,27 720,67 C960,107 1200,22 1440,57"

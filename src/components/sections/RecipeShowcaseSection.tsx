@@ -319,7 +319,7 @@ export default function RecipeShowcaseSection() {
       {/* Top wave separator */}
       <div className="absolute -top-px left-0 right-0 z-10">
         <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" className="block w-full h-[40px] sm:h-[60px] rotate-180">
-          <path d="M0 60V30C360 5 720 15 1080 8C1260 4 1350 12 1440 25V60H0Z" fill="var(--color-cream-deeper)" />
+          <path d="M0 60V30C360 5 720 15 1080 8C1260 4 1350 12 1440 25V60H0Z" fill="#F5F5F5" />
         </svg>
       </div>
 
@@ -365,7 +365,7 @@ export default function RecipeShowcaseSection() {
       {/* Bottom wave separator */}
       <div className="absolute -bottom-px left-0 right-0 z-10">
         <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" className="block w-full h-[40px] sm:h-[60px]">
-          <path d="M0 60V25C180 40 360 8 720 20C1080 32 1260 5 1440 18V60H0Z" fill="var(--color-cream)" />
+          <path d="M0 60V25C180 40 360 8 720 20C1080 32 1260 5 1440 18V60H0Z" fill="#F5F5F5" />
         </svg>
       </div>
     </section>
