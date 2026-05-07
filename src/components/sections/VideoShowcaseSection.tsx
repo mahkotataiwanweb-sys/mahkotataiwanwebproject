@@ -386,7 +386,9 @@ export default function VideoShowcaseSection() {
   if (isLoading) {
     return (
       <section className="relative py-6 sm:py-12 overflow-hidden">
-        <RedWavyBackground />
+        <div className="absolute inset-0" style={{ clipPath: 'url(#video-section-clip)' }}>
+          <RedWavyBackground />
+        </div>
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
           <div className="h-10 bg-white/20 rounded w-48 mx-auto mb-4 animate-pulse" />
           <div className="h-6 bg-white/15 rounded w-96 mx-auto animate-pulse" />
@@ -400,53 +402,29 @@ export default function VideoShowcaseSection() {
       ref={sectionRef}
       className="py-16 sm:py-24 relative overflow-hidden"
     >
-      <RedWavyBackground />
+      {/* Clip-path SVG definition for wavy edges */}
+      <svg width="0" height="0" className="absolute">
+        <defs>
+          <clipPath id="video-section-clip" clipPathUnits="objectBoundingBox">
+            <path d="M0,0.06 C0.17,0.1 0.33,0.01 0.5,0.05 C0.67,0.09 0.83,0.0 1,0.04 L1,0.96 C0.83,1.0 0.67,0.91 0.5,0.95 C0.33,0.99 0.17,0.9 0,0.94 Z" />
+          </clipPath>
+        </defs>
+      </svg>
 
-      {/* Top wave separator + yellow dashed accent (incoming from cream Discover section) */}
-      <div className="absolute top-0 left-0 right-0 z-20 pointer-events-none">
-        <svg
-          viewBox="0 0 1440 110"
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="block w-full h-[60px] sm:h-[90px]"
-        >
-          <path
-            d="M0,60 C240,110 480,15 720,55 C960,95 1200,10 1440,45 L1440,0 L0,0 Z"
-            fill="#F5F5F5"
-          />
-          <path
-            d="M0,72 C240,122 480,27 720,67 C960,107 1200,22 1440,57"
-            fill="none"
-            stroke="#facc15"
-            strokeWidth="2.5"
-            strokeDasharray="5 9"
-            strokeLinecap="round"
-            opacity="0.85"
-          />
-        </svg>
+      {/* Brand-red background with wavy clip edges - body pattern shows through */}
+      <div className="absolute inset-0" style={{ clipPath: 'url(#video-section-clip)' }}>
+        <RedWavyBackground />
       </div>
 
-      {/* Bottom wave separator + yellow dashed accent (outgoing to cream Where-to-Buy) */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
-        <svg
-          viewBox="0 0 1440 110"
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="block w-full h-[60px] sm:h-[90px] rotate-180"
-        >
-          <path
-            d="M0,60 C240,110 480,15 720,55 C960,95 1200,10 1440,45 L1440,0 L0,0 Z"
-            fill="#F5F5F5"
-          />
-          <path
-            d="M0,72 C240,122 480,27 720,67 C960,107 1200,22 1440,57"
-            fill="none"
-            stroke="#facc15"
-            strokeWidth="2.5"
-            strokeDasharray="5 9"
-            strokeLinecap="round"
-            opacity="0.85"
-          />
+      {/* Yellow dashed accent lines (decorative) */}
+      <div className="absolute top-[4%] left-0 right-0 z-20 pointer-events-none">
+        <svg viewBox="0 0 1440 20" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" className="block w-full h-[12px] sm:h-[16px]">
+          <path d="M0,10 C240,20 480,2 720,12 C960,22 1200,4 1440,14" fill="none" stroke="#facc15" strokeWidth="2.5" strokeDasharray="5 9" strokeLinecap="round" opacity="0.85" />
+        </svg>
+      </div>
+      <div className="absolute bottom-[4%] left-0 right-0 z-20 pointer-events-none">
+        <svg viewBox="0 0 1440 20" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" className="block w-full h-[12px] sm:h-[16px]">
+          <path d="M0,10 C240,0 480,18 720,8 C960,-2 1200,16 1440,6" fill="none" stroke="#facc15" strokeWidth="2.5" strokeDasharray="5 9" strokeLinecap="round" opacity="0.85" />
         </svg>
       </div>
 
