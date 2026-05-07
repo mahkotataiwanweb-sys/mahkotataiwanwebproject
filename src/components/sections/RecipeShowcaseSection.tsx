@@ -187,7 +187,7 @@ function CylinderCarousel({
                     sizes="280px"
                   />
                 ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-red/80 to-navy" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-red to-red-dark" />
                 )}
 
                 {/* Gradient overlay */}
@@ -222,8 +222,8 @@ function CylinderCarousel({
       </div>
 
       {/* Edge fades */}
-      <div className="absolute inset-y-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-navy to-transparent z-10 pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-navy to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-y-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-red-dark to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-red-dark to-transparent z-10 pointer-events-none" />
     </div>
   );
 }
