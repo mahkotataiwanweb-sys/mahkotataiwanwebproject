@@ -400,13 +400,13 @@ export default function VideoShowcaseSection() {
   return (
     <section
       ref={sectionRef}
-      className="py-16 sm:py-24 relative overflow-hidden overflow-x-clip"
+      className="py-16 sm:py-24 sm:pb-32 relative overflow-hidden overflow-x-clip"
     >
       {/* Clip-path SVG definition for wavy edges */}
       <svg width="0" height="0" className="absolute">
         <defs>
           <clipPath id="video-section-clip" clipPathUnits="objectBoundingBox">
-            <path d="M0,0.06 C0.17,0.1 0.33,0.01 0.5,0.05 C0.67,0.09 0.83,0.0 1,0.04 L1,0.96 C0.83,1.0 0.67,0.91 0.5,0.95 C0.33,0.99 0.17,0.9 0,0.94 Z" />
+            <path d="M0,0.05 C0.17,0.08 0.33,0.01 0.5,0.04 C0.67,0.07 0.83,0.0 1,0.03 L1,0.97 C0.83,1.0 0.67,0.93 0.5,0.96 C0.33,0.99 0.17,0.93 0,0.96 Z" />
           </clipPath>
         </defs>
       </svg>
