@@ -399,17 +399,7 @@ function InfiniteSlider({
       style={{ cursor: isDraggingRef.current ? 'grabbing' : 'grab' }}
     >
       <div className="absolute top-0 left-1/2 -translate-x-px w-[2px] h-full bg-navy/8 pointer-events-none z-0" />
-
-      <div
-        className="absolute top-0 left-0 w-24 sm:w-44 h-full z-10 pointer-events-none"
-        style={{ background: 'linear-gradient(to right, var(--color-cream-deeper), transparent)' }}
-      />
-      <div
-        className="absolute top-0 right-0 w-24 sm:w-44 h-full z-10 pointer-events-none"
-        style={{ background: 'linear-gradient(to left, var(--color-cream-deeper), transparent)' }}
-      />
-
-      <div
+<div
         ref={trackRef}
         className="flex select-none touch-none will-change-transform"
         onPointerDown={handlePointerDown}
@@ -598,7 +588,7 @@ export default function ProductCatalogSection() {
         className="relative overflow-hidden py-16 sm:py-24"
         style={{ backgroundColor: 'transparent' }}
       >
-        <WavyTextureBackground />
+        {/* WavyTextureBackground removed */}
 
         <div ref={contentRef} className="relative z-10">
           {/* Section Heading */}
