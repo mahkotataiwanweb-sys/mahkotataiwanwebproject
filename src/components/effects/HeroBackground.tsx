@@ -26,14 +26,14 @@ export default function HeroBackground() {
 
 {/* Floating sparkle elements */}
       <motion.div
-        className="pointer-events-none absolute top-20 right-[15%] text-[#FAEDD3]/10"
+        className="pointer-events-none absolute top-20 right-[15%] text-[#F0F0F0]/10"
         animate={{ y: [0, -15, 0], rotate: [0, 180, 360] }}
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
       >
         <Sparkles className="h-8 w-8" />
       </motion.div>
       <motion.div
-        className="pointer-events-none absolute bottom-16 left-[20%] text-[#FAEDD3]/8"
+        className="pointer-events-none absolute bottom-16 left-[20%] text-[#F0F0F0]/8"
         animate={{ y: [0, 12, 0], rotate: [0, -90, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
       >
@@ -49,7 +49,7 @@ export default function HeroBackground() {
 
       {/* Animated vertical accent line */}
       <motion.div
-        className="absolute right-12 top-16 bottom-16 hidden w-px bg-gradient-to-b from-transparent via-[#FAEDD3]/15 to-transparent lg:block"
+        className="absolute right-12 top-16 bottom-16 hidden w-px bg-gradient-to-b from-transparent via-[#F0F0F0]/15 to-transparent lg:block"
         initial={{ scaleY: 0 }}
         animate={{ scaleY: 1 }}
         transition={{ duration: 1.4, ease: 'easeOut', delay: 0.5 }}
