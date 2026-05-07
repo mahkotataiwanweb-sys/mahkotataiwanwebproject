@@ -11,6 +11,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ChefHat, ArrowRight, Flame, Clock, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
+import RedWavyBackground from '@/components/ui/RedWavyBackground';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -236,7 +237,7 @@ function FloatingParticles() {
       {Array.from({ length: 20 }).map((_, i) => (
         <div
           key={i}
-          className="absolute rounded-full bg-red/20"
+          className="absolute rounded-full bg-white/30"
           style={{
             width: `${2 + (i % 4) * 1.5}px`,
             height: `${2 + (i % 4) * 1.5}px`,
@@ -312,19 +313,10 @@ export default function RecipeShowcaseSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative py-12 sm:py-16 bg-navy overflow-hidden"
+      className="relative py-12 sm:py-16 overflow-hidden"
     >
-      {/* Background effects */}
-      <div className="absolute inset-0 pointer-events-none">
-
-<div
-          className="absolute inset-0 opacity-[0.015]"
-          style={{
-            backgroundImage: 'radial-gradient(rgba(250,237,211,0.5) 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
-          }}
-        />
-      </div>
+      {/* Brand-red wavy texture background */}
+      <RedWavyBackground />
 
       <FloatingParticles />
 
@@ -340,20 +332,20 @@ export default function RecipeShowcaseSection() {
         {/* Heading */}
         <div ref={headingRef} className="text-center mb-6 sm:mb-10 px-6" style={{ perspective: '800px' }}>
           <div className="inline-flex items-center gap-2 mb-4">
-            <Sparkles className="w-4 h-4 text-red" />
-            <span className="text-red text-xs font-bold tracking-[0.3em] uppercase">
+            <Sparkles className="w-4 h-4 text-white/80" />
+            <span className="text-white/85 text-xs font-bold tracking-[0.3em] uppercase">
               {t('fromOurKitchen')}
             </span>
-            <Sparkles className="w-4 h-4 text-red" />
+            <Sparkles className="w-4 h-4 text-white/80" />
           </div>
 
           <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 leading-[1.05]">
             {heading}
           </h2>
 
-          <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-red to-transparent mx-auto mb-4" />
+          <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-white/70 to-transparent mx-auto mb-4" />
 
-          <p className="text-cream/40 max-w-lg mx-auto text-base sm:text-lg tracking-wide">
+          <p className="text-white/70 max-w-lg mx-auto text-base sm:text-lg tracking-wide">
             {subtitle}
           </p>
         </div>
@@ -365,7 +357,7 @@ export default function RecipeShowcaseSection() {
         <div className="text-center mt-6 sm:mt-10 px-6">
           <Link
             href={`/${locale}/recipes`}
-            className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-red to-red/80 text-white font-heading font-bold text-sm sm:text-base tracking-wide shadow-[0_8px_32px_rgba(193,33,38,0.35)] hover:shadow-[0_12px_48px_rgba(193,33,38,0.5)] transition-all duration-500 hover:scale-105"
+            className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white text-red font-heading font-bold text-sm sm:text-base tracking-wide shadow-[0_8px_32px_rgba(0,0,0,0.18)] hover:shadow-[0_12px_48px_rgba(0,0,0,0.28)] transition-all duration-500 hover:scale-105"
           >
             <ChefHat className="w-5 h-5" />
             {ctaText}
