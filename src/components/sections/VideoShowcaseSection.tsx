@@ -386,7 +386,7 @@ export default function VideoShowcaseSection() {
   if (isLoading) {
     return (
       <section className="relative py-6 sm:py-12 overflow-hidden overflow-x-clip">
-        <div className="absolute -inset-x-1 inset-y-0" style={{ clipPath: 'url(#video-section-clip)' }}>
+        <div className="absolute -inset-x-1 inset-y-0 video-section-bg">
           <RedWavyBackground />
         </div>
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
@@ -412,7 +412,8 @@ export default function VideoShowcaseSection() {
       </svg>
 
       {/* Brand-red background with wavy clip edges - body pattern shows through */}
-      <div className="absolute -inset-x-1 inset-y-0" style={{ clipPath: 'url(#video-section-clip)' }}>
+      {/* On mobile: no clip-path (clean rectangle). On md+: wavy clip via CSS class. */}
+      <div className="absolute -inset-x-1 inset-y-0 video-section-bg">
         <RedWavyBackground />
       </div>
 

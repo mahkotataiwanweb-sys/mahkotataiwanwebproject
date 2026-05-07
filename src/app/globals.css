@@ -1113,3 +1113,13 @@ select.admin-input { appearance: none; background-image: url("data:image/svg+xml
   pointer-events: none;
 }
 .admin-search-wrap .admin-input { padding-left: 2.5rem; }
+
+/* Video showcase: disable wavy clip-path on mobile to prevent overflow */
+.video-section-bg {
+  clip-path: none;
+}
+@media (min-width: 768px) {
+  .video-section-bg {
+    clip-path: url(#video-section-clip);
+  }
+}
