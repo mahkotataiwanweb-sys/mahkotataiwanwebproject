@@ -87,7 +87,7 @@ export default function RecipesSection() {
   const viewAllLabel = t('viewAll');
 
   return (
-    <section ref={sectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+    <section ref={sectionRef} className="py-24 sm:py-32 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-1/3 h-full bg-navy/[0.02] -skew-x-12 translate-x-1/4" />
 <div className="max-w-7xl mx-auto px-6">
         {/* Header */}

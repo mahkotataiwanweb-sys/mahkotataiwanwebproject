@@ -156,7 +156,7 @@ export default function ArticleDetailPage() {
   /* ────── loading state ────── */
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFF8EE] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <motion.div
           animate={{ opacity: [0.3, 1, 0.3] }}
           transition={{ duration: 1.5, repeat: Infinity }}
@@ -172,7 +172,7 @@ export default function ArticleDetailPage() {
   /* ────── 404 ────── */
   if (!article) {
     return (
-      <div className="min-h-screen bg-[#FFF8EE] flex flex-col items-center justify-center gap-6 px-6">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-6">
         <div className="w-24 h-24 rounded-full bg-[#003048]/5 flex items-center justify-center">
           <span className="text-5xl">📄</span>
         </div>
@@ -212,7 +212,7 @@ export default function ArticleDetailPage() {
      RENDER
   ══════════════════════════════════════════════════ */
   return (
-    <main className="min-h-screen bg-[#FFF8EE]">
+    <main className="min-h-screen">
       {/* ── Reading progress bar ── */}
       <div className="fixed top-0 left-0 right-0 z-[60] h-[3px]">
         <motion.div

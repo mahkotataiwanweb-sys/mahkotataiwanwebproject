@@ -280,7 +280,7 @@ export default function ActivityPage() {
 
   /* ─── render ─── */
   return (
-    <main className="min-h-screen bg-[#FFF8EE]">
+    <main className="min-h-screen">
       {/* ═══════════════════════════════════════════════
           HERO SECTION
       ═══════════════════════════════════════════════ */}

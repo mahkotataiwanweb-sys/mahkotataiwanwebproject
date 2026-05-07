@@ -596,7 +596,7 @@ export default function ProductCatalogSection() {
         id="products-catalog"
         ref={sectionRef}
         className="relative overflow-hidden py-16 sm:py-24"
-        style={{ backgroundColor: 'var(--color-cream-deeper)' }}
+        style={{ backgroundColor: 'transparent' }}
       >
         <WavyTextureBackground />
 

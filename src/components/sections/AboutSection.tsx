@@ -105,7 +105,7 @@ export default function AboutSection() {
   }, []);
 
   return (
-    <section id="about" ref={sectionRef} className="py-20 sm:py-24 bg-cream relative overflow-hidden">
+    <section id="about" ref={sectionRef} className="py-20 sm:py-24 relative overflow-hidden">
       {/* Decorative with parallax */}
       <div ref={decorRef} className="absolute top-0 right-0 w-1/3 h-full bg-navy/[0.02] -skew-x-12 translate-x-1/4" />
       

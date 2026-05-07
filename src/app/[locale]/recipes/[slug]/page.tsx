@@ -95,7 +95,7 @@ export default function RecipeDetailPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-cream">
+      <main className="min-h-screen">
         <div className="pt-32 pb-16 bg-navy">
           <div className="max-w-4xl mx-auto px-6">
             <div className="h-8 w-48 bg-white/10 rounded animate-pulse mb-6" />
@@ -115,7 +115,7 @@ export default function RecipeDetailPage() {
 
   if (!recipe) {
     return (
-      <main className="min-h-screen bg-cream flex items-center justify-center">
+      <main className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <ChefHat className="w-16 h-16 text-navy/15 mx-auto mb-4" />
           <h2 className="font-heading text-2xl font-bold text-navy mb-2">
@@ -135,7 +135,7 @@ export default function RecipeDetailPage() {
   const sections = content ? parseRecipeContent(content) : [];
 
   return (
-    <main className="min-h-screen bg-cream">
+    <main className="min-h-screen">
       {/* Hero */}
       <section ref={heroRef} className="relative bg-navy overflow-hidden">
         <div className="pt-28 sm:pt-36 pb-8 sm:pb-12 relative z-10 max-w-4xl mx-auto px-6">

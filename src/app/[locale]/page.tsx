@@ -372,7 +372,7 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════
           DISCOVER SECTION — Auto-flipping article cards
       ═══════════════════════════════════════════════ */}
-      <section ref={sectionRef} className="py-20 sm:py-28 bg-cream relative overflow-hidden">
+      <section ref={sectionRef} className="py-20 sm:py-28 relative overflow-hidden">
         <DiscoverWavyTexture />
 
         <div className="max-w-3xl mx-auto px-6 sm:px-10 relative z-10">

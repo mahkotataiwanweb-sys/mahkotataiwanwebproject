@@ -102,7 +102,7 @@ export default function ProductsShowcase() {
     <section
       id="products"
       ref={sectionRef}
-      className="py-24 sm:py-32 bg-white relative overflow-hidden"
+      className="py-24 sm:py-32 relative overflow-hidden"
     >
       {/* Decorative top border */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-navy/10 to-transparent" />

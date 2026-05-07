@@ -784,7 +784,7 @@ export default function AboutPage() {
     : [];
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen">
       <SandTexture fixed />
 
       <style dangerouslySetInnerHTML={{ __html: `
@@ -875,7 +875,7 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Mission / Description Section
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+      <section className="py-24 sm:py-32 relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-6">
           <div ref={textRef}>
             {/* Centered heading */}
@@ -946,7 +946,7 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Values Section
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+      <section className="py-24 sm:py-32 relative overflow-hidden">
 <div ref={valuesRef} className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <div ref={valuesTitleRef}>
@@ -995,7 +995,7 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Our Partners Section — Physics-Based Interactive Marquee
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+      <section className="py-24 sm:py-32 relative overflow-hidden">
 <div ref={partnersRef} className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <motion.div
@@ -1097,7 +1097,7 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Our Story Section — Timeline
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+      <section className="py-24 sm:py-32 relative overflow-hidden">
 <div ref={storyRef} className="max-w-5xl mx-auto px-6">
           {/* Header */}
           <div className="text-center mb-14">

@@ -272,7 +272,7 @@ export default function EventsPage() {
 
   /* ─── render ─── */
   return (
-    <main className="min-h-screen bg-[#FFF8EE]">
+    <main className="min-h-screen">
       {/* ═══════ HERO ═══════ */}
       <section
         ref={heroRef}

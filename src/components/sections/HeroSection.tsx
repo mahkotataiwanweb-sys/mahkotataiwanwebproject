@@ -42,7 +42,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section id="hero" ref={sectionRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-cream">
+    <section id="hero" ref={sectionRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
       {/* Decorative Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
 

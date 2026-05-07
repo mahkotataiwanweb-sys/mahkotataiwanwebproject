@@ -228,7 +228,7 @@ export default function WhereToBuySection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="bg-cream py-20 md:py-28 overflow-hidden relative">
+    <section ref={sectionRef} className="py-20 md:py-28 overflow-hidden relative">
       
         {/* Wavy texture background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">

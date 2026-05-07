@@ -965,7 +965,7 @@ function ProductsContent() {
   const productLabel = t('label');
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen">
       {/* ============ HERO ============ */}
       <div className="relative bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] overflow-hidden">
         <HeroBackground />
@@ -1165,7 +1165,7 @@ function ProductsContent() {
 /* ------------------------------------------------------------------ */
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-cream" />}>
+    <Suspense fallback={<div className="min-h-screen" />}>
       <ProductsContent />
     </Suspense>
   );

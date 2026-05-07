@@ -174,7 +174,7 @@ export default function RecipesPage() {
   const subtitleText = t('subtitle');
 
   return (
-    <main className="min-h-screen bg-cream">
+    <main className="min-h-screen">
       {/* Hero Header */}
       <section className="relative pt-32 sm:pt-40 pb-16 sm:pb-20 bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] overflow-hidden">
         <HeroBackground />

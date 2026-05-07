@@ -52,7 +52,7 @@ export default function ContactSection() {
   }, []);
 
   return (
-    <section id="contact" ref={sectionRef} className="py-20 sm:py-24 bg-white relative overflow-hidden">
+    <section id="contact" ref={sectionRef} className="py-20 sm:py-24 relative overflow-hidden">
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-navy/10 to-transparent" />
 
       <div className="max-w-4xl mx-auto px-6" ref={contentRef}>
