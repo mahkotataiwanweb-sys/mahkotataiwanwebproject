@@ -10,6 +10,7 @@ import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { VideoShowcase } from '@/types/database';
+import RedWavyBackground from '@/components/ui/RedWavyBackground';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -384,10 +385,11 @@ export default function VideoShowcaseSection() {
 
   if (isLoading) {
     return (
-      <section className="py-6 sm:py-12" style={{ backgroundColor: '#004a6e' }}>
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <div className="h-10 bg-gray-200 rounded w-48 mx-auto mb-4 animate-pulse" />
-          <div className="h-6 bg-gray-100 rounded w-96 mx-auto animate-pulse" />
+      <section className="relative py-6 sm:py-12 overflow-hidden">
+        <RedWavyBackground />
+        <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
+          <div className="h-10 bg-white/20 rounded w-48 mx-auto mb-4 animate-pulse" />
+          <div className="h-6 bg-white/15 rounded w-96 mx-auto animate-pulse" />
         </div>
       </section>
     );
@@ -397,9 +399,9 @@ export default function VideoShowcaseSection() {
     <section
       ref={sectionRef}
       className="py-6 sm:py-12 relative overflow-hidden"
-      style={{ backgroundColor: '#004a6e' }}
     >
-      <div className="max-w-6xl mx-auto px-6">
+      <RedWavyBackground />
+      <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Section Header */}
         <motion.div
           className="text-center mb-10"
@@ -408,13 +410,13 @@ export default function VideoShowcaseSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">
+          <p className="text-white/85 text-sm tracking-[0.3em] uppercase font-semibold mb-3">
             {t('visualContent')}
           </p>
           <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight mb-4">
             {t('watchOurStories')}
           </h2>
-          <div className="w-16 h-[2px] bg-red mx-auto mb-6" />
+          <div className="w-16 h-[2px] bg-white/80 mx-auto mb-6" />
           <p className="text-gray-100 max-w-2xl mx-auto text-base sm:text-lg">
             {t('storyDescription')}
           </p>
