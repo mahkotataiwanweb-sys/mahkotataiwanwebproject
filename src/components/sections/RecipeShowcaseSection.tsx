@@ -220,10 +220,6 @@ function CylinderCarousel({
           );
         })}
       </div>
-
-      {/* Edge fades */}
-      <div className="absolute inset-y-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-red-dark to-transparent z-10 pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-red-dark to-transparent z-10 pointer-events-none" />
     </div>
   );
 }
@@ -332,18 +328,18 @@ export default function RecipeShowcaseSection() {
         {/* Heading */}
         <div ref={headingRef} className="text-center mb-6 sm:mb-10 px-6" style={{ perspective: '800px' }}>
           <div className="inline-flex items-center gap-2 mb-4">
-            <Sparkles className="w-4 h-4 text-white/80" />
-            <span className="text-white/85 text-xs font-bold tracking-[0.3em] uppercase">
+            <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+            <span className="text-white text-xs font-bold tracking-[0.3em] uppercase">
               {t('fromOurKitchen')}
             </span>
-            <Sparkles className="w-4 h-4 text-white/80" />
+            <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
           </div>
 
           <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 leading-[1.05]">
             {heading}
           </h2>
 
-          <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-white/70 to-transparent mx-auto mb-4" />
+          <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-yellow-400 to-transparent mx-auto mb-4" />
 
           <p className="text-white/70 max-w-lg mx-auto text-base sm:text-lg tracking-wide">
             {subtitle}
@@ -357,11 +353,11 @@ export default function RecipeShowcaseSection() {
         <div className="text-center mt-6 sm:mt-10 px-6">
           <Link
             href={`/${locale}/recipes`}
-            className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white text-red font-heading font-bold text-sm sm:text-base tracking-wide shadow-[0_8px_32px_rgba(0,0,0,0.18)] hover:shadow-[0_12px_48px_rgba(0,0,0,0.28)] transition-all duration-500 hover:scale-105"
+            className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-yellow-400 text-navy font-heading font-bold text-xs sm:text-sm tracking-wide shadow-[0_6px_20px_rgba(0,0,0,0.18)] hover:shadow-[0_10px_28px_rgba(0,0,0,0.25)] hover:bg-yellow-300 transition-all duration-300 hover:scale-105"
           >
-            <ChefHat className="w-5 h-5" />
+            <ChefHat className="w-4 h-4" />
             {ctaText}
-            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+            <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
         </div>
       </div>

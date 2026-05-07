@@ -98,8 +98,8 @@ function CategoryTab({
       onClick={onClick}
       className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${
         isActive
-          ? 'bg-red text-white shadow-lg'
-          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          ? 'bg-yellow-400 text-navy shadow-lg'
+          : 'bg-white/95 text-gray-700 hover:bg-white'
       }`}
     >
       <Logo />
@@ -398,9 +398,58 @@ export default function VideoShowcaseSection() {
   return (
     <section
       ref={sectionRef}
-      className="py-6 sm:py-12 relative overflow-hidden"
+      className="py-16 sm:py-24 relative overflow-hidden"
     >
       <RedWavyBackground />
+
+      {/* Top wave separator + yellow dashed accent (incoming from cream Discover section) */}
+      <div className="absolute top-0 left-0 right-0 z-20 pointer-events-none">
+        <svg
+          viewBox="0 0 1440 110"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="block w-full h-[60px] sm:h-[90px]"
+        >
+          <path
+            d="M0,60 C240,110 480,15 720,55 C960,95 1200,10 1440,45 L1440,0 L0,0 Z"
+            fill="var(--color-cream)"
+          />
+          <path
+            d="M0,72 C240,122 480,27 720,67 C960,107 1200,22 1440,57"
+            fill="none"
+            stroke="#facc15"
+            strokeWidth="2.5"
+            strokeDasharray="5 9"
+            strokeLinecap="round"
+            opacity="0.85"
+          />
+        </svg>
+      </div>
+
+      {/* Bottom wave separator + yellow dashed accent (outgoing to cream Where-to-Buy) */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
+        <svg
+          viewBox="0 0 1440 110"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="block w-full h-[60px] sm:h-[90px] rotate-180"
+        >
+          <path
+            d="M0,60 C240,110 480,15 720,55 C960,95 1200,10 1440,45 L1440,0 L0,0 Z"
+            fill="var(--color-cream)"
+          />
+          <path
+            d="M0,72 C240,122 480,27 720,67 C960,107 1200,22 1440,57"
+            fill="none"
+            stroke="#facc15"
+            strokeWidth="2.5"
+            strokeDasharray="5 9"
+            strokeLinecap="round"
+            opacity="0.85"
+          />
+        </svg>
+      </div>
+
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Section Header */}
         <motion.div
