@@ -586,19 +586,7 @@ export default function VideoShowcaseSection() {
               ))}
             </div>
 
-            {/* Video Info */}
-            {categoryVideos.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6 }}
-                className="text-center mt-12"
-              >
-                <p className="text-sm text-gray-300">
-                  {t('showingVideos')} {categoryVideos.length} video{categoryVideos.length !== 1 ? 's' : ''}
-                </p>
-              </motion.div>
-            )}
+
           </motion.div>
         )}
       </div>
