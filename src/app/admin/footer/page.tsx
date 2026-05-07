@@ -28,7 +28,7 @@ import {
 } from '@/components/admin/ui';
 import { swapSortOrder } from '@/lib/admin-helpers';
 
-const SECTIONS = ['products', 'moments', 'company'] as const;
+const SECTIONS = ['products', 'journal', 'company'] as const;
 
 interface FormState {
   id?: string;
@@ -191,14 +191,14 @@ export default function FooterPage() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Footer Links"
-        subtitle="Link footer per section (Products · Moments · Company)"
+        subtitle="Link footer per section (Products · Journal · Company)"
         actions={
           <>
             <AdminButton
               variant="ghost"
               iconLeft={<Trash className="w-4 h-4" />}
               onClick={async () => {
-                if (!confirm('Delete all dead footer links (URLs containing /gallery, /news, /lifestyle, /moments, /journal)? This cannot be undone.')) return;
+                if (!confirm('Delete all dead footer links (URLs containing /gallery, /news, /lifestyle, /moments)? This cannot be undone.')) return;
                 try {
                   const res = await fetch('/api/admin/cleanup-nav', { method: 'POST' });
                   const data = await res.json();

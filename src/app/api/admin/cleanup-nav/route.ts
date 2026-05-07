@@ -5,15 +5,15 @@ import { createAdminClient } from '@/lib/supabase';
  * One-shot DB cleanup: delete `navbar_menus` and `footer_links` rows whose
  * URL points to a page that no longer exists on the live site:
  *
- *   /gallery, /news, /lifestyle, /moments, /journal
+ *   /gallery, /news, /lifestyle, /moments
  *
  * Idempotent — running multiple times is a no-op once the dead rows are gone.
  *
  * Returns the rows that were removed so the admin UI can show what changed.
  */
 
-const DEAD_PATTERNS = ['/gallery', '/news', '/lifestyle', '/moments', '/journal'];
-const DEAD_LABELS = ['gallery', 'news', 'lifestyle', 'moments', 'journal'];
+const DEAD_PATTERNS = ['/gallery', '/news', '/lifestyle', '/moments'];
+const DEAD_LABELS = ['gallery', 'news', 'lifestyle', 'moments'];
 
 async function purge(table: 'navbar_menus' | 'footer_links') {
   const admin = createAdminClient();
