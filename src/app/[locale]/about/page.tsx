@@ -834,13 +834,13 @@ export default function AboutPage() {
             className="hero-text inline-block text-base sm:text-lg font-bold tracking-[0.35em] uppercase mb-5 px-6 py-2 rounded-full border border-cream/20"
             style={{
               background: 'linear-gradient(135deg, rgba(193,33,38,0.15), rgba(250,237,211,0.1))',
-              color: '#FAEDD3',
+              color: '#facc15',
               textShadow: '0 0 20px rgba(250,237,211,0.4), 0 0 40px rgba(193,33,38,0.2)',
             }}
             animate={{ opacity: [0.85, 1, 0.85], scale: [0.98, 1, 0.98] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
-            ✦ <EditableText page="about" section="hero" k="label">{t('label')}</EditableText> ✦
+            <span style={{ color: '#C12126' }}>✦</span> <EditableText page="about" section="hero" k="label">{t('label')}</EditableText> <span style={{ color: '#C12126' }}>✦</span>
           </motion.span>
           <h1 className="hero-text text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-5">
             <EditableText page="about" section="hero" k="title">{t('title')}</EditableText>
@@ -903,9 +903,9 @@ export default function AboutPage() {
             {/* Highlights — clean horizontal pills */}
             <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
               {['highlight1', 'highlight2', 'highlight3'].map((key) => (
-                <div key={key} className="flex items-center gap-2.5 bg-white/80 border border-navy/[0.06] rounded-full px-5 py-2.5 shadow-sm">
+                <div key={key} className="flex items-center gap-2.5 bg-yellow-400 border border-yellow-500/30 rounded-full px-5 py-2.5 shadow-sm">
                   <div className="w-1.5 h-1.5 rounded-full bg-red shrink-0" />
-                  <p className="text-navy/70 text-sm font-medium">{t(key)}</p>
+                  <p className="text-navy text-sm font-semibold">{t(key)}</p>
                 </div>
               ))}
             </div>
@@ -923,16 +923,16 @@ export default function AboutPage() {
               const Icon = stat.icon;
               return (
                 <div key={stat.key} className="stat-bubble-item text-center group">
-                  <div className="bg-white border border-navy/[0.06] rounded-xl p-3.5 sm:p-5 shadow-sm hover:shadow-md transition-shadow duration-300">
-                    <div className="w-8 h-8 rounded-lg bg-navy/[0.06] flex items-center justify-center mx-auto mb-2.5 group-hover:bg-red/10 transition-colors duration-300">
-                      <Icon className="w-4 h-4 text-navy/50 group-hover:text-red transition-colors duration-300" />
+                  <div className="bg-red border border-red-dark rounded-xl p-3.5 sm:p-5 shadow-sm hover:shadow-lg transition-shadow duration-300">
+                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center mx-auto mb-2.5 group-hover:bg-yellow-400 transition-colors duration-300">
+                      <Icon className="w-4 h-4 text-navy transition-colors duration-300" />
                     </div>
-                    <div className="text-xl sm:text-2xl font-heading font-bold text-navy mb-0.5">
+                    <div className="text-xl sm:text-2xl font-heading font-bold text-white mb-0.5">
                       {stat.prefix}
                       <span ref={(el) => { counterRefs.current[i] = el; }}>0</span>
                       {stat.suffix}
                     </div>
-                    <p className="text-navy/40 text-[10px] sm:text-[11px] font-medium tracking-[0.12em] uppercase">{t(`stats.${stat.key}`)}</p>
+                    <p className="text-white/80 text-[10px] sm:text-[11px] font-medium tracking-[0.12em] uppercase">{t(`stats.${stat.key}`)}</p>
                   </div>
                 </div>
               );
@@ -1024,8 +1024,6 @@ export default function AboutPage() {
               onPointerCancel={onPointerCancel}
             >
               {/* Gradient fade overlays */}
-              <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-cream to-transparent z-10 pointer-events-none" />
-              <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-cream to-transparent z-10 pointer-events-none" />
 
               {/* Physics-driven track */}
               <div
@@ -1147,9 +1145,9 @@ export default function AboutPage() {
 
                     {/* Content side */}
                     <div className={`md:w-1/2 pl-12 md:pl-0 ${i % 2 === 0 ? 'md:pl-14' : 'md:order-1 md:text-right md:pr-14'}`}>
-                      <div className="bg-white rounded-2xl border border-navy/[0.06] p-7 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                      <div className="bg-yellow-400 rounded-2xl border border-yellow-500/40 p-7 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                         <h3 className="font-heading text-lg sm:text-xl font-bold text-navy mb-2">{milestone.title}</h3>
-                        <p className="text-navy/55 text-sm leading-relaxed">{milestone.description}</p>
+                        <p className="text-navy/85 text-sm leading-relaxed">{milestone.description}</p>
                       </div>
                     </div>
                   </div>

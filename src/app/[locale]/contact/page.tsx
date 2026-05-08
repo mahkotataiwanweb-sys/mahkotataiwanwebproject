@@ -701,13 +701,13 @@ export default function ContactPage() {
             className="hero-text inline-block text-base sm:text-lg font-bold tracking-[0.35em] uppercase mb-5 px-6 py-2 rounded-full border border-cream/20"
             style={{
               background: 'linear-gradient(135deg, rgba(193,33,38,0.15), rgba(250,237,211,0.1))',
-              color: '#FAEDD3',
+              color: '#facc15',
               textShadow: '0 0 20px rgba(250,237,211,0.4), 0 0 40px rgba(193,33,38,0.2)',
             }}
             animate={{ opacity: [0.85, 1, 0.85], scale: [0.98, 1, 0.98] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
-            ✦ <EditableText page="contact" section="hero" k="label">{t('label')}</EditableText> ✦
+            <span style={{ color: '#C12126' }}>✦</span> <EditableText page="contact" section="hero" k="label">{t('label')}</EditableText> <span style={{ color: '#C12126' }}>✦</span>
           </motion.span>
           <h1 className="hero-text text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-5">
             <EditableText page="contact" section="hero" k="title">{t('title')}</EditableText>
@@ -757,12 +757,29 @@ export default function ContactPage() {
                 className="text-navy/60 text-base sm:text-lg tracking-wide leading-relaxed max-w-md mb-10"
               />
 
-              {/* Social Links */}
+              {/* Social Links — brand-coloured icons over a uniform yellow disc */}
               <div>
                 <p className="text-navy font-semibold text-sm mb-4">{t('followUs')}</p>
                 <div className="flex gap-4">
                   {socials.map((s) => {
-                    const Icon = s.icon;
+                    const renderInner = () => {
+                      if (s.label === 'LINE') {
+                        // Trademark green bubble + white "LINE" lettering on yellow disc
+                        return (
+                          <div className="w-9 h-9 rounded-full bg-[#06C755] flex items-center justify-center text-white font-extrabold text-[9px] tracking-wider shadow-sm">
+                            LINE
+                          </div>
+                        );
+                      }
+                      const Icon = s.icon!;
+                      const colorStyle =
+                        s.label === 'TikTok'
+                          ? { color: '#000000' }
+                          : s.label === 'Facebook'
+                            ? { color: '#1877F2' }
+                            : { color: '#E4405F' }; // Instagram pink
+                      return <Icon className="w-7 h-7" style={colorStyle} />;
+                    };
                     return (
                       <motion.a
                         key={s.label}
@@ -770,11 +787,11 @@ export default function ContactPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={s.label}
-                        className="w-[58px] h-[58px] rounded-full border-2 border-navy/15 flex items-center justify-center text-navy/60 hover:bg-red hover:text-white hover:border-red transition-all duration-300"
+                        className="w-[58px] h-[58px] rounded-full bg-yellow-400 hover:bg-yellow-300 flex items-center justify-center transition-all duration-300 shadow-md"
                         whileHover={{ scale: 1.1, y: -2 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        <Icon className="w-6 h-6" />
+                        {renderInner()}
                       </motion.a>
                     );
                   })}
@@ -792,16 +809,16 @@ export default function ContactPage() {
                     href={card.href}
                     target={card.href.startsWith('http') ? '_blank' : undefined}
                     rel={card.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                    className="group bg-white rounded-3xl p-7 shadow-[0_4px_30px_rgba(0,48,72,0.06)] hover:shadow-[0_12px_40px_rgba(0,48,72,0.12)] hover:-translate-y-1 transition-all duration-400 cursor-pointer border border-navy/[0.04]"
+                    className="group bg-red rounded-3xl p-7 shadow-[0_4px_30px_rgba(193,33,38,0.18)] hover:shadow-[0_12px_40px_rgba(193,33,38,0.32)] hover:-translate-y-1 transition-all duration-400 cursor-pointer border border-red-dark/40"
                   >
-                    <div className={`w-[52px] h-[52px] rounded-2xl ${card.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
-                      <Icon className="w-5 h-5 text-red" />
+                    <div className="w-[52px] h-[52px] rounded-2xl bg-white flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-md">
+                      <Icon className="w-5 h-5 text-navy" />
                     </div>
-                    <h4 className="font-semibold text-navy text-sm mb-2">{t(card.label)}</h4>
-                    <p className="text-navy/55 text-sm leading-relaxed group-hover:text-navy/80 transition-colors duration-300">
+                    <h4 className="font-bold text-navy text-sm mb-2">{t(card.label)}</h4>
+                    <p className="text-white/95 text-sm leading-relaxed group-hover:text-white transition-colors duration-300">
                       {card.value}
                     </p>
-                    <p className="text-red/50 text-xs mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-medium">
+                    <p className="text-white/60 text-xs mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-medium">
                       {card.hoverHint}
                     </p>
                   </a>
