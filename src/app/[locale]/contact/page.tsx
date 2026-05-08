@@ -815,7 +815,7 @@ export default function ContactPage() {
             {/* ╔═══════════════════════════════════════════╗
           ║  3. BUSINESS HOURS — Analog Clock Design   ║
           ╚═══════════════════════════════════════════╝ */}
-      <section ref={hoursSectionRef} className="py-24 sm:py-32 relative overflow-hidden">
+      <section ref={hoursSectionRef} className="py-12 sm:py-16 relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-6">
           {/* Section Header — Premium Scroll-Triggered Text Reveal */}
           <div ref={hoursHeaderRef} className="text-center mb-14">
