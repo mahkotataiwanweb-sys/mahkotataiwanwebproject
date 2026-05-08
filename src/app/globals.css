@@ -3,10 +3,10 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-cream: #FAEDD3;
-  --color-cream-light: #FFF8EE;
-  --color-cream-dark: #F0DDB8;
-  --color-cream-deeper: #D4B896;
+  --color-cream: #F0F0F0;
+  --color-cream-light: #F8F8F8;
+  --color-cream-dark: #E0E0E0;
+  --color-cream-deeper: #D0D0D0;
   --color-navy: #003048;
   --color-navy-light: #004A6E;
   --color-navy-dark: #001E2E;
@@ -60,7 +60,11 @@
   
   body {
     font-family: var(--font-body);
-    background-color: var(--color-cream);
+    background-color: #F5F5F5;
+    background-image: url('/images/bg-pattern.png');
+    background-repeat: repeat;
+    background-size: 600px auto;
+    background-attachment: fixed;
     color: var(--color-navy);
     overflow-x: hidden;
   }
@@ -86,7 +90,7 @@
   
   .glass-effect {
     backdrop-filter: blur(20px) saturate(180%);
-    background: rgba(250, 237, 211, 0.75);
+    background: rgba(240, 240, 240, 0.75);
     border: 1px solid rgba(0, 48, 72, 0.1);
   }
   
@@ -205,7 +209,7 @@
     width: 6px;
   }
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: var(--color-cream);
+    background: #F5F5F5;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: var(--color-navy);
@@ -266,7 +270,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-cream);
+  background: #F5F5F5;
 }
 
 .loading-screen .crown-loader {
@@ -504,7 +508,7 @@
   .glass-frost {
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    background: rgba(250, 246, 237, 0.7);
+    background: rgba(245, 245, 245, 0.7);
   }
 
   /* Magnetic hover effect base */
@@ -1109,3 +1113,13 @@ select.admin-input { appearance: none; background-image: url("data:image/svg+xml
   pointer-events: none;
 }
 .admin-search-wrap .admin-input { padding-left: 2.5rem; }
+
+/* Video showcase: disable wavy clip-path on mobile to prevent overflow */
+.video-section-bg {
+  clip-path: none;
+}
+@media (min-width: 768px) {
+  .video-section-bg {
+    clip-path: url(#video-section-clip);
+  }
+}

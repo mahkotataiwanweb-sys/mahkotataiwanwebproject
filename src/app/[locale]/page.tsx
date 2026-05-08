@@ -13,7 +13,7 @@ import ProductCatalogSection from '@/components/sections/ProductCatalogSection';
 import RecipeShowcaseSection from '@/components/sections/RecipeShowcaseSection';
 import VideoShowcaseSection from '@/components/sections/VideoShowcaseSection';
 import WhereToBuySection from '@/components/sections/WhereToBuySection';
-import SandTexture from '@/components/effects/SandTexture';
+// import SandTexture from '@/components/effects/SandTexture';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
@@ -363,7 +363,7 @@ export default function HomePage() {
 
   return (
     <>
-      <SandTexture fixed />
+      {/* SandTexture removed */}
       <HeroSlider />
       <MarqueeSection />
       <ProductCatalogSection />
@@ -372,8 +372,8 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════
           DISCOVER SECTION — Auto-flipping article cards
       ═══════════════════════════════════════════════ */}
-      <section ref={sectionRef} className="py-20 sm:py-28 bg-cream relative overflow-hidden">
-        <DiscoverWavyTexture />
+      <section ref={sectionRef} className="py-20 sm:py-28 relative overflow-hidden">
+        {/* DiscoverWavyTexture removed */}
 
         <div className="max-w-3xl mx-auto px-6 sm:px-10 relative z-10">
           {/* ── Header ── */}

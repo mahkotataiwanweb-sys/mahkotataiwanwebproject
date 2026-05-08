@@ -6,7 +6,7 @@ import { useLocale } from 'next-intl';
 import { useEditableT } from '@/hooks/useEditableT';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { VideoShowcase } from '@/types/database';
@@ -385,8 +385,10 @@ export default function VideoShowcaseSection() {
 
   if (isLoading) {
     return (
-      <section className="relative py-6 sm:py-12 overflow-hidden">
-        <RedWavyBackground />
+      <section className="relative py-6 sm:py-12 overflow-hidden overflow-x-clip">
+        <div className="absolute -inset-x-1 inset-y-0 video-section-bg">
+          <RedWavyBackground />
+        </div>
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
           <div className="h-10 bg-white/20 rounded w-48 mx-auto mb-4 animate-pulse" />
           <div className="h-6 bg-white/15 rounded w-96 mx-auto animate-pulse" />
@@ -398,57 +400,24 @@ export default function VideoShowcaseSection() {
   return (
     <section
       ref={sectionRef}
-      className="py-16 sm:py-24 relative overflow-hidden"
+      className="py-16 sm:py-24 sm:pb-32 relative overflow-hidden overflow-x-clip"
     >
-      <RedWavyBackground />
+      {/* Clip-path SVG definition for wavy edges */}
+      <svg width="0" height="0" className="absolute">
+        <defs>
+          <clipPath id="video-section-clip" clipPathUnits="objectBoundingBox">
+            <path d="M0,0.05 C0.17,0.08 0.33,0.01 0.5,0.04 C0.67,0.07 0.83,0.0 1,0.03 L1,0.97 C0.83,1.0 0.67,0.93 0.5,0.96 C0.33,0.99 0.17,0.93 0,0.96 Z" />
+          </clipPath>
+        </defs>
+      </svg>
 
-      {/* Top wave separator + yellow dashed accent (incoming from cream Discover section) */}
-      <div className="absolute top-0 left-0 right-0 z-20 pointer-events-none">
-        <svg
-          viewBox="0 0 1440 110"
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="block w-full h-[60px] sm:h-[90px]"
-        >
-          <path
-            d="M0,60 C240,110 480,15 720,55 C960,95 1200,10 1440,45 L1440,0 L0,0 Z"
-            fill="var(--color-cream)"
-          />
-          <path
-            d="M0,72 C240,122 480,27 720,67 C960,107 1200,22 1440,57"
-            fill="none"
-            stroke="#facc15"
-            strokeWidth="2.5"
-            strokeDasharray="5 9"
-            strokeLinecap="round"
-            opacity="0.85"
-          />
-        </svg>
+      {/* Brand-red background with wavy clip edges - body pattern shows through */}
+      {/* On mobile: no clip-path (clean rectangle). On md+: wavy clip via CSS class. */}
+      <div className="absolute -inset-x-1 inset-y-0 video-section-bg">
+        <RedWavyBackground />
       </div>
 
-      {/* Bottom wave separator + yellow dashed accent (outgoing to cream Where-to-Buy) */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
-        <svg
-          viewBox="0 0 1440 110"
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="block w-full h-[60px] sm:h-[90px] rotate-180"
-        >
-          <path
-            d="M0,60 C240,110 480,15 720,55 C960,95 1200,10 1440,45 L1440,0 L0,0 Z"
-            fill="var(--color-cream)"
-          />
-          <path
-            d="M0,72 C240,122 480,27 720,67 C960,107 1200,22 1440,57"
-            fill="none"
-            stroke="#facc15"
-            strokeWidth="2.5"
-            strokeDasharray="5 9"
-            strokeLinecap="round"
-            opacity="0.85"
-          />
-        </svg>
-      </div>
+
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Section Header */}
@@ -459,13 +428,17 @@ export default function VideoShowcaseSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <p className="text-white/85 text-sm tracking-[0.3em] uppercase font-semibold mb-3">
-            {t('visualContent')}
-          </p>
+          <div className="inline-flex items-center gap-2 mb-3">
+            <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+            <span className="text-white text-xs font-bold tracking-[0.3em] uppercase">
+              {t('visualContent')}
+            </span>
+            <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+          </div>
           <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight mb-4">
             {t('watchOurStories')}
           </h2>
-          <div className="w-16 h-[2px] bg-white/80 mx-auto mb-6" />
+          <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-yellow-400 to-transparent mx-auto mb-6" />
           <p className="text-gray-100 max-w-2xl mx-auto text-base sm:text-lg">
             {t('storyDescription')}
           </p>
@@ -614,19 +587,7 @@ export default function VideoShowcaseSection() {
               ))}
             </div>
 
-            {/* Video Info */}
-            {categoryVideos.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6 }}
-                className="text-center mt-12"
-              >
-                <p className="text-sm text-gray-300">
-                  {t('showingVideos')} {categoryVideos.length} video{categoryVideos.length !== 1 ? 's' : ''}
-                </p>
-              </motion.div>
-            )}
+
           </motion.div>
         )}
       </div>

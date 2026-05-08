@@ -311,16 +311,19 @@ export default function RecipeShowcaseSection() {
       ref={sectionRef}
       className="relative py-12 sm:py-16 overflow-hidden"
     >
-      {/* Brand-red wavy texture background */}
-      <RedWavyBackground />
+      {/* Clip-path SVG definition for wavy edges */}
+      <svg width="0" height="0" className="absolute">
+        <defs>
+          <clipPath id="recipe-section-clip" clipPathUnits="objectBoundingBox">
+            <path d="M0,0.08 C0.25,0.0 0.5,0.05 0.75,0.01 C0.88,0.0 1,0.04 1,0.04 L1,0.93 C0.85,0.98 0.65,1.0 0.5,0.97 C0.35,0.94 0.15,1.0 0,0.95 Z" />
+          </clipPath>
+        </defs>
+      </svg>
 
-      <FloatingParticles />
-
-      {/* Top wave separator */}
-      <div className="absolute -top-px left-0 right-0 z-10">
-        <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" className="block w-full h-[40px] sm:h-[60px] rotate-180">
-          <path d="M0 60V30C360 5 720 15 1080 8C1260 4 1350 12 1440 25V60H0Z" fill="var(--color-cream-deeper)" />
-        </svg>
+      {/* Brand-red background with wavy clip edges - body pattern shows through */}
+      <div className="absolute inset-0" style={{ clipPath: 'url(#recipe-section-clip)' }}>
+        <RedWavyBackground />
+        <FloatingParticles />
       </div>
 
       {/* Content */}
@@ -362,12 +365,7 @@ export default function RecipeShowcaseSection() {
         </div>
       </div>
 
-      {/* Bottom wave separator */}
-      <div className="absolute -bottom-px left-0 right-0 z-10">
-        <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" className="block w-full h-[40px] sm:h-[60px]">
-          <path d="M0 60V25C180 40 360 8 720 20C1080 32 1260 5 1440 18V60H0Z" fill="var(--color-cream)" />
-        </svg>
-      </div>
+
     </section>
   );
 }

@@ -25,7 +25,6 @@ import {
   Package,
   Sparkles,
 } from 'lucide-react';
-import SandTexture from '@/components/effects/SandTexture';
 import HeroBackground from '@/components/effects/HeroBackground';
 import EditableText from '@/components/EditableText';
 
@@ -651,8 +650,7 @@ export default function ContactPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-cream">
-      <SandTexture fixed />
+    <div className="min-h-screen">
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes floatSubtle {
@@ -742,7 +740,7 @@ export default function ContactPage() {
       {/* ╔═══════════════════════════════════════════╗
           ║  2. CONTACT CARDS — Premium 2-Col Layout  ║
           ╚═══════════════════════════════════════════╝ */}
-      <section ref={contactSectionRef} className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+      <section ref={contactSectionRef} className="py-24 sm:py-32 relative overflow-hidden">
 <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             {/* Left — Heading + Socials */}
@@ -1000,7 +998,7 @@ export default function ContactPage() {
       {/* ╔═══════════════════════════════════════════╗
           ║  4. FAQ — Premium Accordion               ║
           ╚═══════════════════════════════════════════╝ */}
-      <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+      <section className="py-24 sm:py-32 relative overflow-hidden">
 <div className="max-w-3xl mx-auto px-6">
           {/* Section Header */}
           <div ref={faqHeaderRef} className="text-center mb-14">
@@ -1026,7 +1024,7 @@ export default function ContactPage() {
       {/* ╔═══════════════════════════════════════════╗
           ║  5. GOOGLE MAPS                            ║
           ╚═══════════════════════════════════════════╝ */}
-      <section className="py-24 sm:py-32 bg-cream relative overflow-hidden">
+      <section className="py-24 sm:py-32 relative overflow-hidden">
         <div className="max-w-6xl mx-auto px-6">
           {/* Section Header — Premium Reveal */}
           <motion.div
@@ -1089,7 +1087,7 @@ export default function ContactPage() {
       {/* ╔═══════════════════════════════════════════╗
           ║  6. CTA — Premium Floating Box             ║
           ╚═══════════════════════════════════════════╝ */}
-      <section className="py-20 sm:py-28 bg-cream relative overflow-hidden">
+      <section className="py-20 sm:py-28 relative overflow-hidden">
         <motion.div
           ref={ctaRef}
           initial={{ opacity: 0, y: 80, scale: 0.92 }}

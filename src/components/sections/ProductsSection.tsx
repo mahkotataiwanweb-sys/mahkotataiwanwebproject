@@ -73,7 +73,7 @@ export default function ProductsSection() {
   }, []);
 
   return (
-    <section id="products" ref={sectionRef} className="py-24 sm:py-32 bg-white relative overflow-hidden">
+    <section id="products" ref={sectionRef} className="py-24 sm:py-32 relative overflow-hidden">
       {/* Decorative */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-navy/10 to-transparent" />
       

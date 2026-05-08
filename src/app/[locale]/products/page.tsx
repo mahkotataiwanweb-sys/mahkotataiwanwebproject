@@ -17,7 +17,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import CategoryIcon from '@/components/ui/CategoryIcon';
 import HeroBackground from '@/components/effects/HeroBackground';
-import SandTexture from '@/components/effects/SandTexture';
 import { getLocalizedField } from '@/lib/utils';
 import type { Product, Category } from '@/types/database';
 
@@ -965,7 +964,7 @@ function ProductsContent() {
   const productLabel = t('label');
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen">
       {/* ============ HERO ============ */}
       <div className="relative bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] overflow-hidden">
         <HeroBackground />
@@ -1055,7 +1054,6 @@ function ProductsContent() {
           </svg>
         </div>
         {/* Subtle grain overlay */}
-        <div className="absolute inset-0 z-[1] pointer-events-none opacity-30"><SandTexture /></div>
       <div ref={contentRef} className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20 scroll-mt-8 min-h-[60vh]">
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
@@ -1165,7 +1163,7 @@ function ProductsContent() {
 /* ------------------------------------------------------------------ */
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-cream" />}>
+    <Suspense fallback={<div className="min-h-screen" />}>
       <ProductsContent />
     </Suspense>
   );

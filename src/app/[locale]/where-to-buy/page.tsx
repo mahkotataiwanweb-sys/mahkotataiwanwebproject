@@ -339,7 +339,7 @@ export default function WhereToBuyPage() {
   ];
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-cream relative">
+    <div ref={containerRef} className="min-h-screen relative">
       {/* ─── Parallax Glow Orbs ─── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
 

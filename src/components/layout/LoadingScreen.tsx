@@ -16,7 +16,14 @@ export default function LoadingScreen() {
     <AnimatePresence>
       {isLoading && (
         <motion.div
-          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-cream"
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
+          style={{
+            backgroundColor: '#F5F5F5',
+            backgroundImage: "url('/images/bg-pattern.png')",
+            backgroundRepeat: 'repeat',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
           exit={{ y: '-100%' }}
           transition={{ duration: 0.8, ease: [0.65, 0, 0.35, 1] }}
         >
