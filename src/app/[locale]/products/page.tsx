@@ -982,12 +982,11 @@ function ProductsContent() {
             <div className="hero-reveal flex items-center gap-3 mb-5">
               <div className="w-10 h-[2px] bg-red rounded-full" />
               <span className="text-red text-sm tracking-[0.3em] uppercase font-semibold">
-                {t('title')}
+                {t('halal')}
               </span>
             </div>
 
             <h1 className="hero-reveal font-heading text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-[0.95]">
-              {t('title')}<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cream via-white to-cream/70">
                 {t('label')}
               </span>
@@ -1004,7 +1003,7 @@ function ProductsContent() {
             <div className="hero-reveal flex gap-10 mt-10 pt-8 border-t border-white/10">
               <div>
                 <span className="font-heading text-3xl sm:text-4xl font-bold text-white">{products.length}</span>
-                <p className="text-cream/40 text-sm mt-1">{t('title')}</p>
+                <p className="text-cream/40 text-sm mt-1">{t('label')}</p>
               </div>
               <div>
                 <span className="font-heading text-3xl sm:text-4xl font-bold text-white">{categories.length}</span>
@@ -1038,21 +1037,6 @@ function ProductsContent() {
 
       {/* ============ CONTENT ============ */}
       <div className="relative overflow-hidden">
-        {/* Wavy SVG texture — visible background pattern behind products */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="wavy-products" x="0" y="0" width="180" height="30" patternUnits="userSpaceOnUse">
-                <path d="M0,15 Q30,7 45,15 T90,15 Q120,23 135,15 T180,15" fill="none" stroke="rgba(0,0,0,0.07)" strokeWidth="1.5" />
-              </pattern>
-              <pattern id="wavy-products-2" x="40" y="7" width="220" height="35" patternUnits="userSpaceOnUse">
-                <path d="M0,17.5 Q40,11.5 55,17.5 T110,17.5 Q150,23.5 165,17.5 T220,17.5" fill="none" stroke="rgba(0,0,0,0.04)" strokeWidth="1.2" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#wavy-products)" />
-            <rect width="100%" height="100%" fill="url(#wavy-products-2)" />
-          </svg>
-        </div>
         {/* Subtle grain overlay */}
       <div ref={contentRef} className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20 scroll-mt-8 min-h-[60vh]">
         {loading ? (

@@ -1163,7 +1163,7 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Bottom CTA — Premium Floating Box
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28 bg-cream relative overflow-hidden">
+      <section className="py-20 sm:py-28 relative overflow-hidden">
 <motion.div
           ref={ctaRef}
           initial={{ opacity: 0, y: 80, scale: 0.92 }}

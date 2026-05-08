@@ -36,7 +36,7 @@ export default function SandTexture({ fixed = false }: { fixed?: boolean }) {
       data[i] = intensity + warmth;     // R (warmer)
       data[i + 1] = intensity + Math.floor(warmth * 0.6); // G
       data[i + 2] = intensity - warmth;  // B (cooler = less blue)
-      data[i + 3] = Math.floor(grain * 18); // Very low alpha (0-18)
+      data[i + 3] = Math.floor(grain * 10); // Very low alpha (0-10) — subtler grain
     }
 
     ctx.putImageData(imageData, 0, 0);
@@ -95,7 +95,7 @@ export default function SandTexture({ fixed = false }: { fixed?: boolean }) {
           inset: '-260px',
           backgroundImage: `url(${noiseUrl})`,
           backgroundRepeat: 'repeat',
-          opacity: 0.7,
+          opacity: 0.32,
         }}
       />
       {/* Secondary layer — scaled up for depth, slightly different drift */}
@@ -106,7 +106,7 @@ export default function SandTexture({ fixed = false }: { fixed?: boolean }) {
           inset: '-260px',
           backgroundImage: `url(${noiseUrl})`,
           backgroundRepeat: 'repeat',
-          opacity: 0.4,
+          opacity: 0.18,
           mixBlendMode: 'multiply',
         }}
       />
