@@ -382,13 +382,13 @@ export default function WhereToBuyPage() {
             className="hero-text inline-block text-base sm:text-lg font-bold tracking-[0.35em] uppercase mb-5 px-6 py-2 rounded-full border border-cream/20"
             style={{
               background: 'linear-gradient(135deg, rgba(193,33,38,0.15), rgba(250,237,211,0.1))',
-              color: '#FAEDD3',
+              color: '#facc15',
               textShadow: '0 0 20px rgba(250,237,211,0.4), 0 0 40px rgba(193,33,38,0.2)',
             }}
             animate={{ opacity: [0.85, 1, 0.85], scale: [0.98, 1, 0.98] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
-            ✦ {t('label')} ✦
+            <span style={{ color: '#C12126' }}>✦</span> {t('label')} <span style={{ color: '#C12126' }}>✦</span>
           </motion.span>
           <h1 className="hero-text text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-5">
             {t('title')}

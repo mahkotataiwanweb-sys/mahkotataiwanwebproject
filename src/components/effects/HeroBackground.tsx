@@ -24,27 +24,27 @@ export default function HeroBackground() {
       {/* Decorative circles */}
 
 
-{/* Floating sparkle elements */}
+{/* Floating sparkle elements — brand yellow */}
       <motion.div
-        className="pointer-events-none absolute top-20 right-[15%] text-[#F0F0F0]/10"
+        className="pointer-events-none absolute top-20 right-[15%] text-[#facc15]/55"
         animate={{ y: [0, -15, 0], rotate: [0, 180, 360] }}
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <Sparkles className="h-8 w-8" />
+        <Sparkles className="h-8 w-8" fill="currentColor" />
       </motion.div>
       <motion.div
-        className="pointer-events-none absolute bottom-16 left-[20%] text-[#F0F0F0]/8"
+        className="pointer-events-none absolute bottom-16 left-[20%] text-[#facc15]/45"
         animate={{ y: [0, 12, 0], rotate: [0, -90, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
       >
-        <Sparkles className="h-6 w-6" />
+        <Sparkles className="h-6 w-6" fill="currentColor" />
       </motion.div>
       <motion.div
-        className="pointer-events-none absolute top-1/2 right-[8%] text-[#C12126]/15"
+        className="pointer-events-none absolute top-1/2 right-[8%] text-[#facc15]/60"
         animate={{ y: [0, -10, 0], scale: [1, 1.2, 1] }}
         transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
       >
-        <Sparkles className="h-5 w-5" />
+        <Sparkles className="h-5 w-5" fill="currentColor" />
       </motion.div>
 
       {/* Animated vertical accent line */}
