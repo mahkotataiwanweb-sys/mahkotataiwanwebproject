@@ -204,13 +204,7 @@ export default function HeroSlider() {
     setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
   }, [slides.length]);
 
-  useEffect(() => {
-    if (isPaused || slides.length <= 1) return;
-    timerRef.current = setInterval(nextSlide, AUTOPLAY_INTERVAL);
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [isPaused, nextSlide, slides.length]);
+  // Autoplay disabled — manual navigation only via arrows/dots
 
   /* ✨ Subtle scroll parallax — text layers move at different speeds for depth */
   useEffect(() => {
@@ -412,7 +406,7 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full h-[65vh] sm:h-[70vh] overflow-hidden"
+      className="relative w-full h-[65vh] sm:h-[70vh] overflow-hidden mt-[72px]"
       style={{ transformOrigin: 'center center' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
