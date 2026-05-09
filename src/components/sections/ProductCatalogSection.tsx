@@ -599,7 +599,19 @@ export default function ProductCatalogSection() {
             <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-navy mb-3 drop-shadow-sm">
               {t('title')}
             </h2>
-            <div className="w-16 h-[2px] bg-red mx-auto mb-4 rounded-full" />
+            <motion.div
+              className="h-[2px] bg-red mx-auto mb-4 rounded-full origin-center"
+              initial={{ width: 0, opacity: 0 }}
+              whileInView={{ width: 64, opacity: 1 }}
+              viewport={{ once: false, margin: '-80px' }}
+              transition={{ duration: 1.1, ease: [0.22, 0.68, 0, 1] }}
+            >
+              <motion.span
+                className="block h-full bg-gradient-to-r from-transparent via-red-light to-transparent rounded-full"
+                animate={{ x: ['-100%', '100%'] }}
+                transition={{ duration: 2.4, ease: 'easeInOut', repeat: Infinity }}
+              />
+            </motion.div>
             <p className="text-navy/60 text-base sm:text-lg md:text-xl font-body tracking-wide">
               {t('tagline')}
             </p>
