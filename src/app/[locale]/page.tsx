@@ -250,7 +250,11 @@ export default function HomePage() {
 
   return (
     <>
-      <HeroSlider />
+      {/* Homepage navbar is always yellow + opaque, so push the hero down
+          below it instead of letting the slider sit under a fixed nav. */}
+      <div className="pt-24 sm:pt-28">
+        <HeroSlider />
+      </div>
       <MarqueeSection />
       <ProductCatalogSection />
       <RecipeShowcaseSection />

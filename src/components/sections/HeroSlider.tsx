@@ -267,7 +267,7 @@ export default function HeroSlider() {
   const slideVariants = {
     enter: () => ({
       opacity: 0,
-      scale: 1.06,
+      scale: 1.02,
       zIndex: 2,
     }),
     center: {
@@ -277,7 +277,7 @@ export default function HeroSlider() {
     },
     exit: () => ({
       opacity: 0,
-      scale: 0.97,
+      scale: 1,
       zIndex: 1,
     }),
   };
@@ -392,9 +392,9 @@ export default function HeroSlider() {
       <motion.div
         ref={imageRef}
         className="absolute inset-0"
-        initial={{ scale: 1.12 }}
+        initial={{ scale: 1.04 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 10, ease: 'linear' }}
+        transition={{ duration: 12, ease: 'linear' }}
       >
         <Image
           src={currentSlide.image_url}
@@ -431,8 +431,8 @@ export default function HeroSlider() {
           style={{ willChange: 'transform, opacity' }}
         >
           {renderSlideMedia()}
-          {/* Dark overlay for text readability */}
-          <div className="absolute inset-0 bg-black/40" />
+          {/* Soft bottom gradient — keeps the image bright while preserving readable text */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent pointer-events-none" />
         </motion.div>
       </AnimatePresence>
 

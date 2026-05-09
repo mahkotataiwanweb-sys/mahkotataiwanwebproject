@@ -66,7 +66,9 @@ export default function Navbar() {
   const isDarkHeaderPage = darkHeaderPages.some(
     (p) => pathname === `/${locale}${p}` || pathname.startsWith(`/${locale}${p}/`)
   );
-  const useLightText = !isScrolled && (isHomePage || isDarkHeaderPage);
+  // Homepage uses a yellow header with navy text — never light. Other dark
+  // pages keep the original behaviour where unscrolled = light text.
+  const useLightText = !isScrolled && !isHomePage && isDarkHeaderPage;
 
   // Observe hero brightness
   useEffect(() => {
@@ -490,7 +492,11 @@ export default function Navbar() {
       <motion.header
         className={cn(
           'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
-          isScrolled ? 'glass-effect py-3 shadow-sm' : 'bg-transparent py-5'
+          isHomePage
+            ? 'bg-yellow-400 shadow-md py-3'
+            : isScrolled
+              ? 'glass-effect py-3 shadow-sm'
+              : 'bg-transparent py-5'
         )}
         animate={{ y: isHidden ? -100 : 0 }}
         transition={{ duration: 0.3 }}
@@ -507,7 +513,7 @@ export default function Navbar() {
                   scale: { duration: 4, ease: 'easeInOut', repeat: Infinity },
                 }}
                 className="relative"
-                style={{ marginTop: isScrolled ? '-8px' : '-16px' }}
+                style={{ marginTop: (isScrolled || isHomePage) ? '-8px' : '-16px' }}
               >
                 <motion.div className="absolute inset-0 rounded-full"
                   animate={{ opacity: [0.15, 0.3, 0.15], scale: [1, 1.2, 1] }}
