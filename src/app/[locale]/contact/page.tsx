@@ -203,7 +203,7 @@ function FAQItem({ faq, index }: { faq: { icon: any; question: string; answer: s
 
   return (
     <motion.div
-      className="faq-item bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 border border-navy/5"
+      className="faq-item bg-yellow-400 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 border border-yellow-500/40"
       initial={false}
     >
       <button
@@ -701,13 +701,13 @@ export default function ContactPage() {
             className="hero-text inline-block text-base sm:text-lg font-bold tracking-[0.35em] uppercase mb-5 px-6 py-2 rounded-full border border-cream/20"
             style={{
               background: 'linear-gradient(135deg, rgba(193,33,38,0.15), rgba(250,237,211,0.1))',
-              color: '#facc15',
-              textShadow: '0 0 20px rgba(250,237,211,0.4), 0 0 40px rgba(193,33,38,0.2)',
+              color: '#FFFFFF',
+              textShadow: '0 0 20px rgba(255,255,255,0.4), 0 0 40px rgba(193,33,38,0.2)',
             }}
             animate={{ opacity: [0.85, 1, 0.85], scale: [0.98, 1, 0.98] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
-            <span style={{ color: '#C12126' }}>✦</span> <EditableText page="contact" section="hero" k="label">{t('label')}</EditableText> <span style={{ color: '#C12126' }}>✦</span>
+            <span style={{ color: '#facc15' }}>✦</span> <EditableText page="contact" section="hero" k="label">{t('label')}</EditableText> <span style={{ color: '#facc15' }}>✦</span>
           </motion.span>
           <h1 className="hero-text text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-5">
             <EditableText page="contact" section="hero" k="title">{t('title')}</EditableText>
@@ -787,7 +787,7 @@ export default function ContactPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={s.label}
-                        className="w-[58px] h-[58px] rounded-full bg-yellow-400 hover:bg-yellow-300 flex items-center justify-center transition-all duration-300 shadow-md"
+                        className="w-[58px] h-[58px] rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-all duration-300 shadow-md"
                         whileHover={{ scale: 1.1, y: -2 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -811,14 +811,14 @@ export default function ContactPage() {
                     rel={card.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                     className="group bg-red rounded-3xl p-7 shadow-[0_4px_30px_rgba(193,33,38,0.18)] hover:shadow-[0_12px_40px_rgba(193,33,38,0.32)] hover:-translate-y-1 transition-all duration-400 cursor-pointer border border-red-dark/40"
                   >
-                    <div className="w-[52px] h-[52px] rounded-2xl bg-white flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-md">
+                    <div className="w-[52px] h-[52px] rounded-2xl bg-yellow-400 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-md">
                       <Icon className="w-5 h-5 text-navy" />
                     </div>
-                    <h4 className="font-bold text-navy text-sm mb-2">{t(card.label)}</h4>
-                    <p className="text-white/95 text-sm leading-relaxed group-hover:text-white transition-colors duration-300">
+                    <h4 className="font-bold text-white text-sm mb-2">{t(card.label)}</h4>
+                    <p className="text-yellow-300 text-sm leading-relaxed group-hover:text-yellow-200 transition-colors duration-300 font-medium">
                       {card.value}
                     </p>
-                    <p className="text-white/60 text-xs mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-medium">
+                    <p className="text-navy text-xs mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-semibold">
                       {card.hoverHint}
                     </p>
                   </a>
@@ -1060,7 +1060,7 @@ export default function ContactPage() {
           </motion.div>
 
           <div ref={mapRef}>
-            <div className="bg-white rounded-3xl p-3 sm:p-4 shadow-[0_4px_30px_rgba(0,48,72,0.08)] border border-navy/[0.04] overflow-hidden">
+            <div className="bg-yellow-400 rounded-3xl p-3 sm:p-4 shadow-[0_4px_30px_rgba(0,48,72,0.08)] border border-yellow-500/40 overflow-hidden">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.5!2d121.37!3d25.07!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjXCsDA0JzEyLjAiTiAxMjHCsDIyJzEyLjAiRQ!5e0!3m2!1sen!2stw!4v1"
                 width="100%"
