@@ -22,9 +22,11 @@ export default function ProductsShowcase() {
   const [products, setProducts] = useState<Product[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const ITEMS_PER_PAGE = 3;
 
   // Fetch data from Supabase
   useEffect(() => {
@@ -54,19 +56,28 @@ export default function ProductsShowcase() {
     fetchData();
   }, []);
 
-  // Header animation removed — static display
-
   const filteredProducts =
     activeCategory === 'all'
       ? products
       : products.filter((p) => p.category_id === activeCategory);
 
-  const scrollLeft = () => {
-    scrollContainerRef.current?.scrollBy({ left: -320, behavior: 'smooth' });
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const currentProducts = filteredProducts.slice(
+    page * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE + ITEMS_PER_PAGE
+  );
+
+  // Reset page when category changes
+  useEffect(() => {
+    setPage(0);
+  }, [activeCategory]);
+
+  const goNext = () => {
+    if (page < totalPages - 1) setPage(page + 1);
   };
 
-  const scrollRight = () => {
-    scrollContainerRef.current?.scrollBy({ left: 320, behavior: 'smooth' });
+  const goPrev = () => {
+    if (page > 0) setPage(page - 1);
   };
 
   const getCategoryName = (categoryId: string) => {
@@ -94,7 +105,6 @@ export default function ProductsShowcase() {
             <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy mb-3">
               {t('title')}
             </h2>
-            <div className="w-16 h-[2px] bg-red mb-4" />
             <p className="text-navy/60 max-w-lg">
               {t('showcaseSubtitle')}
             </p>
@@ -136,39 +146,14 @@ export default function ProductsShowcase() {
           ))}
         </div>
 
-        {/* Products Horizontal Carousel */}
-        <div className="relative group/carousel">
-          {/* Scroll buttons */}
-          {filteredProducts.length > 3 && (
-            <>
-              <button
-                onClick={scrollLeft}
-                className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-navy/10 flex items-center justify-center text-navy hover:bg-cream transition-colors opacity-0 group-hover/carousel:opacity-100 duration-300"
-                aria-label="Scroll left"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                onClick={scrollRight}
-                className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-navy/10 flex items-center justify-center text-navy hover:bg-cream transition-colors opacity-0 group-hover/carousel:opacity-100 duration-300"
-                aria-label="Scroll right"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </>
-          )}
-
-          <div
-            ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {loading ? (
-              // Loading skeletons
-              Array.from({ length: 4 }).map((_, i) => (
+        {/* Products Grid - 3 per page */}
+        <div className="relative">
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {Array.from({ length: 3 }).map((_, i) => (
                 <div
                   key={`skeleton-${i}`}
-                  className="flex-shrink-0 w-72 bg-cream rounded-2xl overflow-hidden animate-pulse"
+                  className="bg-cream rounded-2xl overflow-hidden animate-pulse"
                 >
                   <div className="aspect-square bg-cream-dark" />
                   <div className="p-5 space-y-3">
@@ -176,66 +161,112 @@ export default function ProductsShowcase() {
                     <div className="h-5 bg-cream-dark rounded w-40" />
                   </div>
                 </div>
-              ))
-            ) : filteredProducts.length === 0 ? (
-              <div className="w-full text-center py-16">
-                <Package className="w-12 h-12 text-navy/20 mx-auto mb-3" />
-                <p className="text-navy/40">{t('noProductsInCategory')}</p>
-              </div>
-            ) : (
-              <AnimatePresence mode="popLayout">
-                {filteredProducts.map((product) => (
-                  <motion.div
-                    key={product.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.4 }}
-                    className="flex-shrink-0 w-72 group"
-                  >
-                    <div className="bg-cream rounded-2xl overflow-hidden hover-lift premium-shadow">
-                      {/* Image */}
-                      <div className="aspect-square bg-gradient-to-br from-cream to-cream-dark flex items-center justify-center relative overflow-hidden">
-                        {product.image_url ? (
-                          <Image
-                            src={product.image_url}
-                            alt={getLocalizedField(product, 'name', locale)}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                            sizes="288px"
-                          />
-                        ) : (
-                          <div className="text-center">
-                            <Package className="w-12 h-12 text-navy/20 mx-auto mb-2" />
-                            <p className="text-navy/30 text-xs">{t('productImage')}</p>
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-navy/0 group-hover:bg-navy/5 transition-colors duration-500" />
-                      </div>
-                      {/* Info */}
-                      <div className="p-5">
-                        <span className="text-xs text-red/80 font-medium uppercase tracking-wider">
-                          {getCategoryName(product.category_id)}
-                        </span>
-                        <h3 className="font-heading text-lg font-semibold text-navy mt-1 group-hover:text-red transition-colors duration-300">
-                          {getLocalizedField(product, 'name', locale)}
-                        </h3>
+              ))}
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="w-full text-center py-16">
+              <Package className="w-12 h-12 text-navy/20 mx-auto mb-3" />
+              <p className="text-navy/40">{t('noProductsInCategory')}</p>
+            </div>
+          ) : (
+            <>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`page-${page}-${activeCategory}`}
+                  initial={{ opacity: 0, x: 40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -40 }}
+                  transition={{ duration: 0.4 }}
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+                >
+                  {currentProducts.map((product, idx) => (
+                    <div key={product.id} className="group">
+                      <div className="bg-cream rounded-2xl overflow-hidden hover-lift premium-shadow">
+                        {/* Image with floating animation */}
+                        <div className="aspect-square bg-gradient-to-br from-cream to-cream-dark flex items-center justify-center relative overflow-hidden">
+                          {product.image_url ? (
+                            <motion.div
+                              className="relative w-full h-full"
+                              animate={{
+                                y: [0, -12, 0],
+                              }}
+                              transition={{
+                                duration: 3,
+                                repeat: Infinity,
+                                ease: 'easeInOut',
+                                delay: idx * 0.4,
+                              }}
+                            >
+                              <Image
+                                src={product.image_url}
+                                alt={getLocalizedField(product, 'name', locale)}
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                              />
+                            </motion.div>
+                          ) : (
+                            <div className="text-center">
+                              <Package className="w-12 h-12 text-navy/20 mx-auto mb-2" />
+                              <p className="text-navy/30 text-xs">{t('productImage')}</p>
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-navy/0 group-hover:bg-navy/5 transition-colors duration-500 pointer-events-none" />
+                        </div>
+                        {/* Info */}
+                        <div className="p-5">
+                          <span className="text-xs text-red/80 font-medium uppercase tracking-wider">
+                            {getCategoryName(product.category_id)}
+                          </span>
+                          <h3 className="font-heading text-lg font-semibold text-navy mt-1 group-hover:text-red transition-colors duration-300">
+                            {getLocalizedField(product, 'name', locale)}
+                          </h3>
+                        </div>
                       </div>
                     </div>
-                  </motion.div>
-                ))}
+                  ))}
+                </motion.div>
               </AnimatePresence>
-            )}
-          </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-4 mt-10">
+                  <button
+                    onClick={goPrev}
+                    disabled={page === 0}
+                    className="w-11 h-11 rounded-full bg-white shadow-lg border border-navy/10 flex items-center justify-center text-navy hover:bg-cream transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    aria-label="Previous"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <div className="flex items-center gap-2">
+                    {Array.from({ length: totalPages }).map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setPage(i)}
+                        className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                          i === page
+                            ? 'bg-red w-7'
+                            : 'bg-navy/20 hover:bg-navy/40'
+                        }`}
+                        aria-label={`Page ${i + 1}`}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    onClick={goNext}
+                    disabled={page === totalPages - 1}
+                    className="w-11 h-11 rounded-full bg-white shadow-lg border border-navy/10 flex items-center justify-center text-navy hover:bg-cream transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    aria-label="Next"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
-
-      <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </section>
   );
 }
