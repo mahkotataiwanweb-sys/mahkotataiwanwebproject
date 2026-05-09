@@ -818,7 +818,7 @@ export default function ContactPage() {
                     <p className="text-yellow-300 text-sm leading-relaxed group-hover:text-yellow-200 transition-colors duration-300 font-medium">
                       {card.value}
                     </p>
-                    <p className="text-navy text-xs mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-semibold">
+                    <p className="text-navy text-xs mt-3 font-semibold">
                       {card.hoverHint}
                     </p>
                   </a>
@@ -1060,7 +1060,7 @@ export default function ContactPage() {
           </motion.div>
 
           <div ref={mapRef}>
-            <div className="bg-yellow-400 rounded-3xl p-3 sm:p-4 shadow-[0_4px_30px_rgba(0,48,72,0.08)] border border-yellow-500/40 overflow-hidden">
+            <div className="bg-gray-200 rounded-3xl p-3 sm:p-4 shadow-[0_4px_30px_rgba(0,48,72,0.08)] border border-gray-300 overflow-hidden">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.5!2d121.37!3d25.07!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjXCsDA0JzEyLjAiTiAxMjHCsDIyJzEyLjAiRQ!5e0!3m2!1sen!2stw!4v1"
                 width="100%"

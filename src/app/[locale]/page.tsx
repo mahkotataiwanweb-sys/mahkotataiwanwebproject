@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useCallback, useImperativeHandle } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import { useEditableT } from '@/hooks/useEditableT';
 import Link from 'next/link';
@@ -44,26 +45,26 @@ function DiscoverWavyTexture() {
 }
 
 /* ──────────────────────────────────────
-   AutoFlipCard — controlled via ref
+   ManualNavCard — image flip + sliding text box, user-controlled (Prev/Next)
 ────────────────────────────────────────── */
-interface AutoFlipCardHandle {
-  triggerFlip: () => Promise<void>;
-  enterView: () => Promise<void>;
-}
-
-const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
+interface ManualNavCardProps {
   articles: Article[];
   fallbackTitle: string;
   fallbackExcerpt: string;
   fallbackHref: string;
   btnLabel: string;
   locale: string;
-}>(function AutoFlipCardInner({ articles, fallbackTitle, fallbackExcerpt, fallbackHref, btnLabel, locale }, ref) {
+  /** 'left' = image on the left, text box slides in from the right (Events).
+   *  'right' = mirror layout (Activity). */
+  imageSide: 'left' | 'right';
+}
+
+function ManualNavCard({ articles, fallbackTitle, fallbackExcerpt, fallbackHref, btnLabel, locale, imageSide }: ManualNavCardProps) {
   const textBoxRef = useRef<HTMLDivElement>(null);
-  const imageBoxRef = useRef<HTMLDivElement>(null);
-  const indexRef = useRef(0);
-  const [displayIndex, setDisplayIndex] = useState(0);
+  const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
   const count = articles.length;
+  const hasMany = count > 1;
 
   const getArticleData = useCallback((idx: number) => {
     if (count === 0) return { title: fallbackTitle, excerpt: fallbackExcerpt, href: fallbackHref, imageUrl: '' };
@@ -76,155 +77,109 @@ const AutoFlipCard = React.forwardRef<AutoFlipCardHandle, {
     };
   }, [articles, count, locale, fallbackTitle, fallbackExcerpt, fallbackHref]);
 
-  const flippingRef = useRef(false);
+  const goNext = () => {
+    if (!hasMany) return;
+    setDirection(1);
+    setIndex((i) => (i + 1) % count);
+  };
+  const goPrev = () => {
+    if (!hasMany) return;
+    setDirection(-1);
+    setIndex((i) => (i - 1 + count) % count);
+  };
 
-  useImperativeHandle(ref, () => ({
-    triggerFlip: () => new Promise<void>((resolve) => {
-      if (count <= 1) { resolve(); return; }
-      if (!textBoxRef.current || !imageBoxRef.current) { resolve(); return; }
-      if (flippingRef.current) {
-        const checkDone = setInterval(() => {
-          if (!flippingRef.current) { clearInterval(checkDone); resolve(); }
-        }, 50);
-        setTimeout(() => { clearInterval(checkDone); resolve(); }, 3000);
-        return;
-      }
+  const data = getArticleData(index);
+  const slideFromX = imageSide === 'left' ? 60 : -60;
 
-      const textEl = textBoxRef.current;
-      const imgEl = imageBoxRef.current;
-      flippingRef.current = true;
-
-      gsap.killTweensOf(textEl);
-      gsap.killTweensOf(imgEl);
-
-      const nextIdx = (indexRef.current + 1) % count;
-
-      // Phase 1a: Text box flips out FIRST (1.0s)
-      gsap.to(textEl, {
-        rotateY: 90,
-        opacity: 0,
-        scale: 0.92,
-        duration: 1.0,
-        ease: 'power3.in',
-        overwrite: 'auto',
-      });
-
-      // Phase 1b: Image box flips out AFTER text (0.4s delay)
-      gsap.to(imgEl, {
-        rotateY: 90,
-        opacity: 0,
-        scale: 0.92,
-        duration: 1.0,
-        delay: 0.4,
-        ease: 'power3.in',
-        overwrite: 'auto',
-        onComplete: () => {
-          if (!textBoxRef.current || !imageBoxRef.current) { flippingRef.current = false; resolve(); return; }
-          indexRef.current = nextIdx;
-          setDisplayIndex(nextIdx);
-
-          // Reset both to flipped-in position
-          gsap.set(textEl, { rotateY: -90, scale: 0.92 });
-          gsap.set(imgEl, { rotateY: -90, scale: 0.92 });
-
-          // Phase 2a: Text box flips IN first (1.0s)
-          gsap.to(textEl, {
-            rotateY: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 1.0,
-            ease: 'back.out(1.2)',
-            overwrite: 'auto',
-          });
-
-          // Phase 2b: Image box follows after text (0.4s delay)
-          gsap.to(imgEl, {
-            rotateY: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 1.0,
-            delay: 0.4,
-            ease: 'back.out(1.2)',
-            overwrite: 'auto',
-            onComplete: () => {
-              flippingRef.current = false;
-              resolve();
-            },
-          });
-        },
-      });
-    }),
-    enterView: () => new Promise<void>((resolve) => {
-      if (!textBoxRef.current || !imageBoxRef.current) { resolve(); return; }
-      flippingRef.current = true;
-      gsap.killTweensOf(textBoxRef.current);
-      gsap.killTweensOf(imageBoxRef.current);
-      // Entrance: slow & gradual reveal — text 2.2s, image follows 1.0s later
-      gsap.set(textBoxRef.current, { opacity: 0, rotateY: -90, scale: 0.92 });
-      gsap.set(imageBoxRef.current, { opacity: 0, rotateY: -90, scale: 0.92 });
-      gsap.to(textBoxRef.current, {
-        rotateY: 0, opacity: 1, scale: 1,
-        duration: 2.2, ease: 'expo.out', overwrite: 'auto',
-      });
-      gsap.to(imageBoxRef.current, {
-        rotateY: 0, opacity: 1, scale: 1,
-        duration: 2.2, delay: 1.0, ease: 'expo.out', overwrite: 'auto',
-        onComplete: () => { flippingRef.current = false; resolve(); },
-      });
-    }),
-  }), [count]);
-
-  const data = getArticleData(displayIndex);
-  const dots = count > 1 ? (
-    <div className="flex justify-center gap-2 mt-5">
-      {articles.map((_, i) => (
-        <div key={i} className={`w-2 h-2 rounded-full transition-all duration-300 ${i === displayIndex ? 'bg-[#C12126] scale-125' : 'bg-navy/20'}`} />
-      ))}
-    </div>
-  ) : null;
+  /* Layout order — image on the requested side, text box on the other. */
+  const flexDir = imageSide === 'left' ? 'md:flex-row' : 'md:flex-row-reverse';
 
   return (
-    <div>
-      <Link href={data.href} className="group block">
-        <div style={{ perspective: '2500px' }}>
-          <div ref={imageBoxRef} style={{ opacity: 0, transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}>
-            <div className="relative overflow-hidden">
-              <div className="relative aspect-[4/3]">
-                {data.imageUrl ? (
-                  <Image src={data.imageUrl} alt={data.title} fill className="object-cover transition-transform duration-[2s] ease-out group-hover:scale-105" sizes="(max-width: 768px) 100vw, 720px" />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#003048] to-[#001a2c]" />
-                )}
-              </div>
+    <div className={`flex flex-col gap-5 sm:gap-6 ${flexDir} items-stretch`}>
+      {/* IMAGE — flips on key change (rotateY) */}
+      <div className="w-full md:w-1/2" style={{ perspective: '2200px' }}>
+        <Link href={data.href} className="block aspect-[4/3] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.18)] relative">
+          <AnimatePresence mode="wait" initial={false} custom={direction}>
+            <motion.div
+              key={`img-${index}`}
+              initial={{ rotateY: -90, opacity: 0 }}
+              animate={{ rotateY: 0, opacity: 1 }}
+              exit={{ rotateY: 90, opacity: 0 }}
+              transition={{ duration: 0.55, ease: [0.34, 1.56, 0.64, 1] }}
+              style={{ transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}
+              className="absolute inset-0"
+            >
+              {data.imageUrl ? (
+                <Image src={data.imageUrl} alt={data.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 540px" />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-[#003048] to-[#001a2c]" />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </Link>
+      </div>
+
+      {/* TEXT BOX — slides in from the open side after the image flips */}
+      <div className="w-full md:w-1/2 flex">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={`text-${index}`}
+            initial={{ x: slideFromX, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -slideFromX, opacity: 0 }}
+            transition={{ duration: 0.5, delay: 0.35, ease: [0.22, 0.68, 0, 1] }}
+            className="bg-yellow-400 rounded-2xl p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.10)] flex flex-col justify-between w-full"
+          >
+            <div>
+              <h3 className="font-heading text-lg sm:text-xl lg:text-2xl font-bold text-navy mb-3 leading-tight">{data.title}</h3>
+              <p className="text-navy/80 text-sm leading-relaxed mb-5">{data.excerpt}</p>
             </div>
-          </div>
-        </div>
-        <div style={{ perspective: '2500px' }}>
-          <div ref={textBoxRef} style={{ opacity: 0, transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}>
-            <div className="relative bg-white mx-4 sm:mx-6 -mt-5 sm:-mt-6 px-3 sm:px-4 py-3 sm:py-3 shadow-[0_4px_30px_rgba(0,0,0,0.08)]" style={{ clipPath: 'polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px)' }}>
-              <div className="text-center">
-                <h3 className="font-heading text-xs sm:text-sm font-bold text-navy mb-2 leading-tight">{data.title}</h3>
-                <p className="text-navy/50 text-[10px] sm:text-xs leading-relaxed mb-2 max-w-sm mx-auto">{data.excerpt}</p>
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#003048] text-white text-[11px] font-semibold tracking-wide group-hover:bg-[#C12126] transition-colors duration-300">
-                  <span>{btnLabel}</span>
+
+            <div className="flex items-center justify-between gap-3 mt-2 flex-wrap">
+              <Link
+                href={data.href}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-red text-white rounded-full font-bold text-xs uppercase tracking-wider shadow-md hover:bg-red-dark transition-colors duration-300"
+              >
+                <span>{btnLabel}</span>
+                <span aria-hidden>→</span>
+              </Link>
+
+              {hasMany && (
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={goPrev}
+                    aria-label="Previous"
+                    className="w-9 h-9 rounded-full bg-navy text-white flex items-center justify-center hover:bg-navy-light transition-colors"
+                  >
+                    ‹
+                  </button>
+                  <span className="text-navy/70 text-xs font-semibold tabular-nums px-1">
+                    {index + 1} / {count}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={goNext}
+                    aria-label="Next"
+                    className="w-9 h-9 rounded-full bg-navy text-white flex items-center justify-center hover:bg-navy-light transition-colors"
+                  >
+                    ›
+                  </button>
                 </div>
-              </div>
+              )}
             </div>
-          </div>
-        </div>
-      </Link>
-      {dots}
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
-});
+}
 
 export default function HomePage() {
   const locale = useLocale();
   const t = useEditableT('discover', 'home');
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const topCardRef = useRef<AutoFlipCardHandle>(null);
-  const bottomCardRef = useRef<AutoFlipCardHandle>(null);
   const topWrapRef = useRef<HTMLDivElement>(null);
   const bottomWrapRef = useRef<HTMLDivElement>(null);
 
@@ -279,105 +234,21 @@ export default function HomePage() {
     return () => ctx.revert();
   }, []);
 
-  /* ── Coordinated flip sequencer: top → pause → bottom → pause → repeat ── */
-  useEffect(() => {
-    let cancelled = false;
-    let topEntered = false;
-    let bottomEntered = false;
-    let sequencerRunning = false; // ← CRITICAL: prevents double sequencer
-
-    const wait = (ms: number) => new Promise<void>(r => {
-      const id = setTimeout(r, ms);
-      // Store for cleanup if needed
-      return () => clearTimeout(id);
-    });
-
-    const sequencer = async () => {
-      if (sequencerRunning) return; // ← Guard: only ONE sequencer can run
-      sequencerRunning = true;
-
-      while (!cancelled) {
-        /* HOLD — let user read the current cards for 4 seconds */
-        await wait(4000);
-        if (cancelled) break;
-
-        /* Flip top card first — await completion */
-        if (topCardRef.current) {
-          await topCardRef.current.triggerFlip();
-        }
-        if (cancelled) break;
-
-        /* Pause 0.3s then flip bottom card */
-        await wait(300);
-        if (cancelled) break;
-
-        /* Flip bottom card — await completion */
-        if (bottomCardRef.current) {
-          await bottomCardRef.current.triggerFlip();
-        }
-        if (cancelled) break;
-
-        /* Settle buffer before next cycle */
-        await wait(500);
-      }
-
-      sequencerRunning = false;
-    };
-
-    const tryStartSequencer = () => {
-      if (topEntered && bottomEntered && !cancelled && !sequencerRunning) sequencer();
-    };
-
-    /* Each card has its own scroll trigger for entrance */
-    const flipStart = window.innerWidth < 768 ? 'top 55%' : 'top 10%';
-    const ctx = gsap.context(() => {
-      ScrollTrigger.create({
-        trigger: topWrapRef.current,
-        start: flipStart,
-        once: true,
-        onEnter: async () => {
-          if (topEntered) return;
-          topEntered = true;
-          await topCardRef.current?.enterView();
-          tryStartSequencer();
-        },
-      });
-
-      ScrollTrigger.create({
-        trigger: bottomWrapRef.current,
-        start: flipStart,
-        once: true,
-        onEnter: async () => {
-          if (bottomEntered) return;
-          bottomEntered = true;
-          await new Promise(r => setTimeout(r, 200));
-          if (cancelled) return;
-          await bottomCardRef.current?.enterView();
-          tryStartSequencer();
-        },
-      });
-    });
-
-    return () => { cancelled = true; ctx.revert(); };
-  }, []);
-
   return (
     <>
-      {/* SandTexture removed */}
       <HeroSlider />
       <MarqueeSection />
       <ProductCatalogSection />
       <RecipeShowcaseSection />
 
       {/* ═══════════════════════════════════════════════
-          DISCOVER SECTION — Auto-flipping article cards
+          DISCOVER — manual nav (Prev/Next), side-by-side
+          Top: image LEFT, yellow text box RIGHT
+          Bottom: image RIGHT, yellow text box LEFT
       ═══════════════════════════════════════════════ */}
       <section ref={sectionRef} className="py-20 sm:py-28 relative overflow-hidden">
-        {/* DiscoverWavyTexture removed */}
-
-        <div className="max-w-3xl mx-auto px-6 sm:px-10 relative z-10">
-          {/* ── Header ── */}
-          <div ref={headerRef} className="text-center mb-16">
+        <div className="max-w-5xl mx-auto px-6 sm:px-10 relative z-10">
+          <div ref={headerRef} className="text-center mb-12 sm:mb-16">
             <p className="text-[#C12126] text-sm sm:text-base tracking-[0.35em] uppercase font-bold mb-3">{t('label')}</p>
             <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">
               {t('title')}
@@ -388,28 +259,27 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* ── Cards — sequenced: top flips, then bottom, never together ── */}
-          <div className="flex flex-col gap-10 sm:gap-14 lg:gap-12 max-w-lg mx-auto">
+          <div className="flex flex-col gap-12 sm:gap-16">
             <div ref={topWrapRef}>
-              <AutoFlipCard
-                ref={topCardRef}
+              <ManualNavCard
                 articles={events}
                 fallbackTitle={t('fallbackTitle1')}
                 fallbackExcerpt={t('fallbackExcerpt1')}
                 fallbackHref={`/${locale}/events`}
                 btnLabel={t('viewEvents')}
                 locale={locale}
+                imageSide="left"
               />
             </div>
             <div ref={bottomWrapRef}>
-              <AutoFlipCard
-                ref={bottomCardRef}
+              <ManualNavCard
                 articles={activities}
                 fallbackTitle={t('fallbackTitle2')}
                 fallbackExcerpt={t('fallbackExcerpt2')}
                 fallbackHref={`/${locale}/activity`}
                 btnLabel={t('viewActivities')}
                 locale={locale}
+                imageSide="right"
               />
             </div>
           </div>
