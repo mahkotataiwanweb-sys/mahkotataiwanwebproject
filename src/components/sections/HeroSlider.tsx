@@ -406,7 +406,7 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full h-[65vh] sm:h-[70vh] overflow-hidden mt-[72px]"
+      className="relative w-full h-[calc(65vh+68px)] sm:h-[calc(70vh+68px)] overflow-hidden pt-[68px]"
       style={{ transformOrigin: 'center center' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
