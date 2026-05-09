@@ -172,7 +172,7 @@ export default function MarqueeSection() {
         {items.map((item, i) => (
           <div key={i} className="flex items-center gap-6 mx-6">
             <Crown className="w-4 h-4 text-red shrink-0" />
-            <span className="text-yellow-400 text-lg sm:text-xl font-heading font-semibold tracking-wide">
+            <span className="text-white text-lg sm:text-xl font-heading font-semibold tracking-wide">
               {item}
             </span>
           </div>
