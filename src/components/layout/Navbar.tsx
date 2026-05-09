@@ -68,7 +68,7 @@ export default function Navbar() {
   );
   // Homepage uses a yellow header with navy text — never light. Other dark
   // pages keep the original behaviour where unscrolled = light text.
-  const useLightText = !isScrolled && (isHomePage || isDarkHeaderPage);
+  const useLightText = isHomePage || (!isScrolled && isDarkHeaderPage);
 
   // Observe hero brightness
   useEffect(() => {

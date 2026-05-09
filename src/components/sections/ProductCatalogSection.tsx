@@ -398,7 +398,6 @@ function InfiniteSlider({
       className="relative overflow-x-clip overflow-y-visible py-12 sm:py-20"
       style={{ cursor: isDraggingRef.current ? 'grabbing' : 'grab' }}
     >
-      <div className="absolute top-0 left-1/2 -translate-x-px w-[2px] h-full bg-navy/8 pointer-events-none z-0" />
 <div
         ref={trackRef}
         className="flex select-none touch-none will-change-transform"
