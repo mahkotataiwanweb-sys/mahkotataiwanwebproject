@@ -97,16 +97,25 @@ function ManualNavCard({ articles, fallbackTitle, fallbackExcerpt, fallbackHref,
   return (
     <div className={`flex flex-col gap-5 sm:gap-6 ${flexDir} items-stretch`}>
       {/* IMAGE — flips on key change (rotateY) */}
-      <div className="w-full md:w-1/2" style={{ perspective: '2200px' }}>
-        <Link href={data.href} className="block aspect-[4/3] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.18)] relative">
+      <div className="w-full md:w-1/2" style={{ perspective: '2400px' }}>
+        <Link href={data.href} className="block aspect-[4/3] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.18)] relative bg-navy/5">
           <AnimatePresence mode="wait" initial={false} custom={direction}>
             <motion.div
               key={`img-${index}`}
-              initial={{ rotateY: -90, opacity: 0 }}
+              initial={{ rotateY: -110, opacity: 0 }}
               animate={{ rotateY: 0, opacity: 1 }}
-              exit={{ rotateY: 90, opacity: 0 }}
-              transition={{ duration: 0.55, ease: [0.34, 1.56, 0.64, 1] }}
-              style={{ transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}
+              exit={{ rotateY: 110, opacity: 0 }}
+              transition={{
+                duration: 1.4,
+                ease: [0.22, 0.68, 0, 1],
+                opacity: { duration: 0.45 },
+              }}
+              style={{
+                transformStyle: 'preserve-3d',
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
+                willChange: 'transform, opacity',
+              }}
               className="absolute inset-0"
             >
               {data.imageUrl ? (
@@ -127,7 +136,12 @@ function ManualNavCard({ articles, fallbackTitle, fallbackExcerpt, fallbackHref,
             initial={{ x: slideFromX, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -slideFromX, opacity: 0 }}
-            transition={{ duration: 0.5, delay: 0.35, ease: [0.22, 0.68, 0, 1] }}
+            transition={{
+              duration: 1.0,
+              delay: 0.7,
+              ease: [0.22, 0.68, 0, 1],
+              opacity: { duration: 0.55, delay: 0.7 },
+            }}
             className="bg-yellow-400 rounded-2xl p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.10)] flex flex-col justify-between w-full"
           >
             <div>
