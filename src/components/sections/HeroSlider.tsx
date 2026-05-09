@@ -406,7 +406,7 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full h-[calc(65vh+68px)] sm:h-[calc(70vh+68px)] overflow-hidden pt-[68px]"
+      className="relative w-full h-[calc(65vh+68px)] sm:h-[calc(70vh+68px)] overflow-hidden"
       style={{ transformOrigin: 'center center' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
@@ -431,7 +431,7 @@ export default function HeroSlider() {
       </AnimatePresence>
 
       {/* Text layer — completely separate from background crossfade */}
-      <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+      <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none pt-[68px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={`text-${currentSlide.id}`}
