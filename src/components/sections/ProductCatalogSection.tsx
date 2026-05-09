@@ -130,8 +130,8 @@ function InfiniteSlider({
   const FRICTION = 0.975;
   const RETURN_RATE = 0.015;
   const LERP_FACTOR = 0.12; /* faster response — was 0.08 */
-  const ITEM_WIDTH_MOBILE = 160;
-  const ITEM_WIDTH_DESKTOP = 260;
+  const ITEM_WIDTH_MOBILE = 220;
+  const ITEM_WIDTH_DESKTOP = 360;
   const [itemWidth, setItemWidth] = useState(ITEM_WIDTH_DESKTOP);
 
   useEffect(() => {
@@ -418,9 +418,9 @@ function InfiniteSlider({
             <div
               className="product-img-wrap relative cursor-pointer will-change-transform"
               style={{
-                width: itemWidth < 200 ? '132px' : '200px',
-                height: itemWidth < 200 ? '132px' : '200px',
-                padding: itemWidth < 200 ? '6px' : '10px',
+                width: itemWidth < 280 ? '190px' : '300px',
+                height: itemWidth < 280 ? '190px' : '300px',
+                padding: itemWidth < 280 ? '8px' : '14px',
                 transformOrigin: 'center center',
               }}
             >
@@ -591,11 +591,15 @@ export default function ProductCatalogSection() {
         {/* WavyTextureBackground removed */}
 
         <div ref={contentRef} className="relative z-10">
-          {/* Section Heading */}
+          {/* Section Heading — eyebrow → title → red divider → tagline (matches Discover) */}
           <div ref={headerRef} className="text-center mb-6 sm:mb-8 px-4">
-            <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-navy mb-2 drop-shadow-sm">
+            <p className="text-red text-sm sm:text-base tracking-[0.35em] uppercase font-bold mb-3">
+              Showcase
+            </p>
+            <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-navy mb-3 drop-shadow-sm">
               {t('title')}
             </h2>
+            <div className="w-16 h-[2px] bg-red mx-auto mb-4 rounded-full" />
             <p className="text-navy/60 text-base sm:text-lg md:text-xl font-body tracking-wide">
               {t('tagline')}
             </p>
