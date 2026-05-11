@@ -30,7 +30,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <ScrollProgress />
       <SmoothScrollProvider>
         <Navbar />
-        <main className="min-h-screen">{children}</main>
+        <main className="min-h-screen pt-[88px]">{children}</main>
         <Footer />
       </SmoothScrollProvider>
     </NextIntlClientProvider>

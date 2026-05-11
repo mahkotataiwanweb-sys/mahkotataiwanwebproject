@@ -86,372 +86,126 @@ function getProductName(p: ShowcaseProduct, locale: string): string {
 
 /* ------------------------------------------------------------------ */
 /* ------------------------------------------------------------------ */
-/*  Sine easing (module-level for stability)                            */
+/*  Paginated Product Grid (3 per page)                                */
 /* ------------------------------------------------------------------ */
-const easeOutSine = (t: number) => Math.sin((t * Math.PI) / 2);
+import { ChevronLeft, ChevronRight, Package } from 'lucide-react';
 
-/* ------------------------------------------------------------------ */
-/*  Infinite Carousel Slider                                           */
-/* ------------------------------------------------------------------ */
-function InfiniteSlider({
+function PaginatedProductGrid({
   products,
   locale,
 }: {
   products: ShowcaseProduct[];
   locale: string;
-
 }) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const offsetRef = useRef(0);
-  const velocityRef = useRef(0);
-  const baseDirectionRef = useRef(1);
-  const isDraggingRef = useRef(false);
-  const isPausedRef = useRef(false);
-  const lastPointerXRef = useRef(0);
-  const lastMoveTimeRef = useRef(0);
-  const dragVelocityRef = useRef(0);
-  const dragStartXRef = useRef(0);
-  const dragDistRef = useRef(0);
-  const rafRef = useRef<number>(0);
-  const singleSetWidthRef = useRef(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isVisibleRef = useRef(true);
-  const needsSnapRef = useRef(true); /* snap lerp on first frame & after wraps */
-  const pressedIndexRef = useRef<number>(-1);
-  const pressScaleRef = useRef<number[]>([]);
+  const ITEMS_PER_PAGE = 3;
+  const [page, setPage] = useState(0);
+  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+  const currentProducts = products.slice(
+    page * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE + ITEMS_PER_PAGE
+  );
 
-  /* ---- Lerp state for each slot ---- */
-  const lerpStateRef = useRef<{
-    scale: number[]; opacity: number[]; yLift: number[];
-    shadowOpacity: number[]; nameOpacity: number[]; nameScale: number[];
-  }>({ scale: [], opacity: [], yLift: [], shadowOpacity: [], nameOpacity: [], nameScale: [] });
+  useEffect(() => { setPage(0); }, [products]);
 
-  const DEFAULT_SPEED = 0.864;
-  const FRICTION = 0.975;
-  const RETURN_RATE = 0.015;
-  const LERP_FACTOR = 0.12; /* faster response — was 0.08 */
-  const ITEM_WIDTH_MOBILE = 220;
-  const ITEM_WIDTH_DESKTOP = 360;
-  const [itemWidth, setItemWidth] = useState(ITEM_WIDTH_DESKTOP);
-
-  useEffect(() => {
-    const update = () => setItemWidth(window.innerWidth < 640 ? ITEM_WIDTH_MOBILE : ITEM_WIDTH_DESKTOP);
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => { isVisibleRef.current = e.isIntersecting; }, { rootMargin: '200px' });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  const items = [...products, ...products, ...products];
-
-  /* Initialize lerp arrays when item count changes */
-  useEffect(() => {
-    const count = items.length;
-    const s = lerpStateRef.current;
-    if (s.scale.length !== count) {
-      s.scale = Array(count).fill(0.65);
-      s.opacity = Array(count).fill(0.35);
-      s.yLift = Array(count).fill(0);
-      s.shadowOpacity = Array(count).fill(0.08);
-      s.nameOpacity = Array(count).fill(0.25);
-      s.nameScale = Array(count).fill(0.88);
-      pressScaleRef.current = Array(count).fill(1.0);
-      needsSnapRef.current = true;
-    }
-  }, [items.length]);
-
-  const measureSetWidth = useCallback(() => {
-    singleSetWidthRef.current = products.length * itemWidth;
-  }, [products.length, itemWidth]);
-
-  /* ---- Unified transform with optional snap (instant jump) mode ---- */
-  const applyItemTransforms = useCallback((snap: boolean = false) => {
-    const container = containerRef.current;
-    const track = trackRef.current;
-    if (!container || !track) return;
-
-    const containerRect = container.getBoundingClientRect();
-    const centerX = containerRect.left + containerRect.width / 2;
-    const children = track.children;
-    const s = lerpStateRef.current;
-    const lf = snap ? 1.0 : LERP_FACTOR; /* snap = jump instantly to target */
-
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i] as HTMLElement;
-      const imgContainer = child.querySelector('.product-img-wrap') as HTMLElement;
-      const nameEl = child.querySelector('.product-name') as HTMLElement;
-      if (!imgContainer || !nameEl) continue;
-
-      const rect = child.getBoundingClientRect();
-      const childCenter = rect.left + rect.width / 2;
-      const dist = Math.abs(childCenter - centerX);
-      const maxDist = containerRect.width * 0.55;
-      const proximity = Math.max(0, 1 - dist / maxDist);
-      const ep = easeOutSine(proximity);
-
-      /* Target values */
-      const tScale = 0.65 + ep * 0.45;
-      const tOpacity = 0.35 + ep * 0.65;
-      const tYLift = -Math.pow(ep, 1.5) * 22; /* smoother curve than ep*ep */
-      const tShadow = 0.08 + ep * 0.42;
-      const tNameOp = 0.25 + ep * 0.75;
-      const tNameSc = 0.88 + ep * 0.14;
-
-      /* Lerp (or snap) to targets */
-      s.scale[i] += (tScale - s.scale[i]) * lf;
-      s.opacity[i] += (tOpacity - s.opacity[i]) * lf;
-      s.yLift[i] += (tYLift - s.yLift[i]) * lf;
-      s.shadowOpacity[i] += (tShadow - s.shadowOpacity[i]) * lf;
-      s.nameOpacity[i] += (tNameOp - s.nameOpacity[i]) * lf;
-      s.nameScale[i] += (tNameSc - s.nameScale[i]) * lf;
-
-      /* Apply transforms */
-      /* Lerp press scale toward 1.0 (springs back after push) */
-      const ps = pressScaleRef.current;
-      if (ps[i] !== undefined) {
-        if (i === pressedIndexRef.current) {
-          ps[i] += (0.88 - ps[i]) * 0.3; /* push down fast */
-        } else {
-          ps[i] += (1.0 - ps[i]) * 0.12; /* spring back */
-        }
-      }
-      const finalScale = s.scale[i] * (ps[i] ?? 1.0);
-      imgContainer.style.transform = `translateY(${s.yLift[i]}px) scale(${finalScale})`;
-      imgContainer.style.opacity = `${s.opacity[i]}`;
-      imgContainer.style.filter = `drop-shadow(0 ${12 + s.shadowOpacity[i] * 30}px ${20 + s.shadowOpacity[i] * 40}px rgba(0,0,0,${s.shadowOpacity[i]}))`;
-
-      nameEl.style.opacity = `${s.nameOpacity[i]}`;
-      nameEl.style.transform = `scale(${s.nameScale[i]})`;
-      nameEl.style.color = `rgba(0,48,72,${0.3 + ep * 0.7})`;
-    }
-  }, [products.length, itemWidth]);
-
-  /* ---- Center offset on mount & product/width change ---- */
-  useEffect(() => {
-    if (!containerRef.current || products.length === 0) return;
-    measureSetWidth();
-    const containerWidth = containerRef.current.clientWidth;
-    const setWidth = singleSetWidthRef.current;
-    if (setWidth <= 0) return;
-    /* Place first item of middle copy at container center */
-    offsetRef.current = -setWidth + (containerWidth - itemWidth) / 2;
-    /* Normalize into wrap range [-setWidth, 0) */
-    while (offsetRef.current < -setWidth) offsetRef.current += setWidth;
-    while (offsetRef.current > 0) offsetRef.current -= setWidth;
-    needsSnapRef.current = true;
-  }, [products.length, itemWidth, measureSetWidth]);
-
-  const animate = useCallback(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    if (!isVisibleRef.current) { rafRef.current = requestAnimationFrame(animate); return; }
-
-    const setWidth = singleSetWidthRef.current;
-    const targetSpeed = DEFAULT_SPEED * baseDirectionRef.current;
-
-    if (!isDraggingRef.current && !isPausedRef.current) {
-      velocityRef.current += (targetSpeed - velocityRef.current) * RETURN_RATE;
-      const excess = velocityRef.current - targetSpeed;
-      if (Math.abs(excess) > 0.01) {
-        velocityRef.current = targetSpeed + excess * FRICTION;
-      }
-    }
-
-    if (isPausedRef.current && !isDraggingRef.current) {
-      velocityRef.current *= 0.96;
-      if (Math.abs(velocityRef.current) < 0.01) velocityRef.current = 0;
-    }
-
-    if (!isDraggingRef.current) {
-      offsetRef.current += velocityRef.current;
-    }
-
-    /* Wrap detection — snap lerp states instantly to prevent visual pop */
-    let wrapped = false;
-    if (setWidth > 0) {
-      while (offsetRef.current < -setWidth) { offsetRef.current += setWidth; wrapped = true; }
-      while (offsetRef.current > 0) { offsetRef.current -= setWidth; wrapped = true; }
-    }
-
-    track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
-
-    /* Snap on first frame, after wrap, or after resize — eliminates glitch */
-    const shouldSnap = needsSnapRef.current || wrapped;
-    if (needsSnapRef.current) needsSnapRef.current = false;
-    applyItemTransforms(shouldSnap);
-
-    rafRef.current = requestAnimationFrame(animate);
-  }, [applyItemTransforms]);
-
-  useEffect(() => {
-    measureSetWidth();
-    velocityRef.current = DEFAULT_SPEED * baseDirectionRef.current;
-    rafRef.current = requestAnimationFrame(animate);
-    const handleResize = () => { measureSetWidth(); needsSnapRef.current = true; };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [animate, measureSetWidth]);
-
-  useEffect(() => { setTimeout(measureSetWidth, 100); }, [products, measureSetWidth]);
-
-  const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    isDraggingRef.current = true;
-    isPausedRef.current = true;
-    lastPointerXRef.current = e.clientX;
-    dragStartXRef.current = e.clientX;
-    dragDistRef.current = 0;
-    lastMoveTimeRef.current = performance.now();
-    dragVelocityRef.current = 0;
-    (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
-    /* Immediate push effect on the pressed item */
-    const track = trackRef.current;
-    if (track) {
-      let closestIdx = -1, closestDist = Infinity;
-      const children = track.children;
-      for (let i = 0; i < children.length; i++) {
-        const rect = (children[i] as HTMLElement).getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const d = Math.abs(cx - e.clientX);
-        if (d < closestDist) { closestDist = d; closestIdx = i; }
-      }
-      if (closestIdx >= 0) pressedIndexRef.current = closestIdx;
-    }
-  }, []);
-
-  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDraggingRef.current) return;
-    const now = performance.now();
-    const dx = e.clientX - lastPointerXRef.current;
-    const dt = now - lastMoveTimeRef.current;
-    if (dt > 0) dragVelocityRef.current = dragVelocityRef.current * 0.6 + (dx / dt) * 16 * 0.4;
-    dragDistRef.current += Math.abs(dx);
-    offsetRef.current += dx;
-    lastPointerXRef.current = e.clientX;
-    lastMoveTimeRef.current = now;
-
-    const track = trackRef.current;
-    const setWidth = singleSetWidthRef.current;
-    if (track && setWidth > 0) {
-      let dragWrapped = false;
-      while (offsetRef.current < -setWidth) { offsetRef.current += setWidth; dragWrapped = true; }
-      while (offsetRef.current > 0) { offsetRef.current -= setWidth; dragWrapped = true; }
-      track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
-      if (dragWrapped) needsSnapRef.current = true;
-    }
-  }, []);
-
-  const handlePointerUp = useCallback(() => {
-    if (!isDraggingRef.current) return;
-    isDraggingRef.current = false;
-    pressedIndexRef.current = -1; /* release push effect */
-    if (Math.abs(dragVelocityRef.current) > 0.3) {
-      /* Amplify flick velocity for fun momentum — cap at ±12 */
-      const flick = dragVelocityRef.current * 1.5;
-      velocityRef.current = Math.max(-12, Math.min(12, flick));
-    }
-    isPausedRef.current = false;
-  }, []);
-
-  const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (dragDistRef.current > 5) return;
-    /* Find the closest item to the click and trigger push effect */
-    const track = trackRef.current;
-    if (!track) return;
-    const clickX = e.clientX;
-    let closestIdx = -1;
-    let closestDist = Infinity;
-    const children = track.children;
-    for (let i = 0; i < children.length; i++) {
-      const rect = (children[i] as HTMLElement).getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const d = Math.abs(cx - clickX);
-      if (d < closestDist) { closestDist = d; closestIdx = i; }
-    }
-    if (closestIdx >= 0 && closestDist < itemWidth) {
-      pressedIndexRef.current = closestIdx;
-      /* Release after 200ms for bounce-back */
-      setTimeout(() => { pressedIndexRef.current = -1; }, 200);
-    }
-  }, [itemWidth]);
+  const goNext = () => { if (page < totalPages - 1) setPage(page + 1); };
+  const goPrev = () => { if (page > 0) setPage(page - 1); };
 
   if (products.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-navy/40">
+      <div className="flex flex-col items-center justify-center h-64 text-navy/40">
+        <Package className="w-12 h-12 mb-3 text-navy/20" />
         <p className="text-lg">No products in this category yet</p>
       </div>
     );
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="relative overflow-x-clip overflow-y-visible py-12 sm:py-20"
-      style={{ cursor: isDraggingRef.current ? 'grabbing' : 'grab' }}
-    >
-<div
-        ref={trackRef}
-        className="flex select-none touch-none will-change-transform"
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-        onClick={handleClick}
-      >
-        {items.map((product, i) => (
-          <div
-            key={`${product.id}-${i}`}
-            className="flex-shrink-0 flex flex-col items-center justify-end"
-            style={{ width: `${itemWidth}px`, padding: '0 12px' }}
-
-          >
-            <div
-              className="product-img-wrap relative cursor-pointer will-change-transform"
-              style={{
-                width: itemWidth < 280 ? '190px' : '300px',
-                height: itemWidth < 280 ? '190px' : '300px',
-                padding: itemWidth < 280 ? '8px' : '14px',
-                transformOrigin: 'center center',
-              }}
-            >
-              {product.image_url ? (
-                <Image
-                  src={product.image_url}
-                  alt={getProductName(product, locale)}
-                  fill
-                  className="object-contain pointer-events-none"
-                  sizes="200px"
-                />
-              ) : (
-                <div className="w-full h-full rounded-full bg-navy/10 flex items-center justify-center backdrop-blur-sm">
-                  <span className="text-5xl">🍽️</span>
-                </div>
-              )}
+    <div className="max-w-6xl mx-auto px-4 py-12 sm:py-20">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`page-${page}`}
+          initial={{ opacity: 0, x: 60 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -60 }}
+          transition={{ duration: 0.45, ease: 'easeInOut' }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 sm:gap-12"
+        >
+          {currentProducts.map((product, idx) => (
+            <div key={product.id} className="flex flex-col items-center group">
+              {/* Floating product image */}
+              <div className="relative w-[220px] h-[220px] sm:w-[280px] sm:h-[280px]">
+                {product.image_url ? (
+                  <motion.div
+                    className="relative w-full h-full"
+                    animate={{ y: [0, -18, 0] }}
+                    transition={{
+                      duration: 3.2,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: idx * 0.5,
+                    }}
+                    style={{
+                      filter: 'drop-shadow(0 25px 35px rgba(0,0,0,0.18))',
+                    }}
+                  >
+                    <Image
+                      src={product.image_url}
+                      alt={getProductName(product, locale)}
+                      fill
+                      className="object-contain pointer-events-none transition-transform duration-500 group-hover:scale-110"
+                      sizes="(max-width: 640px) 220px, 280px"
+                    />
+                  </motion.div>
+                ) : (
+                  <div className="w-full h-full rounded-full bg-navy/10 flex items-center justify-center">
+                    <span className="text-5xl">🍽️</span>
+                  </div>
+                )}
+              </div>
+              {/* Product name */}
+              <p className="mt-5 text-center font-heading font-semibold text-base sm:text-lg text-navy group-hover:text-red transition-colors duration-300">
+                {getProductName(product, locale)}
+              </p>
             </div>
+          ))}
+        </motion.div>
+      </AnimatePresence>
 
-            <p
-              className="product-name mt-4 text-center font-heading font-semibold text-sm sm:text-base sm:whitespace-nowrap will-change-transform"
-              style={{
-                maxWidth: itemWidth < 200 ? '120px' : '200px',
-                lineHeight: '1.3',
-                wordBreak: 'keep-all',
-                overflowWrap: 'break-word',
-              }}
-            >
-              {getProductName(product, locale)}
-            </p>
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 mt-12">
+          <button
+            onClick={goPrev}
+            disabled={page === 0}
+            className="w-11 h-11 rounded-full bg-white shadow-lg border border-navy/10 flex items-center justify-center text-navy hover:bg-cream transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            aria-label="Previous"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <div className="flex items-center gap-2">
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setPage(i)}
+                className={`h-2.5 rounded-full transition-all duration-300 ${
+                  i === page
+                    ? 'bg-red w-7'
+                    : 'bg-navy/20 hover:bg-navy/40 w-2.5'
+                }`}
+                aria-label={`Page ${i + 1}`}
+              />
+            ))}
           </div>
-        ))}
-      </div>
+          <button
+            onClick={goNext}
+            disabled={page === totalPages - 1}
+            className="w-11 h-11 rounded-full bg-white shadow-lg border border-navy/10 flex items-center justify-center text-navy hover:bg-cream transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            aria-label="Next"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -693,7 +447,7 @@ export default function ProductCatalogSection() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.4, ease: 'easeInOut' }}
             >
-              <InfiniteSlider
+              <PaginatedProductGrid
                 products={products}
                 locale={locale}
               />
