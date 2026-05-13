@@ -441,35 +441,31 @@ export default function HeroSlider() {
             animate="visible"
             exit="exit"
           >
-            <motion.div variants={textItemVariants}>
-              <Image
-                src="/images/logo.png"
-                alt="Mahkota Taiwan"
-                width={70}
-                height={70}
-                className="mx-auto mb-6 drop-shadow-lg brightness-0 invert"
-                priority
+
+            {title && (
+              <motion.h1
+                variants={textItemVariants}
+                className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg"
+              >
+                {title}
+              </motion.h1>
+            )}
+
+            {(title || subtitle) && (
+              <motion.div
+                variants={lineVariants}
+                className="w-20 h-[3px] bg-red mx-auto mb-6 origin-center"
               />
-            </motion.div>
+            )}
 
-            <motion.h1
-              variants={textItemVariants}
-              className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg"
-            >
-              {title}
-            </motion.h1>
-
-            <motion.div
-              variants={lineVariants}
-              className="w-20 h-[3px] bg-red mx-auto mb-6 origin-center"
-            />
-
-            <motion.p
-              variants={textItemVariants}
-              className="text-base sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow"
-            >
-              {subtitle}
-            </motion.p>
+            {subtitle && (
+              <motion.p
+                variants={textItemVariants}
+                className="text-base sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow"
+              >
+                {subtitle}
+              </motion.p>
+            )}
 
             {currentSlide.link_url && (
               <motion.a
