@@ -13,7 +13,7 @@ const marqueeItems = [
   '300+ Stores',
 ];
 
-const DEFAULT_SPEED = 1.5; // px per frame (leftward)
+const DEFAULT_SPEED = 0.5; // px per frame (leftward)
 const FRICTION = 0.95;     // momentum decay per frame
 const RETURN_RATE = 0.05;  // how fast velocity returns to default after release
 
