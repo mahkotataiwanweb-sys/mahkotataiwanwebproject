@@ -146,6 +146,20 @@ export default function HeroSlider() {
   const imageRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
+  const [navbarHeight, setNavbarHeight] = useState(80);
+
+  // Measure actual navbar height so hero starts exactly below the navy bar
+  useEffect(() => {
+    const measure = () => {
+      const header = document.getElementById('main-navbar') || document.querySelector('header');
+      if (header) setNavbarHeight(header.getBoundingClientRect().height);
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    // Re-measure after fonts/images load
+    const timer = setTimeout(measure, 500);
+    return () => { window.removeEventListener('resize', measure); clearTimeout(timer); };
+  }, []);
 
   // Fetch slides from Supabase
   useEffect(() => {
@@ -417,16 +431,18 @@ export default function HeroSlider() {
         animate={{ scale: 1 }}
         transition={{ duration: 12, ease: 'linear' }}
       >
-        {/* Mobile-only 3:4 portrait image (falls back to the desktop URL when no mobile asset is uploaded) */}
-        <Image
-          src={currentSlide.image_url_mobile || currentSlide.image_url}
-          alt={title}
-          fill
-          className="object-cover w-full h-full block sm:hidden"
-          priority={currentIndex === 0}
-          sizes="100vw"
-          quality={90}
-        />
+        {/* Mobile-only portrait image — object-contain so full image is visible without cropping */}
+        <div className="absolute inset-0 block sm:hidden bg-navy">
+          <Image
+            src={currentSlide.image_url_mobile || currentSlide.image_url}
+            alt={title}
+            fill
+            className="object-contain w-full h-full"
+            priority={currentIndex === 0}
+            sizes="100vw"
+            quality={90}
+          />
+        </div>
         {/* Desktop / tablet 10:5 image */}
         <Image
           src={currentSlide.image_url}
@@ -444,7 +460,8 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden mt-[80px] sm:mt-[92px] aspect-[3/4] sm:aspect-[10/5]"
+      className="relative w-full overflow-hidden aspect-[3/4] sm:aspect-[10/5]"
+      style={{ marginTop: `${navbarHeight}px` }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
