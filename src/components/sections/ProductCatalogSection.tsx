@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import { useEditableT } from '@/hooks/useEditableT';
 import Image from 'next/image';
+import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import CategoryIcon from '@/components/ui/CategoryIcon';
@@ -84,9 +85,9 @@ function getProductName(p: ShowcaseProduct, locale: string): string {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Product Grid — 5 per row on desktop, floating animation per card    */
+/*  Product Grid — 4 per row × max 2 rows per page, with pagination     */
 /* ------------------------------------------------------------------ */
-import { Package } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Package } from 'lucide-react';
 
 function ProductGrid({
   products,
@@ -95,6 +96,14 @@ function ProductGrid({
   products: ShowcaseProduct[];
   locale: string;
 }) {
+  const PER_PAGE = 8; // 4 cols × 2 rows
+  const [page, setPage] = useState(0);
+  const totalPages = Math.max(1, Math.ceil(products.length / PER_PAGE));
+
+  useEffect(() => { setPage(0); }, [products]);
+
+  const visible = products.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
+
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-navy/40">
@@ -104,51 +113,98 @@ function ProductGrid({
     );
   }
 
+  const goPrev = () => setPage((p) => Math.max(0, p - 1));
+  const goNext = () => setPage((p) => Math.min(totalPages - 1, p + 1));
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-8">
-        {products.map((product, idx) => (
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`page-${page}`}
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -40 }}
+          transition={{ duration: 0.4, ease: 'easeInOut' }}
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 sm:gap-8"
+        >
+          {visible.map((product, idx) => (
+            <button
+              key={product.id}
+              type="button"
+              className="flex flex-col items-center group bg-transparent border-0 p-0 outline-none focus-visible:ring-2 focus-visible:ring-red/40 rounded-2xl transition-transform duration-150 active:scale-90 active:translate-y-1"
+            >
+              <div className="relative w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] lg:w-[160px] lg:h-[160px]">
+                {product.image_url ? (
+                  <motion.div
+                    className="relative w-full h-full"
+                    animate={{ y: [0, -12, 0] }}
+                    transition={{
+                      duration: 3.2,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: (idx % 4) * 0.5,
+                    }}
+                    style={{
+                      filter: 'drop-shadow(0 14px 22px rgba(0,0,0,0.16))',
+                    }}
+                  >
+                    <Image
+                      src={product.image_url}
+                      alt={getProductName(product, locale)}
+                      fill
+                      className="object-contain pointer-events-none transition-transform duration-500 group-hover:scale-110"
+                      sizes="(max-width: 640px) 120px, (max-width: 1024px) 140px, 160px"
+                    />
+                  </motion.div>
+                ) : (
+                  <div className="w-full h-full rounded-full bg-navy/10 flex items-center justify-center">
+                    <span className="text-4xl">🍽️</span>
+                  </div>
+                )}
+              </div>
+              <p className="mt-3 text-center font-heading font-semibold text-sm text-navy group-hover:text-red transition-colors duration-300">
+                {getProductName(product, locale)}
+              </p>
+            </button>
+          ))}
+        </motion.div>
+      </AnimatePresence>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 mt-10">
           <button
-            key={product.id}
             type="button"
-            className="flex flex-col items-center group bg-transparent border-0 p-0 outline-none focus-visible:ring-2 focus-visible:ring-red/40 rounded-2xl transition-transform duration-150 active:scale-90 active:translate-y-1"
+            onClick={goPrev}
+            disabled={page === 0}
+            aria-label="Previous page"
+            className="w-11 h-11 rounded-full bg-white shadow-lg border border-navy/10 flex items-center justify-center text-navy hover:bg-cream transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           >
-            {/* Floating product image */}
-            <div className="relative w-[140px] h-[140px] sm:w-[170px] sm:h-[170px] lg:w-[200px] lg:h-[200px]">
-              {product.image_url ? (
-                <motion.div
-                  className="relative w-full h-full"
-                  animate={{ y: [0, -14, 0] }}
-                  transition={{
-                    duration: 3.2,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                    delay: (idx % 5) * 0.45,
-                  }}
-                  style={{
-                    filter: 'drop-shadow(0 18px 28px rgba(0,0,0,0.18))',
-                  }}
-                >
-                  <Image
-                    src={product.image_url}
-                    alt={getProductName(product, locale)}
-                    fill
-                    className="object-contain pointer-events-none transition-transform duration-500 group-hover:scale-110"
-                    sizes="(max-width: 640px) 140px, (max-width: 1024px) 170px, 200px"
-                  />
-                </motion.div>
-              ) : (
-                <div className="w-full h-full rounded-full bg-navy/10 flex items-center justify-center">
-                  <span className="text-5xl">🍽️</span>
-                </div>
-              )}
-            </div>
-            <p className="mt-4 text-center font-heading font-semibold text-sm sm:text-base text-navy group-hover:text-red transition-colors duration-300">
-              {getProductName(product, locale)}
-            </p>
+            <ChevronLeft className="w-5 h-5" />
           </button>
-        ))}
-      </div>
+          <div className="flex items-center gap-2">
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setPage(i)}
+                className={`h-2.5 rounded-full transition-all duration-300 ${
+                  i === page ? 'bg-red w-7' : 'bg-navy/20 hover:bg-navy/40 w-2.5'
+                }`}
+                aria-label={`Page ${i + 1}`}
+              />
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={goNext}
+            disabled={page === totalPages - 1}
+            aria-label="Next page"
+            className="w-11 h-11 rounded-full bg-white shadow-lg border border-navy/10 flex items-center justify-center text-navy hover:bg-cream transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -176,8 +232,8 @@ export default function ProductCatalogSection() {
         .order('sort_order', { ascending: true });
       if (!error && data && data.length > 0) {
         setCategories(data as CategoryData[]);
-        // Default landing on "All" so visitors see the entire catalog at once.
-        setSelectedCategory('all');
+        // Default to the first category (the 'All' tab was removed per design).
+        setSelectedCategory(data[0].slug);
       }
     }
     fetchCategories();
@@ -197,11 +253,7 @@ export default function ProductCatalogSection() {
 
   useEffect(() => {
     if (!selectedCategory) return;
-    if (selectedCategory === 'all') {
-      setProducts(allProducts);
-    } else {
-      setProducts(allProducts.filter((p) => p.category === selectedCategory));
-    }
+    setProducts(allProducts.filter((p) => p.category === selectedCategory));
   }, [selectedCategory, allProducts]);
 
   /* Preload product images after initial page load for instant category switching */
@@ -278,8 +330,8 @@ export default function ProductCatalogSection() {
     return () => ctx.revert();
   }, []);
 
-  const allLabel =
-    locale === 'zh-TW' ? '全部產品' : locale === 'id' ? 'Semua Produk' : 'All Products';
+  const viewAllLabel =
+    locale === 'zh-TW' ? '查看全部產品' : locale === 'id' ? 'Lihat Semua Koleksi' : 'View All Collection';
 
   return (
     <>
@@ -306,20 +358,9 @@ export default function ProductCatalogSection() {
             </p>
           </div>
 
-          {/* Category Tabs — horizontal scrollable strip */}
+          {/* Category Tabs — horizontal pill strip (no 'All' tab per design) */}
           <div className="mb-8 sm:mb-12 px-4">
             <div className="flex flex-wrap justify-center gap-2 sm:gap-3 max-w-5xl mx-auto">
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full font-heading text-xs sm:text-sm font-semibold transition-all duration-300 active:scale-95 ${
-                  selectedCategory === 'all'
-                    ? 'bg-red text-white shadow-md'
-                    : 'bg-cream text-navy hover:shadow-md'
-                }`}
-              >
-                <span aria-hidden className="text-base leading-none">★</span>
-                {allLabel}
-              </button>
               {categories.map((cat) => {
                 const catName = getCategoryName(cat, locale);
                 const active = selectedCategory === cat.slug;
@@ -356,6 +397,17 @@ export default function ProductCatalogSection() {
               />
             </motion.div>
           </AnimatePresence>
+
+          {/* CTA — View all collection */}
+          <div className="flex justify-center mt-4 sm:mt-8 px-4">
+            <Link
+              href={`/${locale}/products`}
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-yellow-400 text-navy font-heading font-bold text-sm sm:text-base shadow-lg hover:bg-yellow-300 hover:shadow-xl transition-all duration-300 active:scale-95"
+            >
+              {viewAllLabel}
+              <span aria-hidden>→</span>
+            </Link>
+          </div>
         </div>
       </section>
 

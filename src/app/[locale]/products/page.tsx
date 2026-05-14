@@ -579,7 +579,7 @@ function ProductModal({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Category Dropdown Selector                                         */
+/*  Category Pill Tabs — horizontal scrollable strip (matches homepage) */
 /* ------------------------------------------------------------------ */
 function CategoryDropdown({
   categories,
@@ -594,104 +594,37 @@ function CategoryDropdown({
   productCounts: Record<string, number>;
   onSelect: (categoryId: string) => void;
 }) {
-  const t = useEditableT('products');
-  const [open, setOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const activeCat = categories.find(c => c.id === activeCategory);
-  const activeName = activeCat ? getLocalizedField(activeCat, 'name', locale) : '';
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const categoryLabel = t('categories');
-  const itemsLabel = t('select');
-
   return (
-    <div ref={dropdownRef} className="relative inline-block">
-      {/* Compact trigger button */}
-      <button
-        onClick={() => setOpen(!open)}
-        className="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white/90 backdrop-blur-sm border border-navy/10 shadow-md shadow-navy/5 hover:shadow-lg hover:bg-white hover:border-navy/15 transition-all duration-300"
-      >
-        {activeCat && (
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red/10 to-red/5 flex items-center justify-center text-red">
-            <CategoryIcon slug={activeCat.slug} size={16} />
-          </div>
-        )}
-        <div className="text-left">
-          <span className="text-[9px] text-navy/30 font-semibold uppercase tracking-[0.15em] block leading-none mb-0.5">{categoryLabel}</span>
-          <span className="text-sm font-bold text-navy block leading-tight">{activeName}</span>
-        </div>
-        <ChevronDown className={`w-4 h-4 text-navy/25 ml-1 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
-      </button>
-
-      {/* Compact dropdown menu */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.97 }}
-            transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-            className="absolute top-full left-0 mt-1.5 w-64 sm:w-72 bg-white/[0.99] backdrop-blur-2xl rounded-xl shadow-xl shadow-navy/12 border border-navy/8 overflow-hidden z-50 max-h-[360px] overflow-y-auto"
-            style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(0,48,72,0.12) transparent' }}
-          >
-            <div className="p-1.5">
-              {categories.map((cat, i) => {
-                const name = getLocalizedField(cat, 'name', locale);
-                const isActive = cat.id === activeCategory;
-                const count = productCounts[cat.id] || 0;
-
-                return (
-                  <motion.button
-                    key={cat.id}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.025 }}
-                    onClick={() => {
-                      onSelect(cat.id);
-                      setOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group text-left ${
-                      isActive
-                        ? 'bg-red/8 ring-1 ring-red/12'
-                        : 'hover:bg-cream/60'
-                    }`}
-                  >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 ${
-                      isActive
-                        ? 'bg-red/15 text-red'
-                        : 'bg-navy/5 text-navy/35 group-hover:bg-red/10 group-hover:text-red'
-                    }`}>
-                      <CategoryIcon slug={cat.slug} size={16} />
-                    </div>
-                    <span className={`text-sm font-semibold truncate flex-1 transition-colors duration-200 ${
-                      isActive ? 'text-red' : 'text-navy/70 group-hover:text-navy'
-                    }`}>
-                      {name}
-                    </span>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
-                      isActive
-                        ? 'bg-red/12 text-red'
-                        : 'bg-navy/5 text-navy/25 group-hover:bg-red/8 group-hover:text-red/50'
-                    }`}>
-                      {count}
-                    </span>
-                  </motion.button>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div className="w-full">
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-3 max-w-5xl mx-auto">
+        {categories.map((cat) => {
+          const name = getLocalizedField(cat, 'name', locale);
+          const isActive = cat.id === activeCategory;
+          const count = productCounts[cat.id] || 0;
+          return (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => onSelect(cat.id)}
+              className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full font-heading text-xs sm:text-sm font-semibold transition-all duration-300 active:scale-95 shadow-md ${
+                isActive
+                  ? 'bg-red text-white'
+                  : 'bg-white/95 text-navy hover:shadow-lg'
+              }`}
+            >
+              <CategoryIcon slug={cat.slug} size={15} />
+              <span>{name}</span>
+              <span
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                  isActive ? 'bg-white/20 text-white' : 'bg-navy/10 text-navy/70'
+                }`}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
