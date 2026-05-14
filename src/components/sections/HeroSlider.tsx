@@ -138,14 +138,22 @@ function analyzeImageBrightness(src: string): Promise<'dark' | 'light'> {
 
 export default function HeroSlider() {
   const locale = useLocale();
-  const [slides, setSlides] = useState<HeroSlide[]>(fallbackSlides);
+  // Start empty so the marketing copy ('The Crown of Indonesian Taste…')
+  // never flashes on first paint before the live DB rows arrive. Fallback
+  // slides are only used if the fetch resolves with zero rows.
+  const [slides, setSlides] = useState<HeroSlide[]>([]);
+  const [slidesReady, setSlidesReady] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const imageRef = useRef<HTMLDivElement>(null);
 
-  // Fetch slides from Supabase
+  // Fetch slides from Supabase + warm-up every image so the carousel never
+  // jitters when AnimatePresence swaps in the next slide. We don't flip
+  // `slidesReady` until either a) the fetch resolves successfully, or
+  // b) we fall back to the static slides on error/empty — so the title /
+  // subtitle text never paints on top of an unloaded background.
   useEffect(() => {
     async function fetchSlides() {
       try {
@@ -156,10 +164,26 @@ export default function HeroSlider() {
           .order('sort_order', { ascending: true });
 
         if (!error && data && data.length > 0) {
-          setSlides(data as HeroSlide[]);
+          const list = data as HeroSlide[];
+          setSlides(list);
+          setSlidesReady(true);
+          list.forEach((s) => {
+            if (s.image_url) {
+              const img = new window.Image();
+              img.src = s.image_url;
+            }
+            if (s.image_url_mobile) {
+              const img = new window.Image();
+              img.src = s.image_url_mobile;
+            }
+          });
+        } else {
+          setSlides(fallbackSlides);
+          setSlidesReady(true);
         }
       } catch {
-        // Keep fallback slides
+        setSlides(fallbackSlides);
+        setSlidesReady(true);
       }
     }
     fetchSlides();
@@ -254,6 +278,17 @@ export default function HeroSlider() {
     setDirection(index > currentIndex ? 1 : -1);
     setCurrentIndex(index);
   };
+
+  // While `slidesReady` is false, slides is empty — render a placeholder
+  // section but no slide content, so the loading frame is silent.
+  if (!slidesReady || slides.length === 0) {
+    return (
+      <section
+        id="hero"
+        className="relative w-full overflow-hidden mt-[88px] aspect-[3/4] sm:aspect-[10/5] bg-navy"
+      />
+    );
+  }
 
   const currentSlide = slides[currentIndex];
   const title = getLocalizedField(currentSlide, 'title', locale);
