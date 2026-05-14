@@ -148,6 +148,7 @@ export default function HeroSlider() {
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const imageRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef<number | null>(null);
 
   // Fetch slides from Supabase + warm-up every image so the carousel never
   // jitters when AnimatePresence swaps in the next slide. We don't flip
@@ -458,6 +459,13 @@ export default function HeroSlider() {
       className="relative w-full overflow-hidden mt-[88px] aspect-[3/4] sm:aspect-[10/5]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+      onTouchEnd={(e) => {
+        if (touchStartX.current === null) return;
+        const diff = touchStartX.current - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        touchStartX.current = null;
+      }}
     >
       {/* Background slides — only media + overlay, no text */}
       <AnimatePresence initial={false} custom={direction} mode="sync">
