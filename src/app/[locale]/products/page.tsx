@@ -749,6 +749,7 @@ function FloatingProductCard({
           delay: index * 0.06,
         }}
         whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.9, y: 4 }}
         onClick={onClick}
         className="cursor-pointer group"
       >
@@ -1040,7 +1041,7 @@ function ProductsContent() {
         {/* Subtle grain overlay */}
       <div ref={contentRef} className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-20 scroll-mt-8 min-h-[60vh]">
         {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-8">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="animate-pulse">
                 <div className="bg-navy/5 rounded-2xl aspect-square mb-3" />
@@ -1086,7 +1087,7 @@ function ProductsContent() {
                 transition={{ duration: 0.3, ease: 'easeOut' }}
               >
                 {displayedProducts.length > 0 ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-8">
                     {displayedProducts.map((product, i) => (
                       <FloatingProductCard
                         key={product.id}

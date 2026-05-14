@@ -34,6 +34,7 @@ interface FormState {
   title: MultilingualValue;
   subtitle: MultilingualValue;
   image_url: string;
+  image_url_mobile: string;
   media_type: MediaType;
   link_url: string;
   sort_order: number;
@@ -44,6 +45,7 @@ const emptyForm = (): FormState => ({
   title: emptyMultilingual(),
   subtitle: emptyMultilingual(),
   image_url: '',
+  image_url_mobile: '',
   media_type: 'image',
   link_url: '',
   sort_order: 0,
@@ -98,6 +100,7 @@ export default function HeroSlidesPage() {
       title: fromRow(slide as unknown as Record<string, unknown>, 'title'),
       subtitle: fromRow(slide as unknown as Record<string, unknown>, 'subtitle'),
       image_url: slide.image_url || '',
+      image_url_mobile: slide.image_url_mobile || '',
       media_type: (slide.media_type as MediaType) || 'image',
       link_url: slide.link_url || '',
       sort_order: slide.sort_order,
@@ -114,6 +117,7 @@ export default function HeroSlidesPage() {
         ...toRow(form.title, 'title'),
         ...toRow(form.subtitle, 'subtitle'),
         image_url: form.image_url || null,
+        image_url_mobile: form.image_url_mobile || null,
         media_type: form.media_type,
         link_url: form.link_url || null,
         sort_order: form.sort_order,
@@ -318,14 +322,26 @@ export default function HeroSlidesPage() {
           </div>
 
           <ImageUpload
-            label={form.media_type === 'video' ? 'Slide Video' : form.media_type === 'gif' ? 'Slide GIF' : 'Slide Image'}
-            description={form.media_type === 'video' ? 'MP4, WebM, MOV' : form.media_type === 'gif' ? 'GIF format' : 'JPG, PNG, WebP recommended'}
+            label={form.media_type === 'video' ? 'Slide Video (Desktop 10:5)' : form.media_type === 'gif' ? 'Slide GIF (Desktop 10:5)' : 'Slide Image — Desktop (10:5)'}
+            description={form.media_type === 'video' ? 'MP4, WebM, MOV — recommended aspect 10:5' : form.media_type === 'gif' ? 'GIF format — recommended aspect 10:5' : 'JPG, PNG, WebP — recommended aspect 10:5 (e.g. 2000×1000)'}
             value={form.image_url}
             onChange={(url) => setForm((p) => ({ ...p, image_url: url }))}
             folder={form.media_type === 'video' ? 'hero-slides/videos' : form.media_type === 'gif' ? 'hero-slides/gifs' : 'hero-slides'}
             accept={form.media_type === 'video' ? 'video/mp4,video/webm,video/quicktime' : form.media_type === 'gif' ? 'image/gif' : 'image/*'}
             variant="wide"
           />
+
+          {form.media_type === 'image' && (
+            <ImageUpload
+              label="Slide Image — Mobile (3:4)"
+              description="Optional. Used on phones; falls back to the desktop image if empty. Recommended aspect 3:4 (e.g. 900×1200)."
+              value={form.image_url_mobile}
+              onChange={(url) => setForm((p) => ({ ...p, image_url_mobile: url }))}
+              folder="hero-slides/mobile"
+              accept="image/*"
+              variant="square"
+            />
+          )}
 
           <MultilingualField
             label="Title"

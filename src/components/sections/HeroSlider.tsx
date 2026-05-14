@@ -26,6 +26,7 @@ const fallbackSlides: HeroSlide[] = [
     subtitle_id: '300+ toko di seluruh Taiwan mempercayai kami menghadirkan cita rasa Indonesia otentik — dari dapur kami ke meja Anda.',
     subtitle_zh: '全台300+門市信賴我們，將正宗印尼風味從我們的廚房送到您的餐桌。',
     image_url: null,
+    image_url_mobile: null,
     media_type: 'image',
     link_url: null,
     sort_order: 0,
@@ -42,6 +43,7 @@ const fallbackSlides: HeroSlide[] = [
     subtitle_id: 'Bergabunglah dengan jaringan distribusi makanan Indonesia #1 di Taiwan — produk premium, pasokan andal, pasar terjamin.',
     subtitle_zh: '加入台灣第一的印尼食品配銷網路 — 優質產品、穩定供應、市場需求強勁。',
     image_url: null,
+    image_url_mobile: null,
     media_type: 'image',
     link_url: null,
     sort_order: 1,
@@ -58,6 +60,7 @@ const fallbackSlides: HeroSlide[] = [
     subtitle_id: 'Setiap produk dipilih dan diuji dengan cermat — karena kepercayaan Anda adalah mahkota kami. Temukan 26+ lini produk unggulan.',
     subtitle_zh: '每件產品精心挑選與檢驗 — 因為您的信任就是我們的皇冠。探索26+條卓越產品線。',
     image_url: null,
+    image_url_mobile: null,
     media_type: 'image',
     link_url: null,
     sort_order: 2,
@@ -390,11 +393,22 @@ export default function HeroSlider() {
         animate={{ scale: 1 }}
         transition={{ duration: 12, ease: 'linear' }}
       >
+        {/* Mobile-only 3:4 portrait image (falls back to the desktop URL when no mobile asset is uploaded) */}
+        <Image
+          src={currentSlide.image_url_mobile || currentSlide.image_url}
+          alt={title}
+          fill
+          className="object-cover w-full h-full block sm:hidden"
+          priority={currentIndex === 0}
+          sizes="100vw"
+          quality={90}
+        />
+        {/* Desktop / tablet 10:5 image */}
         <Image
           src={currentSlide.image_url}
           alt={title}
           fill
-          className="object-cover w-full h-full"
+          className="object-cover w-full h-full hidden sm:block"
           priority={currentIndex === 0}
           sizes="100vw"
           quality={90}
@@ -406,8 +420,7 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden mt-[88px]"
-      style={{ aspectRatio: '10/5' }}
+      className="relative w-full overflow-hidden mt-[88px] aspect-[3/4] sm:aspect-[10/5]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >

@@ -273,6 +273,8 @@ export interface HeroSlide {
   subtitle_id: string;
   subtitle_zh: string;
   image_url: string | null;
+  /** Mobile-only image (3:4). Falls back to image_url if empty. */
+  image_url_mobile: string | null;
   media_type: 'image' | 'video' | 'gif';
   link_url: string | null;
   sort_order: number;
@@ -290,6 +292,7 @@ export interface HeroSlideInsert {
   subtitle_id: string;
   subtitle_zh: string;
   image_url?: string | null;
+  image_url_mobile?: string | null;
   media_type?: 'image' | 'video' | 'gif';
   link_url?: string | null;
   sort_order?: number;
@@ -307,6 +310,7 @@ export interface HeroSlideUpdate {
   subtitle_id?: string;
   subtitle_zh?: string;
   image_url?: string | null;
+  image_url_mobile?: string | null;
   media_type?: 'image' | 'video' | 'gif';
   link_url?: string | null;
   sort_order?: number;
