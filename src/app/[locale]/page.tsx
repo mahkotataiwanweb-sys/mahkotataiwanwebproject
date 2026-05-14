@@ -250,10 +250,6 @@ export default function HomePage() {
   return (
     <>
       <HeroSlider />
-<<<<<<< HEAD
-      <MarqueeSection />
-=======
->>>>>>> 370d53f58c6bc8b10651921a569dd22181090218
       <ProductCatalogSection />
       <RecipeShowcaseSection />
 
