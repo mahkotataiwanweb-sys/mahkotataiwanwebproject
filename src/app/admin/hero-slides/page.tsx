@@ -323,7 +323,7 @@ export default function HeroSlidesPage() {
 
           <ImageUpload
             label={form.media_type === 'video' ? 'Slide Video (Desktop 10:5)' : form.media_type === 'gif' ? 'Slide GIF (Desktop 10:5)' : 'Slide Image — Desktop (10:5)'}
-            description={form.media_type === 'video' ? 'MP4, WebM, MOV — recommended aspect 10:5' : form.media_type === 'gif' ? 'GIF format — recommended aspect 10:5' : 'JPG, PNG, WebP — recommended aspect 10:5 (e.g. 2000×1000)'}
+            description={form.media_type === 'video' ? 'MP4, WebM, MOV — recommended aspect 10:5' : form.media_type === 'gif' ? 'GIF format — recommended aspect 10:5' : 'JPG, PNG, WebP — Desktop 10:5 / 2:1 (landscape) → 1920 × 960 px'}
             value={form.image_url}
             onChange={(url) => setForm((p) => ({ ...p, image_url: url }))}
             folder={form.media_type === 'video' ? 'hero-slides/videos' : form.media_type === 'gif' ? 'hero-slides/gifs' : 'hero-slides'}
@@ -334,7 +334,7 @@ export default function HeroSlidesPage() {
           {form.media_type === 'image' && (
             <ImageUpload
               label="Slide Image — Mobile (3:4)"
-              description="Optional. Used on phones; falls back to the desktop image if empty. Recommended aspect 3:4 (e.g. 900×1200)."
+              description="Optional. Used on phones; falls back to the desktop image if empty. Mobile 3:4 (portrait) → 1080 × 1440 px"
               value={form.image_url_mobile}
               onChange={(url) => setForm((p) => ({ ...p, image_url_mobile: url }))}
               folder="hero-slides/mobile"
