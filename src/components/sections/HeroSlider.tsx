@@ -420,7 +420,7 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden aspect-[3/4] sm:aspect-[10/5]"
+      className="relative w-full overflow-hidden mt-[72px] sm:mt-[92px] h-[calc(100dvh-72px)] sm:h-auto sm:aspect-[10/5]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
