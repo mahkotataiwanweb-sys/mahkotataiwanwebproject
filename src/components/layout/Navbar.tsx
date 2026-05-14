@@ -492,7 +492,7 @@ export default function Navbar() {
       <motion.header
         id="main-navbar"
         className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-500 overflow-hidden',
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-500 overflow-visible',
           isHomePage
             ? 'bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] shadow-md py-3'
             : isScrolled
