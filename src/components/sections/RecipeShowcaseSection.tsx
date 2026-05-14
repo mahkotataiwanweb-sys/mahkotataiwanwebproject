@@ -268,7 +268,17 @@ export default function RecipeShowcaseSection() {
         .eq('type', 'recipe')
         .order('published_at', { ascending: false })
         .limit(9);
-      if (!error && data) setRecipes(data);
+      if (!error && data) {
+        setRecipes(data);
+        // Warm the browser cache so the 3D carousel rotates without
+        // waiting on lazy-load network round-trips.
+        data.forEach((r) => {
+          if (r.image_url) {
+            const img = new window.Image();
+            img.src = r.image_url;
+          }
+        });
+      }
     }
     fetchRecipes();
   }, []);

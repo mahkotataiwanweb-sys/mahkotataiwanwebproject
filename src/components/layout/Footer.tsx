@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import { useEditableT } from '@/hooks/useEditableT';
 import Image from 'next/image';
@@ -13,6 +14,7 @@ import {
   Phone,
   Mail,
   MapPin,
+  Sparkles as SparklesIcon,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import type { NavMenuItem, CompanySettings } from '@/types/database';
@@ -271,8 +273,37 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-navy text-cream/90">
-      <div className="max-w-5xl mx-auto px-6 py-14">
+    <footer className="relative bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] text-cream/90 overflow-hidden">
+      {/* Subtle grid overlay — matches the Where-to-Buy hero */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }}
+        aria-hidden
+      />
+
+      {/* Two floating animated yellow stars (Sparkles), randomly placed */}
+      <motion.div
+        className="pointer-events-none absolute top-10 right-[12%] text-[#facc15]/55"
+        animate={{ y: [0, -14, 0], rotate: [0, 180, 360] }}
+        transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+        aria-hidden
+      >
+        <SparklesIcon className="h-7 w-7" fill="currentColor" />
+      </motion.div>
+      <motion.div
+        className="pointer-events-none absolute bottom-16 left-[18%] text-[#facc15]/45"
+        animate={{ y: [0, 10, 0], rotate: [0, -90, 0], scale: [1, 1.15, 1] }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.4 }}
+        aria-hidden
+      >
+        <SparklesIcon className="h-5 w-5" fill="currentColor" />
+      </motion.div>
+
+      <div className="relative z-10 max-w-5xl mx-auto px-6 py-14">
         {/* Logo + Brand - Centered */}
         <div className="flex flex-col items-center mb-6">
           <div className="flex items-center gap-3 mb-4">
@@ -406,7 +437,7 @@ export default function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-cream/10">
+      <div className="relative z-10 border-t border-cream/10">
         <div className="max-w-5xl mx-auto px-6 py-5 flex flex-col items-center gap-1.5">
           <p className="text-cream/40 text-xs text-center">
             &copy; {new Date().getFullYear()} Mahkota Taiwan. {t('allRightsReserved')}

@@ -154,6 +154,8 @@ function ProductGrid({
                       fill
                       className="object-contain pointer-events-none transition-transform duration-500 group-hover:scale-110"
                       sizes="(max-width: 640px) 120px, (max-width: 1024px) 140px, 160px"
+                      loading="eager"
+                      priority={idx < 8}
                     />
                   </motion.div>
                 ) : (
@@ -218,6 +220,7 @@ export default function ProductCatalogSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const categoryStripRef = useRef<HTMLDivElement>(null);
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [products, setProducts] = useState<ShowcaseProduct[]>([]);
@@ -256,22 +259,21 @@ export default function ProductCatalogSection() {
     setProducts(allProducts.filter((p) => p.category === selectedCategory));
   }, [selectedCategory, allProducts]);
 
-  /* Preload product images after initial page load for instant category switching */
+  /* Preload product images immediately on fetch so the category-switch
+     UI never waits for network — was delayed 3 s previously which made
+     the first selection feel sluggish. */
   useEffect(() => {
     if (allProducts.length === 0) return;
-    const timer = setTimeout(() => {
-      allProducts.forEach((p) => {
-        if (p.image_url) {
-          const img = new window.Image();
-          img.src = p.image_url;
-        }
-        if (p.detail_image_url) {
-          const img = new window.Image();
-          img.src = p.detail_image_url;
-        }
-      });
-    }, 3000);
-    return () => clearTimeout(timer);
+    allProducts.forEach((p) => {
+      if (p.image_url) {
+        const img = new window.Image();
+        img.src = p.image_url;
+      }
+      if (p.detail_image_url) {
+        const img = new window.Image();
+        img.src = p.detail_image_url;
+      }
+    });
   }, [allProducts]);
 
   useEffect(() => {
@@ -306,6 +308,29 @@ export default function ProductCatalogSection() {
           },
         }
       );
+
+      // Category pills — same scroll-reveal cascade as the heading children
+      const pills = categoryStripRef.current?.querySelectorAll('.category-pill');
+      if (pills && pills.length) {
+        gsap.fromTo(
+          pills,
+          { opacity: 0, y: 30, scale: 0.92 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 1.0,
+            stagger: 0.08,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: categoryStripRef.current,
+              start: 'top 90%',
+              toggleActions: 'play none none reverse',
+            },
+            delay: 0.4,
+          }
+        );
+      }
 
       // Red line draws from center — matches WhereToBuy style
       const redLine = headerRef.current!.querySelector('.red-line-reveal');
@@ -358,8 +383,8 @@ export default function ProductCatalogSection() {
             </p>
           </div>
 
-          {/* Category Tabs — horizontal pill strip (no 'All' tab per design) */}
-          <div className="mb-8 sm:mb-12 px-4">
+          {/* Category Tabs — horizontal pill strip with scroll-reveal stagger */}
+          <div ref={categoryStripRef} className="mb-8 sm:mb-12 px-4">
             <div className="flex flex-wrap justify-center gap-2 sm:gap-3 max-w-5xl mx-auto">
               {categories.map((cat) => {
                 const catName = getCategoryName(cat, locale);
@@ -368,7 +393,7 @@ export default function ProductCatalogSection() {
                   <button
                     key={cat.slug}
                     onClick={() => setSelectedCategory(cat.slug)}
-                    className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full font-heading text-xs sm:text-sm font-semibold transition-all duration-300 active:scale-95 ${
+                    className={`category-pill inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full font-heading text-xs sm:text-sm font-semibold transition-all duration-300 active:scale-95 ${
                       active
                         ? 'bg-red text-white shadow-md'
                         : 'bg-cream text-navy hover:shadow-md'

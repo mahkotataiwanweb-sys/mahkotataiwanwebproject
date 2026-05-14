@@ -138,30 +138,22 @@ function analyzeImageBrightness(src: string): Promise<'dark' | 'light'> {
 
 export default function HeroSlider() {
   const locale = useLocale();
-  const [slides, setSlides] = useState<HeroSlide[]>(fallbackSlides);
+  // Start empty so the marketing copy ('The Crown of Indonesian Taste…')
+  // never flashes on first paint before the live DB rows arrive. Fallback
+  // slides are only used if the fetch resolves with zero rows.
+  const [slides, setSlides] = useState<HeroSlide[]>([]);
+  const [slidesReady, setSlidesReady] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const imageRef = useRef<HTMLDivElement>(null);
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
-  const [navbarHeight, setNavbarHeight] = useState(80);
 
-  // Measure actual navbar height so hero starts exactly below the navy bar
-  useEffect(() => {
-    const measure = () => {
-      const header = document.getElementById('main-navbar') || document.querySelector('header');
-      if (header) setNavbarHeight(header.getBoundingClientRect().height);
-    };
-    measure();
-    window.addEventListener('resize', measure);
-    // Re-measure after fonts/images load
-    const timer = setTimeout(measure, 500);
-    return () => { window.removeEventListener('resize', measure); clearTimeout(timer); };
-  }, []);
-
-  // Fetch slides from Supabase
+  // Fetch slides from Supabase + warm-up every image so the carousel never
+  // jitters when AnimatePresence swaps in the next slide. We don't flip
+  // `slidesReady` until either a) the fetch resolves successfully, or
+  // b) we fall back to the static slides on error/empty — so the title /
+  // subtitle text never paints on top of an unloaded background.
   useEffect(() => {
     async function fetchSlides() {
       try {
@@ -172,10 +164,26 @@ export default function HeroSlider() {
           .order('sort_order', { ascending: true });
 
         if (!error && data && data.length > 0) {
-          setSlides(data as HeroSlide[]);
+          const list = data as HeroSlide[];
+          setSlides(list);
+          setSlidesReady(true);
+          list.forEach((s) => {
+            if (s.image_url) {
+              const img = new window.Image();
+              img.src = s.image_url;
+            }
+            if (s.image_url_mobile) {
+              const img = new window.Image();
+              img.src = s.image_url_mobile;
+            }
+          });
+        } else {
+          setSlides(fallbackSlides);
+          setSlidesReady(true);
         }
       } catch {
-        // Keep fallback slides
+        setSlides(fallbackSlides);
+        setSlidesReady(true);
       }
     }
     fetchSlides();
@@ -271,27 +279,16 @@ export default function HeroSlider() {
     setCurrentIndex(index);
   };
 
-  /* ── Swipe handlers for mobile ── */
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-  }, []);
-
-  const handleTouchEnd = useCallback(
-    (e: React.TouchEvent) => {
-      if (touchStartX.current === null || touchStartY.current === null) return;
-      const dx = e.changedTouches[0].clientX - touchStartX.current;
-      const dy = e.changedTouches[0].clientY - touchStartY.current;
-      // Only trigger if horizontal swipe is dominant and > 50px
-      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
-        if (dx < 0) nextSlide();
-        else prevSlide();
-      }
-      touchStartX.current = null;
-      touchStartY.current = null;
-    },
-    [nextSlide, prevSlide]
-  );
+  // While `slidesReady` is false, slides is empty — render a placeholder
+  // section but no slide content, so the loading frame is silent.
+  if (!slidesReady || slides.length === 0) {
+    return (
+      <section
+        id="hero"
+        className="relative w-full overflow-hidden mt-[88px] aspect-[3/4] sm:aspect-[10/5] bg-navy"
+      />
+    );
+  }
 
   const currentSlide = slides[currentIndex];
   const title = getLocalizedField(currentSlide, 'title', locale);
@@ -431,18 +428,16 @@ export default function HeroSlider() {
         animate={{ scale: 1 }}
         transition={{ duration: 12, ease: 'linear' }}
       >
-        {/* Mobile-only portrait image — object-cover to fill entire container */}
-        <div className="absolute inset-0 block sm:hidden">
-          <Image
-            src={currentSlide.image_url_mobile || currentSlide.image_url}
-            alt={title}
-            fill
-            className="object-cover w-full h-full"
-            priority={currentIndex === 0}
-            sizes="100vw"
-            quality={90}
-          />
-        </div>
+        {/* Mobile-only 3:4 portrait image (falls back to the desktop URL when no mobile asset is uploaded) */}
+        <Image
+          src={currentSlide.image_url_mobile || currentSlide.image_url}
+          alt={title}
+          fill
+          className="object-cover w-full h-full block sm:hidden"
+          priority={currentIndex === 0}
+          sizes="100vw"
+          quality={90}
+        />
         {/* Desktop / tablet 10:5 image */}
         <Image
           src={currentSlide.image_url}
@@ -460,12 +455,9 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden aspect-[3/4] sm:aspect-[10/5]"
-      style={{ marginTop: `${navbarHeight}px` }}
+      className="relative w-full overflow-hidden mt-[88px] aspect-[3/4] sm:aspect-[10/5]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
     >
       {/* Background slides — only media + overlay, no text */}
       <AnimatePresence initial={false} custom={direction} mode="sync">

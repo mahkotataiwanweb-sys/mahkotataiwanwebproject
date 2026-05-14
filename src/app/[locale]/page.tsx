@@ -94,28 +94,30 @@ function ManualNavCard({ articles, fallbackTitle, fallbackExcerpt, fallbackHref,
   const flexDir = imageSide === 'left' ? 'md:flex-row' : 'md:flex-row-reverse';
 
   return (
-    <div className={`flex flex-col gap-5 sm:gap-6 ${flexDir} items-stretch`}>
-      {/* IMAGE — flips on key change (rotateY) */}
+    <div className={`flex flex-col gap-2 sm:gap-3 ${flexDir} items-stretch`}>
+      {/* IMAGE — flips on key change (rotateY) — no background plate so the
+          card edges don't leave a ghost rectangle while mid-rotation */}
       <div className="w-full md:w-1/2" style={{ perspective: '2400px' }}>
-        <Link href={data.href} className="block aspect-[4/3] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.18)] relative bg-navy/5">
+        <Link href={data.href} className="block aspect-[4/3] relative rounded-2xl overflow-hidden">
           <AnimatePresence mode="wait" initial={false} custom={direction}>
             <motion.div
               key={`img-${index}`}
-              initial={{ rotateY: -110, opacity: 0 }}
+              initial={{ rotateY: -100, opacity: 0 }}
               animate={{ rotateY: 0, opacity: 1 }}
-              exit={{ rotateY: 110, opacity: 0 }}
+              exit={{ rotateY: 100, opacity: 0 }}
               transition={{
-                duration: 1.4,
+                duration: 1.1,
                 ease: [0.22, 0.68, 0, 1],
-                opacity: { duration: 0.45 },
+                opacity: { duration: 0.35 },
               }}
               style={{
                 transformStyle: 'preserve-3d',
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
                 willChange: 'transform, opacity',
+                filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.18))',
               }}
-              className="absolute inset-0"
+              className="absolute inset-0 rounded-2xl overflow-hidden"
             >
               {data.imageUrl ? (
                 <Image src={data.imageUrl} alt={data.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 540px" />
@@ -136,10 +138,10 @@ function ManualNavCard({ articles, fallbackTitle, fallbackExcerpt, fallbackHref,
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -slideFromX, opacity: 0 }}
             transition={{
-              duration: 1.0,
-              delay: 0.7,
+              duration: 0.8,
+              delay: 0.5,
               ease: [0.22, 0.68, 0, 1],
-              opacity: { duration: 0.55, delay: 0.7 },
+              opacity: { duration: 0.5, delay: 0.5 },
             }}
             className="bg-yellow-400 rounded-2xl p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.10)] flex flex-col justify-between w-full"
           >
@@ -221,6 +223,15 @@ export default function HomePage() {
 
       if (evRes.data) setEvents(evRes.data as Article[]);
       if (lifeRes.data) setActivities(lifeRes.data as Article[]);
+
+      // Preload every article cover so Discover flips are instant.
+      const all = [...(evRes.data || []), ...(lifeRes.data || [])] as Article[];
+      all.forEach((a) => {
+        if (a.image_url) {
+          const img = new window.Image();
+          img.src = a.image_url;
+        }
+      });
     }
     fetchAll();
   }, []);
