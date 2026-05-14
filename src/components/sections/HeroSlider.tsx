@@ -144,6 +144,8 @@ export default function HeroSlider() {
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const imageRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   // Fetch slides from Supabase
   useEffect(() => {
@@ -254,6 +256,28 @@ export default function HeroSlider() {
     setDirection(index > currentIndex ? 1 : -1);
     setCurrentIndex(index);
   };
+
+  /* ── Swipe handlers for mobile ── */
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (touchStartX.current === null || touchStartY.current === null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX.current;
+      const dy = e.changedTouches[0].clientY - touchStartY.current;
+      // Only trigger if horizontal swipe is dominant and > 50px
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0) nextSlide();
+        else prevSlide();
+      }
+      touchStartX.current = null;
+      touchStartY.current = null;
+    },
+    [nextSlide, prevSlide]
+  );
 
   const currentSlide = slides[currentIndex];
   const title = getLocalizedField(currentSlide, 'title', locale);
@@ -420,9 +444,11 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden mt-[72px] sm:mt-[92px] h-[calc(100dvh-72px)] sm:h-auto sm:aspect-[10/5]"
+      className="relative w-full overflow-hidden mt-[72px] sm:mt-[92px] aspect-[3/4] sm:aspect-[10/5]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Background slides — only media + overlay, no text */}
       <AnimatePresence initial={false} custom={direction} mode="sync">
