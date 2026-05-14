@@ -1161,8 +1161,44 @@ export default function AboutPage() {
       {/* ═══════════════════════════════════════════════════════════════
           Bottom CTA — Premium Floating Box
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28 relative overflow-hidden">
-<motion.div
+      <section className="py-20 sm:py-28 relative overflow-hidden bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236]">
+        {/* Grid texture overlay */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+          aria-hidden
+        />
+        {/* 3 floating yellow sparkles */}
+        <motion.div
+          className="pointer-events-none absolute top-8 right-[14%] text-[#facc15]/55"
+          animate={{ y: [0, -12, 0], rotate: [0, 180, 360] }}
+          transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+          aria-hidden
+        >
+          <Sparkles className="h-6 w-6" fill="currentColor" />
+        </motion.div>
+        <motion.div
+          className="pointer-events-none absolute bottom-12 left-[10%] text-[#facc15]/45"
+          animate={{ y: [0, 10, 0], rotate: [0, -90, 0], scale: [1, 1.15, 1] }}
+          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.4 }}
+          aria-hidden
+        >
+          <Sparkles className="h-5 w-5" fill="currentColor" />
+        </motion.div>
+        <motion.div
+          className="pointer-events-none absolute top-[45%] left-[75%] text-[#facc15]/35"
+          animate={{ y: [0, 8, 0], rotate: [0, 120, 0], scale: [1, 1.1, 1] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 2.5 }}
+          aria-hidden
+        >
+          <Sparkles className="h-4 w-4" fill="currentColor" />
+        </motion.div>
+
+        <motion.div
           ref={ctaRef}
           initial={{ opacity: 0, y: 80, scale: 0.92 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
