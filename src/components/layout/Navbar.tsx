@@ -68,7 +68,7 @@ export default function Navbar() {
   );
   // Homepage uses a yellow header with navy text — never light. Other dark
   // pages keep the original behaviour where unscrolled = light text.
-  const useLightText = !isScrolled && !isHomePage && isDarkHeaderPage;
+  const useLightText = isHomePage || (!isScrolled && isDarkHeaderPage);
 
   // Observe hero brightness
   useEffect(() => {
@@ -493,7 +493,7 @@ export default function Navbar() {
         className={cn(
           'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
           isHomePage
-            ? 'bg-yellow-400 shadow-md py-3'
+            ? 'bg-navy shadow-md py-3'
             : isScrolled
               ? 'glass-effect py-3 shadow-sm'
               : 'bg-transparent py-5'
@@ -524,9 +524,9 @@ export default function Navbar() {
                       : 'radial-gradient(circle, rgba(26,82,118,0.25) 0%, transparent 70%)',
                   }}
                 />
-                <Image src={useLightText && !isHomePage ? "/images/logo-light.png" : "/images/logo.png"} alt="Mahkota Taiwan" width={80} height={80} priority
+                <Image src={useLightText ? "/images/logo-light.png" : "/images/logo.png"} alt="Mahkota Taiwan" width={80} height={80} priority
                   className={cn('relative w-16 h-16 sm:w-20 sm:h-20 transition-all duration-300 drop-shadow-lg',
-                    false && 'brightness-0 invert')} />
+                    isHomePage && 'brightness-0 invert')} />
               </motion.div>
             </Link>
           </motion.div>
@@ -538,7 +538,7 @@ export default function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-4">
-            <LanguageSwitcher light={useLightText && !isHomePage} />
+            <LanguageSwitcher light={useLightText} />
             <button className="md:hidden relative z-10 p-2" onClick={() => setIsMobileOpen(!isMobileOpen)} aria-label="Toggle menu">
               {isMobileOpen ? <X className="w-6 h-6 text-navy" /> : <Menu className={cn('w-6 h-6 transition-colors duration-300', hamburgerColor)} />}
             </button>

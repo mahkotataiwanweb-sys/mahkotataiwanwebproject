@@ -107,10 +107,7 @@ export default function HeroSlidesPage() {
   };
 
   const handleSave = async () => {
-    if (!form.title.en.trim()) {
-      toast.error('English title is required');
-      return;
-    }
+    // Title is optional
     setSaving(true);
     try {
       const payload = {
@@ -332,7 +329,6 @@ export default function HeroSlidesPage() {
 
           <MultilingualField
             label="Title"
-            required
             values={form.title}
             onChange={(values) => setForm((p) => ({ ...p, title: values }))}
             context="hero slide title"

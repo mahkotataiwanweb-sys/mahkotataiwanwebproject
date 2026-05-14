@@ -204,13 +204,7 @@ export default function HeroSlider() {
     setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
   }, [slides.length]);
 
-  useEffect(() => {
-    if (isPaused || slides.length <= 1) return;
-    timerRef.current = setInterval(nextSlide, AUTOPLAY_INTERVAL);
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [isPaused, nextSlide, slides.length]);
+  // Autoplay disabled — manual navigation only via arrows/dots
 
   /* ✨ Subtle scroll parallax — text layers move at different speeds for depth */
   useEffect(() => {
@@ -412,8 +406,8 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full h-[65vh] sm:h-[70vh] overflow-hidden"
-      style={{ transformOrigin: 'center center' }}
+      className="relative w-full overflow-hidden mt-[88px]"
+      style={{ aspectRatio: '10/5' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -447,35 +441,31 @@ export default function HeroSlider() {
             animate="visible"
             exit="exit"
           >
-            <motion.div variants={textItemVariants}>
-              <Image
-                src="/images/logo.png"
-                alt="Mahkota Taiwan"
-                width={70}
-                height={70}
-                className="mx-auto mb-6 drop-shadow-lg brightness-0 invert"
-                priority
+
+            {title && (
+              <motion.h1
+                variants={textItemVariants}
+                className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg"
+              >
+                {title}
+              </motion.h1>
+            )}
+
+            {(title || subtitle) && (
+              <motion.div
+                variants={lineVariants}
+                className="w-20 h-[3px] bg-red mx-auto mb-6 origin-center"
               />
-            </motion.div>
+            )}
 
-            <motion.h1
-              variants={textItemVariants}
-              className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg"
-            >
-              {title}
-            </motion.h1>
-
-            <motion.div
-              variants={lineVariants}
-              className="w-20 h-[3px] bg-red mx-auto mb-6 origin-center"
-            />
-
-            <motion.p
-              variants={textItemVariants}
-              className="text-base sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow"
-            >
-              {subtitle}
-            </motion.p>
+            {subtitle && (
+              <motion.p
+                variants={textItemVariants}
+                className="text-base sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow"
+              >
+                {subtitle}
+              </motion.p>
+            )}
 
             {currentSlide.link_url && (
               <motion.a

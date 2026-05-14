@@ -9,7 +9,6 @@ import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import HeroSlider from '@/components/sections/HeroSlider';
-import MarqueeSection from '@/components/sections/MarqueeSection';
 import ProductCatalogSection from '@/components/sections/ProductCatalogSection';
 import RecipeShowcaseSection from '@/components/sections/RecipeShowcaseSection';
 import VideoShowcaseSection from '@/components/sections/VideoShowcaseSection';
@@ -251,7 +250,10 @@ export default function HomePage() {
   return (
     <>
       <HeroSlider />
+<<<<<<< HEAD
       <MarqueeSection />
+=======
+>>>>>>> 370d53f58c6bc8b10651921a569dd22181090218
       <ProductCatalogSection />
       <RecipeShowcaseSection />
 
