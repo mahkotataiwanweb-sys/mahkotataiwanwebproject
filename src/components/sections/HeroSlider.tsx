@@ -431,13 +431,13 @@ export default function HeroSlider() {
         animate={{ scale: 1 }}
         transition={{ duration: 12, ease: 'linear' }}
       >
-        {/* Mobile-only portrait image — object-contain so full image is visible without cropping */}
-        <div className="absolute inset-0 block sm:hidden bg-navy">
+        {/* Mobile-only portrait image — object-cover to fill entire container */}
+        <div className="absolute inset-0 block sm:hidden">
           <Image
             src={currentSlide.image_url_mobile || currentSlide.image_url}
             alt={title}
             fill
-            className="object-contain w-full h-full"
+            className="object-cover w-full h-full"
             priority={currentIndex === 0}
             sizes="100vw"
             quality={90}
