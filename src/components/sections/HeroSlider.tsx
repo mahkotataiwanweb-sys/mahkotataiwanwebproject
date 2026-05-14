@@ -286,7 +286,7 @@ export default function HeroSlider() {
     return (
       <section
         id="hero"
-        className="relative w-full overflow-hidden mt-[88px] aspect-[3/4] sm:aspect-[10/5] bg-navy"
+        className="relative w-full overflow-hidden mt-[72px] sm:mt-[88px] aspect-[3/4] sm:aspect-[10/5] bg-navy"
       />
     );
   }
@@ -456,7 +456,7 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden mt-[88px] aspect-[3/4] sm:aspect-[10/5]"
+      className="relative w-full overflow-hidden mt-[72px] sm:mt-[88px] aspect-[3/4] sm:aspect-[10/5]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
