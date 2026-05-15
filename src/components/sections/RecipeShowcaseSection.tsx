@@ -185,6 +185,9 @@ function CylinderCarousel({
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                     sizes="280px"
+                    priority={i < 5}
+                    loading={i < 5 ? 'eager' : 'lazy'}
+                    quality={75}
                   />
                 ) : (
                   <div className="absolute inset-0 bg-gradient-to-br from-red to-red-dark" />

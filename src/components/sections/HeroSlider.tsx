@@ -435,9 +435,10 @@ export default function HeroSlider() {
           alt={title}
           fill
           className="object-cover w-full h-full block sm:hidden"
-          priority={currentIndex === 0}
+          priority
+          loading="eager"
           sizes="100vw"
-          quality={90}
+          quality={80}
         />
         {/* Desktop / tablet 10:5 image */}
         <Image
@@ -445,9 +446,10 @@ export default function HeroSlider() {
           alt={title}
           fill
           className="object-cover w-full h-full hidden sm:block"
-          priority={currentIndex === 0}
+          priority
+          loading="eager"
           sizes="100vw"
-          quality={90}
+          quality={80}
         />
       </motion.div>
     );
