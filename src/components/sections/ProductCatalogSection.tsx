@@ -221,6 +221,7 @@ export default function ProductCatalogSection() {
   const contentRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const categoryStripRef = useRef<HTMLDivElement>(null);
+  const productGridRef = useRef<HTMLDivElement>(null);
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [products, setProducts] = useState<ShowcaseProduct[]>([]);
@@ -257,6 +258,21 @@ export default function ProductCatalogSection() {
     if (!selectedCategory) return;
     setProducts(allProducts.filter((p) => p.category === selectedCategory));
   }, [selectedCategory, allProducts]);
+
+  /* When the user picks a category, set it and smooth-scroll so the products
+     that fade in are immediately in view. */
+  const handleCategoryClick = useCallback((slug: string) => {
+    setSelectedCategory(slug);
+    // Wait for the product grid to render before scrolling.
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        const el = productGridRef.current;
+        if (!el) return;
+        const top = el.getBoundingClientRect().top + window.scrollY - 96;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }, 120);
+    });
+  }, []);
 
   /* Preload product images immediately on fetch so the category-switch
      UI never waits for network — was delayed 3 s previously which made
@@ -369,7 +385,7 @@ export default function ProductCatalogSection() {
 
         <div ref={contentRef} className="relative z-10">
           {/* Section Heading — eyebrow → title → red divider → tagline (matches Discover) */}
-          <div ref={headerRef} className="text-center mb-6 sm:mb-8 px-4">
+          <div ref={headerRef} className="text-center mb-14 sm:mb-20 px-4">
             <p className="text-red text-sm sm:text-base tracking-[0.35em] uppercase font-bold mb-3">
               Showcase
             </p>
@@ -382,49 +398,81 @@ export default function ProductCatalogSection() {
             </p>
           </div>
 
-          {/* Category Cards — 300x300 square grid, 3 per row × 2 rows, bouncy reveal */}
-          <div ref={categoryStripRef} className="mb-8 sm:mb-12 px-4">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
+          {/* Category Cards — 300x300 decorative cards, 3 per row × 2 rows, bouncy reveal */}
+          <div ref={categoryStripRef} className="mb-10 sm:mb-14 px-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 sm:gap-8 max-w-4xl mx-auto">
               {categories.slice(0, 6).map((cat) => {
                 const catName = getCategoryName(cat, locale);
                 const active = selectedCategory === cat.slug;
                 return (
                   <motion.button
                     key={cat.slug}
-                    onClick={() => setSelectedCategory(cat.slug)}
-                    whileTap={{ scale: 0.88 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 16 }}
-                    className={`category-pill relative aspect-square w-full max-w-[300px] mx-auto rounded-3xl overflow-hidden transition-all duration-300 ${
+                    onClick={() => handleCategoryClick(cat.slug)}
+                    whileTap={{ scale: 0.86 }}
+                    whileHover={{ y: -6 }}
+                    transition={{ type: 'spring', stiffness: 380, damping: 18 }}
+                    className={`category-pill group relative aspect-square w-full max-w-[300px] mx-auto rounded-[28px] transition-all duration-500 ${
                       active
-                        ? 'ring-4 ring-red shadow-2xl shadow-red/30'
-                        : 'ring-1 ring-navy/10 shadow-lg hover:shadow-xl hover:-translate-y-1'
+                        ? 'shadow-[0_25px_50px_-12px_rgba(193,33,38,0.45)]'
+                        : 'shadow-[0_12px_28px_-8px_rgba(0,48,72,0.25)] hover:shadow-[0_22px_45px_-12px_rgba(193,33,38,0.35)]'
                     }`}
                   >
-                    {cat.image_url ? (
-                      <Image
-                        src={cat.image_url}
-                        alt={catName}
-                        fill
-                        sizes="(max-width: 640px) 50vw, 300px"
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-cream to-yellow-100 flex items-center justify-center">
-                        <CategoryIcon slug={cat.slug} size={64} />
-                      </div>
-                    )}
-                    {/* Bottom gradient overlay so the label stays readable */}
-                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/75 via-black/35 to-transparent" />
-                    {/* Category name */}
-                    <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
-                      <span className="block text-white font-heading font-bold text-sm sm:text-base md:text-lg tracking-wide drop-shadow-md text-center">
-                        {catName}
+                    {/* Outer decorative gradient frame (cream → yellow) */}
+                    <span
+                      className={`absolute inset-0 rounded-[28px] p-[3px] transition-all duration-500 ${
+                        active
+                          ? 'bg-gradient-to-br from-yellow-300 via-red to-yellow-400'
+                          : 'bg-gradient-to-br from-yellow-300 via-cream to-yellow-400 group-hover:from-yellow-300 group-hover:via-red/60 group-hover:to-yellow-400'
+                      }`}
+                      aria-hidden
+                    >
+                      <span className="block w-full h-full rounded-[25px] bg-cream" />
+                    </span>
+
+                    {/* Image / icon area */}
+                    <div className="absolute inset-[3px] rounded-[25px] overflow-hidden">
+                      {cat.image_url ? (
+                        <>
+                          <Image
+                            src={cat.image_url}
+                            alt={catName}
+                            fill
+                            sizes="(max-width: 640px) 50vw, 300px"
+                            className="object-cover transition-transform duration-700 group-hover:scale-110"
+                          />
+                          {/* Inner brand tint that lifts on hover */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-navy/0 via-transparent to-red/20 opacity-60 mix-blend-overlay" />
+                        </>
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-cream via-yellow-100 to-yellow-200 flex items-center justify-center">
+                          <CategoryIcon slug={cat.slug} size={72} />
+                        </div>
+                      )}
+
+                      {/* Top-right yellow sparkle corner accent */}
+                      <span
+                        className="pointer-events-none absolute top-2 right-2 w-6 h-6 rounded-full bg-yellow-400/90 shadow-[0_0_14px_rgba(250,204,21,0.7)] flex items-center justify-center"
+                        aria-hidden
+                      >
+                        <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 text-white" fill="currentColor">
+                          <path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z" />
+                        </svg>
                       </span>
+
+                      {/* Bottom gradient panel + label inside a stylized ribbon */}
+                      <div className="absolute inset-x-0 bottom-0 px-3 pt-12 pb-3 sm:pb-4 bg-gradient-to-t from-navy/95 via-navy/60 to-transparent">
+                        <span className="block text-white font-heading font-bold text-sm sm:text-base md:text-lg tracking-wide drop-shadow-md text-center">
+                          {catName}
+                        </span>
+                        {/* Tiny red underline */}
+                        <span className="block w-8 h-[2px] bg-yellow-400 mx-auto mt-1.5 rounded-full" />
+                      </div>
+
+                      {/* Active state — red border ring inside the frame */}
+                      {active && (
+                        <span className="pointer-events-none absolute inset-0 rounded-[25px] ring-2 ring-red/80" aria-hidden />
+                      )}
                     </div>
-                    {/* Active indicator dot */}
-                    {active && (
-                      <span className="absolute top-3 right-3 w-3 h-3 rounded-full bg-red shadow-[0_0_0_3px_white]" />
-                    )}
                   </motion.button>
                 );
               })}
@@ -432,22 +480,24 @@ export default function ProductCatalogSection() {
           </div>
 
           {/* Product Grid — only appears once a category is chosen */}
-          <AnimatePresence mode="wait">
-            {selectedCategory && (
-              <motion.div
-                key={selectedCategory}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4, ease: 'easeInOut' }}
-              >
-                <ProductGrid
-                  products={products}
-                  locale={locale}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div ref={productGridRef}>
+            <AnimatePresence mode="wait">
+              {selectedCategory && (
+                <motion.div
+                  key={selectedCategory}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4, ease: 'easeInOut' }}
+                >
+                  <ProductGrid
+                    products={products}
+                    locale={locale}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* CTA — View all collection */}
           <div className="flex justify-center mt-4 sm:mt-8 px-4">
