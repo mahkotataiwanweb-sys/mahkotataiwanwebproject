@@ -30,6 +30,18 @@ function isAdminAsset(pathname: string): boolean {
   );
 }
 
+/** Files served at the root by Next.js (sitemap.ts / robots.ts route files
+    and conventional crawl files) — must bypass the next-intl middleware
+    or they'd get rewritten to /id/sitemap.xml and 404. */
+function isCrawlerRootFile(pathname: string): boolean {
+  return (
+    pathname === '/sitemap.xml' ||
+    pathname === '/robots.txt' ||
+    pathname === '/manifest.webmanifest' ||
+    pathname === '/manifest.json'
+  );
+}
+
 export function middleware(request: NextRequest) {
   const rawHost = request.headers.get('host') || '';
   const host = rawHost.split(':')[0].toLowerCase();
@@ -57,6 +69,16 @@ export function middleware(request: NextRequest) {
   // Pass-through for non-admin API calls.
   if (pathname.startsWith('/api')) {
     return NextResponse.next();
+  }
+
+  // Crawler-facing root files must skip the intl middleware so Next.js can
+  // serve sitemap.ts / robots.ts at /sitemap.xml and /robots.txt directly.
+  if (isCrawlerRootFile(pathname)) {
+    const passthrough = NextResponse.next();
+    if (!INDEXABLE_HOSTS.has(host)) {
+      passthrough.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    }
+    return passthrough;
   }
 
   // Admin auth gate (only ever reached on cmsHost thanks to the block above).
