@@ -41,7 +41,7 @@ const fallbackNavItems: FallbackNavItem[] = [
 ];
 
 // Pages with dark backgrounds where navbar needs light text
-const darkHeaderPages = ['/products', '/activity', '/events', '/about', '/where-to-buy', '/contact', '/recipes'];
+const darkHeaderPages = ['/products', '/activity', '/events', '/about', '/where-to-buy', '/contact', '/recipes', '/articles'];
 
 /* ------------------------------------------------------------------ */
 /*  Main Navbar                                                        */
