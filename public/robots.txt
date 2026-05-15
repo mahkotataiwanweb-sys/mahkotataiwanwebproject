@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /admin
+Disallow: /api/admin
+Disallow: /api/auth
+
+Sitemap: https://mahkotatw.com/sitemap.xml
