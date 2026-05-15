@@ -961,12 +961,20 @@ function ProductsContent() {
           </div>
         </div>
 
-        {/* Wave divider */}
-        <div className="absolute -bottom-[3px] left-0 right-0 z-20">
-          <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" className="block w-full h-[60px] sm:h-[80px]">
-            <path d="M0 80V30C240 10 480 0 720 10C960 20 1200 40 1440 30V80H0Z" fill="var(--color-cream)" />
-          </svg>
-        </div>
+      </div>
+
+      {/* Wave divider — overlaps hero's bottom; the curved area below is
+          transparent so the page's swirl texture shows through. */}
+      <div className="relative -mt-[60px] sm:-mt-[80px] z-20 pointer-events-none overflow-hidden">
+        <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" className="block w-full h-[60px] sm:h-[80px]">
+          <defs>
+            <linearGradient id="products-wave-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#003048" />
+              <stop offset="100%" stopColor="#002236" />
+            </linearGradient>
+          </defs>
+          <path d="M0 0V50C240 70 480 80 720 70C960 60 1200 40 1440 50V0Z" fill="url(#products-wave-grad)" />
+        </svg>
       </div>
 
       {/* ============ CONTENT ============ */}
