@@ -45,8 +45,8 @@ function CylinderCarousel({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isVisibleRef = useRef(true);
   const angleRef = useRef(0);
-  const velocityRef = useRef(0.15);
-  const targetVelocityRef = useRef(0.15);
+  const velocityRef = useRef(0.1);
+  const targetVelocityRef = useRef(0.1);
   const isDraggingRef = useRef(false);
   const lastXRef = useRef(0);
   const rafRef = useRef<number>(0);
@@ -114,7 +114,7 @@ function CylinderCarousel({
     if (hoveredIndex !== null) {
       targetVelocityRef.current = 0;
     } else {
-      targetVelocityRef.current = 0.15;
+      targetVelocityRef.current = 0.1;
     }
   }, [hoveredIndex]);
 
@@ -135,7 +135,7 @@ function CylinderCarousel({
 
   const handlePointerUp = useCallback(() => {
     isDraggingRef.current = false;
-    targetVelocityRef.current = 0.15;
+    targetVelocityRef.current = 0.1;
   }, []);
 
   return (
@@ -176,7 +176,7 @@ function CylinderCarousel({
               onMouseLeave={() => setHoveredIndex(null)}
               onClick={(e) => { if (isDraggingRef.current) e.preventDefault(); }}
             >
-              <div className="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden group shadow-2xl shadow-black/20">
+              <div className="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden group">
                 {/* Recipe image */}
                 {recipe.image_url ? (
                   <Image
