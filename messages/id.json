@@ -120,7 +120,12 @@
     "halal": "Bersertifikat Halal",
     "select": "pilih",
     "navigate": "navigasi",
-    "defaultProductDescription": "Produk Indonesia berkualitas premium, dibuat dengan resep autentik dan bahan-bahan terbaik."
+    "defaultProductDescription": "Produk Indonesia berkualitas premium, dibuat dengan resep autentik dan bahan-bahan terbaik.",
+    "ctaTitle": "Sudah Menemukan Produk Favorit Anda?",
+    "ctaDescription": "Cek di mana Anda dapat membeli produk Mahkota Taiwan di seluruh Taiwan, atau hubungi kami jika Anda tertarik menjadi mitra distribusi.",
+    "ctaButtonWhereToBuy": "Lihat Di Mana Membeli",
+    "ctaButtonPartner": "Jadi Mitra Kami",
+    "ctaFootnote": "300+ toko di seluruh Taiwan menjual produk Mahkota Taiwan."
   },
   "recipes": {
     "title": "Resep",

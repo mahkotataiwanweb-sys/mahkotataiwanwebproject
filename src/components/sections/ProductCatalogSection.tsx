@@ -261,7 +261,15 @@ export default function ProductCatalogSection() {
 
   /* When the user picks a category, set it and smooth-scroll so the products
      that fade in are immediately in view. */
+  const backTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const handleCategoryClick = useCallback((slug: string) => {
+    // If a pending 'back-to-showcase' clear is queued, cancel it — otherwise
+    // it will fire after the new category is picked and wipe the reveal mid
+    // animation, which is the bug behind 'no animation on second pick'.
+    if (backTimeoutRef.current) {
+      clearTimeout(backTimeoutRef.current);
+      backTimeoutRef.current = null;
+    }
     setSelectedCategory(slug);
     // Wait for the product grid to render before scrolling.
     requestAnimationFrame(() => {
@@ -365,8 +373,13 @@ export default function ProductCatalogSection() {
       window.scrollTo({ top, behavior: 'smooth' });
     }
     // Wait for scroll to complete before clearing so the user sees the cards
-    // before the product grid fades out.
-    setTimeout(() => setSelectedCategory(''), 600);
+    // before the product grid fades out. Save the timeout id so handleCategoryClick
+    // can cancel it if the user picks a new category before the timer fires.
+    if (backTimeoutRef.current) clearTimeout(backTimeoutRef.current);
+    backTimeoutRef.current = setTimeout(() => {
+      setSelectedCategory('');
+      backTimeoutRef.current = null;
+    }, 600);
   }, []);
 
   return (

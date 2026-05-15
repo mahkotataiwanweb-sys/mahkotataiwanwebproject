@@ -10,6 +10,7 @@ import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowLeft, Calendar, X, ChevronLeft, ChevronRight, Clock, ArrowUpRight, Images as ImagesIcon } from 'lucide-react';
+import HeroBackground from '@/components/effects/HeroBackground';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import type { Article } from '@/types/database';
@@ -237,76 +238,63 @@ export default function ArticleDetailPage() {
         </Link>
       </motion.div>
 
-      {/* ══════════════ IMMERSIVE HERO ══════════════ */}
-      <section className="relative h-[55vh] sm:h-[65vh] lg:h-[78vh] overflow-hidden">
-        {/* Parallax image */}
-        <div
-          className="absolute inset-0 will-change-transform"
-          style={{ transform: `translateY(${heroOffset}px) scale(${1 + heroOffset * 0.0003})` }}
-        >
-          {article.image_url ? (
-            <Image src={article.image_url} alt={title} fill className="object-cover" priority unoptimized />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#003048] via-[#003048] to-[#001a2c]" />
-          )}
-        </div>
+      {/* ══════════════ BRAND NAVY HERO ══════════════ */}
+      <section className="relative bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] overflow-hidden">
+        <HeroBackground />
+        <div className="pt-28 sm:pt-36 pb-12 sm:pb-16 relative z-10 max-w-4xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 0.68, 0, 1] }}
+          >
+            {/* meta row */}
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              <span className="px-4 py-1.5 bg-[#C12126] text-white text-[11px] font-bold uppercase tracking-[0.2em] rounded-full shadow-lg shadow-[#C12126]/30">
+                {typeLabel}
+              </span>
+              <span className="flex items-center gap-1.5 text-white/60 text-xs sm:text-sm">
+                <Calendar className="w-3.5 h-3.5" />
+                {date}
+              </span>
+              <span className="flex items-center gap-1.5 text-white/60 text-xs sm:text-sm">
+                <Clock className="w-3.5 h-3.5" />
+                {readingTime} {t('minRead')}
+              </span>
+            </div>
 
-        {/* overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/5" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+            {/* title */}
+            <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-[1.08] mb-5 drop-shadow-md">
+              {title}
+            </h1>
 
-        {/* decorative grid pattern */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
-
-        {/* bottom fade into cream */}
-        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#FFF8EE] to-transparent" />
-
-        {/* hero content */}
-        <div className="absolute inset-0 flex flex-col justify-end">
-          <div className="max-w-4xl mx-auto w-full px-6 pb-16 sm:pb-20 lg:pb-24">
+            {/* accent line */}
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, ease: [0.22, 0.68, 0, 1] }}
-            >
-              {/* meta row */}
-              <div className="flex flex-wrap items-center gap-3 mb-5">
-                <span className="px-4 py-1.5 bg-[#C12126] text-white text-xs font-bold uppercase tracking-[0.15em] rounded-full shadow-lg shadow-[#C12126]/30">
-                  {typeLabel}
-                </span>
-                <span className="flex items-center gap-1.5 text-white/70 text-sm">
-                  <Calendar className="w-3.5 h-3.5" />
-                  {date}
-                </span>
-                <span className="flex items-center gap-1.5 text-white/70 text-sm">
-                  <Clock className="w-3.5 h-3.5" />
-                  {readingTime} {t('minRead')}
-                </span>
-              </div>
+              className="h-[3px] bg-[#C12126] rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: 80 }}
+              transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
+            />
 
-              {/* title */}
-              <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-[1.08] mb-5 drop-shadow-xl">
-                {title}
-              </h1>
-
-              {/* accent line */}
-              <motion.div
-                className="h-[3px] bg-[#C12126] rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: 80 }}
-                transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
-              />
-            </motion.div>
-          </div>
+          </motion.div>
         </div>
       </section>
+
+      {/* Cover image — sits below the navy hero, framed nicely */}
+      {article.image_url && (
+        <section className="relative max-w-5xl mx-auto px-4 sm:px-6 -mt-2">
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 0.68, 0, 1] }}
+            className="relative aspect-[16/9] sm:aspect-[16/7] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_30px_70px_-25px_rgba(0,48,72,0.45)] ring-1 ring-navy/10"
+            style={{ transform: `translateY(${heroOffset * 0.35}px)` }}
+          >
+            <Image src={article.image_url} alt={title} fill className="object-cover" priority unoptimized />
+            {/* subtle bottom gradient for depth */}
+            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+          </motion.div>
+        </section>
+      )}
 
       {/* ══════════════ ARTICLE CONTENT ══════════════ */}
       <article className="max-w-4xl mx-auto px-6 py-12 sm:py-16 lg:py-20">

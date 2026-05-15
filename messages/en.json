@@ -120,7 +120,12 @@
     "select": "select",
     "navigate": "navigate",
     "defaultProductDescription": "Premium quality Indonesian product, crafted with authentic recipes and the finest ingredients.",
-    "noProductsInCategory": "No products found in this category."
+    "noProductsInCategory": "No products found in this category.",
+    "ctaTitle": "Found Your Favorite Product?",
+    "ctaDescription": "Check where you can buy Mahkota Taiwan products across Taiwan, or reach out if you're interested in becoming a distribution partner.",
+    "ctaButtonWhereToBuy": "See Where to Buy",
+    "ctaButtonPartner": "Become a Partner",
+    "ctaFootnote": "300+ stores across Taiwan stock Mahkota Taiwan products."
   },
   "recipes": {
     "title": "Recipes",
