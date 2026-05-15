@@ -351,6 +351,21 @@ export default function ProductCatalogSection() {
 
   const viewAllLabel =
     locale === 'zh-TW' ? '查看全部產品' : locale === 'id' ? 'Lihat Semua Koleksi' : 'View All Collection';
+  const backToShowcaseLabel =
+    locale === 'zh-TW' ? '返回展示' : locale === 'id' ? 'Kembali ke Showcase' : 'Back to Showcase';
+
+  /* Scroll back to the category cards and clear selection so the back button
+     hides itself. Called from the "Kembali ke Showcase" button below. */
+  const handleBackToShowcase = useCallback(() => {
+    const el = categoryStripRef.current;
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - 96;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+    // Wait for scroll to complete before clearing so the user sees the cards
+    // before the product grid fades out.
+    setTimeout(() => setSelectedCategory(''), 600);
+  }, []);
 
   return (
     <>
@@ -399,7 +414,7 @@ export default function ProductCatalogSection() {
                       mass: 0.9,
                       delay: idx * 0.09,
                     }}
-                    className={`category-pill group relative aspect-square w-full max-w-[200px] mx-auto rounded-[22px] overflow-hidden bg-white transition-shadow duration-500 ${
+                    className={`category-pill group relative aspect-square w-full max-w-[240px] mx-auto rounded-[22px] overflow-hidden bg-white transition-shadow duration-500 ${
                       active
                         ? 'shadow-[0_30px_60px_-20px_rgba(193,33,38,0.45),0_0_0_2px_#C12126]'
                         : 'shadow-[0_18px_36px_-18px_rgba(0,48,72,0.35),0_0_0_1px_rgba(0,48,72,0.08)] hover:shadow-[0_28px_55px_-18px_rgba(0,48,72,0.5),0_0_0_1px_rgba(0,48,72,0.18)]'
@@ -411,7 +426,7 @@ export default function ProductCatalogSection() {
                         src={cat.image_url}
                         alt={catName}
                         fill
-                        sizes="(max-width: 640px) 50vw, 200px"
+                        sizes="(max-width: 640px) 50vw, 240px"
                         className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.07]"
                       />
                     ) : (
@@ -442,7 +457,7 @@ export default function ProductCatalogSection() {
 
                     {/* Bottom label panel — clean navy gradient, no yellow */}
                     <div className="absolute inset-x-0 bottom-0 px-4 pt-14 pb-4 bg-gradient-to-t from-[#001a2c]/95 via-[#003048]/70 to-transparent">
-                      <span className="block text-white font-heading font-semibold text-sm sm:text-base md:text-lg tracking-[0.04em] text-center leading-tight">
+                      <span className="block text-white font-heading font-semibold text-xs sm:text-sm md:text-base tracking-[0.04em] text-center leading-tight">
                         {catName}
                       </span>
                       {/* Thin red underline that grows on hover/active */}
@@ -490,6 +505,29 @@ export default function ProductCatalogSection() {
               )}
             </AnimatePresence>
           </div>
+
+          {/* Back to showcase — only when a category is selected */}
+          <AnimatePresence>
+            {selectedCategory && (
+              <motion.div
+                key="back-to-showcase"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="flex justify-center mt-4 sm:mt-8 px-4"
+              >
+                <button
+                  type="button"
+                  onClick={handleBackToShowcase}
+                  className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-navy text-yellow-400 font-heading font-bold text-sm sm:text-base shadow-lg hover:bg-[#001E2E] hover:shadow-xl transition-all duration-300 active:scale-95"
+                >
+                  <span aria-hidden>←</span>
+                  {backToShowcaseLabel}
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* CTA — View all collection */}
           <div className="flex justify-center mt-4 sm:mt-8 px-4">
