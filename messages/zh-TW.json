@@ -120,7 +120,12 @@
     "select": "選擇",
     "navigate": "導航",
     "defaultProductDescription": "優質印尼產品，採用正宗食譜和最高級的食材精心製作。",
-    "noProductsInCategory": "找不到此分類的產品。"
+    "noProductsInCategory": "找不到此分類的產品。",
+    "ctaTitle": "已經找到您最喜歡的產品了嗎？",
+    "ctaDescription": "查看全台灣哪些地方可以買到 Mahkota Taiwan 的產品，或聯繫我們成為分銷合作夥伴。",
+    "ctaButtonWhereToBuy": "查看銷售地點",
+    "ctaButtonPartner": "成為合作夥伴",
+    "ctaFootnote": "全台灣 300+ 商店都有販售 Mahkota Taiwan 產品。"
   },
   "recipes": {
     "title": "食譜",

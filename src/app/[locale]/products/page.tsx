@@ -11,7 +11,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   Package, ArrowLeft, X,
-  Shield, Award, Search, ArrowRight, Sparkles, ChevronDown
+  Shield, Award, Search, ArrowRight, Sparkles, ChevronDown,
+  Handshake, MapPin, ChevronRight
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
@@ -1067,6 +1068,111 @@ function ProductsContent() {
       </div>
 
       </div>{/* end SandTexture wrapper */}
+
+      {/* CTA — Where to buy + partnership inquiry, mirrors contact CTA design */}
+      <section className="py-20 sm:py-28 relative overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 80, scale: 0.92 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 2.3, ease: [0.22, 0.68, 0, 1] }}
+          className="max-w-4xl mx-auto px-6 sm:px-8"
+        >
+          <div
+            className="relative bg-navy rounded-[2rem] p-10 sm:p-14 lg:p-16 text-center overflow-hidden shadow-[0_40px_100px_-25px_rgba(0,48,72,0.5),0_0_0_1px_rgba(255,255,255,0.05)_inset]"
+            style={{ animation: 'floatSubtle 6s ease-in-out infinite' }}
+          >
+            <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white/[0.1] via-transparent to-white/[0.02] pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+            <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+
+            <div
+              className="pointer-events-none absolute inset-0 rounded-[2rem]"
+              style={{
+                backgroundImage:
+                  'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+                backgroundSize: '60px 60px',
+              }}
+              aria-hidden
+            />
+
+            <motion.div
+              className="pointer-events-none absolute top-6 right-[12%] text-[#facc15]/55"
+              animate={{ y: [0, -14, 0], rotate: [0, 180, 360] }}
+              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+              aria-hidden
+            >
+              <Sparkles className="h-7 w-7" fill="currentColor" />
+            </motion.div>
+            <motion.div
+              className="pointer-events-none absolute bottom-8 left-[14%] text-[#facc15]/45"
+              animate={{ y: [0, 10, 0], rotate: [0, -90, 0], scale: [1, 1.15, 1] }}
+              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.4 }}
+              aria-hidden
+            >
+              <Sparkles className="h-5 w-5" fill="currentColor" />
+            </motion.div>
+            <motion.div
+              className="pointer-events-none absolute top-[40%] right-[28%] text-[#facc15]/35"
+              animate={{ y: [0, 8, 0], rotate: [0, 120, 0], scale: [1, 1.1, 1] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 2.5 }}
+              aria-hidden
+            >
+              <Sparkles className="h-4 w-4" fill="currentColor" />
+            </motion.div>
+
+            <div className="absolute inset-0 rounded-[2rem] overflow-hidden pointer-events-none">
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent"
+                style={{ animation: 'shimmerSlide 4s ease-in-out infinite' }}
+              />
+            </div>
+
+            <div className="relative z-10">
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3, type: 'spring', stiffness: 200 }}
+                className="w-[72px] h-[72px] rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-8 backdrop-blur-sm border border-white/[0.08]"
+              >
+                <Handshake className="w-9 h-9 text-red/80" />
+              </motion.div>
+
+              <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-5 leading-tight">
+                {t('ctaTitle')}
+              </h2>
+              <p className="text-cream/70 text-sm tracking-wide mb-10 max-w-lg mx-auto">
+                {t('ctaDescription')}
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href={`/${locale}/where-to-buy`}
+                  className="inline-flex items-center justify-center gap-2 bg-red hover:bg-red/90 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-red/20 text-base"
+                >
+                  <MapPin className="w-4 h-4" />
+                  {t('ctaButtonWhereToBuy')}
+                  <ChevronRight className="w-5 h-5" />
+                </Link>
+                <Link
+                  href={`/${locale}/contact`}
+                  className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 border border-white/20 hover:border-white/30 text-base backdrop-blur-sm"
+                >
+                  <Handshake className="w-4 h-4" />
+                  {t('ctaButtonPartner')}
+                </Link>
+              </div>
+
+              <p className="text-cream/25 text-xs mt-10">
+                {t('ctaFootnote')}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </section>
 
       {/* Product Modal */}
       <AnimatePresence>
