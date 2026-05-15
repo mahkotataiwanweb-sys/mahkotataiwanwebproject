@@ -235,8 +235,7 @@ export default function ProductCatalogSection() {
         .order('sort_order', { ascending: true });
       if (!error && data && data.length > 0) {
         setCategories(data as CategoryData[]);
-        // Default to the first category (the 'All' tab was removed per design).
-        setSelectedCategory(data[0].slug);
+        // Don't auto-select — wait for the user to tap a category card first.
       }
     }
     fetchCategories();
@@ -309,26 +308,25 @@ export default function ProductCatalogSection() {
         }
       );
 
-      // Category pills — dramatic scroll-reveal: bigger slide-up, scale & rotate
+      // Category cards — bounce pop-up reveal on scroll
       const pills = categoryStripRef.current?.querySelectorAll('.category-pill');
       if (pills && pills.length) {
         gsap.fromTo(
           pills,
-          { opacity: 0, y: 50, scale: 0.7, rotateX: -45 },
+          { opacity: 0, y: 60, scale: 0.4 },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            rotateX: 0,
-            duration: 0.9,
-            stagger: { each: 0.1, from: 'start' },
-            ease: 'back.out(1.6)',
+            duration: 1.1,
+            stagger: { each: 0.12, from: 'start' },
+            ease: 'elastic.out(1, 0.55)',
             scrollTrigger: {
               trigger: categoryStripRef.current,
-              start: 'top 88%',
+              start: 'top 90%',
               toggleActions: 'play none none reverse',
             },
-            delay: 0.3,
+            delay: 0.25,
           }
         );
       }
@@ -384,44 +382,71 @@ export default function ProductCatalogSection() {
             </p>
           </div>
 
-          {/* Category Tabs — horizontal pill strip with scroll-reveal stagger */}
+          {/* Category Cards — 300x300 square grid, 3 per row × 2 rows, bouncy reveal */}
           <div ref={categoryStripRef} className="mb-8 sm:mb-12 px-4">
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 max-w-5xl mx-auto">
-              {categories.map((cat) => {
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
+              {categories.slice(0, 6).map((cat) => {
                 const catName = getCategoryName(cat, locale);
                 const active = selectedCategory === cat.slug;
                 return (
-                  <button
+                  <motion.button
                     key={cat.slug}
                     onClick={() => setSelectedCategory(cat.slug)}
-                    className={`category-pill inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full font-heading text-xs sm:text-sm font-semibold transition-all duration-300 active:scale-95 ${
+                    whileTap={{ scale: 0.88 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 16 }}
+                    className={`category-pill relative aspect-square w-full max-w-[300px] mx-auto rounded-3xl overflow-hidden transition-all duration-300 ${
                       active
-                        ? 'bg-red text-white shadow-md'
-                        : 'bg-cream text-navy hover:shadow-md'
+                        ? 'ring-4 ring-red shadow-2xl shadow-red/30'
+                        : 'ring-1 ring-navy/10 shadow-lg hover:shadow-xl hover:-translate-y-1'
                     }`}
                   >
-                    <CategoryIcon slug={cat.slug} size={15} />
-                    {catName}
-                  </button>
+                    {cat.image_url ? (
+                      <Image
+                        src={cat.image_url}
+                        alt={catName}
+                        fill
+                        sizes="(max-width: 640px) 50vw, 300px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-cream to-yellow-100 flex items-center justify-center">
+                        <CategoryIcon slug={cat.slug} size={64} />
+                      </div>
+                    )}
+                    {/* Bottom gradient overlay so the label stays readable */}
+                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/75 via-black/35 to-transparent" />
+                    {/* Category name */}
+                    <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+                      <span className="block text-white font-heading font-bold text-sm sm:text-base md:text-lg tracking-wide drop-shadow-md text-center">
+                        {catName}
+                      </span>
+                    </div>
+                    {/* Active indicator dot */}
+                    {active && (
+                      <span className="absolute top-3 right-3 w-3 h-3 rounded-full bg-red shadow-[0_0_0_3px_white]" />
+                    )}
+                  </motion.button>
                 );
               })}
             </div>
           </div>
 
-          {/* Product Grid */}
+          {/* Product Grid — only appears once a category is chosen */}
           <AnimatePresence mode="wait">
-            <motion.div
-              key={selectedCategory}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4, ease: 'easeInOut' }}
-            >
-              <ProductGrid
-                products={products}
-                locale={locale}
-              />
-            </motion.div>
+            {selectedCategory && (
+              <motion.div
+                key={selectedCategory}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4, ease: 'easeInOut' }}
+              >
+                <ProductGrid
+                  products={products}
+                  locale={locale}
+                />
+              </motion.div>
+            )}
           </AnimatePresence>
 
           {/* CTA — View all collection */}
