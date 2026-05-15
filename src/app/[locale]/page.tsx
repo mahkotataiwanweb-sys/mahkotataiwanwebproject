@@ -121,7 +121,7 @@ function ManualNavCard({ articles, fallbackTitle, fallbackExcerpt, fallbackHref,
               className="absolute inset-0 rounded-2xl overflow-hidden"
             >
               {data.imageUrl ? (
-                <Image src={data.imageUrl} alt={data.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 540px" />
+                <Image src={data.imageUrl} alt={data.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 540px" priority loading="eager" quality={75} />
               ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-[#003048] to-[#001a2c]" />
               )}

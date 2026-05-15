@@ -309,25 +309,26 @@ export default function ProductCatalogSection() {
         }
       );
 
-      // Category pills — same scroll-reveal cascade as the heading children
+      // Category pills — dramatic scroll-reveal: bigger slide-up, scale & rotate
       const pills = categoryStripRef.current?.querySelectorAll('.category-pill');
       if (pills && pills.length) {
         gsap.fromTo(
           pills,
-          { opacity: 0, y: 30, scale: 0.92 },
+          { opacity: 0, y: 50, scale: 0.7, rotateX: -45 },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 1.0,
-            stagger: 0.08,
-            ease: 'power3.out',
+            rotateX: 0,
+            duration: 0.9,
+            stagger: { each: 0.1, from: 'start' },
+            ease: 'back.out(1.6)',
             scrollTrigger: {
               trigger: categoryStripRef.current,
-              start: 'top 90%',
+              start: 'top 88%',
               toggleActions: 'play none none reverse',
             },
-            delay: 0.4,
+            delay: 0.3,
           }
         );
       }
