@@ -1104,7 +1104,42 @@ export default function ContactPage() {
       {/* ╔═══════════════════════════════════════════╗
           ║  6. CTA — Premium Floating Box             ║
           ╚═══════════════════════════════════════════╝ */}
-      <section className="py-20 sm:py-28 relative overflow-hidden bg-cream">
+      <section className="py-20 sm:py-28 relative overflow-hidden bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236]">
+        {/* Grid texture overlay */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+          aria-hidden
+        />
+        {/* 3 floating yellow sparkles */}
+        <motion.div
+          className="pointer-events-none absolute top-8 right-[14%] text-[#facc15]/55"
+          animate={{ y: [0, -12, 0], rotate: [0, 180, 360] }}
+          transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+          aria-hidden
+        >
+          <Sparkles className="h-6 w-6" fill="currentColor" />
+        </motion.div>
+        <motion.div
+          className="pointer-events-none absolute bottom-12 left-[10%] text-[#facc15]/45"
+          animate={{ y: [0, 10, 0], rotate: [0, -90, 0], scale: [1, 1.15, 1] }}
+          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.4 }}
+          aria-hidden
+        >
+          <Sparkles className="h-5 w-5" fill="currentColor" />
+        </motion.div>
+        <motion.div
+          className="pointer-events-none absolute top-[45%] left-[75%] text-[#facc15]/35"
+          animate={{ y: [0, 8, 0], rotate: [0, 120, 0], scale: [1, 1.1, 1] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 2.5 }}
+          aria-hidden
+        >
+          <Sparkles className="h-4 w-4" fill="currentColor" />
+        </motion.div>
 
         <motion.div
           ref={ctaRef}
@@ -1114,7 +1149,7 @@ export default function ContactPage() {
           transition={{ duration: 2.3, ease: [0.22, 0.68, 0, 1] }}
           className="max-w-4xl mx-auto px-6 sm:px-8"
         >
-          <div className="relative bg-navy rounded-[2rem] p-10 sm:p-14 lg:p-16 text-center overflow-hidden shadow-[0_40px_100px_-25px_rgba(0,48,72,0.35),0_0_0_1px_rgba(255,255,255,0.05)_inset]"
+          <div className="relative bg-navy rounded-[2rem] p-10 sm:p-14 lg:p-16 text-center overflow-hidden shadow-[0_40px_100px_-25px_rgba(0,48,72,0.5),0_0_0_1px_rgba(255,255,255,0.05)_inset]"
             style={{ animation: 'floatSubtle 6s ease-in-out infinite' }}
           >
             {/* Glossy shine overlays */}
@@ -1124,42 +1159,6 @@ export default function ContactPage() {
             <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
             <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
             
-            {/* Grid texture overlay */}
-            <div
-              className="pointer-events-none absolute inset-0 rounded-[2rem]"
-              style={{
-                backgroundImage:
-                  'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
-                backgroundSize: '60px 60px',
-              }}
-              aria-hidden
-            />
-            {/* Floating yellow sparkles */}
-            <motion.div
-              className="pointer-events-none absolute top-6 right-[12%] text-[#facc15]/55"
-              animate={{ y: [0, -8, 0], rotate: [0, 180, 360] }}
-              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-              aria-hidden
-            >
-              <Sparkles className="h-5 w-5" fill="currentColor" />
-            </motion.div>
-            <motion.div
-              className="pointer-events-none absolute bottom-8 left-[8%] text-[#facc15]/45"
-              animate={{ y: [0, 6, 0], rotate: [0, -90, 0], scale: [1, 1.15, 1] }}
-              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.4 }}
-              aria-hidden
-            >
-              <Sparkles className="h-4 w-4" fill="currentColor" />
-            </motion.div>
-            <motion.div
-              className="pointer-events-none absolute top-[40%] right-[6%] text-[#facc15]/35"
-              animate={{ y: [0, 5, 0], rotate: [0, 120, 0], scale: [1, 1.1, 1] }}
-              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 2.5 }}
-              aria-hidden
-            >
-              <Sparkles className="h-3 w-3" fill="currentColor" />
-            </motion.div>
-
             {/* Animated gradient orbs */}
 
 
