@@ -285,7 +285,7 @@ export default function Footer() {
         aria-hidden
       />
 
-      {/* Two floating animated yellow stars (Sparkles), randomly placed */}
+      {/* Four floating animated yellow stars (Sparkles), randomly placed */}
       <motion.div
         className="pointer-events-none absolute top-10 right-[12%] text-[#facc15]/55"
         animate={{ y: [0, -14, 0], rotate: [0, 180, 360] }}
@@ -301,6 +301,22 @@ export default function Footer() {
         aria-hidden
       >
         <SparklesIcon className="h-5 w-5" fill="currentColor" />
+      </motion.div>
+      <motion.div
+        className="pointer-events-none absolute top-[40%] right-[30%] text-[#facc15]/35"
+        animate={{ y: [0, 8, 0], rotate: [0, 120, 0], scale: [1, 1.1, 1] }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 2.5 }}
+        aria-hidden
+      >
+        <SparklesIcon className="h-4 w-4" fill="currentColor" />
+      </motion.div>
+      <motion.div
+        className="pointer-events-none absolute top-[55%] left-[8%] text-[#facc15]/40"
+        animate={{ y: [0, -10, 0], rotate: [0, -150, 0], scale: [1, 1.2, 1] }}
+        transition={{ duration: 7.5, repeat: Infinity, ease: 'easeInOut', delay: 0.7 }}
+        aria-hidden
+      >
+        <SparklesIcon className="h-6 w-6" fill="currentColor" />
       </motion.div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-14">

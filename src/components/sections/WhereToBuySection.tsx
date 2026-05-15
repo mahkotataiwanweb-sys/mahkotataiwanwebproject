@@ -381,7 +381,7 @@ export default function WhereToBuySection() {
                     x={pin.x}
                     y={pin.y + 12}
                     textAnchor="middle"
-                    fill="#1a5276"
+                    fill="#ffffff"
                     fontSize="7"
                     fontWeight="600"
                     fontFamily="sans-serif"
