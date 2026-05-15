@@ -417,7 +417,24 @@ export default function VideoShowcaseSection() {
         <RedWavyBackground />
       </div>
 
-
+      {/* Floating bubble particles — same vibe as RecipeShowcase background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
+        {Array.from({ length: 22 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full bg-white/30"
+            style={{
+              width: `${3 + (i % 4) * 1.8}px`,
+              height: `${3 + (i % 4) * 1.8}px`,
+              left: `${(i * 37 + 13) % 100}%`,
+              top: `${(i * 53 + 7) % 100}%`,
+              animation: `particleFloat ${7 + (i % 5) * 2}s ease-in-out infinite`,
+              animationDelay: `${(i % 8) * 0.5}s`,
+              opacity: 0.25 + (i % 3) * 0.12,
+            }}
+          />
+        ))}
+      </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Section Header */}
@@ -500,15 +517,15 @@ export default function VideoShowcaseSection() {
           >
             {activeVideo && (
               <>
-                {/* Video Title */}
+                {/* Category label */}
                 <motion.h3
                   key={`title-${activeVideoIndex}`}
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="text-2xl sm:text-3xl font-bold text-navy mb-6 text-center"
+                  className="text-xl sm:text-2xl font-bold text-white mb-6 text-center"
                 >
-                  {getLocalizedField(activeVideo, 'title', locale)}
+                  Youtube Videos
                 </motion.h3>
 
                 {/* Video Player */}
@@ -566,10 +583,10 @@ export default function VideoShowcaseSection() {
             {/* Title */}
             <h3 className="text-xl sm:text-2xl font-bold text-white mb-8 text-center">
               {activeCategory === 'shorts'
-                ? 'Shorts'
+                ? 'Shorts Youtube Videos'
                 : activeCategory === 'tiktok'
-                ? 'TikTok Videos'
-                : 'Reels'}
+                ? 'Tiktok Videos'
+                : 'Instagram Reels'}
             </h3>
 
             {/* Videos Grid */}
