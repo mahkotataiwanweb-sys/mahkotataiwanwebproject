@@ -458,9 +458,15 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden mt-[72px] sm:mt-[88px] aspect-[3/4] sm:aspect-[10/5]"
+      className="relative w-full overflow-hidden mt-[72px] sm:mt-[88px] aspect-[3/4] sm:aspect-[10/5] sm:cursor-pointer"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onClick={() => {
+        // Desktop only: clicking anywhere on the hero advances to the next slide.
+        if (typeof window !== 'undefined' && window.innerWidth >= 640) {
+          nextSlide();
+        }
+      }}
       onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
       onTouchEnd={(e) => {
         if (touchStartX.current === null) return;
@@ -542,18 +548,18 @@ export default function HeroSlider() {
       {slides.length > 1 && (
         <>
           <button
-            onClick={prevSlide}
-            className="hidden sm:flex absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 items-center justify-center text-white hover:bg-white/20 transition-all duration-300"
+            onClick={(e) => { e.stopPropagation(); prevSlide(); }}
+            className="hidden sm:flex absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-yellow-400 hover:bg-yellow-300 shadow-lg items-center justify-center text-navy transition-all duration-300"
             aria-label="Previous slide"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-6 h-6" strokeWidth={3} />
           </button>
           <button
-            onClick={nextSlide}
-            className="hidden sm:flex absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 items-center justify-center text-white hover:bg-white/20 transition-all duration-300"
+            onClick={(e) => { e.stopPropagation(); nextSlide(); }}
+            className="hidden sm:flex absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-yellow-400 hover:bg-yellow-300 shadow-lg items-center justify-center text-navy transition-all duration-300"
             aria-label="Next slide"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-6 h-6" strokeWidth={3} />
           </button>
         </>
       )}
@@ -564,7 +570,7 @@ export default function HeroSlider() {
           {slides.map((_, index) => (
             <button
               key={index}
-              onClick={() => goToSlide(index)}
+              onClick={(e) => { e.stopPropagation(); goToSlide(index); }}
               className={`transition-all duration-300 rounded-full ${
                 index === currentIndex
                   ? 'w-8 h-3 bg-red'
