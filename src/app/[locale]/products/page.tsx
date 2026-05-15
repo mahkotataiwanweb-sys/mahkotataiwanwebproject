@@ -1070,7 +1070,7 @@ function ProductsContent() {
       </div>{/* end SandTexture wrapper */}
 
       {/* CTA — Where to buy + partnership inquiry, mirrors contact CTA design */}
-      <section className="py-20 sm:py-28 relative overflow-hidden">
+      <section className="pt-4 sm:pt-8 pb-20 sm:pb-28 relative overflow-hidden">
         <motion.div
           initial={{ opacity: 0, y: 80, scale: 0.92 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
