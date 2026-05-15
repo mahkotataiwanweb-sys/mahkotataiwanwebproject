@@ -7,8 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Globe } from 'lucide-react';
 
 const locales = [
-  { code: 'en', label: 'English', flag: '🇺🇸' },
   { code: 'id', label: 'Indonesia', flag: '🇮🇩' },
+  { code: 'en', label: 'English', flag: '🇺🇸' },
   { code: 'zh-TW', label: '繁體中文', flag: '🇹🇼' },
 ];
 
