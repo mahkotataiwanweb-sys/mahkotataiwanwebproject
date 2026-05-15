@@ -349,10 +349,8 @@ export default function ProductCatalogSection() {
     return () => ctx.revert();
   }, []);
 
-  const viewAllLabel =
-    locale === 'zh-TW' ? '查看全部產品' : locale === 'id' ? 'Lihat Semua Koleksi' : 'View All Collection';
-  const backToShowcaseLabel =
-    locale === 'zh-TW' ? '返回展示' : locale === 'id' ? 'Kembali ke Showcase' : 'Back to Showcase';
+  const viewAllLabel = t('viewAllCollection');
+  const backToShowcaseLabel = t('backToShowcase');
 
   /* Scroll back to the category cards and clear selection so the back button
      hides itself. Called from the "Kembali ke Showcase" button below. */
@@ -506,34 +504,29 @@ export default function ProductCatalogSection() {
             </AnimatePresence>
           </div>
 
-          {/* Back to showcase — only when a category is selected */}
-          <AnimatePresence>
-            {selectedCategory && (
-              <motion.div
-                key="back-to-showcase"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="flex justify-center mt-4 sm:mt-8 px-4"
-              >
-                <button
+          {/* Back to showcase + View all collection — paired buttons, small,
+              back is pulled slightly left of centre, view-all slightly right. */}
+          <div className="flex flex-row items-center justify-center gap-3 mt-4 sm:mt-8 px-4">
+            <AnimatePresence>
+              {selectedCategory && (
+                <motion.button
+                  key="back-to-showcase"
                   type="button"
                   onClick={handleBackToShowcase}
-                  className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-navy text-yellow-400 font-heading font-bold text-sm sm:text-base shadow-lg hover:bg-[#001E2E] hover:shadow-xl transition-all duration-300 active:scale-95"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="-translate-x-1 sm:-translate-x-2 inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-full bg-navy text-yellow-400 font-heading font-bold text-xs sm:text-sm shadow-md hover:bg-[#001E2E] hover:shadow-lg transition-all duration-300 active:scale-95"
                 >
                   <span aria-hidden>←</span>
                   {backToShowcaseLabel}
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* CTA — View all collection */}
-          <div className="flex justify-center mt-4 sm:mt-8 px-4">
+                </motion.button>
+              )}
+            </AnimatePresence>
             <Link
               href={`/${locale}/products`}
-              className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-yellow-400 text-navy font-heading font-bold text-sm sm:text-base shadow-lg hover:bg-yellow-300 hover:shadow-xl transition-all duration-300 active:scale-95"
+              className="translate-x-1 sm:translate-x-2 inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-full bg-yellow-400 text-navy font-heading font-bold text-xs sm:text-sm shadow-md hover:bg-yellow-300 hover:shadow-lg transition-all duration-300 active:scale-95"
             >
               {viewAllLabel}
               <span aria-hidden>→</span>
