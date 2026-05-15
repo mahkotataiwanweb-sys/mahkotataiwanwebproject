@@ -426,12 +426,18 @@ export default function ProductCatalogSection() {
                       aria-hidden
                     />
 
-                    {/* Editorial number tag — top-left, monospace look */}
+                    {/* Brand logo chip — top-left */}
                     <span
-                      className="pointer-events-none absolute top-3 left-3 inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-white/85 backdrop-blur-sm text-[10px] font-mono font-bold tracking-widest text-navy/85"
+                      className="pointer-events-none absolute top-3 left-3 inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow-sm"
                       aria-hidden
                     >
-                      {String(idx + 1).padStart(2, '0')}
+                      <Image
+                        src="/images/logo.png"
+                        alt=""
+                        width={28}
+                        height={28}
+                        className="w-5 h-5 object-contain"
+                      />
                     </span>
 
                     {/* Bottom label panel — clean navy gradient, no yellow */}
