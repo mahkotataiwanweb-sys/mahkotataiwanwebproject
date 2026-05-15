@@ -5,7 +5,6 @@ import { useLocale } from 'next-intl';
 import { useEditableT } from '@/hooks/useEditableT';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import SailingShips from './SailingShips';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -229,11 +228,10 @@ export default function WhereToBuySection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="pt-20 md:pt-28 pb-[280px] sm:pb-[340px] overflow-hidden relative">
-      {/* Decorative sailing ships + sea waves at the bottom */}
-      <SailingShips />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
+    <section ref={sectionRef} className="py-20 md:py-28 overflow-hidden relative">
+      
+{/* Wavy texture removed */}
+      <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div ref={headerRef} className="text-center mb-12">
           <span className="inline-block text-red/80 text-sm font-semibold tracking-widest uppercase mb-3">
@@ -375,8 +373,8 @@ export default function WhereToBuySection() {
                     filter="url(#pinGlow)"
                   />
 
-                  {/* Inner circle — yellow accent */}
-                  <circle cx={pin.x} cy={pin.y - 10} r="3.5" fill="#facc15" />
+                  {/* White inner circle */}
+                  <circle cx={pin.x} cy={pin.y - 10} r="3.5" fill="white" />
 
                   {/* City label */}
                   <text
