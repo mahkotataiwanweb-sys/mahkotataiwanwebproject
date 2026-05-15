@@ -33,30 +33,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  /* Dynamic routes (Supabase) ------------------------------------- */
+  /* Dynamic routes (Supabase) — wrapped so a network/auth blip never breaks
+     the whole sitemap; static routes above always make it out. */
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (supabaseUrl && supabaseKey) {
-    const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } });
-    const { data: articles } = await supabase
-      .from('articles')
-      .select('slug,type,updated_at')
-      .eq('is_active', true);
+    try {
+      const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } });
+      const { data: articles } = await supabase
+        .from('articles')
+        .select('slug,type,updated_at')
+        .eq('is_active', true);
 
-    if (articles) {
-      for (const a of articles) {
-        const route = a.type === 'recipe' ? 'recipes' : 'articles';
-        for (const locale of LOCALES) {
-          const path = `/${route}/${a.slug}`;
-          entries.push({
-            url: `${SITE_URL}/${locale}${path}`,
-            lastModified: a.updated_at ? new Date(a.updated_at) : now,
-            changeFrequency: 'monthly',
-            priority: 0.6,
-            alternates: { languages: buildLanguageAlternates(path) },
-          });
+      if (articles) {
+        for (const a of articles) {
+          const route = a.type === 'recipe' ? 'recipes' : 'articles';
+          for (const locale of LOCALES) {
+            const path = `/${route}/${a.slug}`;
+            entries.push({
+              url: `${SITE_URL}/${locale}${path}`,
+              lastModified: a.updated_at ? new Date(a.updated_at) : now,
+              changeFrequency: 'monthly',
+              priority: 0.6,
+              alternates: { languages: buildLanguageAlternates(path) },
+            });
+          }
         }
       }
+    } catch {
+      // Swallow — static routes above still get returned, so the sitemap
+      // remains valid for Google Search Console.
     }
   }
 
