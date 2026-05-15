@@ -11,6 +11,7 @@ import gsap from 'gsap';
 import { ArrowLeft, Clock, Users, ChefHat, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
+import HeroBackground from '@/components/effects/HeroBackground';
 import type { Article } from '@/types/database';
 
 /* ------------------------------------------------------------------ */
@@ -137,7 +138,8 @@ export default function RecipeDetailPage() {
   return (
     <main className="min-h-screen">
       {/* Hero */}
-      <section ref={heroRef} className="relative bg-navy overflow-hidden">
+      <section ref={heroRef} className="relative bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] overflow-hidden">
+        <HeroBackground />
         <div className="pt-28 sm:pt-36 pb-8 sm:pb-12 relative z-10 max-w-4xl mx-auto px-6">
           <Link
             href={`/${locale}/recipes`}
