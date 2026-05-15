@@ -224,10 +224,10 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             <span className="flex-1 text-left">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
           </button>
-          <Link href="/" target="_blank" className="admin-sidebar-link w-full">
+          <a href="https://mahkotatw.com" target="_blank" rel="noopener noreferrer" className="admin-sidebar-link w-full">
             <ExternalLink className="w-4 h-4" />
             <span className="flex-1 text-left">View website</span>
-          </Link>
+          </a>
           <button type="button" onClick={handleLogout} className="admin-sidebar-link w-full text-red-300 hover:text-red-200">
             <LogOut className="w-4 h-4" />
             <span className="flex-1 text-left">Logout</span>
