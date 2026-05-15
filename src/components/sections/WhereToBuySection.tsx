@@ -373,8 +373,8 @@ export default function WhereToBuySection() {
                     filter="url(#pinGlow)"
                   />
 
-                  {/* White inner circle */}
-                  <circle cx={pin.x} cy={pin.y - 10} r="3.5" fill="white" />
+                  {/* Yellow inner circle */}
+                  <circle cx={pin.x} cy={pin.y - 10} r="3.5" fill="#facc15" />
 
                   {/* City label */}
                   <text
