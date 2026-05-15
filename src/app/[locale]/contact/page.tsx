@@ -1122,6 +1122,43 @@ export default function ContactPage() {
             <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
             <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+
+            {/* Subtle grid texture overlay — matches footer */}
+            <div
+              className="pointer-events-none absolute inset-0 rounded-[2rem]"
+              style={{
+                backgroundImage:
+                  'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+                backgroundSize: '60px 60px',
+              }}
+              aria-hidden
+            />
+
+            {/* 3 animated sparkles — matches footer */}
+            <motion.div
+              className="pointer-events-none absolute top-6 right-[12%] text-[#facc15]/55"
+              animate={{ y: [0, -14, 0], rotate: [0, 180, 360] }}
+              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+              aria-hidden
+            >
+              <Sparkles className="h-7 w-7" fill="currentColor" />
+            </motion.div>
+            <motion.div
+              className="pointer-events-none absolute bottom-8 left-[14%] text-[#facc15]/45"
+              animate={{ y: [0, 10, 0], rotate: [0, -90, 0], scale: [1, 1.15, 1] }}
+              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.4 }}
+              aria-hidden
+            >
+              <Sparkles className="h-5 w-5" fill="currentColor" />
+            </motion.div>
+            <motion.div
+              className="pointer-events-none absolute top-[40%] right-[28%] text-[#facc15]/35"
+              animate={{ y: [0, 8, 0], rotate: [0, 120, 0], scale: [1, 1.1, 1] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 2.5 }}
+              aria-hidden
+            >
+              <Sparkles className="h-4 w-4" fill="currentColor" />
+            </motion.div>
             
             {/* Animated gradient orbs */}
 

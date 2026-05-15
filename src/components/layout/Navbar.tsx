@@ -8,7 +8,7 @@ import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, Sparkles as SparklesIcon } from 'lucide-react';
 import LanguageSwitcher from './LanguageSwitcher';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -492,9 +492,9 @@ export default function Navbar() {
       <motion.header
         id="main-navbar"
         className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-500 overflow-visible',
           isHomePage
-            ? 'bg-navy shadow-md py-3'
+            ? 'bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] shadow-md py-3'
             : isScrolled
               ? 'glass-effect py-3 shadow-sm'
               : 'bg-transparent py-5'
@@ -502,7 +502,42 @@ export default function Navbar() {
         animate={{ y: isHidden ? -100 : 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between overflow-visible">
+        {/* Grid texture overlay like footer */}
+        {isHomePage && (
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+              backgroundSize: '60px 60px',
+            }}
+            aria-hidden
+          />
+        )}
+
+        {/* Floating yellow sparkles */}
+        {isHomePage && (
+          <>
+            <motion.div
+              className="pointer-events-none absolute top-2 right-[15%] text-[#facc15]/50"
+              animate={{ y: [0, -6, 0], rotate: [0, 180, 360] }}
+              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+              aria-hidden
+            >
+              <SparklesIcon className="h-4 w-4" fill="currentColor" />
+            </motion.div>
+            <motion.div
+              className="pointer-events-none absolute bottom-2 left-[10%] text-[#facc15]/40"
+              animate={{ y: [0, 5, 0], rotate: [0, -90, 0], scale: [1, 1.15, 1] }}
+              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+              aria-hidden
+            >
+              <SparklesIcon className="h-3.5 w-3.5" fill="currentColor" />
+            </motion.div>
+          </>
+        )}
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 flex items-center justify-between overflow-visible">
           {/* Logo */}
           <motion.div whileHover={{ scale: 1.08 }} className="relative z-10">
             <Link href={`/${locale}`} className="flex items-center gap-3">
