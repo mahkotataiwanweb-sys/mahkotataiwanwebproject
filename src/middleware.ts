@@ -11,6 +11,11 @@ const intlMiddleware = createMiddleware(routing);
  */
 const CMS_HOST = 'cms.mahkotatw.com';
 
+/** Hosts whose responses should NOT be indexed by search engines —
+    the dedicated production frontend (mahkotatw.com) is the only
+    surface we want in Google. */
+const INDEXABLE_HOSTS = new Set<string>(['mahkotatw.com', 'www.mahkotatw.com']);
+
 function isCmsHost(host: string): boolean {
   if (host === CMS_HOST) return true;
   if (host === 'localhost' || host === '127.0.0.1') return true;
@@ -71,7 +76,14 @@ export function middleware(request: NextRequest) {
   }
 
   // Public i18n routes.
-  return intlMiddleware(request);
+  const response = intlMiddleware(request);
+
+  // Block indexing of every host that isn't the canonical production domain
+  // (covers vercel.app preview URLs, the *.vercel.app generated host, etc.).
+  if (!INDEXABLE_HOSTS.has(host)) {
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  }
+  return response;
 }
 
 export const config = {
