@@ -324,28 +324,7 @@ export default function ProductCatalogSection() {
         }
       );
 
-      // Category cards — bounce pop-up reveal on scroll
-      const pills = categoryStripRef.current?.querySelectorAll('.category-pill');
-      if (pills && pills.length) {
-        gsap.fromTo(
-          pills,
-          { opacity: 0, y: 60, scale: 0.4 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 1.1,
-            stagger: { each: 0.12, from: 'start' },
-            ease: 'elastic.out(1, 0.55)',
-            scrollTrigger: {
-              trigger: categoryStripRef.current,
-              start: 'top 90%',
-              toggleActions: 'play none none reverse',
-            },
-            delay: 0.25,
-          }
-        );
-      }
+      // Category cards reveal is handled by framer-motion whileInView per-card.
 
       // Red line draws from center — matches WhereToBuy style
       const redLine = headerRef.current!.querySelector('.red-line-reveal');
@@ -398,81 +377,88 @@ export default function ProductCatalogSection() {
             </p>
           </div>
 
-          {/* Category Cards — 300x300 decorative cards, 3 per row × 2 rows, bouncy reveal */}
+          {/* Category Cards — refined editorial-style cards, 3 per row × 2 rows */}
           <div ref={categoryStripRef} className="mb-10 sm:mb-14 px-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 sm:gap-8 max-w-4xl mx-auto">
-              {categories.slice(0, 6).map((cat) => {
+              {categories.slice(0, 6).map((cat, idx) => {
                 const catName = getCategoryName(cat, locale);
                 const active = selectedCategory === cat.slug;
                 return (
                   <motion.button
                     key={cat.slug}
                     onClick={() => handleCategoryClick(cat.slug)}
-                    whileTap={{ scale: 0.86 }}
-                    whileHover={{ y: -6 }}
-                    transition={{ type: 'spring', stiffness: 380, damping: 18 }}
-                    className={`category-pill group relative aspect-square w-full max-w-[300px] mx-auto rounded-[28px] transition-all duration-500 ${
+                    initial={{ opacity: 0, y: 70, scale: 0.7 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, margin: '-80px' }}
+                    whileTap={{ scale: 0.94 }}
+                    whileHover={{ y: -8 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 220,
+                      damping: 16,
+                      mass: 0.9,
+                      delay: idx * 0.09,
+                    }}
+                    className={`category-pill group relative aspect-square w-full max-w-[300px] mx-auto rounded-[22px] overflow-hidden bg-white transition-shadow duration-500 ${
                       active
-                        ? 'shadow-[0_25px_50px_-12px_rgba(193,33,38,0.45)]'
-                        : 'shadow-[0_12px_28px_-8px_rgba(0,48,72,0.25)] hover:shadow-[0_22px_45px_-12px_rgba(193,33,38,0.35)]'
+                        ? 'shadow-[0_30px_60px_-20px_rgba(193,33,38,0.45),0_0_0_2px_#C12126]'
+                        : 'shadow-[0_18px_36px_-18px_rgba(0,48,72,0.35),0_0_0_1px_rgba(0,48,72,0.08)] hover:shadow-[0_28px_55px_-18px_rgba(0,48,72,0.5),0_0_0_1px_rgba(0,48,72,0.18)]'
                     }`}
                   >
-                    {/* Outer decorative gradient frame (cream → yellow) */}
+                    {/* Image / icon */}
+                    {cat.image_url ? (
+                      <Image
+                        src={cat.image_url}
+                        alt={catName}
+                        fill
+                        sizes="(max-width: 640px) 50vw, 300px"
+                        className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.07]"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-cream via-white to-cream flex items-center justify-center">
+                        <CategoryIcon slug={cat.slug} size={84} />
+                      </div>
+                    )}
+
+                    {/* Subtle inner glass edge — refined frame inside the card */}
                     <span
-                      className={`absolute inset-0 rounded-[28px] p-[3px] transition-all duration-500 ${
-                        active
-                          ? 'bg-gradient-to-br from-yellow-300 via-red to-yellow-400'
-                          : 'bg-gradient-to-br from-yellow-300 via-cream to-yellow-400 group-hover:from-yellow-300 group-hover:via-red/60 group-hover:to-yellow-400'
-                      }`}
+                      className="pointer-events-none absolute inset-[6px] rounded-[16px] ring-1 ring-white/35"
+                      aria-hidden
+                    />
+
+                    {/* Editorial number tag — top-left, monospace look */}
+                    <span
+                      className="pointer-events-none absolute top-3 left-3 inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-white/85 backdrop-blur-sm text-[10px] font-mono font-bold tracking-widest text-navy/85"
                       aria-hidden
                     >
-                      <span className="block w-full h-full rounded-[25px] bg-cream" />
+                      {String(idx + 1).padStart(2, '0')}
                     </span>
 
-                    {/* Image / icon area */}
-                    <div className="absolute inset-[3px] rounded-[25px] overflow-hidden">
-                      {cat.image_url ? (
-                        <>
-                          <Image
-                            src={cat.image_url}
-                            alt={catName}
-                            fill
-                            sizes="(max-width: 640px) 50vw, 300px"
-                            className="object-cover transition-transform duration-700 group-hover:scale-110"
-                          />
-                          {/* Inner brand tint that lifts on hover */}
-                          <div className="absolute inset-0 bg-gradient-to-br from-navy/0 via-transparent to-red/20 opacity-60 mix-blend-overlay" />
-                        </>
-                      ) : (
-                        <div className="absolute inset-0 bg-gradient-to-br from-cream via-yellow-100 to-yellow-200 flex items-center justify-center">
-                          <CategoryIcon slug={cat.slug} size={72} />
-                        </div>
-                      )}
-
-                      {/* Top-right yellow sparkle corner accent */}
+                    {/* Bottom label panel — clean navy gradient, no yellow */}
+                    <div className="absolute inset-x-0 bottom-0 px-4 pt-14 pb-4 bg-gradient-to-t from-[#001a2c]/95 via-[#003048]/70 to-transparent">
+                      <span className="block text-white font-heading font-semibold text-sm sm:text-base md:text-lg tracking-[0.04em] text-center leading-tight">
+                        {catName}
+                      </span>
+                      {/* Thin red underline that grows on hover/active */}
                       <span
-                        className="pointer-events-none absolute top-2 right-2 w-6 h-6 rounded-full bg-yellow-400/90 shadow-[0_0_14px_rgba(250,204,21,0.7)] flex items-center justify-center"
+                        className={`block h-[2px] mx-auto mt-2 rounded-full bg-red transition-all duration-500 ${
+                          active ? 'w-12' : 'w-6 group-hover:w-12'
+                        }`}
+                        aria-hidden
+                      />
+                    </div>
+
+                    {/* Active corner ribbon — minimalist red dot */}
+                    {active && (
+                      <span
+                        className="pointer-events-none absolute top-3 right-3 inline-flex items-center justify-center w-6 h-6 rounded-full bg-red text-white shadow-md"
                         aria-hidden
                       >
-                        <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 text-white" fill="currentColor">
-                          <path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z" />
+                        <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
                         </svg>
                       </span>
-
-                      {/* Bottom gradient panel + label inside a stylized ribbon */}
-                      <div className="absolute inset-x-0 bottom-0 px-3 pt-12 pb-3 sm:pb-4 bg-gradient-to-t from-navy/95 via-navy/60 to-transparent">
-                        <span className="block text-white font-heading font-bold text-sm sm:text-base md:text-lg tracking-wide drop-shadow-md text-center">
-                          {catName}
-                        </span>
-                        {/* Tiny red underline */}
-                        <span className="block w-8 h-[2px] bg-yellow-400 mx-auto mt-1.5 rounded-full" />
-                      </div>
-
-                      {/* Active state — red border ring inside the frame */}
-                      {active && (
-                        <span className="pointer-events-none absolute inset-0 rounded-[25px] ring-2 ring-red/80" aria-hidden />
-                      )}
-                    </div>
+                    )}
                   </motion.button>
                 );
               })}
