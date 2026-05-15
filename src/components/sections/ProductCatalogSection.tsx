@@ -357,7 +357,11 @@ export default function ProductCatalogSection() {
   const handleBackToShowcase = useCallback(() => {
     const el = categoryStripRef.current;
     if (el) {
-      const top = el.getBoundingClientRect().top + window.scrollY - 96;
+      // Desktop visitors need more headroom so the cards aren't crammed under
+      // the navbar; mobile keeps the snug 96 px offset.
+      const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
+      const offset = isDesktop ? 180 : 96;
+      const top = el.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: 'smooth' });
     }
     // Wait for scroll to complete before clearing so the user sees the cards
