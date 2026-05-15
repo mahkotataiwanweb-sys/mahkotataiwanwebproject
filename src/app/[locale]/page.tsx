@@ -9,6 +9,7 @@ import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import HeroSlider from '@/components/sections/HeroSlider';
+import HeroFireworksBanner from '@/components/sections/HeroFireworksBanner';
 import ProductCatalogSection from '@/components/sections/ProductCatalogSection';
 import RecipeShowcaseSection from '@/components/sections/RecipeShowcaseSection';
 import VideoShowcaseSection from '@/components/sections/VideoShowcaseSection';
@@ -261,6 +262,7 @@ export default function HomePage() {
   return (
     <>
       <HeroSlider />
+      <HeroFireworksBanner />
       <ProductCatalogSection />
       <RecipeShowcaseSection />
 
