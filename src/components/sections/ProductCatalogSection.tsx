@@ -399,7 +399,7 @@ export default function ProductCatalogSection() {
                       mass: 0.9,
                       delay: idx * 0.09,
                     }}
-                    className={`category-pill group relative aspect-square w-full max-w-[300px] mx-auto rounded-[22px] overflow-hidden bg-white transition-shadow duration-500 ${
+                    className={`category-pill group relative aspect-square w-full max-w-[200px] mx-auto rounded-[22px] overflow-hidden bg-white transition-shadow duration-500 ${
                       active
                         ? 'shadow-[0_30px_60px_-20px_rgba(193,33,38,0.45),0_0_0_2px_#C12126]'
                         : 'shadow-[0_18px_36px_-18px_rgba(0,48,72,0.35),0_0_0_1px_rgba(0,48,72,0.08)] hover:shadow-[0_28px_55px_-18px_rgba(0,48,72,0.5),0_0_0_1px_rgba(0,48,72,0.18)]'
@@ -411,7 +411,7 @@ export default function ProductCatalogSection() {
                         src={cat.image_url}
                         alt={catName}
                         fill
-                        sizes="(max-width: 640px) 50vw, 300px"
+                        sizes="(max-width: 640px) 50vw, 200px"
                         className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.07]"
                       />
                     ) : (
