@@ -83,11 +83,11 @@ function Firework({
 export default function HeroFireworksBanner() {
   return (
     <div
-      className="pointer-events-none relative w-full"
+      className="pointer-events-none relative w-full overflow-x-clip"
       style={{ height: 0 }}
       aria-hidden
     >
-      <div className="absolute left-0 right-0 -translate-y-1/2 h-[280px] z-30 overflow-visible">
+      <div className="absolute left-0 right-0 -translate-y-1/2 h-[280px] z-30 overflow-x-clip">
         <Firework origin={{ x: '6%',  y: '32%' }} side="left"  delay={0} />
         <Firework origin={{ x: '10%', y: '72%' }} side="left"  delay={0.8} />
         <Firework origin={{ x: '94%', y: '32%' }} side="right" delay={0.4} />
