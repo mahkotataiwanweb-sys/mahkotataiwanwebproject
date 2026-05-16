@@ -222,27 +222,17 @@ export default function ArticleDetailPage() {
         />
       </div>
 
-      {/* ── Floating back button — sits below the navbar so it doesn't
-            overlap the Mahkota Taiwan logo ── */}
-      <motion.div
-        className="fixed top-24 sm:top-28 left-4 sm:left-6 z-[45]"
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.6, duration: 0.5 }}
-      >
-        <Link
-          href={backHref}
-          className="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur-md shadow-lg border border-white/25 text-xs sm:text-sm font-medium text-white hover:bg-white/25 transition-all"
-        >
-          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-          <span className="hidden sm:inline">{backLabel}</span>
-        </Link>
-      </motion.div>
-
       {/* ══════════════ BRAND NAVY HERO ══════════════ */}
       <section className="relative bg-gradient-to-br from-[#003048] via-[#003048] to-[#002236] overflow-hidden">
         <HeroBackground />
         <div className="pt-28 sm:pt-36 pb-12 sm:pb-16 relative z-10 max-w-4xl mx-auto px-6">
+          <Link
+            href={backHref}
+            className="inline-flex items-center gap-2 text-white/40 hover:text-white/70 text-sm font-medium mb-8 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            {backLabel}
+          </Link>
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
