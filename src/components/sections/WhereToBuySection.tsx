@@ -5,6 +5,7 @@ import { useLocale } from 'next-intl';
 import { useEditableT } from '@/hooks/useEditableT';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import FloatingLanterns from './FloatingLanterns';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -229,9 +230,8 @@ export default function WhereToBuySection() {
 
   return (
     <section ref={sectionRef} className="py-20 md:py-28 overflow-hidden relative">
-      
-{/* Wavy texture removed */}
-      <div className="max-w-7xl mx-auto px-6">
+      <FloatingLanterns />
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Header */}
         <div ref={headerRef} className="text-center mb-12">
           <span className="inline-block text-red/80 text-sm font-semibold tracking-widest uppercase mb-3">
