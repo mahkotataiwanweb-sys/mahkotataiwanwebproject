@@ -285,7 +285,13 @@ export default function HomePage() {
           </div>
 
           <div className="flex flex-col gap-12 sm:gap-16">
-            <div ref={topWrapRef}>
+            <motion.div
+              ref={topWrapRef}
+              initial={{ opacity: 0, y: 70 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 1.0, ease: [0.22, 0.68, 0, 1] }}
+            >
               <ManualNavCard
                 articles={events}
                 fallbackTitle={t('fallbackTitle1')}
@@ -295,8 +301,14 @@ export default function HomePage() {
                 locale={locale}
                 imageSide="left"
               />
-            </div>
-            <div ref={bottomWrapRef}>
+            </motion.div>
+            <motion.div
+              ref={bottomWrapRef}
+              initial={{ opacity: 0, y: 70 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 1.0, ease: [0.22, 0.68, 0, 1], delay: 0.15 }}
+            >
               <ManualNavCard
                 articles={activities}
                 fallbackTitle={t('fallbackTitle2')}
@@ -306,7 +318,7 @@ export default function HomePage() {
                 locale={locale}
                 imageSide="right"
               />
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>

@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { BLUR_DATA_URL } from '@/lib/imageBlur';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { supabase } from '@/lib/supabase';
@@ -435,8 +434,6 @@ export default function HeroSlider() {
           fetchPriority="high"
           sizes="(max-width: 640px) 100vw, 0px"
           quality={70}
-          placeholder="blur"
-          blurDataURL={BLUR_DATA_URL}
         />
         {/* Desktop / tablet 10:5 image */}
         <Image
@@ -449,8 +446,6 @@ export default function HeroSlider() {
           fetchPriority="high"
           sizes="(min-width: 640px) 100vw, 0px"
           quality={70}
-          placeholder="blur"
-          blurDataURL={BLUR_DATA_URL}
         />
       </motion.div>
     );
