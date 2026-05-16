@@ -368,7 +368,7 @@ function SmartSearch({
 
             <div className="px-5 py-3 border-t border-navy/5 flex items-center gap-2">
               <Sparkles className="w-3 h-3 text-red/30" />
-              <span className="text-[10px] text-navy/25">{searchHint}</span>
+              <span className="text-xs sm:text-sm text-navy/60">{searchHint}</span>
             </div>
           </div>
         )}
@@ -403,7 +403,7 @@ function SmartSearch({
             onFocus={() => setFocused(true)}
             onKeyDown={handleKeyDown}
             placeholder={placeholderText}
-            className="flex-1 px-4 py-4.5 bg-transparent text-navy placeholder:text-navy/30 text-base focus:outline-none"
+            className="flex-1 px-4 py-4.5 bg-transparent text-navy placeholder:text-navy/55 text-base sm:text-lg focus:outline-none"
           />
           <AnimatePresence>
             {query && (
@@ -607,16 +607,16 @@ function CategoryDropdown({
               key={cat.id}
               type="button"
               onClick={() => onSelect(cat.id)}
-              className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full font-heading text-xs sm:text-sm font-semibold transition-all duration-300 active:scale-95 shadow-md ${
+              className={`inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-heading text-sm sm:text-base font-semibold transition-all duration-300 active:scale-95 shadow-md ${
                 isActive
                   ? 'bg-red text-white'
                   : 'bg-white/95 text-navy hover:shadow-lg'
               }`}
             >
-              <CategoryIcon slug={cat.slug} size={15} />
+              <CategoryIcon slug={cat.slug} size={18} />
               <span>{name}</span>
               <span
-                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                   isActive ? 'bg-white/20 text-white' : 'bg-navy/10 text-navy/70'
                 }`}
               >
@@ -938,15 +938,15 @@ function ProductsContent() {
             <div className="hero-reveal flex gap-10 mt-10 pt-8 border-t border-white/10">
               <div>
                 <span className="font-heading text-3xl sm:text-4xl font-bold text-white">{products.length}</span>
-                <p className="text-cream/40 text-sm mt-1">{t('label')}</p>
+                <p className="text-cream/75 text-sm sm:text-base mt-1">{t('label')}</p>
               </div>
               <div>
                 <span className="font-heading text-3xl sm:text-4xl font-bold text-white">{categories.length}</span>
-                <p className="text-cream/40 text-sm mt-1">{t('categories')}</p>
+                <p className="text-cream/75 text-sm sm:text-base mt-1">{t('categories')}</p>
               </div>
               <div>
                 <span className="font-heading text-3xl sm:text-4xl font-bold text-red">100%</span>
-                <p className="text-cream/40 text-sm mt-1">{t('halal')}</p>
+                <p className="text-cream/75 text-sm sm:text-base mt-1">{t('halal')}</p>
               </div>
             </div>
 
