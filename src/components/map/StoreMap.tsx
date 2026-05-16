@@ -1241,18 +1241,7 @@ function PremiumDropdown({
           <div
             ref={listRef}
             className="premium-dropdown-list overflow-y-auto max-h-[320px] py-1.5 px-1.5"
-            onWheel={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              const element = listRef.current;
-              if (!element) return;
-              element.scrollTop += e.deltaY;
-            }}
-            onTouchMove={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            style={{ touchAction: 'none', pointerEvents: 'auto' }}
+            style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
           >
             {options.map((city, i) => {
               const isActive = value === city;
