@@ -279,7 +279,7 @@ export default function HomePage() {
               {t('title')}
             </h2>
             <div className="w-16 h-[2px] bg-[#C12126] mx-auto mb-4 rounded-full" />
-            <p className="text-navy/40 max-w-lg mx-auto text-base sm:text-lg tracking-wide">
+            <p className="text-navy/70 max-w-lg mx-auto text-base sm:text-lg tracking-wide">
               {t('subtitle')}
             </p>
           </div>

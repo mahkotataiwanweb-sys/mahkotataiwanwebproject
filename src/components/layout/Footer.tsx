@@ -158,7 +158,7 @@ export default function Footer() {
             <div key={item.id} className="text-center">
               <Link
                 href={buildHref(item.url)}
-                className="text-cream/70 hover:text-white text-sm font-medium transition-colors duration-200"
+                className="text-cream/70 hover:text-white text-sm md:text-base font-medium transition-colors duration-200"
               >
                 {getLabel(item)}
               </Link>
@@ -171,7 +171,7 @@ export default function Footer() {
             <div className="inline-flex items-center gap-1 justify-center">
               <button
                 onClick={() => toggleMenu(menuKey)}
-                className="text-cream/70 hover:text-white text-sm font-medium transition-colors duration-200"
+                className="text-cream/70 hover:text-white text-sm md:text-base font-medium transition-colors duration-200"
               >
                 {getLabel(item)}
               </button>
@@ -198,7 +198,7 @@ export default function Footer() {
                   <Link
                     key={child.id}
                     href={buildHref(child.url)}
-                    className="block text-cream/50 hover:text-white text-xs transition-colors duration-200"
+                    className="block text-cream/50 hover:text-white text-xs md:text-sm transition-colors duration-200"
                   >
                     {getLabel(child)}
                   </Link>
@@ -217,7 +217,7 @@ export default function Footer() {
           <div key={item.key} className="text-center">
             <Link
               href={buildHref(item.href)}
-              className="text-cream/70 hover:text-white text-sm font-medium transition-colors duration-200"
+              className="text-cream/70 hover:text-white text-sm md:text-base font-medium transition-colors duration-200"
             >
               {navT(item.key)}
             </Link>
@@ -233,7 +233,7 @@ export default function Footer() {
           <div className="inline-flex items-center gap-1 justify-center">
             <button
               onClick={() => toggleMenu(menuKey)}
-              className="text-cream/70 hover:text-white text-sm font-medium transition-colors duration-200"
+              className="text-cream/70 hover:text-white text-sm md:text-base font-medium transition-colors duration-200"
             >
               {navT(item.key)}
             </button>
@@ -260,7 +260,7 @@ export default function Footer() {
                 <Link
                   key={child.key}
                   href={buildHref(child.href)}
-                  className="block text-cream/50 hover:text-white text-xs transition-colors duration-200"
+                  className="block text-cream/50 hover:text-white text-xs md:text-sm transition-colors duration-200"
                 >
                   {navT(child.key)}
                 </Link>
@@ -328,7 +328,7 @@ export default function Footer() {
           </div>
 
           {/* Description - Centered */}
-          <p className="text-cream/60 text-sm leading-relaxed max-w-md text-center">
+          <p className="text-cream/60 text-sm md:text-base leading-relaxed max-w-md text-center">
             {t('description')}
           </p>
         </div>
@@ -349,10 +349,10 @@ export default function Footer() {
           >
             <MapPin className="w-3.5 h-3.5 text-red mt-0.5 flex-shrink-0" />
             <div>
-              <span className="text-cream/80 text-[10px] font-semibold uppercase tracking-wider block mb-0.5">
+              <span className="text-cream/80 text-[10px] md:text-xs font-semibold uppercase tracking-wider block mb-0.5">
                 {t('office')}
               </span>
-              <span className="text-cream/55 text-xs leading-snug group-hover:text-cream/80 transition-colors">
+              <span className="text-cream/55 text-xs md:text-sm leading-snug group-hover:text-cream/80 transition-colors">
                 {officeAddress}
               </span>
             </div>
@@ -370,10 +370,10 @@ export default function Footer() {
           >
             <MapPin className="w-3.5 h-3.5 text-red mt-0.5 flex-shrink-0" />
             <div>
-              <span className="text-cream/80 text-[10px] font-semibold uppercase tracking-wider block mb-0.5">
+              <span className="text-cream/80 text-[10px] md:text-xs font-semibold uppercase tracking-wider block mb-0.5">
                 {t('warehouse')}
               </span>
-              <span className="text-cream/55 text-xs leading-snug group-hover:text-cream/80 transition-colors">
+              <span className="text-cream/55 text-xs md:text-sm leading-snug group-hover:text-cream/80 transition-colors">
                 {warehouseAddress}
               </span>
             </div>
@@ -386,14 +386,14 @@ export default function Footer() {
           <div className="flex flex-col gap-1.5 items-center md:items-start">
             <a
               href={`tel:${phone}`}
-              className="flex items-center gap-1.5 text-cream/60 hover:text-white text-xs transition-colors"
+              className="flex items-center gap-1.5 text-cream/60 hover:text-white text-xs md:text-sm transition-colors"
             >
               <Phone className="w-3 h-3" />
               <span>{phone}</span>
             </a>
             <a
               href={`mailto:${email}`}
-              className="flex items-center gap-1.5 text-cream/60 hover:text-white text-xs transition-colors"
+              className="flex items-center gap-1.5 text-cream/60 hover:text-white text-xs md:text-sm transition-colors"
             >
               <Mail className="w-3 h-3" />
               <span>{email}</span>
@@ -447,10 +447,10 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="relative z-10 border-t border-cream/10">
         <div className="max-w-5xl mx-auto px-6 py-5 flex flex-col items-center gap-1.5">
-          <p className="text-cream/40 text-xs text-center">
+          <p className="text-cream/40 text-xs md:text-sm text-center">
             &copy; {new Date().getFullYear()} Mahkota Taiwan. {t('allRightsReserved')}
           </p>
-          <p className="text-cream/30 text-xs text-center">
+          <p className="text-cream/30 text-xs md:text-sm text-center">
             {t('tagline')}
           </p>
         </div>
