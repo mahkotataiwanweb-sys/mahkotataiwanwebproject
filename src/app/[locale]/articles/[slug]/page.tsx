@@ -298,12 +298,13 @@ export default function ArticleDetailPage() {
           </div>
         )}
 
-        {/* Paragraphs — each animated on scroll */}
-        <div className="space-y-6">
+        {/* Paragraphs — animated on scroll, sit inside a soft cream card
+            so the body copy mirrors the recipe-detail reading surface. */}
+        <div data-anim className="bg-cream-dark/50 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-5">
           {paragraphs.map((para, i) => (
-            <div key={i} data-anim>
-              <p className="text-[#003048]/80 leading-[1.85] text-base sm:text-lg">{para}</p>
-            </div>
+            <p key={i} className="text-[#003048]/85 leading-[1.85] text-base sm:text-lg">
+              {para}
+            </p>
           ))}
         </div>
 
@@ -366,8 +367,13 @@ export default function ArticleDetailPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {related.map((rel) => (
-                <Link key={rel.id} href={`/${locale}/articles/${rel.slug}`} data-anim className="group block">
-                  <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-4 shadow-lg shadow-[#003048]/10 ring-1 ring-[#003048]/5">
+                <Link
+                  key={rel.id}
+                  href={`/${locale}/articles/${rel.slug}`}
+                  data-anim
+                  className="group block bg-cream-dark/40 hover:bg-cream-dark/55 transition-colors rounded-2xl p-4 sm:p-5 ring-1 ring-[#003048]/8 shadow-sm hover:shadow-lg hover:shadow-[#003048]/10"
+                >
+                  <div className="relative aspect-[16/10] rounded-xl overflow-hidden mb-4 shadow-md shadow-[#003048]/10">
                     {rel.image_url ? (
                       <Image
                         src={rel.image_url}
@@ -381,17 +387,17 @@ export default function ArticleDetailPage() {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     {/* hover arrow */}
-                    <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/0 group-hover:bg-white/30 backdrop-blur-sm flex items-center justify-center scale-0 group-hover:scale-100 transition-all duration-300">
+                    <div className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/0 group-hover:bg-white/35 backdrop-blur-sm flex items-center justify-center scale-0 group-hover:scale-100 transition-all duration-300">
                       <ArrowUpRight className="w-4 h-4 text-white" />
                     </div>
                   </div>
-                  <p className="text-xs text-[#C12126] font-semibold uppercase tracking-wider mb-1.5">
+                  <p className="text-xs sm:text-sm text-[#C12126] font-semibold uppercase tracking-wider mb-2">
                     {formatDate(rel.published_at, locale)}
                   </p>
-                  <h3 className="font-heading font-bold text-[#003048] group-hover:text-[#C12126] transition-colors line-clamp-2 leading-snug">
+                  <h3 className="font-heading font-bold text-base sm:text-lg text-[#003048] group-hover:text-[#C12126] transition-colors line-clamp-2 leading-snug">
                     {getLocalizedField(rel, 'title', locale)}
                   </h3>
-                  <p className="mt-1.5 text-xs text-[#003048]/40 line-clamp-2">
+                  <p className="mt-2 text-sm text-[#003048]/65 line-clamp-2 leading-snug">
                     {getLocalizedField(rel, 'excerpt', locale)}
                   </p>
                 </Link>
