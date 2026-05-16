@@ -466,53 +466,58 @@ function ProductModal({
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-end justify-center"
+      className="fixed inset-0 z-50 flex justify-end"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
       onClick={onClose}
     >
-      {/* Cinematic backdrop — slight blur, dark navy */}
+      {/* Cinematic backdrop — soft navy with a gentle blur so the rest
+          of the catalog stays visible behind the panel. */}
       <motion.div
-        className="absolute inset-0 bg-navy/55 backdrop-blur-md"
+        className="absolute inset-0 bg-navy/45 backdrop-blur-md"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.4 }}
       />
 
-      {/* Bottom-sheet drawer — slides up from bottom on every viewport.
-          Desktop: capped at max-w-2xl with margin-bottom, reading like a
-          centred premium card. Mobile: full-bleed sheet with drag handle. */}
-      <motion.div
-        className="relative w-full sm:max-w-2xl bg-cream rounded-t-[2.5rem] sm:rounded-[2rem] sm:mb-6 overflow-hidden flex flex-col"
+      {/* Right-side premium panel.
+          Mobile: full-width slide-in. Desktop: 480-560 px wide,
+          full-height, edge-to-edge on the right. */}
+      <motion.aside
+        className="relative w-full sm:max-w-[480px] lg:max-w-[560px] h-full flex flex-col overflow-hidden"
         style={{
-          maxHeight: '92vh',
-          boxShadow: '0 -40px 90px -10px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06) inset',
+          background:
+            'linear-gradient(165deg, var(--color-cream-light) 0%, var(--color-cream) 55%, #F5EBD9 100%)',
+          boxShadow:
+            '-40px 0 90px -20px rgba(0,25,45,0.35), 0 0 0 1px rgba(255,255,255,0.4) inset',
         }}
-        initial={{ y: '100%' }}
-        animate={{ y: 0 }}
-        exit={{ y: '100%' }}
-        transition={{ type: 'spring', damping: 30, stiffness: 240, mass: 0.9 }}
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '100%' }}
+        transition={{ type: 'spring', damping: 32, stiffness: 280, mass: 0.9 }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Mobile drag handle */}
-        <div className="sm:hidden flex justify-center pt-3 pb-1">
-          <div className="w-12 h-1.5 rounded-full bg-navy/20" />
-        </div>
+        {/* Left edge accent — thin red rule that anchors the panel */}
+        <span
+          className="pointer-events-none absolute top-12 bottom-12 left-0 w-[3px] rounded-r-full bg-gradient-to-b from-red/0 via-red/60 to-red/0"
+          aria-hidden
+        />
 
-        {/* Close — frosted glass */}
+        {/* Close — sits over the image */}
         <motion.button
           onClick={onClose}
-          className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full bg-white/15 backdrop-blur-xl hover:bg-white/30 flex items-center justify-center transition-all duration-300 shadow-lg group border border-white/15"
+          className="absolute top-5 right-5 z-30 w-10 h-10 rounded-full bg-white/15 backdrop-blur-xl hover:bg-white/30 flex items-center justify-center transition-all duration-300 shadow-lg group border border-white/15"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.25, duration: 0.4, ease: 'backOut' }}
-          whileHover={{ scale: 1.1 }}
+          transition={{ delay: 0.2, duration: 0.4, ease: 'backOut' }}
+          whileHover={{ scale: 1.1, rotate: 90 }}
           whileTap={{ scale: 0.9 }}
+          aria-label="Close"
         >
-          <X className="w-4 h-4 text-white group-hover:rotate-90 transition-transform duration-500" />
+          <X className="w-4 h-4 text-white" />
         </motion.button>
 
         {/* Scroll body */}
@@ -525,33 +530,34 @@ function ProductModal({
           }}
         >
 
-        {/* Image area */}
-        <div className={`relative aspect-square overflow-hidden ${hasDetailImage ? 'bg-[#0a1628]' : 'bg-gradient-to-br from-cream-dark/50 to-cream'}`}>
+        {/* Image area — large, no aspect-square cap so the panel can
+            adapt to portrait or square product photography */}
+        <div className={`relative aspect-[5/4] overflow-hidden ${hasDetailImage ? 'bg-[#0a1628]' : 'bg-gradient-to-br from-cream-dark/40 via-cream to-cream'}`}>
           {imageUrl ? (
             <>
               <motion.div
                 className="relative w-full h-full"
                 initial={{ scale: 1.08, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 1.2, ease: [0.22, 0.68, 0, 1] }}
+                transition={{ duration: 1.1, ease: [0.22, 0.68, 0, 1] }}
               >
                 <Image
                   src={imageUrl}
                   alt={name}
                   fill
-                  className={hasDetailImage ? 'object-contain p-6' : 'object-contain p-4'}
-                  sizes="(max-width: 512px) 100vw, 512px"
+                  className={hasDetailImage ? 'object-contain p-8' : 'object-contain p-6'}
+                  sizes="(max-width: 640px) 100vw, 560px"
                   unoptimized
                 />
               </motion.div>
-              {/* Subtle vignette */}
-              <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.12)] pointer-events-none" />
-              {/* Bottom fade to cream */}
-              <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-cream via-cream/80 to-transparent" />
+              {/* Inner vignette */}
+              <div className="absolute inset-0 shadow-[inset_0_0_140px_rgba(0,0,0,0.16)] pointer-events-none" />
+              {/* Bottom feather into cream */}
+              <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[var(--color-cream-light)] via-[var(--color-cream-light)]/85 to-transparent" />
             </>
           ) : (
             <div className="flex flex-col items-center justify-center h-full gap-3 text-navy/20">
-              <Package className="w-20 h-20" />
+              <Package className="w-24 h-24" />
             </div>
           )}
 
@@ -559,20 +565,34 @@ function ProductModal({
           <motion.span
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.6 }}
-            className="absolute top-5 left-5 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.18em] uppercase text-white/90 bg-white/10 backdrop-blur-xl px-4 py-2 rounded-full border border-white/10 shadow-lg"
+            transition={{ delay: 0.3, duration: 0.55 }}
+            className="absolute top-5 left-6 inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.2em] uppercase text-white bg-black/25 backdrop-blur-xl px-4 py-2 rounded-full border border-white/15 shadow-lg"
           >
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-red" />
             {categoryName}
           </motion.span>
         </div>
 
         {/* Content */}
-        <div className="relative -mt-10 px-8 sm:px-10 pb-10">
-          <motion.h3
-            initial={{ opacity: 0, y: 20 }}
+        <div className="relative -mt-12 px-8 sm:px-10 lg:px-12 pb-14">
+          {/* Brand eyebrow */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.8, ease: [0.22, 0.68, 0, 1] }}
-            className="font-heading text-2xl sm:text-3xl font-bold text-navy mb-4 leading-tight"
+            transition={{ delay: 0.18, duration: 0.5 }}
+            className="flex items-center gap-2 mb-3"
+          >
+            <span className="inline-block w-6 h-[2px] bg-red rounded-full" />
+            <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.28em] uppercase text-red/85">
+              Mahkota Taiwan
+            </span>
+          </motion.div>
+
+          <motion.h3
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.22, duration: 0.7, ease: [0.22, 0.68, 0, 1] }}
+            className="font-heading text-3xl sm:text-4xl font-bold text-navy mb-4 leading-[1.08] tracking-tight"
           >
             {name}
           </motion.h3>
@@ -580,21 +600,48 @@ function ProductModal({
           <motion.div
             initial={{ scaleX: 0, opacity: 0 }}
             animate={{ scaleX: 1, opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 0.68, 0, 1] }}
-            className="w-14 h-[2px] bg-gradient-to-r from-red to-red/20 mb-5 origin-left rounded-full"
+            transition={{ delay: 0.34, duration: 0.7, ease: [0.22, 0.68, 0, 1] }}
+            className="w-16 h-[2px] bg-gradient-to-r from-red via-red/60 to-transparent mb-6 origin-left rounded-full"
           />
 
           <motion.p
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.7, ease: [0.22, 0.68, 0, 1] }}
-            className="text-navy/55 text-sm sm:text-base leading-[1.85] whitespace-pre-line"
+            transition={{ delay: 0.42, duration: 0.65, ease: [0.22, 0.68, 0, 1] }}
+            className="text-navy/75 text-base sm:text-lg leading-[1.85] whitespace-pre-line"
           >
             {description || t('defaultProductDescription')}
           </motion.p>
+
+          {/* Trust strip */}
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.58, duration: 0.6 }}
+            className="mt-8 grid grid-cols-2 gap-3"
+          >
+            <div className="flex items-center gap-3 bg-white/70 backdrop-blur-sm border border-navy/8 rounded-2xl px-4 py-3">
+              <span className="w-9 h-9 rounded-full bg-red/10 text-red flex items-center justify-center">
+                <Shield className="w-4 h-4" />
+              </span>
+              <div>
+                <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-navy/55">Halal</p>
+                <p className="text-sm font-semibold text-navy">Certified</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 bg-white/70 backdrop-blur-sm border border-navy/8 rounded-2xl px-4 py-3">
+              <span className="w-9 h-9 rounded-full bg-navy/10 text-navy flex items-center justify-center">
+                <Award className="w-4 h-4" />
+              </span>
+              <div>
+                <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-navy/55">Authentic</p>
+                <p className="text-sm font-semibold text-navy">Indonesian</p>
+              </div>
+            </div>
+          </motion.div>
         </div>
         </div>
-      </motion.div>
+      </motion.aside>
     </motion.div>
   );
 }
