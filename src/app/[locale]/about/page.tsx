@@ -895,7 +895,7 @@ export default function AboutPage() {
 
             {/* Clean description paragraph */}
             <div className="mb-12">
-              <p className="text-navy/60 leading-[1.9] text-base sm:text-lg text-center max-w-3xl mx-auto">
+              <p className="text-navy/80 leading-[1.9] text-base sm:text-lg text-center max-w-3xl mx-auto">
                 {t('description')}
               </p>
             </div>
@@ -1009,7 +1009,7 @@ export default function AboutPage() {
                 <EditableText page="about" section="partners" k="title">{t('partnersTitle')}</EditableText>
               </h2>
               <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
-              <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">
+              <p className="text-navy/75 max-w-lg mx-auto text-sm tracking-wide">
                 <EditableText page="about" section="partners" k="description">{t('partnersDescription')}</EditableText>
               </p>
             </motion.div>

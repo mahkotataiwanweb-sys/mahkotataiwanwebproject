@@ -232,7 +232,7 @@ function FAQItem({ faq, index }: { faq: { icon: any; question: string; answer: s
             className="overflow-hidden"
           >
             <div className="px-6 pb-6 pl-20">
-              <p className="text-navy/60 text-sm leading-relaxed">{faq.answer}</p>
+              <p className="text-navy/80 text-sm leading-relaxed">{faq.answer}</p>
             </div>
           </motion.div>
         )}
@@ -754,7 +754,7 @@ export default function ContactPage() {
               <div className="w-16 h-[2px] bg-red mb-4" />
               <LineReveal
                 text={t('subtitle')}
-                className="text-navy/60 text-base sm:text-lg tracking-wide leading-relaxed max-w-md mb-10"
+                className="text-navy/80 text-base sm:text-lg tracking-wide leading-relaxed max-w-md mb-10"
               />
 
               {/* Social Links — brand-coloured icons over a uniform yellow disc */}
@@ -988,23 +988,23 @@ export default function ContactPage() {
             <div className="flex items-center gap-3">
               <span className="w-8 h-[3px] rounded-full bg-navy" />
               <span className="text-navy text-sm font-semibold">{t('mondayToFriday')}</span>
-              <span className="text-navy/50 text-sm">{t('weekdayHours')}</span>
+              <span className="text-navy/75 text-sm">{t('weekdayHours')}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="w-8 h-[3px] rounded-full bg-red" />
               <span className="text-navy text-sm font-semibold">{t('saturday')}</span>
-              <span className="text-navy/50 text-sm">{t('saturdayHours')}</span>
+              <span className="text-navy/75 text-sm">{t('saturdayHours')}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="w-8 h-[3px] rounded-full bg-red/40" />
               <span className="text-navy text-sm font-semibold">{t('sunday')}</span>
-              <span className="text-navy/50 text-sm">{t('sundayStatus')}</span>
+              <span className="text-navy/75 text-sm">{t('sundayStatus')}</span>
             </div>
           </div>
 
           {/* Footnote */}
           <div ref={hoursFootnoteRef} className="text-center mt-8">
-            <p className="text-navy/40 text-xs">
+            <p className="text-navy/65 text-xs">
               {t('timezoneNote')}
             </p>
           </div>
@@ -1024,7 +1024,7 @@ export default function ContactPage() {
               {t('faq.title')}
             </h2>
             <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
-            <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">
+            <p className="text-navy/75 max-w-lg mx-auto text-sm tracking-wide">
               {t('subtitle')}
             </p>
           </div>
@@ -1054,7 +1054,7 @@ export default function ContactPage() {
             <p className="text-red text-sm tracking-[0.3em] uppercase font-semibold mb-3">{t('label')}</p>
             <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-navy tracking-tight mb-3">{t('title')}</h2>
             <div className="w-16 h-[2px] bg-red mx-auto mb-4" />
-            <p className="text-navy/50 max-w-lg mx-auto text-sm tracking-wide">
+            <p className="text-navy/75 max-w-lg mx-auto text-sm tracking-wide">
               {t('subtitle')}
             </p>
           </motion.div>
@@ -1081,7 +1081,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="font-semibold text-navy text-base">{t('officeTitle')}</p>
-                    <p className="text-navy/50 text-sm">
+                    <p className="text-navy/75 text-sm">
                       No. 83, Liyuan 2nd Street, Linkou District, New Taipei City
                     </p>
                   </div>

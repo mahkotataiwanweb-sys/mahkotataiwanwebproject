@@ -416,7 +416,7 @@ export default function WhereToBuySection() {
                 </span>
               ))}
             </p>
-            <p className="letter-line-b font-heading text-sm sm:text-base md:text-lg lg:text-xl text-navy/60 font-medium tracking-wide">
+            <p className="letter-line-b font-heading text-sm sm:text-base md:text-lg lg:text-xl text-navy/80 font-medium tracking-wide">
               {t('allOverTaiwan').split('').map((char, i) => (
                 <span
                   key={`b-${i}`}
