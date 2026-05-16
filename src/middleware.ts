@@ -26,7 +26,7 @@ function isAdminAsset(pathname: string): boolean {
   return (
     pathname.startsWith('/_next/') ||
     pathname === '/favicon.ico' ||
-    /\.(?:png|jpg|jpeg|gif|svg|webp|ico|css|js|map|woff|woff2|ttf)$/i.test(pathname)
+    /\.(?:png|jpg|jpeg|gif|svg|webp|ico|css|js|map|woff|woff2|ttf|mp3|json)$/i.test(pathname)
   );
 }
 
@@ -114,6 +114,6 @@ export const config = {
      * Intercept everything except Next internals and obvious static assets.
      * The middleware itself decides which paths to actually act on.
      */
-    '/((?!_next/static|_next/image|favicon.ico|images/|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|css|js|woff|woff2|ttf|map)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|images/|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|css|js|woff|woff2|ttf|map|mp3|json)$).*)',
   ],
 };
