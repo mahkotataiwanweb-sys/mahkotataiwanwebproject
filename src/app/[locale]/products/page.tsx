@@ -530,31 +530,24 @@ function ProductModal({
           }}
         >
 
-        {/* Image area — large, no aspect-square cap so the panel can
-            adapt to portrait or square product photography */}
-        <div className={`relative aspect-[5/4] overflow-hidden ${hasDetailImage ? 'bg-[#0a1628]' : 'bg-gradient-to-br from-cream-dark/40 via-cream to-cream'}`}>
+        {/* Image area — clean 1:1 square, no shadows, image fills fully */}
+        <div className={`relative aspect-square overflow-hidden ${hasDetailImage ? 'bg-[#0a1628]' : 'bg-[var(--color-cream-light)]'}`}>
           {imageUrl ? (
-            <>
-              <motion.div
-                className="relative w-full h-full"
-                initial={{ scale: 1.08, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 1.1, ease: [0.22, 0.68, 0, 1] }}
-              >
-                <Image
-                  src={imageUrl}
-                  alt={name}
-                  fill
-                  className={hasDetailImage ? 'object-contain p-8' : 'object-contain p-6'}
-                  sizes="(max-width: 640px) 100vw, 560px"
-                  unoptimized
-                />
-              </motion.div>
-              {/* Inner vignette */}
-              <div className="absolute inset-0 shadow-[inset_0_0_140px_rgba(0,0,0,0.16)] pointer-events-none" />
-              {/* Bottom feather into cream */}
-              <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[var(--color-cream-light)] via-[var(--color-cream-light)]/85 to-transparent" />
-            </>
+            <motion.div
+              className="relative w-full h-full"
+              initial={{ scale: 1.04, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.9, ease: [0.22, 0.68, 0, 1] }}
+            >
+              <Image
+                src={imageUrl}
+                alt={name}
+                fill
+                className="object-contain"
+                sizes="(max-width: 640px) 100vw, 560px"
+                unoptimized
+              />
+            </motion.div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full gap-3 text-navy/20">
               <Package className="w-24 h-24" />
@@ -574,7 +567,7 @@ function ProductModal({
         </div>
 
         {/* Content */}
-        <div className="relative -mt-12 px-8 sm:px-10 lg:px-12 pb-14">
+        <div className="relative px-8 sm:px-10 lg:px-12 pt-8 pb-14">
           {/* Brand eyebrow */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
