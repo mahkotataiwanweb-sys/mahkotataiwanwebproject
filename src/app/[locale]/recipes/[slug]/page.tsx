@@ -262,15 +262,17 @@ export default function RecipeDetailPage() {
                     </ul>
                   </div>
                 ) : isSteps ? (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {section.items.map((step, stepIdx) => (
-                      <div key={stepIdx} className="flex gap-4 sm:gap-5">
-                        <div className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-navy text-white flex items-center justify-center text-sm font-bold">
+                      <div key={stepIdx} className="flex items-stretch gap-3 sm:gap-4">
+                        <div className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-navy text-white flex items-center justify-center text-sm font-bold self-start mt-1">
                           {stepIdx + 1}
                         </div>
-                        <p className="text-navy/70 text-sm sm:text-base leading-relaxed pt-1">
-                          {step}
-                        </p>
+                        <div className="flex-1 bg-yellow-400 rounded-2xl px-5 py-3.5 sm:px-6 sm:py-4 shadow-sm">
+                          <p className="text-navy text-sm sm:text-base leading-relaxed font-medium">
+                            {step}
+                          </p>
+                        </div>
                       </div>
                     ))}
                   </div>
