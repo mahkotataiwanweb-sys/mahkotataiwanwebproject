@@ -16,8 +16,10 @@ export const LOCALES = ['id', 'en', 'zh-TW'] as const;
 export type AppLocale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: AppLocale = 'id';
 
-/** OG image lives in /public/images — change here once and the whole site updates. */
-export const DEFAULT_OG_IMAGE = '/images/logo.png';
+/** OG image — purpose-built 1200×630 PNG with dark navy gradient, crown
+    logo and brand strapline. Lives in /public so it ships as a stable
+    URL the social platforms can cache. */
+export const DEFAULT_OG_IMAGE = '/og-image.png';
 
 type LocaleString = Partial<Record<AppLocale, string>>;
 

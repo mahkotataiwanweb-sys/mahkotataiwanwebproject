@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { BLUR_DATA_URL } from '@/lib/imageBlur';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { supabase } from '@/lib/supabase';
@@ -168,16 +169,10 @@ export default function HeroSlider() {
           const list = data as HeroSlide[];
           setSlides(list);
           setSlidesReady(true);
-          list.forEach((s) => {
-            if (s.image_url) {
-              const img = new window.Image();
-              img.src = s.image_url;
-            }
-            if (s.image_url_mobile) {
-              const img = new window.Image();
-              img.src = s.image_url_mobile;
-            }
-          });
+          // Pre-warming via new Image() was useless here — Next.js routes
+          // images through /_next/image, not the raw Supabase URL, so the
+          // raw fetch never populated the cache that <Image> reads from.
+          // Removing it frees bandwidth for the actually displayed slide.
         } else {
           setSlides(fallbackSlides);
           setSlidesReady(true);
@@ -437,8 +432,11 @@ export default function HeroSlider() {
           className="object-cover w-full h-full block sm:hidden"
           priority
           loading="eager"
-          sizes="100vw"
-          quality={80}
+          fetchPriority="high"
+          sizes="(max-width: 640px) 100vw, 0px"
+          quality={70}
+          placeholder="blur"
+          blurDataURL={BLUR_DATA_URL}
         />
         {/* Desktop / tablet 10:5 image */}
         <Image
@@ -448,8 +446,11 @@ export default function HeroSlider() {
           className="object-cover w-full h-full hidden sm:block"
           priority
           loading="eager"
-          sizes="100vw"
-          quality={80}
+          fetchPriority="high"
+          sizes="(min-width: 640px) 100vw, 0px"
+          quality={70}
+          placeholder="blur"
+          blurDataURL={BLUR_DATA_URL}
         />
       </motion.div>
     );
