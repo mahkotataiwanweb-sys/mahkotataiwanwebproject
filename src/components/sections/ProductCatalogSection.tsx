@@ -10,7 +10,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import CategoryIcon from '@/components/ui/CategoryIcon';
 import { supabase } from '@/lib/supabase';
-import { BLUR_DATA_URL } from '@/lib/imageBlur';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -155,11 +154,8 @@ function ProductGrid({
                       fill
                       className="object-contain pointer-events-none transition-transform duration-500 group-hover:scale-110"
                       sizes="(max-width: 640px) 120px, (max-width: 1024px) 140px, 160px"
-                      loading={idx < 4 ? 'eager' : 'lazy'}
-                      priority={idx < 4}
-                      quality={65}
-                      placeholder="blur"
-                      blurDataURL={BLUR_DATA_URL}
+                      loading="eager"
+                      priority={idx < 8}
                     />
                   </motion.div>
                 ) : (
@@ -286,10 +282,22 @@ export default function ProductCatalogSection() {
     });
   }, []);
 
-  /* Pre-warming the raw Supabase URL did nothing — <Image> reads through
-     /_next/image, not the original. Removed; first-page priority hints +
-     blur placeholders give a snappier feel without wasting bandwidth on
-     ~50 hidden images. */
+  /* Preload product images immediately on fetch so the category-switch
+     UI never waits for network — was delayed 3 s previously which made
+     the first selection feel sluggish. */
+  useEffect(() => {
+    if (allProducts.length === 0) return;
+    allProducts.forEach((p) => {
+      if (p.image_url) {
+        const img = new window.Image();
+        img.src = p.image_url;
+      }
+      if (p.detail_image_url) {
+        const img = new window.Image();
+        img.src = p.detail_image_url;
+      }
+    });
+  }, [allProducts]);
 
   useEffect(() => {
     if (!sectionRef.current || !contentRef.current) return;
@@ -435,11 +443,6 @@ export default function ProductCatalogSection() {
                         fill
                         sizes="(max-width: 640px) 50vw, 240px"
                         className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.07]"
-                        priority={idx < 3}
-                        loading={idx < 3 ? 'eager' : 'lazy'}
-                        quality={70}
-                        placeholder="blur"
-                        blurDataURL={BLUR_DATA_URL}
                       />
                     ) : (
                       <div className="absolute inset-0 bg-gradient-to-br from-cream via-white to-cream flex items-center justify-center">
