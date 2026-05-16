@@ -1010,10 +1010,10 @@ function ProductsContent() {
 
                 {/* Product count + hint */}
                 <div className="text-right">
-                  <p className="text-navy/50 text-sm">
+                  <p className="text-navy/85 text-base sm:text-lg font-semibold">
                     <span className="font-bold text-navy">{displayedProducts.length}</span> {productLabel}
                   </p>
-                  <p className="text-navy/30 text-xs mt-0.5">{tapLabel}</p>
+                  <p className="text-navy/65 text-sm mt-1">{tapLabel}</p>
                 </div>
               </div>
             </motion.div>
