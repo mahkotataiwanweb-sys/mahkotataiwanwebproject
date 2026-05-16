@@ -10,7 +10,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import CategoryIcon from '@/components/ui/CategoryIcon';
 import { supabase } from '@/lib/supabase';
-import { BLUR_DATA_URL } from '@/lib/imageBlur';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -158,8 +157,6 @@ function ProductGrid({
                       loading={idx < 4 ? 'eager' : 'lazy'}
                       priority={idx < 4}
                       quality={65}
-                      placeholder="blur"
-                      blurDataURL={BLUR_DATA_URL}
                     />
                   </motion.div>
                 ) : (
@@ -438,8 +435,6 @@ export default function ProductCatalogSection() {
                         priority={idx < 3}
                         loading={idx < 3 ? 'eager' : 'lazy'}
                         quality={70}
-                        placeholder="blur"
-                        blurDataURL={BLUR_DATA_URL}
                       />
                     ) : (
                       <div className="absolute inset-0 bg-gradient-to-br from-cream via-white to-cream flex items-center justify-center">

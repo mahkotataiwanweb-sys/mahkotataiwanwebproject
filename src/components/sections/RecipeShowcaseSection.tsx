@@ -12,7 +12,6 @@ import { ChefHat, ArrowRight, Flame, Clock, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import RedWavyBackground from '@/components/ui/RedWavyBackground';
-import { BLUR_DATA_URL } from '@/lib/imageBlur';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -189,8 +188,6 @@ function CylinderCarousel({
                     priority={i < 3}
                     loading={i < 3 ? 'eager' : 'lazy'}
                     quality={65}
-                    placeholder="blur"
-                    blurDataURL={BLUR_DATA_URL}
                   />
                 ) : (
                   <div className="absolute inset-0 bg-gradient-to-br from-red to-red-dark" />
