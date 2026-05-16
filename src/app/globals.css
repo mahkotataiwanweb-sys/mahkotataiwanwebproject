@@ -1123,3 +1123,11 @@ select.admin-input { appearance: none; background-image: url("data:image/svg+xml
     clip-path: url(#video-section-clip);
   }
 }
+
+/* ===== Product card shake (triggered when a search result is clicked) ===== */
+@keyframes productShake {
+  0%, 100% { transform: translateX(0); }
+  15%, 45%, 75% { transform: translateX(-10px); }
+  30%, 60%, 90% { transform: translateX(10px); }
+}
+.product-shake { animation: productShake 0.7s cubic-bezier(.36,.07,.19,.97) both; }

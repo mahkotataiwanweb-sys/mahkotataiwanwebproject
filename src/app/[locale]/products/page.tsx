@@ -299,10 +299,10 @@ function SmartSearch({
               const cat = categories.find((c) => c.id === catId);
               return (
                 <div key={catId}>
-                  <div className="px-5 py-2 text-[10px] font-bold text-navy/30 uppercase tracking-[0.2em] bg-gradient-to-r from-cream/60 to-transparent flex items-center gap-2 sticky top-0 backdrop-blur-sm z-10">
-                    {cat && <CategoryIcon slug={cat.slug} size={12} className="opacity-40" />}
+                  <div className="px-5 sm:px-6 py-3 text-xs sm:text-sm font-bold text-navy/65 uppercase tracking-[0.18em] bg-gradient-to-r from-cream/85 via-cream/65 to-transparent flex items-center gap-2.5 sticky top-0 backdrop-blur-md z-10 border-b border-navy/5">
+                    {cat && <CategoryIcon slug={cat.slug} size={16} className="opacity-70" />}
                     {catName}
-                    <span className="text-navy/20">({prods.length})</span>
+                    <span className="text-navy/40 font-semibold">({prods.length})</span>
                   </div>
                   {prods.map((product) => {
                     globalResultIndex++;
@@ -323,41 +323,44 @@ function SmartSearch({
                           setFocused(false);
                         }}
                         onMouseEnter={() => setActiveIndex(thisIndex)}
-                        className={`w-full flex items-center gap-4 px-5 py-3.5 transition-all duration-200 group text-left ${
+                        className={`w-full flex items-center gap-4 sm:gap-5 px-5 sm:px-6 py-4 sm:py-5 transition-all duration-200 group text-left ${
                           isActive ? 'bg-red/5' : 'hover:bg-cream/60'
                         }`}
                       >
-                        <div className={`w-13 h-13 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center transition-all duration-300 ${
-                          isActive ? 'bg-red/10 shadow-md shadow-red/10' : 'bg-cream/80'
+                        <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex-shrink-0 overflow-hidden flex items-center justify-center transition-all duration-300 ${
+                          isActive ? 'bg-red/10 shadow-md shadow-red/10 ring-1 ring-red/20' : 'bg-cream/80 ring-1 ring-navy/5'
                         }`}>
                           {product.image_url ? (
                             <Image
                               src={product.image_url}
                               alt={name}
-                              width={52}
-                              height={52}
-                              className="w-full h-full object-contain p-1"
+                              width={80}
+                              height={80}
+                              className="w-full h-full object-contain p-1.5"
                               unoptimized
                             />
                           ) : (
-                            <Package className="w-5 h-5 text-navy/20" />
+                            <Package className="w-7 h-7 text-navy/20" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className={`font-semibold text-sm truncate transition-colors duration-200 ${
+                          <p className={`font-heading font-semibold text-base sm:text-lg truncate transition-colors duration-200 ${
                             isActive ? 'text-red' : 'text-navy group-hover:text-red'
                           }`}>
                             {highlightText(name, query)}
                           </p>
                           {desc && (
-                            <p className="text-navy/35 text-xs mt-0.5 truncate">
-                              {highlightText(desc.slice(0, 60), query)}{desc.length > 60 ? '...' : ''}
+                            <p className="text-navy/70 text-sm mt-1 line-clamp-2 leading-snug">
+                              {highlightText(desc.slice(0, 90), query)}{desc.length > 90 ? '…' : ''}
                             </p>
                           )}
-                          <p className="text-navy/25 text-[10px] mt-0.5">{catName}</p>
+                          <p className="inline-flex items-center gap-1.5 mt-2 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-navy/55">
+                            <span className="inline-block w-1 h-1 rounded-full bg-red/60" />
+                            {catName}
+                          </p>
                         </div>
-                        <ArrowRight className={`w-4 h-4 shrink-0 transition-all duration-300 ${
-                          isActive ? 'text-red translate-x-1' : 'text-navy/15 group-hover:text-red group-hover:translate-x-1'
+                        <ArrowRight className={`w-5 h-5 shrink-0 transition-all duration-300 ${
+                          isActive ? 'text-red translate-x-1' : 'text-navy/25 group-hover:text-red group-hover:translate-x-1'
                         }`} />
                       </motion.button>
                     );
@@ -463,48 +466,64 @@ function ProductModal({
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.3 }}
       onClick={onClose}
     >
-      {/* Deep cinematic backdrop */}
+      {/* Cinematic backdrop — slight blur, dark navy */}
       <motion.div
-        className="absolute inset-0 bg-navy/75 backdrop-blur-2xl"
+        className="absolute inset-0 bg-navy/55 backdrop-blur-md"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.4 }}
       />
 
-      {/* Card */}
+      {/* Bottom-sheet drawer — slides up from bottom on every viewport.
+          Desktop: capped at max-w-2xl with margin-bottom, reading like a
+          centred premium card. Mobile: full-bleed sheet with drag handle. */}
       <motion.div
-        className="relative bg-cream rounded-[2.5rem] overflow-hidden max-w-lg w-full max-h-[90vh] overflow-y-auto overscroll-contain"
-        initial={{ scale: 0.85, y: 80, opacity: 0 }}
-        animate={{ scale: 1, y: 0, opacity: 1 }}
-        exit={{ scale: 0.9, y: 50, opacity: 0 }}
-        transition={{ duration: 1.0, ease: [0.22, 0.68, 0, 1] }}
-        onClick={(e) => e.stopPropagation()}
+        className="relative w-full sm:max-w-2xl bg-cream rounded-t-[2.5rem] sm:rounded-[2rem] sm:mb-6 overflow-hidden flex flex-col"
         style={{
-          boxShadow: '0 50px 120px -20px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06) inset',
-          scrollbarWidth: 'thin',
-          scrollbarColor: 'rgba(0,48,72,0.12) transparent',
+          maxHeight: '92vh',
+          boxShadow: '0 -40px 90px -10px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06) inset',
         }}
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 30, stiffness: 240, mass: 0.9 }}
+        onClick={(e) => e.stopPropagation()}
       >
+        {/* Mobile drag handle */}
+        <div className="sm:hidden flex justify-center pt-3 pb-1">
+          <div className="w-12 h-1.5 rounded-full bg-navy/20" />
+        </div>
+
         {/* Close — frosted glass */}
         <motion.button
           onClick={onClose}
-          className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full bg-white/12 backdrop-blur-xl hover:bg-white/25 flex items-center justify-center transition-all duration-500 shadow-lg group border border-white/10"
+          className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full bg-white/15 backdrop-blur-xl hover:bg-white/30 flex items-center justify-center transition-all duration-300 shadow-lg group border border-white/15"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5, duration: 0.5, ease: 'backOut' }}
+          transition={{ delay: 0.25, duration: 0.4, ease: 'backOut' }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
           <X className="w-4 h-4 text-white group-hover:rotate-90 transition-transform duration-500" />
         </motion.button>
+
+        {/* Scroll body */}
+        <div
+          className="overflow-y-auto overscroll-contain flex-1"
+          data-lenis-prevent
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgba(0,48,72,0.12) transparent',
+          }}
+        >
 
         {/* Image area */}
         <div className={`relative aspect-square overflow-hidden ${hasDetailImage ? 'bg-[#0a1628]' : 'bg-gradient-to-br from-cream-dark/50 to-cream'}`}>
@@ -573,6 +592,7 @@ function ProductModal({
           >
             {description || t('defaultProductDescription')}
           </motion.p>
+        </div>
         </div>
       </motion.div>
     </motion.div>
@@ -654,9 +674,22 @@ function FloatingProductCard({
 
   useEffect(() => {
     if (isHighlighted && cardRef.current) {
+      const el = cardRef.current;
       setTimeout(() => {
-        cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 300);
+      // After the scroll settles, kick the shake on a child wrapper so it
+      // doesn't fight the float animation on the outer .product-card-float-wrapper.
+      setTimeout(() => {
+        const shakeTarget = el?.querySelector('[data-shake]') as HTMLElement | null;
+        if (!shakeTarget) return;
+        shakeTarget.classList.remove('product-shake');
+        // Reflow so the keyframe restarts cleanly when the same product is
+        // selected twice in a row from search.
+        void shakeTarget.offsetWidth;
+        shakeTarget.classList.add('product-shake');
+        setTimeout(() => shakeTarget.classList.remove('product-shake'), 800);
+      }, 900);
     }
   }, [isHighlighted]);
 
@@ -688,6 +721,7 @@ function FloatingProductCard({
         className="cursor-pointer group"
       >
         <div
+          data-shake
           className="relative"
           style={{
             filter: isHighlighted
@@ -881,10 +915,12 @@ function ProductsContent() {
 
   const handleSearchSelectProduct = useCallback((product: Product, categoryId: string) => {
     setActiveFilter(categoryId);
-    setHighlightedProductId(product.id);
-    setTimeout(() => {
-      setSelectedProductForModal(product);
-    }, 600);
+    // Bump the highlighted id so even if the same product is reselected the
+    // FloatingProductCard sees a change and replays its shake animation.
+    setHighlightedProductId(null);
+    setTimeout(() => setHighlightedProductId(product.id), 30);
+    // Intentionally NO setSelectedProductForModal — user asked for highlight
+    // + shake only, not auto-popup.
     setTimeout(() => {
       contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
