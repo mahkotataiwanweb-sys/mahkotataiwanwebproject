@@ -1240,6 +1240,7 @@ function PremiumDropdown({
 
           <div
             ref={listRef}
+            data-lenis-prevent
             className="premium-dropdown-list overflow-y-auto max-h-[320px] py-1.5 px-1.5"
             style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
           >
