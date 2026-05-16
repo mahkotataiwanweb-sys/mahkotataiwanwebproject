@@ -12,6 +12,7 @@ import { ChefHat, ArrowRight, Flame, Clock, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import RedWavyBackground from '@/components/ui/RedWavyBackground';
+import { BLUR_DATA_URL } from '@/lib/imageBlur';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -185,9 +186,11 @@ function CylinderCarousel({
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                     sizes="280px"
-                    priority={i < 5}
-                    loading={i < 5 ? 'eager' : 'lazy'}
-                    quality={75}
+                    priority={i < 3}
+                    loading={i < 3 ? 'eager' : 'lazy'}
+                    quality={65}
+                    placeholder="blur"
+                    blurDataURL={BLUR_DATA_URL}
                   />
                 ) : (
                   <div className="absolute inset-0 bg-gradient-to-br from-red to-red-dark" />
@@ -273,14 +276,9 @@ export default function RecipeShowcaseSection() {
         .limit(9);
       if (!error && data) {
         setRecipes(data);
-        // Warm the browser cache so the 3D carousel rotates without
-        // waiting on lazy-load network round-trips.
-        data.forEach((r) => {
-          if (r.image_url) {
-            const img = new window.Image();
-            img.src = r.image_url;
-          }
-        });
+        // Pre-warm via new Image() warmed the raw Supabase URL — but the
+        // <Image> component reads /_next/image, so the warm-up never hit
+        // the actual cache. Removed to avoid 9 wasted network requests.
       }
     }
     fetchRecipes();
