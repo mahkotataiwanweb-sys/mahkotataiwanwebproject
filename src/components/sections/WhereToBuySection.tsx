@@ -270,7 +270,7 @@ export default function WhereToBuySection() {
             <svg
               ref={mapRef}
               viewBox="0 0 200 450"
-              className="w-32 md:w-40 lg:w-48 h-auto"
+              className="w-32 md:w-52 lg:w-64 xl:w-72 h-auto"
               xmlns="http://www.w3.org/2000/svg"
               style={{ filter: 'none' }}
             >

@@ -33,13 +33,18 @@ interface LanternProps {
 }
 
 function Lantern({ id, delay, duration, bottomPct, xOffset, sway, scale }: LanternProps) {
-  const width = 56 * scale;
+  const desktopW = 56 * scale;
+  const mobileW = Math.round(34 * scale); // ~60% of desktop on phones
   return (
     <motion.div
       className="absolute"
       style={{
-        width,
-        left: `calc(50% + ${xOffset}px - ${width / 2}px)`,
+        // Use clamp so phones see the mobile width and desktops see the
+        // full size. 7vw smoothly interpolates between breakpoints.
+        width: `clamp(${mobileW}px, 7vw, ${desktopW}px)`,
+        // Anchor relative to the column center, then nudge horizontally
+        // so two lanterns per column never share a vertical track.
+        left: `calc(50% + ${xOffset}px - clamp(${mobileW}px, 7vw, ${desktopW}px) / 2)`,
         bottom: `${bottomPct}%`,
         willChange: 'transform, opacity',
       }}
