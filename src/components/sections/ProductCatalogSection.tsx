@@ -272,9 +272,9 @@ export default function ProductCatalogSection() {
 
     // The page uses Lenis smooth scroll which hijacks window.scrollTo,
     // so we go through the exposed lenis instance when available and
-    // fall back to native scrollIntoView otherwise. Run twice — once
-    // on the next paint, once after the grid has actually rendered —
-    // so even a same-category re-click and a fresh-grid mount both land.
+    // fall back to native scrollIntoView otherwise. Run twice — once on
+    // the next paint, once after the grid has actually rendered — so
+    // even a same-category re-click and a fresh-grid mount both land.
     const doScroll = () => {
       const el = productGridRef.current;
       if (!el) return;
