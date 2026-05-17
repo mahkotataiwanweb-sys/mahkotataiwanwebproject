@@ -167,7 +167,12 @@ export default function Footer() {
         }
 
         return (
-          <div key={item.id} className="text-center">
+          <div
+            key={item.id}
+            className="text-center group"
+            onMouseEnter={() => setExpandedMenu(menuKey)}
+            onMouseLeave={() => setExpandedMenu((curr) => (curr === menuKey ? null : curr))}
+          >
             <div className="inline-flex items-center gap-1 justify-center">
               <button
                 onClick={() => toggleMenu(menuKey)}
@@ -229,7 +234,12 @@ export default function Footer() {
       const isExpanded = expandedMenu === menuKey;
 
       return (
-        <div key={item.key} className="text-center">
+        <div
+          key={item.key}
+          className="text-center"
+          onMouseEnter={() => setExpandedMenu(menuKey)}
+          onMouseLeave={() => setExpandedMenu((curr) => (curr === menuKey ? null : curr))}
+        >
           <div className="inline-flex items-center gap-1 justify-center">
             <button
               onClick={() => toggleMenu(menuKey)}
