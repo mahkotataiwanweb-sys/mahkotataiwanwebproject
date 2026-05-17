@@ -423,13 +423,10 @@ export default function WhereToBuyPage() {
         <div className="max-w-5xl mx-auto px-6 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
             {stats.map((stat, idx) => {
-              const variants = [
-                { cardBg: 'bg-[#FAEDD3]', accent: 'before:bg-red',         iconWrap: 'bg-red text-white shadow-md shadow-red/20',          number: 'text-red',   label: 'text-navy/70',  ring: 'ring-red/15' },
-                { cardBg: 'bg-navy',      accent: 'before:bg-yellow-400', iconWrap: 'bg-yellow-400 text-navy shadow-md shadow-yellow-400/30', number: 'text-white', label: 'text-cream/65', ring: 'ring-white/10' },
-                { cardBg: 'bg-yellow-400',accent: 'before:bg-navy',       iconWrap: 'bg-navy text-yellow-300 shadow-md shadow-navy/30',   number: 'text-navy',  label: 'text-navy/75',  ring: 'ring-navy/15' },
-                { cardBg: 'bg-[#F0F0F0]', accent: 'before:bg-navy',       iconWrap: 'bg-navy text-white shadow-md shadow-navy/30',        number: 'text-navy',  label: 'text-navy/60',  ring: 'ring-navy/10' },
-              ];
-              const v = variants[idx % variants.length];
+              // All four cards share the same light-grey + navy variant
+              // for a clean uniform stats row (matches the '24/7' card the
+              // user wanted to keep).
+              const v = { cardBg: 'bg-[#F0F0F0]', accent: 'before:bg-navy', iconWrap: 'bg-navy text-white shadow-md shadow-navy/30', number: 'text-navy', label: 'text-navy/60', ring: 'ring-navy/10' };
               return (
                 <div
                   key={idx}
