@@ -268,7 +268,7 @@ export default function RecipeDetailPage() {
                         <div className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-navy text-white flex items-center justify-center text-sm font-bold self-start mt-1">
                           {stepIdx + 1}
                         </div>
-                        <div className="flex-1 bg-yellow-400 rounded-2xl px-5 py-3.5 sm:px-6 sm:py-4 shadow-sm">
+                        <div className="flex-1 bg-cream-dark/50 rounded-2xl px-5 py-3.5 sm:px-6 sm:py-4">
                           <p className="text-navy text-sm sm:text-base leading-relaxed font-medium">
                             {step}
                           </p>
