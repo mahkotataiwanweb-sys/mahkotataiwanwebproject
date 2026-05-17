@@ -316,8 +316,8 @@ export default function ArticleDetailPage() {
                 <ImagesIcon className="w-5 h-5 text-[#C12126]" />
               </div>
               <div>
-                <h2 className="font-heading text-2xl font-bold text-[#003048]">{t('gallery')}</h2>
-                <p className="text-[#003048]/40 text-xs mt-0.5">{galleryImages.length} {t('photos')}</p>
+                <h2 className="font-heading text-2xl font-bold text-[#003048]">{t('galleryTitle')}</h2>
+                <p className="text-[#003048]/40 text-xs mt-0.5">{galleryImages.length} {t('photosLabel')}</p>
               </div>
             </div>
 

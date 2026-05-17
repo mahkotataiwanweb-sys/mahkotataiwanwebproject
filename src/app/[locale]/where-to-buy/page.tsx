@@ -422,33 +422,35 @@ export default function WhereToBuyPage() {
       <section className="stats-section relative py-10 md:py-14">
         <div className="max-w-5xl mx-auto px-6 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
-            {stats.map((stat, idx) => (
-              <div
-                key={idx}
-                className="stat-card group relative bg-white/80 backdrop-blur-sm rounded-2xl p-5 md:p-6 text-center transition-all duration-500 ease-out hover:-translate-y-1"
-                style={{ boxShadow: '0 1px 3px rgba(0,48,72,0.06), 0 0 0 1px rgba(0,48,72,0.04)' }}
-              >
-                {/* Compact icon */}
-                <div className="inline-flex items-center justify-center w-9 h-9 rounded-xl mb-4"
-                  style={{ background: idx % 2 === 0 ? 'rgba(193,33,38,0.08)' : 'rgba(0,48,72,0.07)' }}
-                >
-                  <stat.icon className="w-4 h-4" style={{ color: idx % 2 === 0 ? '#C12126' : '#003048' }} />
-                </div>
-
-                {/* Number — clean single color */}
+            {stats.map((stat, idx) => {
+              const variants = [
+                { cardBg: 'bg-[#FAEDD3]', accent: 'before:bg-red',         iconWrap: 'bg-red text-white shadow-md shadow-red/20',          number: 'text-red',   label: 'text-navy/70',  ring: 'ring-red/15' },
+                { cardBg: 'bg-navy',      accent: 'before:bg-yellow-400', iconWrap: 'bg-yellow-400 text-navy shadow-md shadow-yellow-400/30', number: 'text-white', label: 'text-cream/65', ring: 'ring-white/10' },
+                { cardBg: 'bg-yellow-400',accent: 'before:bg-navy',       iconWrap: 'bg-navy text-yellow-300 shadow-md shadow-navy/30',   number: 'text-navy',  label: 'text-navy/75',  ring: 'ring-navy/15' },
+                { cardBg: 'bg-[#F0F0F0]', accent: 'before:bg-navy',       iconWrap: 'bg-navy text-white shadow-md shadow-navy/30',        number: 'text-navy',  label: 'text-navy/60',  ring: 'ring-navy/10' },
+              ];
+              const v = variants[idx % variants.length];
+              return (
                 <div
-                  className="stat-number text-2xl md:text-3xl font-heading font-bold mb-1.5 tracking-[-0.02em] leading-none text-navy"
-                  data-value={stat.number}
+                  key={idx}
+                  className={`stat-card group relative ${v.cardBg} rounded-2xl px-5 py-6 md:px-6 md:py-7 transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-xl ring-1 ${v.ring} overflow-hidden before:content-[''] before:absolute before:left-0 before:top-6 before:bottom-6 before:w-[3px] before:rounded-r-full ${v.accent}`}
+                  style={{ boxShadow: '0 12px 28px -10px rgba(0,48,72,0.18)' }}
                 >
-                  {stat.number.includes('/') ? stat.number : loading ? '\u2014' : '0'}
+                  <div className={`inline-flex items-center justify-center w-11 h-11 rounded-xl mb-4 ${v.iconWrap}`}>
+                    <stat.icon className="w-5 h-5" />
+                  </div>
+                  <div
+                    className={`stat-number font-heading font-extrabold tracking-[-0.02em] leading-none mb-2 text-3xl md:text-4xl ${v.number}`}
+                    data-value={stat.number}
+                  >
+                    {stat.number.includes('/') ? stat.number : loading ? '—' : '0'}
+                  </div>
+                  <div className={`text-[11px] sm:text-xs font-bold uppercase tracking-[0.18em] ${v.label}`}>
+                    {stat.label}
+                  </div>
                 </div>
-
-                {/* Label */}
-                <div className="text-navy/35 text-[10px] font-semibold uppercase tracking-[0.2em]">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
