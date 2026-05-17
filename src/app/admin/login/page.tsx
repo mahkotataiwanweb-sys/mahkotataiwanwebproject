@@ -106,7 +106,16 @@ export default function AdminLogin() {
   }));
 
   return (
-    <div className="min-h-screen w-full relative overflow-hidden bg-[#003048]">
+    <div
+      className="min-h-screen w-full relative overflow-hidden"
+      style={{
+        backgroundColor: '#F5F5F5',
+        backgroundImage: "url('/images/bg-pattern.png')",
+        backgroundRepeat: 'repeat',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
       {/* ── animated background ── */}
       <div className="absolute inset-0">
         {/* gradient orbs */}
@@ -161,7 +170,14 @@ export default function AdminLogin() {
       <AnimatePresence>
         {showSplash && (
           <motion.div
-            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#003048]"
+            className="absolute inset-0 z-50 flex flex-col items-center justify-center"
+            style={{
+              backgroundColor: '#F5F5F5',
+              backgroundImage: "url('/images/bg-pattern.png')",
+              backgroundRepeat: 'repeat',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
             exit={{ opacity: 0, scale: 1.1 }}
             transition={{ duration: 0.6, ease: [0.65, 0, 0.35, 1] }}
           >
@@ -202,7 +218,7 @@ export default function AdminLogin() {
 
             {/* loading bar */}
             <motion.div
-              className="mt-8 h-[3px] rounded-full overflow-hidden bg-white/10"
+              className="mt-8 h-[3px] rounded-full overflow-hidden bg-navy/10"
               style={{ width: 160 }}
             >
               <motion.div
@@ -218,7 +234,7 @@ export default function AdminLogin() {
             </motion.div>
 
             <motion.p
-              className="mt-4 text-[11px] uppercase tracking-[0.3em] text-white/40 font-medium"
+              className="mt-4 text-[11px] uppercase tracking-[0.3em] text-navy/60 font-medium"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
@@ -261,7 +277,7 @@ export default function AdminLogin() {
                 />
               </motion.div>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-navy tracking-tight">
               CMS Console
             </h1>
             <div className="flex items-center gap-2 mt-2">
@@ -273,13 +289,12 @@ export default function AdminLogin() {
             </div>
           </motion.div>
 
-          {/* card */}
+          {/* card — navy panel sits on the light pattern bg */}
           <motion.div
-            className="rounded-3xl border border-white/[0.08] p-8 sm:p-10 shadow-2xl"
+            className="rounded-3xl border border-navy/15 p-8 sm:p-10 shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-              backdropFilter: 'blur(40px)',
-              boxShadow: '0 0 0 1px rgba(255,255,255,0.05), 0 20px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)',
+              background: 'linear-gradient(135deg, #003048 0%, #001E2E 100%)',
+              boxShadow: '0 0 0 1px rgba(255,255,255,0.04) inset, 0 30px 60px -10px rgba(0,48,72,0.35), 0 12px 24px -8px rgba(0,48,72,0.25)',
             }}
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: showSplash ? 30 : 0, opacity: showSplash ? 0 : 1 }}

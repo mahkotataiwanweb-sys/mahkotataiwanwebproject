@@ -676,7 +676,7 @@ function CategoryDropdown({
               <CategoryIcon slug={cat.slug} size={18} />
               <span>{name}</span>
               <span
-                className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                className={`font-body text-xs font-semibold tabular-nums px-2 py-0.5 rounded-full ${
                   isActive ? 'bg-white/20 text-white' : 'bg-navy/10 text-navy/70'
                 }`}
               >
