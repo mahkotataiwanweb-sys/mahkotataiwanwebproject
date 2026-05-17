@@ -264,23 +264,26 @@ export default function ProductCatalogSection() {
      that fade in are immediately in view. */
   const backTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const handleCategoryClick = useCallback((slug: string) => {
-    // If a pending 'back-to-showcase' clear is queued, cancel it — otherwise
-    // it will fire after the new category is picked and wipe the reveal mid
-    // animation, which is the bug behind 'no animation on second pick'.
     if (backTimeoutRef.current) {
       clearTimeout(backTimeoutRef.current);
       backTimeoutRef.current = null;
     }
     setSelectedCategory(slug);
-    // Wait for the product grid to render before scrolling.
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        const el = productGridRef.current;
-        if (!el) return;
-        const top = el.getBoundingClientRect().top + window.scrollY - 96;
-        window.scrollTo({ top, behavior: 'smooth' });
-      }, 120);
-    });
+    // Scroll on the next paint AND again after a small delay. The double
+    // tick covers two race conditions:
+    //   1. Clicking the same category re-enters the same state, React
+    //      skips the re-render and the single delayed scroll never fired.
+    //   2. Clicking a new category triggers AnimatePresence + a Supabase
+    //      query — productGridRef's measured top changes once the grid
+    //      paints; the second call corrects the target.
+    const scrollToGrid = () => {
+      const el = productGridRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - 96;
+      window.scrollTo({ top, behavior: 'smooth' });
+    };
+    requestAnimationFrame(scrollToGrid);
+    setTimeout(scrollToGrid, 220);
   }, []);
 
   /* Pre-warming the raw Supabase URL did nothing — <Image> reads through
