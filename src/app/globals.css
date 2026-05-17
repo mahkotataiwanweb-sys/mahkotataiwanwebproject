@@ -14,33 +14,37 @@
   --color-red-light: #E03338;
   --color-red-dark: #9A1A1E;
 
-  /* Admin CMS palette: neutral whites + amber/gold accent */
-  --color-admin-bg: #F7F8FA;
-  --color-admin-surface: #FFFFFF;
-  --color-admin-surface-2: #FAFBFC;
-  --color-admin-border: #E8EBF0;
-  --color-admin-border-strong: #D5DAE2;
-  --color-admin-ink: #0F172A;
-  --color-admin-ink-2: #334155;
-  --color-admin-muted: #64748B;
-  --color-admin-faint: #94A3B8;
-  --color-admin-accent: #B8860B;
-  --color-admin-accent-soft: #FFF4D9;
-  --color-admin-sidebar: #0B1727;
-  --color-admin-sidebar-soft: #122438;
-  --color-admin-sidebar-ink: #E2E8F0;
-  --color-admin-sidebar-muted: #94A3B8;
+  /* Admin CMS palette — matches the live brand: navy + red + yellow + cream */
+  --color-admin-bg: #F8F8F8;            /* cream-light (matches body bg) */
+  --color-admin-surface: #FFFFFF;       /* cards / panels */
+  --color-admin-surface-2: #FAEDD3;     /* warm cream secondary surface */
+  --color-admin-border: rgba(0,48,72,0.12);
+  --color-admin-border-strong: rgba(0,48,72,0.22);
+  --color-admin-ink: #003048;           /* brand navy */
+  --color-admin-ink-2: rgba(0,48,72,0.78);
+  --color-admin-muted: rgba(0,48,72,0.58);
+  --color-admin-faint: rgba(0,48,72,0.4);
+  --color-admin-accent: #C12126;        /* brand red */
+  --color-admin-accent-soft: #FAEDD3;   /* warm cream */
+  --color-admin-sidebar: #003048;       /* brand navy */
+  --color-admin-sidebar-soft: #001E2E;  /* navy-dark */
+  --color-admin-sidebar-ink: #F0F0F0;   /* cream */
+  --color-admin-sidebar-muted: rgba(240,240,240,0.6);
 
-  /* Dark mode admin palette */
-  --color-admin-bg-dark: #0A0F1A;
-  --color-admin-surface-dark: #111827;
-  --color-admin-surface-2-dark: #1A2434;
-  --color-admin-border-dark: #1F2937;
-  --color-admin-border-strong-dark: #2A3548;
-  --color-admin-ink-dark: #F1F5F9;
-  --color-admin-ink-2-dark: #CBD5E1;
-  --color-admin-muted-dark: #94A3B8;
-  --color-admin-faint-dark: #64748B;
+  /* Yellow accent — used for highlights, badges, CTA hovers in admin */
+  --color-admin-gold: #FACC15;
+  --color-admin-gold-soft: #FEF3C7;
+
+  /* Dark mode admin palette — anchored to brand navy */
+  --color-admin-bg-dark: #001E2E;       /* navy-dark */
+  --color-admin-surface-dark: #002A40;
+  --color-admin-surface-2-dark: #003048; /* navy */
+  --color-admin-border-dark: rgba(240,240,240,0.08);
+  --color-admin-border-strong-dark: rgba(240,240,240,0.18);
+  --color-admin-ink-dark: #F0F0F0;
+  --color-admin-ink-2-dark: rgba(240,240,240,0.82);
+  --color-admin-muted-dark: rgba(240,240,240,0.55);
+  --color-admin-faint-dark: rgba(240,240,240,0.38);
 
   --font-heading: 'Playfair Display', Georgia, serif;
   --font-body: 'Inter', system-ui, sans-serif;
