@@ -292,7 +292,7 @@ export default function ArticleDetailPage() {
         {/* Excerpt */}
         {excerpt && (
           <div data-anim className="mb-14 pb-10 border-b border-[#003048]/10">
-            <p className="text-lg sm:text-xl lg:text-2xl text-[#003048]/65 leading-relaxed font-light italic">
+            <p className="text-lg sm:text-xl lg:text-2xl text-[#003048] leading-relaxed font-bold italic">
               &ldquo;{excerpt}&rdquo;
             </p>
           </div>
