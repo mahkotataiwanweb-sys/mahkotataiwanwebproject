@@ -136,7 +136,9 @@ export default function ArticleDetailPage() {
   /* ────── lightbox keyboard ────── */
   useEffect(() => {
     if (!lbOpen) return;
-    const imgs = article?.gallery_images || [];
+    const imgs = (article?.gallery_images || []).filter(
+      (u): u is string => typeof u === 'string' && u.trim().length > 0,
+    );
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setLbOpen(false);
       if (e.key === 'ArrowLeft') setLbIdx((p) => (p === 0 ? imgs.length - 1 : p - 1));
@@ -195,7 +197,11 @@ export default function ArticleDetailPage() {
   const title = getLocalizedField(article, 'title', locale);
   const content = getLocalizedField(article, 'content', locale) || '';
   const excerpt = getLocalizedField(article, 'excerpt', locale);
-  const galleryImages = article.gallery_images || [];
+  // Filter out empty/null entries so the gallery never renders a broken
+  // <Image> for a row the CMS saved as an empty string.
+  const galleryImages = (article.gallery_images || []).filter(
+    (u): u is string => typeof u === 'string' && u.trim().length > 0,
+  );
   const date = formatDate(article.published_at, locale);
   const typeLabel = article.type === 'event' ? t('typeEvent') : article.type === 'lifestyle' ? t('typeActivity') : article.type.charAt(0).toUpperCase() + article.type.slice(1);
   const readingTime = Math.max(1, Math.ceil(content.split(/\s+/).length / 200));
