@@ -17,6 +17,11 @@ export default function SmoothScrollProvider({ children }: { children: ReactNode
       touchMultiplier: 1.8,
     });
 
+    // Expose the Lenis instance so imperative components (e.g. category
+    // click → scroll to product grid) can call lenis.scrollTo() instead of
+    // window.scrollTo, which Lenis hijacks and may swallow.
+    (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
+
     // Feed scroll data into the module-level store
     // Components read from this in their RAF loops — zero re-renders
     lenis.on('scroll', (e: { velocity: number; direction: number; progress: number }) => {
@@ -28,6 +33,7 @@ export default function SmoothScrollProvider({ children }: { children: ReactNode
     gsap.ticker.lagSmoothing(500, 33);
 
     return () => {
+      (window as unknown as { __lenis?: Lenis }).__lenis = undefined;
       lenis.destroy();
     };
   }, []);
