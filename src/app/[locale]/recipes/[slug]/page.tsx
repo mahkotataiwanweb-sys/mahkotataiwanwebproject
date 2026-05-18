@@ -8,7 +8,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowLeft, Clock, Users, ChefHat, Sparkles } from 'lucide-react';
+
+if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 import { supabase } from '@/lib/supabase';
 import { getLocalizedField } from '@/lib/utils';
 import HeroBackground from '@/components/effects/HeroBackground';
@@ -90,6 +93,30 @@ export default function RecipeDetailPage() {
         { opacity: 0, y: 30 },
         { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power3.out', delay: 0.2 }
       );
+
+      // Steps stagger — mirrors the FAQ reveal on /contact: soft blur,
+      // bigger lift, slow expo.out so each step lands one after another.
+      const steps = contentRef.current!.querySelectorAll('.recipe-step');
+      if (steps.length) {
+        gsap.fromTo(
+          steps,
+          { opacity: 0, y: 70, scale: 0.85, filter: 'blur(2px)' },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 2.5,
+            stagger: 0.25,
+            ease: 'expo.out',
+            scrollTrigger: {
+              trigger: steps[0] as Element,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
     });
     return () => ctx.revert();
   }, [recipe]);
@@ -264,7 +291,7 @@ export default function RecipeDetailPage() {
                 ) : isSteps ? (
                   <div className="space-y-3 sm:space-y-4">
                     {section.items.map((step, stepIdx) => (
-                      <div key={stepIdx} className="flex items-stretch gap-3 sm:gap-4">
+                      <div key={stepIdx} className="recipe-step flex items-stretch gap-3 sm:gap-4">
                         <div className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-navy text-white flex items-center justify-center text-sm font-bold self-start mt-1">
                           {stepIdx + 1}
                         </div>
