@@ -649,18 +649,12 @@
  * ADMIN CMS DASHBOARD — Premium UI System
  * ============================================================ */
 
-/* Admin shell — shown on all /admin routes via .admin-scope wrapper.
-   Mirrors the live frontend surface: #F5F5F5 base + bg-pattern swirl
-   so the CMS feels like it belongs to the same product. */
+/* Admin shell — shown on all /admin routes via .admin-scope wrapper. */
 .admin-scope {
   font-family: var(--font-body);
+  background-color: var(--color-admin-bg);
   color: var(--color-admin-ink);
   min-height: 100vh;
-  background-color: #F5F5F5;
-  background-image: url('/images/bg-pattern.png');
-  background-repeat: repeat;
-  background-size: 600px auto;
-  background-attachment: fixed;
 }
 .admin-scope h1, .admin-scope h2, .admin-scope h3, .admin-scope h4, .admin-scope h5, .admin-scope h6 {
   font-family: var(--font-heading);
@@ -669,7 +663,6 @@
 
 .dark .admin-scope {
   background-color: var(--color-admin-bg-dark);
-  background-image: none;
   color: var(--color-admin-ink-dark);
 }
 
