@@ -230,7 +230,7 @@ export default function ProductsPage() {
       label: 'Featured',
       render: (p) => (
         <button onClick={() => toggleFeatured(p)} className="admin-btn-icon" title={p.is_featured ? 'Unfeature' : 'Feature'}>
-          <Star className={`w-4 h-4 ${p.is_featured ? 'text-yellow-400 fill-yellow-400' : 'text-[var(--color-admin-faint)]'}`} />
+          <Star className={`w-4 h-4 ${p.is_featured ? 'text-amber-500 fill-amber-500' : 'text-[var(--color-admin-faint)]'}`} />
         </button>
       ),
     },

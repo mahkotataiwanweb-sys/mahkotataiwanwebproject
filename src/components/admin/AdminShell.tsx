@@ -139,7 +139,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           className: '!rounded-xl !text-sm !font-medium',
           style: {
             background: theme === 'dark' ? '#1A2434' : '#FFFFFF',
-            color: theme === 'dark' ? '#F1F5F9' : '#003048',
+            color: theme === 'dark' ? '#F1F5F9' : '#0F172A',
             border: `1px solid ${theme === 'dark' ? '#2A3548' : '#E8EBF0'}`,
             boxShadow: '0 12px 28px -10px rgba(15,23,42,0.18)',
           },
@@ -156,7 +156,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         {/* Brand */}
         <div className="px-5 pt-5 pb-3 flex items-center justify-between">
           <Link href="/admin" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[var(--color-admin-accent)] to-[#FACC15] flex items-center justify-center shadow-lg">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[var(--color-admin-accent)] to-[#D4A03B] flex items-center justify-center shadow-lg">
               <Image src="/images/logo.png" alt="Logo" width={22} height={22} className="brightness-0" />
             </div>
             <div className="leading-tight">

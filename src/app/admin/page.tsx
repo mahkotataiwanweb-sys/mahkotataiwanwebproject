@@ -47,9 +47,9 @@ const STAT_DEFINITIONS: StatDef[] = [
   { key: 'showcaseProducts', label: 'Showcase Products', href: '/admin/showcase-products', icon: ShoppingBag, tone: 'from-fuchsia-500 to-pink-500' },
   { key: 'events', label: 'Events', href: '/admin/events', icon: Calendar, tone: 'from-violet-500 to-purple-500' },
   { key: 'activities', label: 'Activity', href: '/admin/activities', icon: SparklesIcon, tone: 'from-rose-500 to-pink-500' },
-  { key: 'recipes', label: 'Recipes', href: '/admin/recipes', icon: ChefHat, tone: 'from-yellow-400 to-red' },
+  { key: 'recipes', label: 'Recipes', href: '/admin/recipes', icon: ChefHat, tone: 'from-amber-500 to-orange-500' },
   { key: 'videoShowcases', label: 'Video Showcases', href: '/admin/video-showcase', icon: Play, tone: 'from-orange-500 to-red-500' },
-  { key: 'heroSlides', label: 'Hero Slides', href: '/admin/hero-slides', icon: ImageIcon, tone: 'from-yellow-400 to-yellow-400' },
+  { key: 'heroSlides', label: 'Hero Slides', href: '/admin/hero-slides', icon: ImageIcon, tone: 'from-yellow-500 to-amber-500' },
   { key: 'storeLocations', label: 'Store Locations', href: '/admin/store-locations', icon: MapPin, tone: 'from-sky-500 to-cyan-500' },
   { key: 'storePartners', label: 'Store Partners', href: '/admin/store-partners', icon: Store, tone: 'from-cyan-500 to-blue-500' },
 ];
