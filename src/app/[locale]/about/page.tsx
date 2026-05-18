@@ -9,6 +9,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Award, Store, Package, Users, Shield, Heart, Sparkles, ChevronRight, Star, Globe } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { supabaseImage } from '@/lib/supabaseImage';
 import HeroBackground from '@/components/effects/HeroBackground';
 import EditableText from '@/components/EditableText';
 
@@ -1043,8 +1044,10 @@ export default function AboutPage() {
                     >
                       {partner.logo_url ? (
                         <img
-                          src={partner.logo_url}
+                          src={supabaseImage(partner.logo_url, { width: 240, quality: 80 })}
                           alt={partner.name}
+                          loading="lazy"
+                          decoding="async"
                           className="max-h-12 max-w-[120px] object-contain pointer-events-none group-hover:scale-110 transition-transform duration-300"
                           draggable={false}
                         />
@@ -1059,8 +1062,10 @@ export default function AboutPage() {
                     >
                       {partner.logo_url ? (
                         <img
-                          src={partner.logo_url}
+                          src={supabaseImage(partner.logo_url, { width: 240, quality: 80 })}
                           alt={partner.name}
+                          loading="lazy"
+                          decoding="async"
                           className="max-h-12 max-w-[120px] object-contain pointer-events-none"
                           draggable={false}
                         />
