@@ -16,7 +16,7 @@ function Particle({ delay, x, size }: { delay: number; x: number; size: number }
         height: size,
         left: `${x}%`,
         bottom: -20,
-        background: 'radial-gradient(circle, rgba(250,204,21,0.6) 0%, rgba(250,204,21,0) 70%)',
+        background: 'radial-gradient(circle, rgba(212,160,59,0.6) 0%, rgba(212,160,59,0) 70%)',
       }}
       animate={{
         y: [0, -800],
@@ -39,7 +39,7 @@ function Sparkle({ delay, angle, distance }: { delay: number; angle: number; dis
   const y = Math.sin((angle * Math.PI) / 180) * distance;
   return (
     <motion.div
-      className="absolute w-1.5 h-1.5 rounded-full bg-yellow-300"
+      className="absolute w-1.5 h-1.5 rounded-full bg-amber-300"
       style={{ left: '50%', top: '50%' }}
       animate={{
         x: [0, x],
@@ -106,23 +106,14 @@ export default function AdminLogin() {
   }));
 
   return (
-    <div
-      className="min-h-screen w-full relative overflow-hidden"
-      style={{
-        backgroundColor: '#F5F5F5',
-        backgroundImage: "url('/images/bg-pattern.png')",
-        backgroundRepeat: 'repeat',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
+    <div className="min-h-screen w-full relative overflow-hidden bg-[#0B1120]">
       {/* ── animated background ── */}
       <div className="absolute inset-0">
         {/* gradient orbs */}
         <motion.div
           className="absolute w-[600px] h-[600px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgba(193,33,38,0.15) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(185,28,28,0.15) 0%, transparent 70%)',
             top: '-10%',
             left: '-10%',
           }}
@@ -132,7 +123,7 @@ export default function AdminLogin() {
         <motion.div
           className="absolute w-[500px] h-[500px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgba(250,204,21,0.12) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(212,160,59,0.12) 0%, transparent 70%)',
             bottom: '-10%',
             right: '-10%',
           }}
@@ -142,7 +133,7 @@ export default function AdminLogin() {
         <motion.div
           className="absolute w-[400px] h-[400px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgba(193,33,38,0.08) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(185,28,28,0.08) 0%, transparent 70%)',
             top: '40%',
             right: '20%',
           }}
@@ -170,14 +161,7 @@ export default function AdminLogin() {
       <AnimatePresence>
         {showSplash && (
           <motion.div
-            className="absolute inset-0 z-50 flex flex-col items-center justify-center"
-            style={{
-              backgroundColor: '#F5F5F5',
-              backgroundImage: "url('/images/bg-pattern.png')",
-              backgroundRepeat: 'repeat',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
+            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#0B1120]"
             exit={{ opacity: 0, scale: 1.1 }}
             transition={{ duration: 0.6, ease: [0.65, 0, 0.35, 1] }}
           >
@@ -191,7 +175,7 @@ export default function AdminLogin() {
               <motion.div
                 className="absolute inset-0 rounded-full"
                 style={{
-                  background: 'radial-gradient(circle, rgba(193,33,38,0.3) 0%, transparent 60%)',
+                  background: 'radial-gradient(circle, rgba(185,28,28,0.3) 0%, transparent 60%)',
                   transform: 'scale(2)',
                 }}
                 animate={{ opacity: [0.3, 0.7, 0.3], scale: [1.8, 2.2, 1.8] }}
@@ -211,20 +195,20 @@ export default function AdminLogin() {
                   width={176}
                   height={176}
                   priority
-                  className="relative z-10 drop-shadow-[0_0_40px_rgba(193,33,38,0.4)]"
+                  className="relative z-10 drop-shadow-[0_0_40px_rgba(185,28,28,0.4)]"
                 />
               </motion.div>
             </div>
 
             {/* loading bar */}
             <motion.div
-              className="mt-8 h-[3px] rounded-full overflow-hidden bg-navy/10"
+              className="mt-8 h-[3px] rounded-full overflow-hidden bg-white/10"
               style={{ width: 160 }}
             >
               <motion.div
                 className="h-full rounded-full"
                 style={{
-                  background: 'linear-gradient(90deg, #C12126, #FACC15, #C12126)',
+                  background: 'linear-gradient(90deg, #B91C1C, #D4A03B, #B91C1C)',
                   backgroundSize: '200% 100%',
                 }}
                 initial={{ width: '0%' }}
@@ -234,7 +218,7 @@ export default function AdminLogin() {
             </motion.div>
 
             <motion.p
-              className="mt-4 text-[11px] uppercase tracking-[0.3em] text-navy/60 font-medium"
+              className="mt-4 text-[11px] uppercase tracking-[0.3em] text-white/40 font-medium"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
@@ -262,7 +246,7 @@ export default function AdminLogin() {
           >
             <div className="relative mb-5">
               {/* outer glow */}
-              <div className="absolute inset-0 rounded-full bg-red/20 blur-2xl scale-150" />
+              <div className="absolute inset-0 rounded-full bg-red-700/20 blur-2xl scale-150" />
               <motion.div
                 className="relative w-20 h-20"
                 animate={{ y: [0, -6, 0] }}
@@ -273,28 +257,29 @@ export default function AdminLogin() {
                   alt="Mahkota Taiwan"
                   width={80}
                   height={80}
-                  className="drop-shadow-[0_0_20px_rgba(193,33,38,0.3)]"
+                  className="drop-shadow-[0_0_20px_rgba(185,28,28,0.3)]"
                 />
               </motion.div>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-navy tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               CMS Console
             </h1>
             <div className="flex items-center gap-2 mt-2">
-              <div className="w-8 h-px bg-gradient-to-r from-transparent to-yellow-400/50" />
-              <p className="text-[11px] uppercase tracking-[0.25em] text-yellow-400/70 font-medium">
+              <div className="w-8 h-px bg-gradient-to-r from-transparent to-amber-500/50" />
+              <p className="text-[11px] uppercase tracking-[0.25em] text-amber-400/60 font-medium">
                 Mahkota Taiwan
               </p>
-              <div className="w-8 h-px bg-gradient-to-l from-transparent to-yellow-400/50" />
+              <div className="w-8 h-px bg-gradient-to-l from-transparent to-amber-500/50" />
             </div>
           </motion.div>
 
-          {/* card — navy panel sits on the light pattern bg */}
+          {/* card */}
           <motion.div
-            className="rounded-3xl border border-navy/15 p-8 sm:p-10 shadow-2xl"
+            className="rounded-3xl border border-white/[0.08] p-8 sm:p-10 shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, #003048 0%, #001E2E 100%)',
-              boxShadow: '0 0 0 1px rgba(255,255,255,0.04) inset, 0 30px 60px -10px rgba(0,48,72,0.35), 0 12px 24px -8px rgba(0,48,72,0.25)',
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+              backdropFilter: 'blur(40px)',
+              boxShadow: '0 0 0 1px rgba(255,255,255,0.05), 0 20px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)',
             }}
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: showSplash ? 30 : 0, opacity: showSplash ? 0 : 1 }}
@@ -319,7 +304,7 @@ export default function AdminLogin() {
                   Password
                 </label>
                 <div className="relative group">
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-red/20 to-yellow-400/20 opacity-0 group-focus-within:opacity-100 transition-opacity blur-xl" />
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-red-700/20 to-amber-500/20 opacity-0 group-focus-within:opacity-100 transition-opacity blur-xl" />
                   <div className="relative">
                     <Lock className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
                     <input
@@ -327,7 +312,7 @@ export default function AdminLogin() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Masukkan password admin"
-                      className="w-full pl-11 pr-12 py-3.5 rounded-2xl bg-white/[0.06] border border-white/[0.08] text-sm text-white placeholder-white/25 focus:outline-none focus:border-red/50 focus:bg-white/[0.08] transition-all duration-300"
+                      className="w-full pl-11 pr-12 py-3.5 rounded-2xl bg-white/[0.06] border border-white/[0.08] text-sm text-white placeholder-white/25 focus:outline-none focus:border-red-700/50 focus:bg-white/[0.08] transition-all duration-300"
                       required
                       autoFocus
                     />
@@ -348,10 +333,10 @@ export default function AdminLogin() {
                 disabled={loading}
                 className="relative w-full py-3.5 rounded-2xl font-semibold text-sm shadow-lg overflow-hidden disabled:opacity-60 transition-all duration-300"
                 style={{
-                  background: 'linear-gradient(135deg, #C12126 0%, #9A1A1E 50%, #5A0F12 100%)',
+                  background: 'linear-gradient(135deg, #B91C1C 0%, #991B1B 50%, #7F1D1D 100%)',
                   color: '#fff',
                 }}
-                whileHover={{ scale: 1.01, boxShadow: '0 10px 40px rgba(193,33,38,0.3)' }}
+                whileHover={{ scale: 1.01, boxShadow: '0 10px 40px rgba(185,28,28,0.3)' }}
                 whileTap={{ scale: 0.99 }}
               >
                 {/* shimmer effect */}
