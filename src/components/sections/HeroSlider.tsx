@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { supabaseImage } from '@/lib/supabaseImage';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { supabase } from '@/lib/supabase';
@@ -405,15 +404,10 @@ export default function HeroSlider() {
           animate={{ scale: 1 }}
           transition={{ duration: 8, ease: 'linear' }}
         >
-          {/* GIFs must stay <img> to preserve animation, but route through
-              Supabase image transformation so the file is resized + recompressed
-              at the origin. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={supabaseImage(currentSlide.image_url, { width: 1920, quality: 75 })}
+            src={currentSlide.image_url}
             alt={title}
-            loading="eager"
-            decoding="async"
             className="object-cover w-full h-full absolute inset-0"
           />
         </motion.div>
@@ -431,7 +425,7 @@ export default function HeroSlider() {
       >
         {/* Mobile-only 3:4 portrait image (falls back to the desktop URL when no mobile asset is uploaded) */}
         <Image
-          src={supabaseImage(currentSlide.image_url_mobile || currentSlide.image_url, { width: 900, quality: 75 })}
+          src={currentSlide.image_url_mobile || currentSlide.image_url}
           alt={title}
           fill
           className="object-cover w-full h-full block sm:hidden"
@@ -443,7 +437,7 @@ export default function HeroSlider() {
         />
         {/* Desktop / tablet 10:5 image */}
         <Image
-          src={supabaseImage(currentSlide.image_url, { width: 1920, quality: 75 })}
+          src={currentSlide.image_url}
           alt={title}
           fill
           className="object-cover w-full h-full hidden sm:block"
