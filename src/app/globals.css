@@ -769,15 +769,15 @@ select.admin-input { appearance: none; background-image: url("data:image/svg+xml
   color: #fff;
 }
 .admin-btn-primary:hover:not(:disabled) { background-color: var(--color-admin-ink-2); }
-.dark .admin-btn-primary { background-color: var(--color-admin-accent); color: #1A1308; }
-.dark .admin-btn-primary:hover:not(:disabled) { background-color: #D4A03B; }
+.dark .admin-btn-primary { background-color: var(--color-admin-accent); color: #FACC15; }
+.dark .admin-btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
 
 .admin-btn-accent {
-  background: linear-gradient(135deg, var(--color-admin-accent) 0%, #D4A03B 100%);
-  color: #1A1308;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 8px 16px -8px color-mix(in srgb, var(--color-admin-accent) 50%, transparent);
+  background: var(--color-admin-accent);
+  color: #FACC15;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.18) inset, 0 8px 16px -8px color-mix(in srgb, var(--color-admin-accent) 50%, transparent);
 }
-.admin-btn-accent:hover:not(:disabled) { filter: brightness(1.05); transform: translateY(-1px); }
+.admin-btn-accent:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
 
 .admin-btn-success {
   background-color: #059669;
@@ -943,8 +943,8 @@ select.admin-input { appearance: none; background-image: url("data:image/svg+xml
   background: rgba(255,255,255,0.04);
 }
 .admin-sidebar-link.is-active {
-  color: #1A1308;
-  background: linear-gradient(135deg, var(--color-admin-accent) 0%, #D4A03B 100%);
+  color: #FACC15;
+  background: var(--color-admin-accent);
   box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--color-admin-accent) 60%, transparent);
 }
 .admin-sidebar-group-title {
