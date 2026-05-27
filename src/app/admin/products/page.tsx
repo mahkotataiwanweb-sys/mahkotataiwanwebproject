@@ -351,7 +351,7 @@ export default function ProductsPage() {
             />
             <ImageUpload
               label="Detail Image"
-              description="Large product detail / showcase card"
+              description="Recommended: 400×400 px, aspect ratio 1:1 (square)."
               value={form.detail_image_url}
               onChange={(url) => setForm((p) => ({ ...p, detail_image_url: url }))}
               folder="products/detail"
