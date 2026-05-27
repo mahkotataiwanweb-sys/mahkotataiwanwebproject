@@ -835,42 +835,34 @@ select.admin-input { appearance: none; background-image: url("data:image/svg+xml
   font-size: 0.75rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--color-admin-muted);
-  background-color: var(--color-admin-surface-2);
-  border-bottom: 1px solid var(--color-admin-border);
+  color: #FFD700;
+  background-color: #DC2626;
+  border-bottom: 1px solid #B91C1C;
 }
 .admin-table tbody td {
   padding: 0.875rem 1rem;
-  border-bottom: 1px solid var(--color-admin-border);
-  color: var(--color-admin-ink);
+  border-bottom: 1px solid #E5E7EB;
+  color: #1E3A5F;
+  background-color: #FFFFFF;
   vertical-align: middle;
 }
 .admin-table tbody tr:hover td {
-  background-color: color-mix(in srgb, var(--color-admin-accent-soft) 60%, var(--color-admin-surface));
-}
-.admin-table tbody tr:nth-child(even) td {
-  background-color: color-mix(in srgb, var(--color-admin-surface-2) 60%, var(--color-admin-surface));
-}
-.admin-table tbody tr:nth-child(even):hover td {
-  background-color: color-mix(in srgb, var(--color-admin-accent-soft) 60%, var(--color-admin-surface-2));
+  background-color: #FEF2F2;
 }
 .admin-table tbody tr:last-child td { border-bottom: 0; }
 
 .dark .admin-table thead th {
-  color: var(--color-admin-muted-dark);
-  background-color: var(--color-admin-surface-2-dark);
-  border-color: var(--color-admin-border-dark);
+  color: #FFD700;
+  background-color: #DC2626;
+  border-color: #B91C1C;
 }
 .dark .admin-table tbody td {
-  color: var(--color-admin-ink-dark);
+  color: #CBD5E1;
+  background-color: var(--color-admin-surface-dark);
   border-color: var(--color-admin-border-dark);
 }
-.dark .admin-table tbody tr:nth-child(even) td {
-  background-color: color-mix(in srgb, var(--color-admin-surface-2-dark) 50%, var(--color-admin-surface-dark));
-}
-.dark .admin-table tbody tr:hover td,
-.dark .admin-table tbody tr:nth-child(even):hover td {
-  background-color: rgba(184, 134, 11, 0.08);
+.dark .admin-table tbody tr:hover td {
+  background-color: rgba(220, 38, 38, 0.08);
 }
 
 /* Badges & pills */
