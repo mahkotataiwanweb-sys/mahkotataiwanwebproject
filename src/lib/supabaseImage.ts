@@ -1,25 +1,34 @@
 /**
- * Wraps a Supabase Storage public URL with Supabase's image
- * transformation endpoint so the file is resized + recompressed at the
- * origin. Drastically reduces egress vs. serving the original.
+ * Returns the Supabase Storage public URL as-is.
  *
- *   Input :  https://<project>.supabase.co/storage/v1/object/public/media/foo.png
- *   Output:  https://<project>.supabase.co/storage/v1/render/image/public/media/foo.png?width=W&quality=Q
+ * Previously this function rewrote URLs to use Supabase's Image
+ * Transformation endpoint (/storage/v1/render/image/…) which requires
+ * a Pro plan.  On the Free plan those URLs return 403, causing hero
+ * images (and any other transformed images) to fail to load.
  *
- * If the URL is not a Supabase storage URL, or already a transformation
- * URL, returns it unchanged.
+ * Next.js <Image> already optimises remote images through /_next/image,
+ * so an additional transformation layer is unnecessary.  For raw <img>
+ * tags (GIFs, etc.) we simply serve the original file.
+ *
+ * If you upgrade to Supabase Pro in the future you can re-enable the
+ * transformation by uncommenting the block below.
  */
 export function supabaseImage(
   url: string | null | undefined,
-  opts: { width?: number; height?: number; quality?: number; resize?: 'cover' | 'contain' | 'fill' } = {},
+  _opts: { width?: number; height?: number; quality?: number; resize?: 'cover' | 'contain' | 'fill' } = {},
 ): string {
   if (!url) return '';
-  if (!url.includes('/storage/v1/object/public/')) return url;
-  const base = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-  const params = new URLSearchParams();
-  if (opts.width) params.set('width', String(opts.width));
-  if (opts.height) params.set('height', String(opts.height));
-  params.set('quality', String(opts.quality ?? 75));
-  if (opts.resize) params.set('resize', opts.resize);
-  return `${base}?${params.toString()}`;
+
+  // --- Free-plan safe: return the public URL unchanged ---
+  return url;
+
+  // --- Uncomment below if you upgrade to Supabase Pro ---
+  // if (!url.includes('/storage/v1/object/public/')) return url;
+  // const base = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+  // const params = new URLSearchParams();
+  // if (_opts.width) params.set('width', String(_opts.width));
+  // if (_opts.height) params.set('height', String(_opts.height));
+  // params.set('quality', String(_opts.quality ?? 75));
+  // if (_opts.resize) params.set('resize', _opts.resize);
+  // return `${base}?${params.toString()}`;
 }
