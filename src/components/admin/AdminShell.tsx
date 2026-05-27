@@ -157,7 +157,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         <div className="px-5 pt-5 pb-3 flex items-center justify-between">
           <Link href="/admin" className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[var(--color-admin-accent)] to-[#FACC15] flex items-center justify-center shadow-lg">
-              <Image src="/images/logo.png" alt="Logo" width={22} height={22} className="brightness-0" />
+              <Image src="/images/logo-light.png" alt="Logo" width={22} height={22} />
             </div>
             <div className="leading-tight">
               <p className="font-heading text-[15px] font-bold text-white tracking-tight">Mahkota Taiwan</p>

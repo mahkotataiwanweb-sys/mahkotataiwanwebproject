@@ -31,11 +31,7 @@ interface ShowcaseProduct {
   name: string;
   name_zh: string;
   name_id: string;
-  description_en: string;
-  description_id: string;
-  description_zh: string;
   image_url: string | null;
-  detail_image_url: string | null;
   sort_order: number;
   is_active: boolean;
 }
@@ -52,9 +48,7 @@ interface FormState {
   id?: string;
   category: string;
   name: MultilingualValue;
-  description: MultilingualValue;
   image_url: string;
-  detail_image_url: string;
   sort_order: number;
   is_active: boolean;
 }
@@ -62,9 +56,7 @@ interface FormState {
 const emptyForm = (): FormState => ({
   category: 'abon-sapi',
   name: emptyMultilingual(),
-  description: emptyMultilingual(),
   image_url: '',
-  detail_image_url: '',
   sort_order: 0,
   is_active: true,
 });
@@ -115,9 +107,7 @@ export default function ShowcaseProductsAdmin() {
       id: p.id,
       category: p.category,
       name: { en: p.name || '', id: p.name_id || '', zh: p.name_zh || '' },
-      description: { en: p.description_en || '', id: p.description_id || '', zh: p.description_zh || '' },
       image_url: p.image_url || '',
-      detail_image_url: p.detail_image_url || '',
       sort_order: p.sort_order,
       is_active: p.is_active,
     });
@@ -136,11 +126,7 @@ export default function ShowcaseProductsAdmin() {
         name: form.name.en,
         name_id: form.name.id,
         name_zh: form.name.zh,
-        description_en: form.description.en,
-        description_id: form.description.id,
-        description_zh: form.description.zh,
         image_url: form.image_url || null,
-        detail_image_url: form.detail_image_url || null,
         sort_order: form.sort_order,
         is_active: form.is_active,
       };
@@ -297,9 +283,8 @@ export default function ShowcaseProductsAdmin() {
             <TranslateAllButton
               fields={[
                 { base: 'name', values: form.name, context: 'product name' },
-                { base: 'description', values: form.description, context: 'product description' },
               ]}
-              onUpdate={(u) => setForm((p) => ({ ...p, name: u.name || p.name, description: u.description || p.description }))}
+              onUpdate={(u) => setForm((p) => ({ ...p, name: u.name || p.name }))}
             />
             <AdminButton variant="ghost" onClick={() => setShowModal(false)}>Cancel</AdminButton>
             <AdminButton variant="primary" loading={saving} onClick={handleSave}>{form.id ? 'Save changes' : 'Create'}</AdminButton>
@@ -307,22 +292,13 @@ export default function ShowcaseProductsAdmin() {
         }
       >
         <div className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <ImageUpload
-              label="Card Image"
-              description="Transparent PNG recommended"
-              value={form.image_url}
-              onChange={(url) => setForm((p) => ({ ...p, image_url: url }))}
-              folder="showcase-products"
-            />
-            <ImageUpload
-              label="Detail Image"
-              description="Big card / product detail"
-              value={form.detail_image_url}
-              onChange={(url) => setForm((p) => ({ ...p, detail_image_url: url }))}
-              folder="showcase-products/detail"
-            />
-          </div>
+          <ImageUpload
+            label="Product Image"
+            description="Transparent PNG recommended"
+            value={form.image_url}
+            onChange={(url) => setForm((p) => ({ ...p, image_url: url }))}
+            folder="showcase-products"
+          />
 
           <div>
             <AdminLabel>Category</AdminLabel>
@@ -339,15 +315,6 @@ export default function ShowcaseProductsAdmin() {
             values={form.name}
             onChange={(values) => setForm((p) => ({ ...p, name: values }))}
             context="product name"
-          />
-
-          <MultilingualField
-            label="Description"
-            multiline
-            rows={3}
-            values={form.description}
-            onChange={(values) => setForm((p) => ({ ...p, description: values }))}
-            context="product description"
           />
 
           <div className="flex flex-wrap items-center gap-6">
