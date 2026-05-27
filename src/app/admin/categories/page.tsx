@@ -287,6 +287,7 @@ export default function CategoriesPage() {
 
           <ImageUpload
             label="Image"
+            description="Recommended: 240×240 px, aspect ratio 1:1 (square)."
             value={form.image_url}
             onChange={(url) => setForm((p) => ({ ...p, image_url: url }))}
             folder="categories"

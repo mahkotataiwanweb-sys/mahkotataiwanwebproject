@@ -19,6 +19,9 @@ export async function POST(request: NextRequest) {
   const { error } = await admin.storage.from('media').upload(fileName, buffer, {
     contentType: file.type,
     upsert: false,
+    // 1 year browser + CDN cache. Filenames include a timestamp + random
+    // slug so a new upload always lands on a new URL — immutable is safe.
+    cacheControl: '31536000',
   });
 
   if (error) {
