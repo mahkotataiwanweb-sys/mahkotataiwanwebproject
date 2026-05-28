@@ -26,13 +26,13 @@
     "mission": "Misi kami adalah menjembatani budaya melalui makanan, menyediakan produk Indonesia berkualitas tinggi dengan distribusi yang andal di seluruh Taiwan.",
     "stats": {
       "since": "Didirikan",
-      "sinceValue": "2019",
+      "sinceValue": "2021",
       "stores": "Toko Mitra",
-      "storesValue": "500+",
+      "storesValue": "300+",
       "products": "Produk",
-      "productsValue": "1000+",
+      "productsValue": "26",
       "customers": "Pelanggan Puas",
-      "customersValue": "50.000+"
+      "customersValue": "1M+"
     },
     "label": "Siapa Kami",
     "highlight1": "Produk bersertifikat Halal menjamin kualitas dan kepercayaan",
@@ -337,6 +337,7 @@
         "answer": "Tentu saja! Kami menyambut saran produk dari komunitas kami. Silakan hubungi kami melalui email atau saluran media sosial kami dengan detail produk, dan kami akan berusaha sebaik mungkin untuk mendapatkannya untuk Anda."
       }
     },
+    "faqCount": "5",
     "faq1Question": "Bagaimana cara saya memesan produk Mahkota Taiwan?",
     "faq1Answer": "Anda dapat memesan produk kami melalui salah satu dari 300+ toko mitra kami di seluruh Taiwan. Periksa lokator toko kami untuk menemukan lokasi terdekat, atau hubungi kami langsung untuk pesanan dalam jumlah besar.",
     "faq2Question": "Apakah Anda menawarkan layanan pengiriman?",

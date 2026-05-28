@@ -189,12 +189,22 @@ const yellowMid = pol(hToA(11), YELLOW_ARC_R);
 
 const faqIcons = [ShoppingBag, Truck, Handshake, Package, Users];
 
+// FAQ count is editable via the 'faqCount' content key (default 5). Each
+// item reads faq{n}Question / faq{n}Answer, so admins add or remove a FAQ by
+// bumping faqCount and filling the matching question/answer rows. Items
+// whose question is empty (or still the raw key) are skipped, so a higher
+// count with blank rows won't render empty cards.
 function useFaqs(t: (key: string) => string) {
-  return faqIcons.map((icon, i) => ({
-    icon,
-    question: t(`faq${i + 1}Question`),
-    answer: t(`faq${i + 1}Answer`),
-  }));
+  const rawCount = parseInt(t('faqCount'), 10);
+  const count = Number.isFinite(rawCount) && rawCount > 0 ? Math.min(rawCount, 20) : faqIcons.length;
+  const out: { icon: any; question: string; answer: string }[] = [];
+  for (let i = 1; i <= count; i++) {
+    const question = t(`faq${i}Question`);
+    const answer = t(`faq${i}Answer`);
+    if (!question || question === `faq${i}Question`) continue;
+    out.push({ icon: faqIcons[(i - 1) % faqIcons.length], question, answer });
+  }
+  return out;
 }
 
 function FAQItem({ faq, index }: { faq: { icon: any; question: string; answer: string }; index: number }) {

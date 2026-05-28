@@ -26,13 +26,13 @@
     "mission": "Our mission is to bridge cultures through food, providing high-quality Indonesian products with reliable distribution across Taiwan.",
     "stats": {
       "since": "Established",
-      "sinceValue": "2019",
+      "sinceValue": "2021",
       "stores": "Partner Stores",
-      "storesValue": "500+",
+      "storesValue": "300+",
       "products": "Products",
-      "productsValue": "1000+",
+      "productsValue": "26",
       "customers": "Happy Customers",
-      "customersValue": "50,000+"
+      "customersValue": "1M+"
     },
     "label": "Who We Are",
     "highlight1": "Halal certified products ensuring quality and trust",
@@ -337,6 +337,7 @@
         "answer": "Absolutely! We welcome product suggestions from our community. Please reach out via email or our social media channels with the product details, and we'll do our best to source it for you."
       }
     },
+    "faqCount": "5",
     "faq1Question": "How can I order Mahkota Taiwan products?",
     "faq1Answer": "You can order our products through any of our 300+ partner stores across Taiwan. Check our store locator to find the nearest location, or contact us directly for bulk orders.",
     "faq2Question": "Do you offer delivery services?",
