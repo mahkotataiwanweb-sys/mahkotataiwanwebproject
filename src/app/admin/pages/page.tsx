@@ -348,19 +348,6 @@ export default function PagesEditorPage() {
                         context={`${activePage} ${it.section} ${it.key}`}
                       />
                     )}
-
-                    {/* Optional image alongside text content */}
-                    {it.content_type !== 'image' && (
-                      <div className="mt-3">
-                        <ImageUpload
-                          label="Optional image"
-                          value={it.image_url}
-                          onChange={(url) => updateItem(it.id, { image_url: url || null })}
-                          folder={`page-content/${activePage}`}
-                          variant="square"
-                        />
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
