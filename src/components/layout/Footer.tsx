@@ -460,9 +460,6 @@ export default function Footer() {
           <p className="text-cream/40 text-xs md:text-sm text-center">
             &copy; {new Date().getFullYear()} Mahkota Taiwan. {t('allRightsReserved')}
           </p>
-          <p className="text-cream/30 text-xs md:text-sm text-center">
-            {t('tagline')}
-          </p>
         </div>
       </div>
     </footer>
