@@ -149,26 +149,26 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       {/* Sidebar */}
       <aside
         className={cn(
-          'admin-sidebar fixed inset-y-0 left-0 z-40 w-72 flex flex-col transition-transform duration-300 lg:translate-x-0',
+          'admin-sidebar fixed inset-y-0 left-0 z-40 w-72 flex flex-col transition-transform duration-300',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
         {/* Brand */}
         <div className="px-5 pt-5 pb-3 flex items-center justify-between">
           <Link href="/admin" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[var(--color-admin-accent)] to-[#FACC15] flex items-center justify-center shadow-lg">
-              <Image src="/images/logo-light.png" alt="Logo" width={22} height={22} />
+            <div className="w-9 h-9 flex items-center justify-center">
+              <Image src="/images/logo-light.png" alt="Logo" width={36} height={36} className="brightness-0 invert" />
             </div>
             <div className="leading-tight">
               <p className="font-heading text-[15px] font-bold text-white tracking-tight">Mahkota Taiwan</p>
               <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--color-admin-sidebar-muted)]">
-                CMS Console <span className="ml-1 px-1 py-0.5 rounded bg-[var(--color-admin-accent)] text-[#1A1308] text-[8px] font-bold">v2</span>
+                CMS Console
               </p>
             </div>
           </Link>
           <button
             type="button"
-            className="lg:hidden admin-btn-icon !text-white/70"
+            className="admin-btn-icon !text-white/70"
             onClick={() => setSidebarOpen(false)}
             aria-label="Close sidebar"
           >
@@ -240,19 +240,19 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         <button
           type="button"
           aria-label="Close menu"
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 lg:hidden"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Main column */}
-      <div className="flex-1 lg:ml-72 min-w-0 flex flex-col">
+      <div className="flex-1 min-w-0 flex flex-col">
         {/* Topbar */}
         <header className="sticky top-0 z-20 backdrop-blur-md bg-[color-mix(in_srgb,var(--color-admin-bg)_85%,transparent)] dark:bg-[color-mix(in_srgb,var(--color-admin-bg-dark)_85%,transparent)] border-b border-[var(--color-admin-border)] dark:border-[var(--color-admin-border-dark)]">
           <div className="px-4 sm:px-8 h-14 flex items-center gap-3">
             <button
               type="button"
-              className="lg:hidden admin-btn-icon"
+              className="admin-btn-icon"
               onClick={() => setSidebarOpen(true)}
               aria-label="Open sidebar"
             >
