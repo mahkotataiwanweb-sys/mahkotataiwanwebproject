@@ -239,8 +239,8 @@ export default function PagesEditorPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Page Content"
-        subtitle="Edit konten per halaman website (about, contact, dll.)"
+        title="Site Content"
+        subtitle="Edit konten setiap halaman website — pilih halaman, lalu edit setiap section di bawah."
         actions={
           <>
             <AdminButton variant="ghost" onClick={syncFromTranslations} disabled={syncing}>
@@ -261,21 +261,26 @@ export default function PagesEditorPage() {
         }
       />
 
-      <div className="flex flex-wrap gap-2 admin-surface p-2">
-        {PAGES.map((p) => (
-          <button
-            key={p.value}
-            onClick={() => setActivePage(p.value)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${
-              activePage === p.value
-                ? 'bg-[var(--color-admin-ink)] text-white dark:bg-[var(--color-admin-accent)] dark:text-[#1A1308]'
-                : 'text-[var(--color-admin-muted)] hover:bg-[var(--color-admin-surface-2)] dark:hover:bg-[var(--color-admin-surface-2-dark)]'
-            }`}
-          >
-            <Globe className="w-3 h-3 inline mr-1" />
-            {p.label}
-          </button>
-        ))}
+      {/* Page picker — clear hierarchy: pilih halaman dulu, lalu edit sections */}
+      <div className="admin-surface p-4">
+        <p className="text-[11px] uppercase tracking-[0.18em] font-bold text-[var(--color-admin-faint)] mb-3 flex items-center gap-1.5">
+          <Globe className="w-3 h-3" /> Pilih Halaman
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {PAGES.map((p) => (
+            <button
+              key={p.value}
+              onClick={() => setActivePage(p.value)}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all ${
+                activePage === p.value
+                  ? 'bg-[var(--color-admin-accent)] text-yellow-300 shadow-md'
+                  : 'bg-[var(--color-admin-surface-2)] dark:bg-[var(--color-admin-surface-2-dark)] text-[var(--color-admin-ink-2)] hover:bg-[var(--color-admin-border)]'
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {loading ? (
@@ -295,10 +300,18 @@ export default function PagesEditorPage() {
         <div className="space-y-6">
           {sections.map((section) => (
             <div key={section} className="admin-surface p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="font-heading text-base font-bold text-[var(--color-admin-ink)] dark:text-[var(--color-admin-ink-dark)]">
-                  {formatLabel(section)}
-                </h2>
+              <div className="flex items-center justify-between mb-5 pb-4 border-b border-[var(--color-admin-border)] dark:border-[var(--color-admin-border-dark)]">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.22em] font-bold text-[var(--color-admin-accent)] mb-1">
+                    Section
+                  </p>
+                  <h2 className="font-heading text-xl font-bold text-[var(--color-admin-ink)] dark:text-[var(--color-admin-ink-dark)]">
+                    {formatLabel(section)}
+                  </h2>
+                </div>
+                <span className="text-xs font-semibold text-[var(--color-admin-muted)]">
+                  {items.filter((it) => it.section === section).length} field{items.filter((it) => it.section === section).length === 1 ? '' : 's'}
+                </span>
               </div>
               <div className="space-y-4">
                 {items.filter((it) => it.section === section).map((it) => (
