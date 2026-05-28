@@ -282,7 +282,7 @@ function VideoCard({
 /* Main Component */
 export default function VideoShowcaseSection() {
   const locale = useLocale();
-  const t = useEditableT('hero');
+  const t = useEditableT('videoShowcase', 'home');
   const sectionRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -448,16 +448,16 @@ export default function VideoShowcaseSection() {
           <div className="inline-flex items-center gap-2 mb-3">
             <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
             <span className="text-white text-xs font-bold tracking-[0.3em] uppercase">
-              {t('visualContent')}
+              {t('video_showcase.label')}
             </span>
             <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
           </div>
           <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight mb-4">
-            {t('watchOurStories')}
+            {t('video_showcase.title')}
           </h2>
           <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-yellow-400 to-transparent mx-auto mb-6" />
           <p className="text-gray-100 max-w-2xl mx-auto text-base sm:text-lg">
-            {t('storyDescription')}
+            {t('video_showcase.subtitle')}
           </p>
         </motion.div>
 
