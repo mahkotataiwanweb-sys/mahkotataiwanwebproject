@@ -15,10 +15,7 @@
   "hero": {
     "tagline": "Rasa Indonesia, Hadir di Taiwan",
     "subtitle": "Sumber terpercaya untuk produk makanan Indonesia asli di Taiwan. Dari camilan favorit hingga bumbu masak esensial, kami membawa cita rasa rumah untuk Anda.",
-    "cta": "Jelajahi Produk",
-    "visualContent": "Konten Visual",
-    "watchOurStories": "Tonton Cerita Kami",
-    "storyDescription": "Temukan Mahkota Taiwan melalui konten video kami di YouTube, Shorts, TikTok, dan Reels."
+    "cta": "Jelajahi Produk"
   },
   "about": {
     "title": "Mahkota Taiwan",
@@ -218,9 +215,11 @@
     "fallbackExcerpt2": "Lihat bagaimana komunitas kami menikmati produk Mahkota Taiwan dalam kehidupan sehari-hari"
   },
   "videoShowcase": {
-    "label": "Konten Visual",
-    "title": "Tonton Kisah Kami",
-    "subtitle": "Temukan Mahkota Taiwan melalui konten video kami di YouTube, Shorts, TikTok, dan Reels.",
+    "video_showcase": {
+      "label": "Konten Visual",
+      "title": "Tonton Cerita Kami",
+      "subtitle": "Temukan Mahkota Taiwan melalui konten video kami di YouTube, Shorts, TikTok, dan Reels."
+    },
     "noVideos": "Belum ada video untuk kategori ini.",
     "showing": "Menampilkan",
     "video": "video",
