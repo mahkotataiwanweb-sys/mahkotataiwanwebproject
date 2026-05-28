@@ -929,9 +929,7 @@ export default function AboutPage() {
                       <Icon className="w-4 h-4 text-navy transition-colors duration-300" />
                     </div>
                     <div className="text-xl sm:text-2xl font-heading font-bold text-white mb-0.5">
-                      {stat.prefix}
-                      <span ref={(el) => { counterRefs.current[i] = el; }}>0</span>
-                      {stat.suffix}
+                      {t(`stats.${stat.key}Value`)}
                     </div>
                     <p className="text-white/80 text-[10px] sm:text-[11px] font-medium tracking-[0.12em] uppercase">{t(`stats.${stat.key}`)}</p>
                   </div>
