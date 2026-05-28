@@ -57,7 +57,7 @@ const NAV_GROUPS: NavGroup[] = [
     title: 'Homepage',
     items: [
       { href: '/admin/hero-slides', label: 'Hero Slides', icon: ImageIconLucide, description: 'Slider utama (image / video / gif)' },
-      { href: '/admin/content', label: 'Site Content', icon: FileText, description: 'Konten umum tiap section' },
+      { href: '/admin/pages', label: 'Site Content', icon: FileText, description: 'Edit konten setiap halaman & section' },
     ],
   },
   {
@@ -95,7 +95,6 @@ const NAV_GROUPS: NavGroup[] = [
     title: 'Pengaturan',
     items: [
       { href: '/admin/settings', label: 'Company Settings', icon: Settings, description: 'Profil perusahaan & social' },
-      { href: '/admin/pages', label: 'Page Content', icon: Globe, description: 'Konten per halaman (about/contact/dll)' },
     ],
   },
 ];
