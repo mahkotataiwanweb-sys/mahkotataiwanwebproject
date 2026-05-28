@@ -43,10 +43,6 @@ const PAGES = [
   { value: 'events', label: 'Events' },
   { value: 'activities', label: 'Activity' },
   { value: 'recipes', label: 'Recipes' },
-  { value: 'articles', label: 'Articles' },
-  { value: 'navbar', label: 'Navbar' },
-  { value: 'footer', label: 'Footer' },
-  { value: 'hero', label: 'Hero (homepage)' },
 ];
 
 const CONTENT_TYPES = ['text', 'textarea', 'richtext', 'number', 'image', 'link', 'email', 'phone'];
