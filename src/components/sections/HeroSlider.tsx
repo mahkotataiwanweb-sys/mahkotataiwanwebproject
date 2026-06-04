@@ -281,7 +281,7 @@ export default function HeroSlider() {
     return (
       <section
         id="hero"
-        className="relative w-full overflow-hidden mt-[72px] sm:mt-[88px] aspect-[3/4] sm:aspect-[10/5] bg-navy"
+        className="relative w-full overflow-hidden mt-[72px] sm:mt-[88px] aspect-[3/4] sm:aspect-[21/9] bg-navy"
       />
     );
   }
@@ -460,7 +460,7 @@ export default function HeroSlider() {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden mt-[72px] sm:mt-[88px] aspect-[3/4] sm:aspect-[10/5] sm:cursor-pointer"
+      className="relative w-full overflow-hidden mt-[72px] sm:mt-[88px] aspect-[3/4] sm:aspect-[21/9] sm:cursor-pointer"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onClick={() => {
