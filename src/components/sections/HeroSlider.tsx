@@ -441,7 +441,7 @@ export default function HeroSlider() {
           sizes="(max-width: 640px) 100vw, 0px"
           quality={70}
         />
-        {/* Desktop / tablet 10:5 image */}
+        {/* Desktop / tablet 21:9 image */}
         <Image
           src={supabaseImage(currentSlide.image_url, { width: 1920, quality: 75 })}
           alt={title}
