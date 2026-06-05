@@ -159,7 +159,7 @@ function TikTokPlayer({ videoId }: { videoId: string }) {
       <iframe
         src={`https://www.tiktok.com/embed/v2/${videoId}`}
         width="100%"
-        height="400"
+        height="600"
         frameBorder="0"
         allow="autoplay; encrypted-media"
         allowFullScreen
@@ -213,15 +213,13 @@ function VideoCard({
           ? 'overflow-hidden'
           : category === 'shorts'
           ? 'overflow-hidden cursor-pointer hover:shadow-xl'
-          : 'overflow-hidden cursor-pointer hover:shadow-xl'
+          : 'aspect-[9/16] overflow-hidden cursor-pointer hover:shadow-xl'
       }`}
       style={
         category === 'reels'
-          ? { height: '380px' }
+          ? { height: '485px' }
           : category === 'shorts'
-          ? { height: '340px' }
-          : category === 'tiktok'
-          ? { height: '380px' }
+          ? { height: '420px' }
           : {}
       }
       onClick={() => {
@@ -594,7 +592,7 @@ export default function VideoShowcaseSection() {
             {/* Videos Grid */}
             <div
               ref={scrollContainerRef}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
             >
               {categoryVideos.map((video) => (
                 <VideoCard
